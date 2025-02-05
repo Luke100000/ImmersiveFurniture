@@ -1,0 +1,12 @@
+{
+  "repair": {
+    "sounds": [
+      "immersive_furniture:repair_0",
+      "immersive_furniture:repair_1",
+      "immersive_furniture:repair_2",
+      "immersive_furniture:repair_3",
+      "immersive_furniture:repair_4",
+      "immersive_furniture:repair_5"
+    ]
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "CCC",
+    "CWC",
+    "CCC"
+  ],
+  "key": {
+    "W": [
+      {
+        "item": "minecraft:crafting_table"
+      }
+    ],
+    "C": [
+      {
+        "item": "minecraft:copper_ingot"
+      }
+    ]
+  },
+  "result": {
+    "item": "immersive_furniture:artisans_workstation"
+  }
+}

@@ -1,0 +1,35 @@
+modLoader = "javafml"
+loaderVersion = "[47,)"
+issueTrackerURL = "https://github.com/Luke100000/ImmersiveFurniture/issues"
+license = "GPL-3.0-only"
+
+[[mods]]
+modId = "immersive_furniture"
+version = "${version}"
+displayName = "Immersive Furniture"
+displayURL = "https://www.curseforge.com/minecraft/mc-mods/immersive-furniture"
+authors = "Luke100000"
+description = "Create custom and fancy furniture, deco, and objects in game or choose from a vast online library."
+logoFile = "icon.png"
+itemIcon = "immersive_furniture:biplane"
+
+[[dependencies.immersive_furniture]]
+modId = "minecraft"
+mandatory = true
+versionRange = "[1.20.1,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.immersive_furniture]]
+modId = "forge"
+mandatory = true
+versionRange = "[47,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.immersive_furniture]]
+modId = "ad_astra"
+mandatory = false
+versionRange = "[1.15.6,)"
+ordering = "NONE"
+side = "BOTH"
