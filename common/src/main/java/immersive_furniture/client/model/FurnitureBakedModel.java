@@ -1,7 +1,7 @@
-package immersive_furniture.data;
+package immersive_furniture.client.model;
 
 import immersive_furniture.Common;
-import immersive_furniture.block.FurnitureBlock;
+import immersive_furniture.data.FurnitureData;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.ItemOverrides;
 import net.minecraft.client.renderer.block.model.ItemTransforms;
@@ -21,7 +21,6 @@ public class FurnitureBakedModel implements BakedModel {
     private static final Material MISSING_TEXTURE = new Material(InventoryMenu.BLOCK_ATLAS, MissingTextureAtlasSprite.getLocation());
     public static final ResourceLocation LOCATION = Common.locate("block/furniture");
 
-
     static class ModelBakerImpl implements ModelBaker {
         ModelBakerImpl() {
         }
@@ -39,9 +38,16 @@ public class FurnitureBakedModel implements BakedModel {
         }
     }
 
-    public static BakedModel getModel(BlockState state) {
-        Integer value = state.getValue(FurnitureBlock.IDENTIFIER);
-        return FurnitureModel.getEmptyModel().bake(new ModelBakerImpl(), Material::sprite, BlockModelRotation.by(0, 0), LOCATION);
+    static ModelBakerImpl modelBaker = new ModelBakerImpl();
+
+    public static BakedModel getModel() {
+        // TODO: Cache
+        //Integer value = state.getValue(FurnitureBlock.IDENTIFIER);
+        FurnitureData data = FurnitureData.EMPTY;
+        return FurnitureModelFactory.getModel(data, DynamicAtlas.ENTITY).bake(modelBaker, material -> {
+            // return material.sprite(); // TODO: Here, use the full atlas sprite when in entity mode
+            return DynamicAtlas.ENTITY.sprite;
+        }, BlockModelRotation.by(0, 0), LOCATION);
     }
 
     @Override

@@ -33,7 +33,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
 public class FurnitureBlock extends BaseEntityBlock implements SimpleWaterloggedBlock {
-    protected static final VoxelShape SHAPE = Block.box(0.0, 0.0, 0.0, 16.0, 7.0, 16.0);
+    protected static final VoxelShape SHAPE = Block.box(2.0, 2.0, 2.0, 14.0, 14.0, 14.0);
 
     public static final IntegerProperty IDENTIFIER = IntegerProperty.create("identifier", 0, 1023);
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
@@ -99,7 +99,9 @@ public class FurnitureBlock extends BaseEntityBlock implements SimpleWaterlogged
 
     @Override
     public RenderShape getRenderShape(BlockState state) {
-        return RenderShape.MODEL;
+        // return RenderShape.MODEL;
+        // TODO: Maybe use two different blocks (Dynamic and Baked)?
+        return RenderShape.ENTITYBLOCK_ANIMATED;
     }
 
     @Override

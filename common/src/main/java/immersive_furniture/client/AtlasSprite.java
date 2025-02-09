@@ -28,6 +28,7 @@ public class AtlasSprite {
         @Override
         public void tickAndUpload(int x, int y) {
             spriteContentsAccessor.getMipLevelData()[0].fillRect(x, y, spriteContents.width(), spriteContents.height(), random.nextInt());
+            // TODO: MipmapGenerator.generateMipmaps(spriteContentsAccessor.getMipLevelData());
             upload(x, y, spriteContentsAccessor.getMipLevelData());
         }
 
