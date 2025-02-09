@@ -9,6 +9,9 @@ public final class Common {
     public static String MOD_LOADER = "unknown";
     public static NetworkManager networkManager;
 
+    public static ClientHandler clientHandler = new ClientHandler() {
+    };
+
     public static ResourceLocation locate(String path) {
         return new ResourceLocation(MOD_ID, path);
     }

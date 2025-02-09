@@ -3,6 +3,7 @@ package immersive_furniture;
 import immersive_furniture.cobalt.registration.Registration;
 import immersive_furniture.item.FurnitureItem;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
@@ -13,8 +14,8 @@ import java.util.function.Supplier;
 public interface Items {
     List<Supplier<Item>> items = new LinkedList<>();
 
-    Supplier<Item> ARTISANS_WORKSTATION = register("artisans_workstation", () -> new Item(baseProps().stacksTo(64)));
-    Supplier<Item> FURNITURE = register("furniture", () -> new FurnitureItem(baseProps().stacksTo(64)));
+    Supplier<Item> ARTISANS_WORKSTATION = register("artisans_workstation", () -> new BlockItem(Blocks.ARTISANS_WORKSTATION.get(), baseProps()));
+    Supplier<Item> FURNITURE = register("furniture", () -> new FurnitureItem(baseProps()));
 
     static Supplier<Item> register(String name, Supplier<Item> item) {
         Supplier<Item> register = Registration.register(BuiltInRegistries.ITEM, Common.locate(name), item);
