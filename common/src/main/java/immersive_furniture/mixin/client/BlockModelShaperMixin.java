@@ -1,7 +1,8 @@
 package immersive_furniture.mixin.client;
 
 import immersive_furniture.block.FurnitureBlock;
-import immersive_furniture.client.model.FurnitureBakedModel;
+import immersive_furniture.client.model.FurnitureModelBaker;
+import immersive_furniture.data.FurnitureData;
 import net.minecraft.client.renderer.block.BlockModelShaper;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.world.level.block.state.BlockState;
@@ -15,7 +16,7 @@ public class BlockModelShaperMixin {
     @Inject(method = "getBlockModel(Lnet/minecraft/world/level/block/state/BlockState;)Lnet/minecraft/client/resources/model/BakedModel;", at = @At("HEAD"), cancellable = true)
     private void immersiveFuture$getBlockModel(BlockState state, CallbackInfoReturnable<BakedModel> cir) {
         if (state.getBlock() instanceof FurnitureBlock) {
-            cir.setReturnValue(FurnitureBakedModel.getModel());
+            cir.setReturnValue(FurnitureModelBaker.getModel(FurnitureData.EMPTY));
         }
     }
 }

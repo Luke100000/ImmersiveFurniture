@@ -1,6 +1,6 @@
 package immersive_furniture.mixin.client;
 
-import immersive_furniture.client.model.FurnitureBakedModel;
+import immersive_furniture.client.model.FurnitureModelBaker;
 import immersive_furniture.item.FurnitureItem;
 import net.minecraft.client.renderer.ItemModelShaper;
 import net.minecraft.client.resources.model.BakedModel;
@@ -15,7 +15,7 @@ public class ItemModelShaperMixin {
     @Inject(method = "getItemModel(Lnet/minecraft/world/item/ItemStack;)Lnet/minecraft/client/resources/model/BakedModel;", at = @At("HEAD"), cancellable = true)
     private void immersiveFuture$getItemModel(ItemStack stack, CallbackInfoReturnable<BakedModel> cir) {
         if (stack.getItem() instanceof FurnitureItem) {
-            cir.setReturnValue(FurnitureBakedModel.getModel());
+            cir.setReturnValue(FurnitureModelBaker.getModel(FurnitureItem.getData(stack)));
         }
     }
 }

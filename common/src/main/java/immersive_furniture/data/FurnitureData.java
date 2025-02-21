@@ -6,6 +6,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import org.joml.Vector3f;
+import org.joml.Vector3i;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -46,6 +47,14 @@ public class FurnitureData {
         public Direction.Axis axis = Direction.Axis.X;
         public float rotation = 0.0f;
         public Material material = new Material();
+
+        public Vector3i getSize() {
+            return new Vector3i(
+                    Math.abs((int) (to.x - from.x)),
+                    Math.abs((int) (to.y - from.y)),
+                    Math.abs((int) (to.z - from.z))
+            );
+        }
     }
 
     public static class Material {

@@ -17,8 +17,6 @@ import java.util.List;
 import java.util.Map;
 
 public class FurnitureModelFactory {
-    private static final Vector3f ORIGIN = new Vector3f(0, 0, 0);
-
     private static final Map<@NotNull String, @NotNull Either<Material, String>> TEXTURE_MAP = Map.of(
             "0", Either.left(new Material(InventoryMenu.BLOCK_ATLAS, Common.locate("block/furniture")))
     );
@@ -54,7 +52,7 @@ public class FurnitureModelFactory {
         for (int x = 0; x < dimensions.x; x++) {
             for (int y = 0; y < dimensions.y; y++) {
                 Vector3i pos = ModelUtils.to3D(element, direction, x, y);
-                int color = TextureSource.fromCube(element, direction, x, y, dimensions.x, dimensions.y);
+                int color = MaterialSource.fromCube(element, direction, x, y, dimensions.x, dimensions.y);
                 pixels.setPixelRGBA(quad.x() + x, quad.y() + y, color);
             }
         }
@@ -90,7 +88,11 @@ public class FurnitureModelFactory {
                         Direction.EAST, getEmptyFace(element, Direction.EAST)
                 ),
                 new BlockElementRotation(
-                        ORIGIN,
+                        new Vector3f(
+                                (element.from.x + element.to.x) / 2.0f,
+                                (element.from.y + element.to.y) / 2.0f,
+                                (element.from.z + element.to.z) / 2.0f
+                        ),
                         element.axis,
                         element.rotation,
                         false

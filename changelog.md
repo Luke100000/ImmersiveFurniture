@@ -85,7 +85,6 @@ A 3D position is mapped to a 2D texture coordinate and sprite.
 An additional offset controls either the inner part, or the whole part for repeat mode.
 An additional margin controls the margin for expand mode, default 4px.
 
-
 ## Volumes
 
 Generate (sometimes lazy) volumes to be used by effects.
@@ -95,3 +94,29 @@ Generate (sometimes lazy) volumes to be used by effects.
 * Rain (Floodfill with flow, simulating water damage)
 * Edge (Similar like AO, but with smaller kernel, detecting edges and corners)
 * Noise (Multi octave and seeded)
+
+## Workflow
+
+* Model
+    * Transformation tools and rotation settings
+    * Per-element settings including particle effects and co
+    * Material type override (auto, iron, wood, ...)
+    * Copy material, paste material
+    * Element type
+* Materials
+    * A block model lookup with a search
+    * Favorite to always show on top
+* Material shapes
+    * Nails, bordered, ...
+    * Uses a luminance + albedo overlay texture
+* Material effects as sliders
+    * Age, moss, rust, dirt, burned, ...
+* Particle emitter settings
+    * Particle selection
+    * Speed and jitter
+    * Size, velocity, ...
+* Inventory settings
+* Sounds
+* Global settings
+
+Left the settings, right the element list

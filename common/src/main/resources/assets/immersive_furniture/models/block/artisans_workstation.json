@@ -3,8 +3,8 @@
 	"parent": "block/block",
 	"texture_size": [64, 64],
 	"textures": {
-		"0": "immersive_furniture/block/artisans_workstation",
-		"particle": "immersive_furniture/block/artisans_workstation"
+		"0": "immersive_furniture:block/artisans_workstation",
+		"particle": "immersive_furniture:block/artisans_workstation"
 	},
 	"elements": [
 		{

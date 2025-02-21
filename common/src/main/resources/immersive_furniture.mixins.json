@@ -9,7 +9,7 @@
     "defaultRequire": 1
   },
   "client": [
-    "client.BlockModelShaperMixin", "client.ItemModelShaperMixin", "client.SpriteContentsAccessor",
-    "client.SpriteContentsMixin"
+    "client.BlockModelAccessor", "client.BlockModelShaperMixin", "client.ItemModelShaperMixin",
+    "client.ModelBakeryMixin", "client.SpriteContentsAccessor", "client.SpriteContentsMixin"
   ]
 }

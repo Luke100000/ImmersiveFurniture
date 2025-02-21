@@ -2,5 +2,17 @@
   "itemGroup.immersive_furniture.immersive_furniture_tab": "Immersive Furniture",
 
   "block.immersive_furniture.artisans_workstation": "Artisan's Workstation",
-  "item.immersive_furniture.artisans_workstation": "Artisan's Workstation"
+  "item.immersive_furniture.artisans_workstation": "Artisan's Workstation",
+
+  "gui.immersive_furniture.select": "Select a element",
+  "gui.immersive_furniture.position": "Position",
+  "gui.immersive_furniture.size": "Size",
+  "gui.immersive_furniture.rotation": "Rotation",
+
+  "gui.immersive_furniture.tab.model": "Model",
+  "gui.immersive_furniture.tab.materials": "Materials",
+  "gui.immersive_furniture.tab.shapes": "Shapes",
+  "gui.immersive_furniture.tab.effects": "Effects",
+  "gui.immersive_furniture.tab.inventory": "Inventory",
+  "gui.immersive_furniture.tab.settings": "Settings"
 }
