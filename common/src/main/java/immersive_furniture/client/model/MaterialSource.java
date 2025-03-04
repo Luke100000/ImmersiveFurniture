@@ -11,6 +11,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.InventoryMenu;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 
 public record MaterialSource(
@@ -23,6 +24,15 @@ public record MaterialSource(
         Material east
 ) {
     public static final ResourceLocation MISSING = new ResourceLocation("minecraft:missingno");
+    public static final MaterialSource DEFAULT = new MaterialSource(
+            new ResourceLocation("minecraft:oak_log"),
+            new Material(InventoryMenu.BLOCK_ATLAS, new ResourceLocation("minecraft:block/oak_log_top")),
+            new Material(InventoryMenu.BLOCK_ATLAS, new ResourceLocation("minecraft:block/oak_log_top")),
+            new Material(InventoryMenu.BLOCK_ATLAS, new ResourceLocation("minecraft:block/oak_log")),
+            new Material(InventoryMenu.BLOCK_ATLAS, new ResourceLocation("minecraft:block/oak_log")),
+            new Material(InventoryMenu.BLOCK_ATLAS, new ResourceLocation("minecraft:block/oak_log")),
+            new Material(InventoryMenu.BLOCK_ATLAS, new ResourceLocation("minecraft:block/oak_log"))
+    );
 
     public NativeImage get(Direction direction) {
         return getImage(getMaterial(direction).sprite());
@@ -44,7 +54,9 @@ public record MaterialSource(
     }
 
     public Component name() {
-        return Component.translatable("block." + location.getNamespace() + "." + location.getPath());
+        String key = "block." + location.getNamespace() + "." + location.getPath();
+        String fallback = StringUtils.capitalize(location.getPath().replace("/", " ").replace("_", " "));
+        return Component.translatableWithFallback(key, fallback);
     }
 
     private static @Nullable Material getMaterial(ResourceLocation location) {
@@ -133,12 +145,8 @@ public record MaterialSource(
         }
     }
 
-    public static int fromCube(FurnitureData.Element element, Direction direction, int x, int y, int w, int h) {
-        FurnitureData.Material material = element.material;
-        MaterialSource data = create(material.texture);
-        if (data == null) return 0;
-
-        NativeImage texture = data.get(direction);
+    public static int fromCube(FurnitureData.Material material, Direction direction, int x, int y, int w, int h) {
+        NativeImage texture = material.source.get(direction);
 
         if (material.wrap == FurnitureData.WrapMode.EXPAND) {
             x = smartWrap(x, w, texture.getWidth(), material.margin);

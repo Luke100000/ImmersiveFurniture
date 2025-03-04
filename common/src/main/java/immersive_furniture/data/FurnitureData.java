@@ -1,5 +1,6 @@
 package immersive_furniture.data;
 
+import immersive_furniture.client.model.MaterialSource;
 import net.minecraft.client.resources.model.Material;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -42,7 +43,7 @@ public class FurnitureData {
     }
 
     public static class Element {
-        public Vector3f from = new Vector3f(2, 2, 2);
+        public Vector3f from = new Vector3f(2, 2, 2); // TODO: Enforce from < to
         public Vector3f to = new Vector3f(14, 14, 14);
         public Direction.Axis axis = Direction.Axis.X;
         public float rotation = 0.0f;
@@ -58,12 +59,7 @@ public class FurnitureData {
     }
 
     public static class Material {
-        public ResourceLocation texture = new ResourceLocation("minecraft:block/oak_log");
-
-        public int offsetX;
-        public int offsetY;
-        public int offsetZ;
-
+        public MaterialSource source = MaterialSource.DEFAULT;
         public int margin = 4;
         public WrapMode wrap = WrapMode.EXPAND;
     }

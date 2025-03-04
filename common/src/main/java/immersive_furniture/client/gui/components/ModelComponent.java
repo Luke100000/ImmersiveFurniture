@@ -1,10 +1,13 @@
 package immersive_furniture.client.gui.components;
 
 import immersive_furniture.client.gui.ArtisansWorkstationEditorScreen;
+import immersive_furniture.client.gui.widgets.StateImageButton;
+import immersive_furniture.data.FurnitureData;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.ImageButton;
+import net.minecraft.client.gui.narration.NarrationSupplier;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
@@ -22,6 +25,18 @@ public class ModelComponent extends ScreenComponent {
     static final Component FIELD_TITLE = Component.translatable("gui.immersive_furniture.field");
     static final Component FIELD_HINT = Component.translatable("gui.immersive_furniture.field_hint").withStyle(ChatFormatting.ITALIC).withStyle(ChatFormatting.GRAY);
 
+    private EditBox px;
+    private EditBox py;
+    private EditBox pz;
+
+    private EditBox sx;
+    private EditBox sy;
+    private EditBox sz;
+
+    private StateImageButton rx;
+    private StateImageButton ry;
+    private StateImageButton rz;
+
     public ModelComponent(ArtisansWorkstationEditorScreen screen) {
         super(screen);
     }
@@ -32,32 +47,36 @@ public class ModelComponent extends ScreenComponent {
 
         // New
         addButton(leftPos + 6, topPos + height - 22, 16, 64, 96, () -> {
-
+            screen.selectedElement = new FurnitureData.Element();
+            screen.data.elements.add(screen.selectedElement);
+            screen.init();
         });
 
         if (screen.selectedElement == null) return;
 
         // Delete
         addButton(leftPos + 24, topPos + height - 22, 16, 80, 96, () -> {
-
+            screen.data.elements.remove(screen.selectedElement);
+            screen.selectedElement = null;
+            screen.init();
         });
 
         // Position
-        EditBox px = addNewFloatBox(leftPos + 6, topPos + 17, 24);
+        px = addNewFloatBox(leftPos + 6, topPos + 17, 28);
         px.setValue(Float.toString(screen.selectedElement.from.x));
         px.setResponder(b -> {
             float offset = parse(px.getValue(), screen.selectedElement.from.x) - screen.selectedElement.from.x;
             screen.selectedElement.from.x += offset;
             screen.selectedElement.to.x += offset;
         });
-        EditBox py = addNewFloatBox(leftPos + 6 + 28, topPos + 17, 24);
+        py = addNewFloatBox(leftPos + 6 + 30, topPos + 17, 28);
         py.setValue(Float.toString(screen.selectedElement.from.y));
         py.setResponder(b -> {
             float offset = parse(py.getValue(), screen.selectedElement.from.y) - screen.selectedElement.from.y;
             screen.selectedElement.from.y += offset;
             screen.selectedElement.to.y += offset;
         });
-        EditBox pz = addNewFloatBox(leftPos + 6 + 28 * 2, topPos + 17, 24);
+        pz = addNewFloatBox(leftPos + 6 + 30 * 2, topPos + 17, 28);
         pz.setValue(Float.toString(screen.selectedElement.from.z));
         pz.setResponder(b -> {
             float offset = parse(pz.getValue(), screen.selectedElement.from.z) - screen.selectedElement.from.z;
@@ -67,52 +86,76 @@ public class ModelComponent extends ScreenComponent {
 
         // Size
         Vector3i size = screen.selectedElement.getSize();
-        EditBox sx = addNewFloatBox(leftPos + 6, topPos + 47, 24);
+        sx = addNewFloatBox(leftPos + 6, topPos + 47, 24);
         sx.setValue(String.valueOf(size.x));
         sx.setResponder(b -> {
             int oldSize = screen.selectedElement.getSize().x;
-            int newSize = Integer.getInteger(sx.getValue(), oldSize);
+            int newSize = Math.max(0, parse(sx.getValue(), oldSize));
             screen.selectedElement.from.x -= (newSize - oldSize) / 2.0f;
             screen.selectedElement.to.x += (newSize - oldSize) / 2.0f;
         });
-        EditBox sy = addNewFloatBox(leftPos + 6 + 26, topPos + 47, 24);
+        sy = addNewFloatBox(leftPos + 6 + 30, topPos + 47, 28);
         sy.setValue(String.valueOf(size.y));
         sy.setResponder(b -> {
             int oldSize = screen.selectedElement.getSize().y;
-            int newSize = Integer.getInteger(sy.getValue(), oldSize);
+            int newSize = Math.max(0, parse(sx.getValue(), oldSize));
             screen.selectedElement.from.y -= (newSize - oldSize) / 2.0f;
             screen.selectedElement.to.y += (newSize - oldSize) / 2.0f;
         });
-        EditBox sz = addNewFloatBox(leftPos + 6 + 26 * 2, topPos + 47, 24);
+        sz = addNewFloatBox(leftPos + 6 + 30 * 2, topPos + 47, 28);
         sz.setValue(String.valueOf(size.z));
         sz.setResponder(b -> {
             int oldSize = screen.selectedElement.getSize().z;
-            int newSize = Integer.getInteger(sz.getValue(), oldSize);
+            int newSize = Math.max(0, parse(sx.getValue(), oldSize));
             screen.selectedElement.from.z -= (newSize - oldSize) / 2.0f;
             screen.selectedElement.to.z += (newSize - oldSize) / 2.0f;
         });
 
         // Rotation
-        addButton(leftPos + 6, topPos + 77, 16, 16, 96, () -> {
+        rx = addButton(leftPos + 6, topPos + 77, 16, 16, 96, () -> {
             screen.selectedElement.axis = Direction.Axis.X;
+            rx.setEnabled(true);
+            ry.setEnabled(false);
+            rz.setEnabled(false);
         });
-        addButton(leftPos + 24, topPos + 77, 16, 32, 96, () -> {
+        ry = addButton(leftPos + 24, topPos + 77, 16, 32, 96, () -> {
             screen.selectedElement.axis = Direction.Axis.Y;
+            rx.setEnabled(false);
+            ry.setEnabled(true);
+            rz.setEnabled(false);
         });
-        addButton(leftPos + 42, topPos + 77, 16, 48, 96, () -> {
+        rz = addButton(leftPos + 42, topPos + 77, 16, 48, 96, () -> {
             screen.selectedElement.axis = Direction.Axis.Z;
+            rx.setEnabled(false);
+            ry.setEnabled(false);
+            rz.setEnabled(true);
         });
-        addButton(leftPos + 64, topPos + 78, 14, 26, 228, () -> {
-            screen.selectedElement.rotation = (screen.selectedElement.rotation + 22.5f) % 360;
-        });
-        addButton(leftPos + 80, topPos + 78, 14, 41, 228, () -> {
-            screen.selectedElement.rotation = (screen.selectedElement.rotation - 22.5f) % 360;
-        });
+        addButton(leftPos + 62, topPos + 78, 14, 26, 228, () ->
+                screen.selectedElement.rotation = (screen.selectedElement.rotation + 22.5f) % 360);
+        addButton(leftPos + 78, topPos + 78, 14, 42, 228, () ->
+                screen.selectedElement.rotation = (screen.selectedElement.rotation - 22.5f) % 360);
     }
 
-    private ImageButton addButton(int x, int y, int size, int u, int v, Runnable clicked) {
+    public void update() {
+        if (screen.selectedElement == null) return;
+
+        px.setValue(Float.toString(screen.selectedElement.from.x));
+        py.setValue(Float.toString(screen.selectedElement.from.y));
+        pz.setValue(Float.toString(screen.selectedElement.from.z));
+
+        Vector3i size = screen.selectedElement.getSize();
+        sx.setValue(String.valueOf(size.x));
+        sy.setValue(String.valueOf(size.y));
+        sz.setValue(String.valueOf(size.z));
+
+        rx.setEnabled(screen.selectedElement.axis == Direction.Axis.X);
+        ry.setEnabled(screen.selectedElement.axis == Direction.Axis.Y);
+        rz.setEnabled(screen.selectedElement.axis == Direction.Axis.Z);
+    }
+
+    private StateImageButton addButton(int x, int y, int size, int u, int v, Runnable clicked) {
         return screen.addRenderableWidget(
-                new ImageButton(x, y, size, size, u, v, size, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE, b -> clicked.run())
+                new StateImageButton(x, y, size, size, u, v, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE, b -> clicked.run(), Component.literal(""))
         );
     }
 
@@ -127,6 +170,14 @@ public class ModelComponent extends ScreenComponent {
     public float parse(String value, float defaultValue) {
         try {
             return Float.parseFloat(value);
+        } catch (NumberFormatException e) {
+            return defaultValue;
+        }
+    }
+
+    public int parse(String value, int defaultValue) {
+        try {
+            return Integer.parseInt(value);
         } catch (NumberFormatException e) {
             return defaultValue;
         }

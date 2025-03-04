@@ -13,6 +13,6 @@
   "gui.immersive_furniture.tab.materials": "Materials",
   "gui.immersive_furniture.tab.shapes": "Shapes",
   "gui.immersive_furniture.tab.effects": "Effects",
-  "gui.immersive_furniture.tab.inventory": "Inventory",
-  "gui.immersive_furniture.tab.settings": "Settings"
+  "gui.immersive_furniture.tab.settings": "Settings",
+  "gui.immersive_furniture.tab.finish": "Finish"
 }

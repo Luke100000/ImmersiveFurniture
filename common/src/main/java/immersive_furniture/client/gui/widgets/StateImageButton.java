@@ -14,7 +14,7 @@ public class StateImageButton extends ImageButton {
 
     @Override
     public boolean isHoveredOrFocused() {
-        return super.isHoveredOrFocused() || enabled;
+        return super.isHoveredOrFocused() ^ isEnabled();
     }
 
     public boolean isEnabled() {

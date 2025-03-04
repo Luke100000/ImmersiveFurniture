@@ -53,7 +53,10 @@ public class MaterialsComponent extends ScreenComponent {
                         leftPos + 6 + x * 22, topPos + 24 + y * 22,
                         22, 22, 24, 48,
                         b -> {
-                            // TODO: Handle button press
+                            if (screen.selectedElement != null) {
+                                screen.selectedElement.material.source = ((MaterialButton)b).getMaterial();
+                                screen.init();
+                            }
                         }
                 );
                 materialButtons.add(button);

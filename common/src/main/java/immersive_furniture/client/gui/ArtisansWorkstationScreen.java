@@ -1,5 +1,6 @@
 package immersive_furniture.client.gui;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
@@ -20,14 +21,14 @@ import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
 import org.jetbrains.annotations.NotNull;
-import org.joml.Matrix4f;
-import org.joml.Quaternionf;
-import org.joml.Vector4f;
+import org.joml.*;
 
+import java.lang.Math;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -41,8 +42,6 @@ public abstract class ArtisansWorkstationScreen extends Screen {
     int windowHeight = 180;
     int leftPos;
     int topPos;
-
-    FurnitureData.Element hoveredElement;
 
     public ArtisansWorkstationScreen() {
         super(TITLE);
@@ -68,68 +67,34 @@ public abstract class ArtisansWorkstationScreen extends Screen {
         graphics.blit(TEXTURE, x + 16, y + 16, w - 32, h - 32, originX + 16, originY + 16, 16, 16, TEXTURE_SIZE, TEXTURE_SIZE);
     }
 
-    protected void drawModel(GuiGraphics graphics, FurnitureData data, int x, int y, float size, float yaw, float pitch, int mouseX, int mouseY) {
-        graphics.pose().pushPose();
-        graphics.pose().translate(x, y, 100.0);
-        graphics.pose().translate(0.5, 0.5, 0.5);
-        graphics.pose().scale(size, size, size);
-        graphics.pose().mulPose(new Quaternionf().rotateX(pitch).rotateY(yaw));
-        graphics.pose().translate(-0.5, -0.5, -0.5);
-
-        // Render the model
+    static BakedModel renderModel(GuiGraphics graphics, FurnitureData data) {
+        Lighting.setupFor3DItems();
         BlockRenderDispatcher blockRenderer = Minecraft.getInstance().getBlockRenderer();
         BakedModel bakedModel = FurnitureModelBaker.getModel(data);
         ResourceLocation location = DynamicAtlas.SCRATCH.getLocation();
-        Lighting.setupForEntityInInventory();
         VertexConsumer consumer = graphics.bufferSource().getBuffer(RenderType.entityCutout(location));
         blockRenderer.getModelRenderer().renderModel(graphics.pose().last(), consumer, null, bakedModel, 1.0f, 1.0f, 1.0f, 0xFFFFFF, OverlayTexture.NO_OVERLAY);
+        return bakedModel;
+    }
 
-        Matrix4f pose = graphics.pose().last().pose();
-
-        checkerPlane(graphics);
-
-        graphics.pose().popPose();
-        graphics.flush();
-
-        // Z-cast and get the hovered element
-        List<BakedQuad> quads = bakedModel.getQuads(null, null, RandomSource.create());
-        List<Integer> elementIndices = new LinkedList<>();
-        for (int quadIndex = 0; quadIndex < quads.size(); quadIndex++) {
+    void drawSelection(GuiGraphics graphics, FurnitureData data, FurnitureData.Element element, List<BakedQuad> quads, Matrix4f pose, float width) {
+        int elementIndex = data.elements.indexOf(element);
+        if (elementIndex < 0) return;
+        for (int quadIndex = elementIndex * 6; quadIndex < (elementIndex + 1) * 6; quadIndex++) {
             int[] vertices = quads.get(quadIndex).getVertices();
-            Vector4f[] vectorVertices = {
-                    getVertex(pose, vertices, 0),
-                    getVertex(pose, vertices, 1),
-                    getVertex(pose, vertices, 2),
-                    getVertex(pose, vertices, 3)
-            };
-            if (Utils.isWithinQuad(mouseX, mouseY, vectorVertices)) {
-                elementIndices.add(quadIndex / 6);
-                quadIndex = (quadIndex / 6 + 1) * 6;
-            }
-        }
-        if (!elementIndices.isEmpty()) {
-            List<FurnitureData.Element> elements = elementIndices.stream().map(data.elements::get).toList();
-            int elementIndex = (elements.indexOf(elements.get(0)) + 1) % elements.size();
-            hoveredElement = elements.get(elementIndex);
-
-            // Highlight the hovered element
-            for (int quadIndex = elementIndex * 6; quadIndex < (elementIndex + 1) * 6; quadIndex++) {
-                int[] vertices = quads.get(quadIndex).getVertices();
-                for (int i = 0; i < 4; i++) {
-                    Vector4f vertex = getVertex(pose, vertices, i);
-                    Vector4f nextVertex = getVertex(pose, vertices, (i + 1) % 4);
-                    line(graphics, (int) vertex.x(), (int) vertex.y(), (int) nextVertex.x(), (int) nextVertex.y(), 1, 0.0f, 0.0f, 0.0f, 1.0f);
-                }
+            for (int i = 0; i < 4; i++) {
+                Vector4f vertex = getVertex(pose, vertices, i);
+                Vector4f nextVertex = getVertex(pose, vertices, (i + 1) % 4);
+                line(graphics, (int) vertex.x(), (int) vertex.y(), (int) nextVertex.x(), (int) nextVertex.y(), width, 0.0f, 0.0f, 0.0f, 1.0f);
             }
         }
     }
 
-
-    public void line(GuiGraphics graphics, int x0, int y0, int x1, int y1, int width, float r, float g, float b, float a) {
+    void line(GuiGraphics graphics, int x0, int y0, int x1, int y1, float width, float r, float g, float b, float a) {
         float length = (float) Math.sqrt((x1 - x0) * (x1 - x0) + (y1 - y0) * (y1 - y0));
         float nx = (y1 - y0) / length * width * 0.5f;
         float ny = (x0 - x1) / length * width * 0.5f;
-        int z = 300;
+        int z = 30;
 
         Matrix4f matrix4f = graphics.pose().last().pose();
         VertexConsumer vertexConsumer = graphics.bufferSource().getBuffer(RenderType.gui());
@@ -142,20 +107,25 @@ public abstract class ArtisansWorkstationScreen extends Screen {
         graphics.flush();
     }
 
-    public void checkerPlane(GuiGraphics graphics) {
+    void checkerPlane(GuiGraphics graphics) {
         RenderSystem.setShaderTexture(0, TEXTURE);
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
+        RenderSystem.depthMask(false);
+        RenderSystem.disableCull();
+        RenderSystem.enableBlend();
+        RenderSystem.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
         Matrix4f matrix4f = graphics.pose().last().pose();
         BufferBuilder builder = Tesselator.getInstance().getBuilder();
         builder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
-        builder.vertex(matrix4f, -0.25f, -0.25f, 0.0f).uv(244.0f / 256.0f, 0.0f).color(1.0f, 1.0f, 1.0f, 0.5f).endVertex();
-        builder.vertex(matrix4f, -0.25f, 1.25f, 0.0f).uv(244.0f / 256.0f, 0.0f).color(1.0f, 1.0f, 1.0f, 0.5f).endVertex();
-        builder.vertex(matrix4f, 1.25f, 1.25f, 0.0f).uv(244.0f / 256.0f, 0.0f).color(1.0f, 1.0f, 1.0f, 0.5f).endVertex();
-        builder.vertex(matrix4f, 1.25f, -0.25f, 0.0f).uv(244.0f / 256.0f, 0.0f).color(1.0f, 1.0f, 1.0f, 0.5f).endVertex();
+        builder.vertex(matrix4f, -0.25f, 0.0f, -0.25f).uv(244.0f / 256.0f, 0.0f).color(1.0f, 1.0f, 1.0f, 0.5f).endVertex();
+        builder.vertex(matrix4f, -0.25f, 0.0f, 1.25f).uv(244.0f / 256.0f, 12.0f / 256.0f).color(1.0f, 1.0f, 1.0f, 0.5f).endVertex();
+        builder.vertex(matrix4f, 1.25f, 0.0f, 1.25f).uv(1.0f, 12.0f / 256.0f).color(1.0f, 1.0f, 1.0f, 0.5f).endVertex();
+        builder.vertex(matrix4f, 1.25f, 0.0f, -0.25f).uv(1.0f, 0.0f).color(1.0f, 1.0f, 1.0f, 0.5f).endVertex();
         BufferUploader.drawWithShader(builder.end());
+        RenderSystem.enableCull();
     }
 
-    private static Vector4f getVertex(Matrix4f pose, int[] vertices, int i) {
+    static Vector4f getVertex(Matrix4f pose, int[] vertices, int i) {
         return pose.transform(new Vector4f(
                 Float.intBitsToFloat(vertices[i * 8]),
                 Float.intBitsToFloat(vertices[i * 8 + 1]),

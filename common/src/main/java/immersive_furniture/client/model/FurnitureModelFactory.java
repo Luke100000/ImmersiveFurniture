@@ -11,7 +11,6 @@ import net.minecraft.world.inventory.InventoryMenu;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector2i;
 import org.joml.Vector3f;
-import org.joml.Vector3i;
 
 import java.util.List;
 import java.util.Map;
@@ -51,8 +50,7 @@ public class FurnitureModelFactory {
         assert pixels != null;
         for (int x = 0; x < dimensions.x; x++) {
             for (int y = 0; y < dimensions.y; y++) {
-                Vector3i pos = ModelUtils.to3D(element, direction, x, y);
-                int color = MaterialSource.fromCube(element, direction, x, y, dimensions.x, dimensions.y);
+                int color = MaterialSource.fromCube(element.material, direction, x, y, dimensions.x, dimensions.y);
                 pixels.setPixelRGBA(quad.x() + x, quad.y() + y, color);
             }
         }
@@ -89,9 +87,9 @@ public class FurnitureModelFactory {
                 ),
                 new BlockElementRotation(
                         new Vector3f(
-                                (element.from.x + element.to.x) / 2.0f,
-                                (element.from.y + element.to.y) / 2.0f,
-                                (element.from.z + element.to.z) / 2.0f
+                                -(element.from.x + element.to.x) / 32.0f,
+                                -(element.from.y + element.to.y) / 32.0f,
+                                -(element.from.z + element.to.z) / 32.0f
                         ),
                         element.axis,
                         element.rotation,
