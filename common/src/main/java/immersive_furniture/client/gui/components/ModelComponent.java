@@ -98,7 +98,7 @@ public class ModelComponent extends ScreenComponent {
         sy.setValue(String.valueOf(size.y));
         sy.setResponder(b -> {
             int oldSize = screen.selectedElement.getSize().y;
-            int newSize = Math.max(0, parse(sx.getValue(), oldSize));
+            int newSize = Math.max(0, parse(sy.getValue(), oldSize));
             screen.selectedElement.from.y -= (newSize - oldSize) / 2.0f;
             screen.selectedElement.to.y += (newSize - oldSize) / 2.0f;
         });
@@ -106,7 +106,7 @@ public class ModelComponent extends ScreenComponent {
         sz.setValue(String.valueOf(size.z));
         sz.setResponder(b -> {
             int oldSize = screen.selectedElement.getSize().z;
-            int newSize = Math.max(0, parse(sx.getValue(), oldSize));
+            int newSize = Math.max(0, parse(sz.getValue(), oldSize));
             screen.selectedElement.from.z -= (newSize - oldSize) / 2.0f;
             screen.selectedElement.to.z += (newSize - oldSize) / 2.0f;
         });

@@ -1,11 +1,10 @@
 package immersive_furniture.data;
 
 import immersive_furniture.client.model.MaterialSource;
-import net.minecraft.client.resources.model.Material;
+import net.minecraft.client.renderer.block.model.BlockElementRotation;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.resources.ResourceLocation;
 import org.joml.Vector3f;
 import org.joml.Vector3i;
 
@@ -43,7 +42,7 @@ public class FurnitureData {
     }
 
     public static class Element {
-        public Vector3f from = new Vector3f(2, 2, 2); // TODO: Enforce from < to
+        public Vector3f from = new Vector3f(2, 2, 2);
         public Vector3f to = new Vector3f(14, 14, 14);
         public Direction.Axis axis = Direction.Axis.X;
         public float rotation = 0.0f;
@@ -54,6 +53,23 @@ public class FurnitureData {
                     Math.abs((int) (to.x - from.x)),
                     Math.abs((int) (to.y - from.y)),
                     Math.abs((int) (to.z - from.z))
+            );
+        }
+
+        public BlockElementRotation getRotation() {
+            return new BlockElementRotation(
+                    getOrigin(),
+                    axis,
+                    rotation,
+                    false
+            );
+        }
+
+        public Vector3f getOrigin() {
+            return new Vector3f(
+                    (from.x + to.x) / 32.0f,
+                    (from.y + to.y) / 32.0f,
+                    (from.z + to.z) / 32.0f
             );
         }
     }

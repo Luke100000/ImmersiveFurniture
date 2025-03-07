@@ -5,7 +5,6 @@ import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import immersive_furniture.Common;
-import immersive_furniture.client.Utils;
 import immersive_furniture.client.model.DynamicAtlas;
 import immersive_furniture.client.model.FurnitureModelBaker;
 import immersive_furniture.data.FurnitureData;
@@ -18,19 +17,12 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
-import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.RandomSource;
 import org.jetbrains.annotations.NotNull;
-import org.joml.*;
-
-import java.lang.Math;
-import java.util.LinkedList;
-import java.util.List;
+import org.joml.Matrix4f;
 
 
 public abstract class ArtisansWorkstationScreen extends Screen {
@@ -67,27 +59,13 @@ public abstract class ArtisansWorkstationScreen extends Screen {
         graphics.blit(TEXTURE, x + 16, y + 16, w - 32, h - 32, originX + 16, originY + 16, 16, 16, TEXTURE_SIZE, TEXTURE_SIZE);
     }
 
-    static BakedModel renderModel(GuiGraphics graphics, FurnitureData data) {
+    static void renderModel(GuiGraphics graphics, FurnitureData data) {
         Lighting.setupFor3DItems();
         BlockRenderDispatcher blockRenderer = Minecraft.getInstance().getBlockRenderer();
         BakedModel bakedModel = FurnitureModelBaker.getModel(data);
         ResourceLocation location = DynamicAtlas.SCRATCH.getLocation();
         VertexConsumer consumer = graphics.bufferSource().getBuffer(RenderType.entityCutout(location));
         blockRenderer.getModelRenderer().renderModel(graphics.pose().last(), consumer, null, bakedModel, 1.0f, 1.0f, 1.0f, 0xFFFFFF, OverlayTexture.NO_OVERLAY);
-        return bakedModel;
-    }
-
-    void drawSelection(GuiGraphics graphics, FurnitureData data, FurnitureData.Element element, List<BakedQuad> quads, Matrix4f pose, float width) {
-        int elementIndex = data.elements.indexOf(element);
-        if (elementIndex < 0) return;
-        for (int quadIndex = elementIndex * 6; quadIndex < (elementIndex + 1) * 6; quadIndex++) {
-            int[] vertices = quads.get(quadIndex).getVertices();
-            for (int i = 0; i < 4; i++) {
-                Vector4f vertex = getVertex(pose, vertices, i);
-                Vector4f nextVertex = getVertex(pose, vertices, (i + 1) % 4);
-                line(graphics, (int) vertex.x(), (int) vertex.y(), (int) nextVertex.x(), (int) nextVertex.y(), width, 0.0f, 0.0f, 0.0f, 1.0f);
-            }
-        }
     }
 
     void line(GuiGraphics graphics, int x0, int y0, int x1, int y1, float width, float r, float g, float b, float a) {
@@ -108,6 +86,7 @@ public abstract class ArtisansWorkstationScreen extends Screen {
     }
 
     void checkerPlane(GuiGraphics graphics) {
+        // TODO: Let user switch between different checker shapes
         RenderSystem.setShaderTexture(0, TEXTURE);
         RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
         RenderSystem.depthMask(false);
@@ -123,13 +102,6 @@ public abstract class ArtisansWorkstationScreen extends Screen {
         builder.vertex(matrix4f, 1.25f, 0.0f, -0.25f).uv(1.0f, 0.0f).color(1.0f, 1.0f, 1.0f, 0.5f).endVertex();
         BufferUploader.drawWithShader(builder.end());
         RenderSystem.enableCull();
-    }
-
-    static Vector4f getVertex(Matrix4f pose, int[] vertices, int i) {
-        return pose.transform(new Vector4f(
-                Float.intBitsToFloat(vertices[i * 8]),
-                Float.intBitsToFloat(vertices[i * 8 + 1]),
-                Float.intBitsToFloat(vertices[i * 8 + 2]), 1.0f));
     }
 
     @Override

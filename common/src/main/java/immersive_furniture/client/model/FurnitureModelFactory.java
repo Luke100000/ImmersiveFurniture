@@ -40,7 +40,7 @@ public class FurnitureModelFactory {
     }
 
 
-    private BlockElementFace getEmptyFace(FurnitureData.Element element, Direction direction) {
+    private BlockElementFace getFace(FurnitureData.Element element, Direction direction) {
         // Allocate pixels
         Vector2i dimensions = ModelUtils.getFaceDimensions(element, direction);
         DynamicAtlas.Quad quad = atlas.allocate(dimensions.x, dimensions.y);
@@ -78,23 +78,14 @@ public class FurnitureModelFactory {
                 element.from,
                 element.to,
                 Map.of(
-                        Direction.UP, getEmptyFace(element, Direction.UP),
-                        Direction.DOWN, getEmptyFace(element, Direction.DOWN),
-                        Direction.NORTH, getEmptyFace(element, Direction.NORTH),
-                        Direction.SOUTH, getEmptyFace(element, Direction.SOUTH),
-                        Direction.WEST, getEmptyFace(element, Direction.WEST),
-                        Direction.EAST, getEmptyFace(element, Direction.EAST)
+                        Direction.UP, getFace(element, Direction.UP),
+                        Direction.DOWN, getFace(element, Direction.DOWN),
+                        Direction.NORTH, getFace(element, Direction.NORTH),
+                        Direction.SOUTH, getFace(element, Direction.SOUTH),
+                        Direction.WEST, getFace(element, Direction.WEST),
+                        Direction.EAST, getFace(element, Direction.EAST)
                 ),
-                new BlockElementRotation(
-                        new Vector3f(
-                                -(element.from.x + element.to.x) / 32.0f,
-                                -(element.from.y + element.to.y) / 32.0f,
-                                -(element.from.z + element.to.z) / 32.0f
-                        ),
-                        element.axis,
-                        element.rotation,
-                        false
-                ),
+                element.getRotation(),
                 true
         );
     }

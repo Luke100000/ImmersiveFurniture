@@ -1,9 +1,11 @@
 package immersive_furniture.client.gui;
 
+import com.mojang.math.Axis;
 import immersive_furniture.client.Utils;
 import immersive_furniture.client.gui.components.MaterialsComponent;
 import immersive_furniture.client.gui.components.ModelComponent;
 import immersive_furniture.client.gui.widgets.StateImageButton;
+import immersive_furniture.client.model.ModelUtils;
 import immersive_furniture.data.FurnitureData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -39,6 +41,9 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
     boolean holdingCtrl = false;
     boolean holdingSpace = false;
 
+    int lastMouseX;
+    int lastMouseY;
+
     MaterialsComponent materialsComponent = new MaterialsComponent(this);
     ModelComponent modelComponent = new ModelComponent(this);
 
@@ -60,6 +65,9 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
         clearWidgets();
 
         minecraft = Minecraft.getInstance();
+
+        // TODO
+        data = FurnitureData.EMPTY;
 
         switch (currentPage) {
             case MODEL -> modelComponent.init(leftPos, topPos, TOOLS_WIDTH, windowHeight);
@@ -121,52 +129,40 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
         }
 
         if (draggingContext != null) {
-            float offset = draggingContext.getOffset(mouseX, mouseY);
-            float offset2 = holdingShift ? -offset : 0.0f;
+            Vector3f normal = draggingContext.resize ? draggingContext.direction.step() : draggingContext.getNormal();
+            normal.mul(draggingContext.getOffset(mouseX, mouseY));
 
-            if (draggingContext.direction == Direction.WEST || draggingContext.direction == Direction.NORTH || draggingContext.direction == Direction.UP) {
-                float temp = offset2;
-                offset = offset2;
-                offset2 = temp;
-            }
+            // Snap to grid
+            float stepSize = !draggingContext.resize && holdingCtrl ? 8.0f : 1.0f;
+            normal.x = (float) Math.floor(normal.x * stepSize + 0.5f) / stepSize;
+            normal.y = (float) Math.floor(normal.y * stepSize + 0.5f) / stepSize;
+            normal.z = (float) Math.floor(normal.z * stepSize + 0.5f) / stepSize;
 
-            if (draggingContext.resize) {
-                offset = (float) Math.floor(offset + 0.5f);
-                switch (draggingContext.direction) {
-                    case EAST, WEST -> {
-                        draggingContext.element.from.x = draggingContext.originalFrom.z + offset;
-                        draggingContext.element.to.x = Math.max(draggingContext.element.from.x, draggingContext.originalTo.x - offset2);
-                    }
-                    case UP, DOWN -> {
-                        draggingContext.element.from.y = draggingContext.originalFrom.z + offset;
-                        draggingContext.element.to.y = Math.max(draggingContext.element.from.y, draggingContext.originalTo.y - offset2);
-                    }
-                    case NORTH, SOUTH -> {
-                        draggingContext.element.from.z = draggingContext.originalFrom.z + offset;
-                        draggingContext.element.to.z = Math.max(draggingContext.element.from.z, draggingContext.originalTo.z - offset2);
-                    }
-                }
+            // Offset of the opposite face
+            Vector3f normal2 = draggingContext.resize ? new Vector3f(
+                    holdingShift ? -normal.x : 0.0f,
+                    holdingShift ? -normal.y : 0.0f,
+                    holdingShift ? -normal.z : 0.0f
+            ) : normal;
+
+            // TODO: Resize on rotated objects feels off
+
+            if (draggingContext.direction == Direction.DOWN || draggingContext.direction == Direction.WEST || draggingContext.direction == Direction.NORTH) {
+                draggingContext.element.from.x = Math.min(draggingContext.element.to.x, draggingContext.originalFrom.x + normal.x);
+                draggingContext.element.from.y = Math.min(draggingContext.element.to.y, draggingContext.originalFrom.y - normal.y);
+                draggingContext.element.from.z = Math.min(draggingContext.element.to.z, draggingContext.originalFrom.z + normal.z);
+
+                draggingContext.element.to.x = Math.max(draggingContext.element.from.x, draggingContext.originalTo.x + normal2.x);
+                draggingContext.element.to.y = Math.max(draggingContext.element.from.y, draggingContext.originalTo.y - normal2.y);
+                draggingContext.element.to.z = Math.max(draggingContext.element.from.z, draggingContext.originalTo.z + normal2.z);
             } else {
-                if (holdingCtrl) {
-                    offset = (float) Math.floor(offset * 8.0f + 0.5f) / 8.0f;
-                } else {
-                    offset = (float) Math.floor(offset + 0.5f);
-                }
+                draggingContext.element.to.x = Math.max(draggingContext.element.from.x, draggingContext.originalTo.x + normal.x);
+                draggingContext.element.to.y = Math.max(draggingContext.element.from.y, draggingContext.originalTo.y - normal.y);
+                draggingContext.element.to.z = Math.max(draggingContext.element.from.z, draggingContext.originalTo.z + normal.z);
 
-                switch (draggingContext.direction) {
-                    case EAST, WEST -> {
-                        draggingContext.element.to.x = draggingContext.originalTo.x + offset;
-                        draggingContext.element.from.x = draggingContext.originalFrom.x + offset;
-                    }
-                    case UP, DOWN -> {
-                        draggingContext.element.to.y = draggingContext.originalTo.y + offset;
-                        draggingContext.element.from.y = draggingContext.originalFrom.y + offset;
-                    }
-                    case NORTH, SOUTH -> {
-                        draggingContext.element.from.z = draggingContext.originalFrom.z + offset;
-                        draggingContext.element.to.z = draggingContext.originalTo.z + offset;
-                    }
-                }
+                draggingContext.element.from.x = Math.min(draggingContext.element.to.x, draggingContext.originalFrom.x + normal2.x);
+                draggingContext.element.from.y = Math.min(draggingContext.element.to.y, draggingContext.originalFrom.y - normal2.y);
+                draggingContext.element.from.z = Math.min(draggingContext.element.to.z, draggingContext.originalFrom.z + normal2.z);
             }
 
             modelComponent.update();
@@ -185,17 +181,26 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
                 init();
 
                 draggingContext = new DraggingContext(hoveredElement, hoveredDirection, mouseX, mouseY, button == 1);
-            } else if (mouseX > leftPos + TOOLS_WIDTH && mouseX < leftPos + windowWidth && mouseY > topPos && mouseY < topPos + windowHeight) {
-                selectedElement = null;
             }
         }
+
+        lastMouseX = (int) mouseX;
+        lastMouseY = (int) mouseY;
 
         return super.mouseClicked(mouseX, mouseY, button);
     }
 
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
-        draggingContext = null;
+        if (draggingContext != null) {
+            draggingContext = null;
+        }
+
+        // Deselect element
+        if (selectedElement != hoveredElement && lastMouseX == (int) mouseX && lastMouseY == (int) mouseY && mouseX > leftPos + TOOLS_WIDTH && mouseX < leftPos + windowWidth && mouseY > topPos && mouseY < topPos + windowHeight) {
+            selectedElement = null;
+            init();
+        }
 
         return super.mouseReleased(mouseX, mouseY, button);
     }
@@ -255,12 +260,27 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
         }
 
         public float getOffset(double mouseX, double mouseY) {
+            // To global coordinates
+            Vector3f normal = getNormal();
+
+            // To screen coordinates
             Quaternionf q = new Quaternionf().rotateX(camPitch).rotateY(camYaw);
+            q.transform(normal);
+
             Vector3f drag = new Vector3f((float) (mouseX - x), (float) (mouseY - y), 0.0f);
-            Vector3f transform = q.transform(direction.step());
-            float dot = transform.dot(drag.normalize(new Vector3f()));
+            float dot = normal.dot(drag.normalize(new Vector3f()));
             drag.mul(dot);
             return drag.length() / camZoom * 16.0f * (dot < 0 ? -1 : 1);
+        }
+
+        private Vector3f getNormal() {
+            Vector3f normal = direction.step();
+            switch (this.element.axis) {
+                case X -> Axis.XN.rotationDegrees(this.element.rotation).transform(normal);
+                case Y -> Axis.YN.rotationDegrees(this.element.rotation).transform(normal);
+                case Z -> Axis.ZN.rotationDegrees(this.element.rotation).transform(normal);
+            }
+            return normal;
         }
     }
 
@@ -274,56 +294,67 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
         graphics.pose().mulPoseMatrix(new Matrix4f().scaling(1, -1, 1));
 
         // Render the model
-        BakedModel bakedModel = renderModel(graphics, data);
+        renderModel(graphics, data);
 
         // Render the checker plane
+        graphics.pose().pushPose();
         checkerPlane(graphics);
+        graphics.pose().mulPose(new Quaternionf().rotateX((float) Math.PI / 2));
+        graphics.pose().translate(0, 0, -1);
+        checkerPlane(graphics);
+        graphics.pose().popPose();
 
         Matrix4f pose = graphics.pose().last().pose();
         Matrix3f normal = graphics.pose().last().normal();
+
         graphics.pose().popPose();
         graphics.flush();
 
         // Z-cast and get the hovered element
-        List<BakedQuad> quads = bakedModel.getQuads(null, null, RandomSource.create());
-        List<Integer> elementIndices = new LinkedList<>();
+        List<FurnitureData.Element> elements = new LinkedList<>();
         List<Direction> elementDirections = new LinkedList<>();
-        for (int quadIndex = 0; quadIndex < quads.size(); quadIndex++) {
-            BakedQuad quad = quads.get(quadIndex);
-            Vector3f n = normal.transform(new Vector3f(quad.getDirection().step().mul(1, -1, 1)));
-            if (n.z() < 0) {
-                continue;
-            }
-            int[] vertices = quad.getVertices();
-            Vector4f[] vectorVertices = {
-                    getVertex(pose, vertices, 0),
-                    getVertex(pose, vertices, 1),
-                    getVertex(pose, vertices, 2),
-                    getVertex(pose, vertices, 3)
-            };
-            if (Utils.isWithinQuad(mouseX, mouseY, vectorVertices)) {
-                elementIndices.add(quadIndex / 6);
-                elementDirections.add(quad.getDirection());
-                quadIndex = (quadIndex / 6 + 1) * 6;
+        for (FurnitureData.Element element : data.elements) {
+            float[] fs = ModelUtils.getShapeData(element);
+            for (Direction facing : Direction.values()) {
+                Vector3f n = normal.transform(new Vector3f(facing.step()).mul(1, -1, 1));
+                if (n.z() < 0) continue;
+
+                Vector3f[] vertices = ModelUtils.getVertices(element, facing, fs, pose);
+                if (Utils.isWithinQuad(mouseX, mouseY, vertices)) {
+                    elements.add(element);
+                    System.out.println(facing);
+                    elementDirections.add(facing);
+                }
             }
         }
-        if (elementIndices.isEmpty()) {
+
+        if (elements.isEmpty()) {
             hoveredElement = null;
             hoveredDirection = null;
         } else {
-            List<FurnitureData.Element> elements = elementIndices.stream().map(data.elements::get).toList();
             int elementIndex = (elements.indexOf(selectedElement) + 1) % elements.size();
             hoveredElement = elements.get(elementIndex);
             hoveredDirection = elementDirections.get(elementIndex);
 
-
             // Highlight the hovered element
-            drawSelection(graphics, data, hoveredElement, quads, pose, 1.0f);
+            drawSelection(graphics, hoveredElement, pose, 1.0f);
         }
 
         // Highlight the selected element
         if (selectedElement != null) {
-            drawSelection(graphics, data, selectedElement, quads, pose, 0.5f);
+            drawSelection(graphics, selectedElement, pose, 0.5f);
+        }
+    }
+
+    void drawSelection(GuiGraphics graphics, FurnitureData.Element element, Matrix4f pose, float width) {
+        float[] fs = ModelUtils.getShapeData(element);
+        for (Direction facing : Direction.values()) {
+            Vector3f[] vertices = ModelUtils.getVertices(element, facing, fs, pose);
+            for (int i = 0; i < 4; i++) {
+                Vector3f vertex = vertices[i];
+                Vector3f nextVertex = vertices[(i + 1) % 4];
+                line(graphics, (int) vertex.x(), (int) vertex.y(), (int) nextVertex.x(), (int) nextVertex.y(), width, 0.0f, 0.0f, 0.0f, 1.0f);
+            }
         }
     }
 }

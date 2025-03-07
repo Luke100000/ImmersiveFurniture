@@ -45,6 +45,8 @@ public class MaterialsComponent extends ScreenComponent {
         this.searchBox.setResponder(this::updateSearch);
         screen.addRenderableWidget(searchBox);
 
+        // TODO: Since rotation is limited, texture mapping rot should also be controllable with a axis (XYZ) and rotation (rot and flip flags)
+
         // Material buttons
         materialButtons.clear();
         for (int y = 0; y < 6; y++) {
