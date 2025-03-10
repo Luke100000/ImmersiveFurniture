@@ -1,7 +1,6 @@
 package immersive_furniture.client.gui;
 
 import com.mojang.blaze3d.platform.GlStateManager;
-import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import immersive_furniture.Common;
@@ -60,33 +59,32 @@ public abstract class ArtisansWorkstationScreen extends Screen {
     }
 
     static void renderModel(GuiGraphics graphics, FurnitureData data) {
-        Lighting.setupFor3DItems();
         BlockRenderDispatcher blockRenderer = Minecraft.getInstance().getBlockRenderer();
         BakedModel bakedModel = FurnitureModelBaker.getModel(data);
         ResourceLocation location = DynamicAtlas.SCRATCH.getLocation();
         VertexConsumer consumer = graphics.bufferSource().getBuffer(RenderType.entityCutout(location));
-        blockRenderer.getModelRenderer().renderModel(graphics.pose().last(), consumer, null, bakedModel, 1.0f, 1.0f, 1.0f, 0xFFFFFF, OverlayTexture.NO_OVERLAY);
+        blockRenderer.getModelRenderer().renderModel(graphics.pose().last(), consumer, null, bakedModel, 1.0f, 1.0f, 1.0f, 0xF000F0, OverlayTexture.NO_OVERLAY);
     }
 
-    void line(GuiGraphics graphics, int x0, int y0, int x1, int y1, float width, float r, float g, float b, float a) {
+    void line(GuiGraphics graphics, float x0, float y0, float z0, float x1, float y1, float z1, float width, boolean overlay, float r, float g, float b, float a) {
         float length = (float) Math.sqrt((x1 - x0) * (x1 - x0) + (y1 - y0) * (y1 - y0));
         float nx = (y1 - y0) / length * width * 0.5f;
         float ny = (x0 - x1) / length * width * 0.5f;
-        int z = 30;
 
         Matrix4f matrix4f = graphics.pose().last().pose();
-        VertexConsumer vertexConsumer = graphics.bufferSource().getBuffer(RenderType.gui());
+        VertexConsumer vertexConsumer = graphics.bufferSource().getBuffer(overlay ? RenderType.guiOverlay() : RenderType.gui());
 
-        vertexConsumer.vertex(matrix4f, x1 - nx + 0.5f, y1 - ny + 0.5f, z).color(r, g, b, a).endVertex();
-        vertexConsumer.vertex(matrix4f, x1 + nx + 0.5f, y1 + ny + 0.5f, z).color(r, g, b, a).endVertex();
-        vertexConsumer.vertex(matrix4f, x0 + nx + 0.5f, y0 + ny + 0.5f, z).color(r, g, b, a).endVertex();
-        vertexConsumer.vertex(matrix4f, x0 - nx + 0.5f, y0 - ny + 0.5f, z).color(r, g, b, a).endVertex();
+        float z = 2.0f;
 
-        graphics.flush();
+        vertexConsumer.vertex(matrix4f, x1 - nx + 0.5f, y1 - ny + 0.5f, z1 + z).color(r, g, b, a).endVertex();
+        vertexConsumer.vertex(matrix4f, x1 + nx + 0.5f, y1 + ny + 0.5f, z1 + z).color(r, g, b, a).endVertex();
+        vertexConsumer.vertex(matrix4f, x0 + nx + 0.5f, y0 + ny + 0.5f, z0 + z).color(r, g, b, a).endVertex();
+        vertexConsumer.vertex(matrix4f, x0 - nx + 0.5f, y0 - ny + 0.5f, z0 + z).color(r, g, b, a).endVertex();
     }
 
     void checkerPlane(GuiGraphics graphics) {
-        // TODO: Let user switch between different checker shapes
+        float margin = 0.0f;
+
         RenderSystem.setShaderTexture(0, TEXTURE);
         RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
         RenderSystem.depthMask(false);
@@ -97,8 +95,8 @@ public abstract class ArtisansWorkstationScreen extends Screen {
         BufferBuilder builder = Tesselator.getInstance().getBuilder();
         builder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
         builder.vertex(matrix4f, -0.25f, 0.0f, -0.25f).uv(244.0f / 256.0f, 0.0f).color(1.0f, 1.0f, 1.0f, 0.5f).endVertex();
-        builder.vertex(matrix4f, -0.25f, 0.0f, 1.25f).uv(244.0f / 256.0f, 12.0f / 256.0f).color(1.0f, 1.0f, 1.0f, 0.5f).endVertex();
-        builder.vertex(matrix4f, 1.25f, 0.0f, 1.25f).uv(1.0f, 12.0f / 256.0f).color(1.0f, 1.0f, 1.0f, 0.5f).endVertex();
+        builder.vertex(matrix4f, -0.25f, 0.0f, 1.0f + margin).uv(244.0f / 256.0f, (10.0f + margin * 8.0f) / 256.0f).color(1.0f, 1.0f, 1.0f, 0.5f).endVertex();
+        builder.vertex(matrix4f, 1.25f, 0.0f, 1.0f + margin).uv(1.0f, (10.0f + margin * 8.0f) / 256.0f).color(1.0f, 1.0f, 1.0f, 0.5f).endVertex();
         builder.vertex(matrix4f, 1.25f, 0.0f, -0.25f).uv(1.0f, 0.0f).color(1.0f, 1.0f, 1.0f, 0.5f).endVertex();
         BufferUploader.drawWithShader(builder.end());
         RenderSystem.enableCull();

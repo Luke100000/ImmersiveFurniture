@@ -4,7 +4,7 @@
   "block.immersive_furniture.artisans_workstation": "Artisan's Workstation",
   "item.immersive_furniture.artisans_workstation": "Artisan's Workstation",
 
-  "gui.immersive_furniture.select": "Select a element",
+  "gui.immersive_furniture.select": "Select an element",
   "gui.immersive_furniture.position": "Position",
   "gui.immersive_furniture.size": "Size",
   "gui.immersive_furniture.rotation": "Rotation",

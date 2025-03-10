@@ -1,5 +1,7 @@
 package immersive_furniture.client.gui;
 
+import com.mojang.blaze3d.platform.Lighting;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.math.Axis;
 import immersive_furniture.client.Utils;
 import immersive_furniture.client.gui.components.MaterialsComponent;
@@ -10,16 +12,15 @@ import immersive_furniture.data.FurnitureData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Tooltip;
-import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.util.RandomSource;
 import org.jetbrains.annotations.NotNull;
-import org.joml.*;
+import org.joml.Matrix3f;
+import org.joml.Matrix4f;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 
-import java.lang.Math;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -197,7 +198,7 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
         }
 
         // Deselect element
-        if (selectedElement != hoveredElement && lastMouseX == (int) mouseX && lastMouseY == (int) mouseY && mouseX > leftPos + TOOLS_WIDTH && mouseX < leftPos + windowWidth && mouseY > topPos && mouseY < topPos + windowHeight) {
+        if (selectedElement != null && hoveredElement == null && lastMouseX == (int) mouseX && lastMouseY == (int) mouseY && mouseX > leftPos + TOOLS_WIDTH && mouseX < leftPos + windowWidth && mouseY > topPos && mouseY < topPos + windowHeight) {
             selectedElement = null;
             init();
         }
@@ -268,8 +269,8 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
             q.transform(normal);
 
             Vector3f drag = new Vector3f((float) (mouseX - x), (float) (mouseY - y), 0.0f);
-            float dot = normal.dot(drag.normalize(new Vector3f()));
-            drag.mul(dot);
+            float dot = normal.dot(drag);
+            drag.mul(dot / (drag.length() + 0.001f));
             return drag.length() / camZoom * 16.0f * (dot < 0 ? -1 : 1);
         }
 
@@ -284,6 +285,9 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
         }
     }
 
+    record HoverResult(FurnitureData.Element element, Direction direction, float depth) {
+    }
+
     protected void drawModel(GuiGraphics graphics, FurnitureData data, int x, int y, float size, float yaw, float pitch, int mouseX, int mouseY) {
         graphics.pose().pushPose();
         graphics.pose().translate(x, y, 100.0);
@@ -293,14 +297,21 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
         graphics.pose().translate(-0.5, 0.4, -0.5);
         graphics.pose().mulPoseMatrix(new Matrix4f().scaling(1, -1, 1));
 
+        RenderSystem.assertOnRenderThread();
+        Lighting.setupLevel(new Matrix4f().rotateX(pitch).rotateY(yaw));
+
         // Render the model
         renderModel(graphics, data);
+        graphics.flush();
+
+        Lighting.setupFor3DItems();
 
         // Render the checker plane
         graphics.pose().pushPose();
         checkerPlane(graphics);
         graphics.pose().mulPose(new Quaternionf().rotateX((float) Math.PI / 2));
-        graphics.pose().translate(0, 0, -1);
+        graphics.pose().translate(1, 1, -1);
+        graphics.pose().scale(-1, 1, 1);
         checkerPlane(graphics);
         graphics.pose().popPose();
 
@@ -308,11 +319,9 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
         Matrix3f normal = graphics.pose().last().normal();
 
         graphics.pose().popPose();
-        graphics.flush();
 
         // Z-cast and get the hovered element
-        List<FurnitureData.Element> elements = new LinkedList<>();
-        List<Direction> elementDirections = new LinkedList<>();
+        List<HoverResult> results = new LinkedList<>();
         for (FurnitureData.Element element : data.elements) {
             float[] fs = ModelUtils.getShapeData(element);
             for (Direction facing : Direction.values()) {
@@ -321,40 +330,52 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
 
                 Vector3f[] vertices = ModelUtils.getVertices(element, facing, fs, pose);
                 if (Utils.isWithinQuad(mouseX, mouseY, vertices)) {
-                    elements.add(element);
-                    System.out.println(facing);
-                    elementDirections.add(facing);
+                    float depth = vertices[0].z() + vertices[1].z() + vertices[2].z() + vertices[3].z();
+                    results.add(new HoverResult(element, facing, depth));
                 }
             }
         }
 
-        if (elements.isEmpty()) {
+        if (results.isEmpty()) {
             hoveredElement = null;
             hoveredDirection = null;
         } else {
-            int elementIndex = (elements.indexOf(selectedElement) + 1) % elements.size();
-            hoveredElement = elements.get(elementIndex);
-            hoveredDirection = elementDirections.get(elementIndex);
+            results.sort((a, b) -> Float.compare(a.depth, b.depth));
+
+            int index = 0;
+            if (lastMouseX == mouseX && lastMouseY == mouseY && selectedElement != null) {
+                for (HoverResult result : results) {
+                    if (result.element == selectedElement) {
+                        break;
+                    }
+                    index++;
+                }
+            }
+            HoverResult hoverResult = results.get((index + 1) % results.size());
+            hoveredElement = hoverResult.element();
+            hoveredDirection = hoverResult.direction();
 
             // Highlight the hovered element
-            drawSelection(graphics, hoveredElement, pose, 1.0f);
+            drawSelection(graphics, hoveredElement, pose, 1.0f, false);
         }
 
         // Highlight the selected element
         if (selectedElement != null) {
-            drawSelection(graphics, selectedElement, pose, 0.5f);
+            drawSelection(graphics, selectedElement, pose, 0.5f, true);
         }
     }
 
-    void drawSelection(GuiGraphics graphics, FurnitureData.Element element, Matrix4f pose, float width) {
+    void drawSelection(GuiGraphics graphics, FurnitureData.Element element, Matrix4f pose, float width, boolean overlay) {
         float[] fs = ModelUtils.getShapeData(element);
         for (Direction facing : Direction.values()) {
             Vector3f[] vertices = ModelUtils.getVertices(element, facing, fs, pose);
             for (int i = 0; i < 4; i++) {
                 Vector3f vertex = vertices[i];
                 Vector3f nextVertex = vertices[(i + 1) % 4];
-                line(graphics, (int) vertex.x(), (int) vertex.y(), (int) nextVertex.x(), (int) nextVertex.y(), width, 0.0f, 0.0f, 0.0f, 1.0f);
+                line(graphics, vertex.x(), vertex.y(), vertex.z(), nextVertex.x(), nextVertex.y(), nextVertex.z(), width, overlay, 0.0f, 0.0f, 0.0f, 1.0f);
             }
         }
+
+        graphics.flush();
     }
 }
