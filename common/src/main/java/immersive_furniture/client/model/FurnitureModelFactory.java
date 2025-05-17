@@ -9,6 +9,7 @@ import net.minecraft.client.resources.model.Material;
 import net.minecraft.core.Direction;
 import net.minecraft.world.inventory.InventoryMenu;
 import org.jetbrains.annotations.NotNull;
+import org.joml.Quaternionf;
 import org.joml.Vector2i;
 import org.joml.Vector3f;
 
@@ -39,7 +40,6 @@ public class FurnitureModelFactory {
         this.atlas = atlas;
     }
 
-
     private BlockElementFace getFace(FurnitureData.Element element, Direction direction) {
         // Allocate pixels
         Vector2i dimensions = ModelUtils.getFaceDimensions(element, direction);
@@ -51,6 +51,19 @@ public class FurnitureModelFactory {
         for (int x = 0; x < dimensions.x; x++) {
             for (int y = 0; y < dimensions.y; y++) {
                 int color = MaterialSource.fromCube(element.material, direction, x, y, dimensions.x, dimensions.y);
+                int r = ((color >> 16) & 0xFF);
+                int g = ((color >> 8) & 0xFF);
+                int b = (color & 0xFF);
+                int a = ((color >> 24) & 0xFF);
+
+                Vector3f pos = new Vector3f(ModelUtils.to3D(element, direction, x, y));
+                ModelUtils.applyElementRotation(pos, element.getRotation());
+                float ao = Math.min(1.0f, Math.max(0.0f, 2.0f - AmbientOcclusion.INSTANCE.getValue(pos) * 2.0f));
+                r = (int) (r * ao);
+                g = (int) (g * ao);
+                b = (int) (b * ao);
+
+                color = (a << 24) | (r << 16) | (g << 8) | b;
                 pixels.setPixelRGBA(quad.x() + x, quad.y() + y, color);
             }
         }
@@ -73,7 +86,7 @@ public class FurnitureModelFactory {
         );
     }
 
-    private BlockElement getEmptyElement(FurnitureData.Element element) {
+    private BlockElement getElement(FurnitureData.Element element) {
         return new BlockElement(
                 element.from,
                 element.to,
@@ -93,7 +106,7 @@ public class FurnitureModelFactory {
     private BlockModel getModel() {
         return new BlockModel(
                 null,
-                data.elements.stream().map(this::getEmptyElement).toList(),
+                data.elements.stream().map(this::getElement).toList(),
                 TEXTURE_MAP,
                 true,
                 BlockModel.GuiLight.SIDE,
@@ -103,7 +116,18 @@ public class FurnitureModelFactory {
     }
 
     public static BlockModel getModel(FurnitureData data, DynamicAtlas atlas) {
-        atlas.clear();
+        AmbientOcclusion ao = AmbientOcclusion.INSTANCE;
+        ao.clear();
+        for (FurnitureData.Element element : data.elements) {
+            BlockElementRotation r = element.getRotation();
+            Quaternionf rotation = ModelUtils.getElementRotation(element.getRotation());
+            Vector3f origin = new Vector3f(element.from).mul(1.0f / 16.0f);
+            ModelUtils.applyElementRotation(origin, r);
+            origin.mul(16.0f);
+            ao.place(element.getSize(), origin, rotation);
+        }
+
+        atlas.clear(); // TODO
         return new FurnitureModelFactory(data, atlas).getModel();
     }
 }

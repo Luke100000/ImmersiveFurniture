@@ -1,7 +1,13 @@
 package immersive_furniture.client.gui.components;
 
 import immersive_furniture.client.gui.ArtisansWorkstationEditorScreen;
+import immersive_furniture.client.gui.widgets.StateImageButton;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.components.Tooltip;
+import net.minecraft.network.chat.Component;
+
+import static immersive_furniture.client.gui.ArtisansWorkstationScreen.TEXTURE;
+import static immersive_furniture.client.gui.ArtisansWorkstationScreen.TEXTURE_SIZE;
 
 public class ScreenComponent {
     final ArtisansWorkstationEditorScreen screen;
@@ -22,5 +28,23 @@ public class ScreenComponent {
         this.topPos = topPos;
         this.width = width;
         this.height = height;
+    }
+
+    protected StateImageButton addButton(int x, int y, int size, int u, int v, Runnable clicked) {
+        return addButton(x, y, size, u, v, null, clicked);
+    }
+
+    protected StateImageButton addButton(int x, int y, int size, int u, int v, Component tooltip, Runnable clicked) {
+        StateImageButton button = screen.addRenderableWidget(
+                new StateImageButton(x, y, size, size, u, v, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE,
+                        b -> clicked.run(),
+                        tooltip == null ? Component.literal("") : tooltip)
+        );
+
+        if (tooltip != null) {
+            button.setTooltip(Tooltip.create(tooltip));
+        }
+
+        return button;
     }
 }

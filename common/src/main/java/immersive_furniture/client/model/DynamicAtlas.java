@@ -50,6 +50,9 @@ public class DynamicAtlas extends DynamicTexture {
                 if (quad.h > h) {
                     quads.add(new Quad(quad.x, quad.y + h, w, quad.h - h));
                 }
+                if (quad.w > w && quad.h > h) {
+                    quads.add(new Quad(quad.x + w, quad.y + h, quad.w - w, quad.h - h));
+                }
                 allocated += w * h;
                 return new Quad(quad.x, quad.y, w, h);
             }
@@ -61,6 +64,7 @@ public class DynamicAtlas extends DynamicTexture {
     public void clear() {
         quads.clear();
         quads.add(new Quad(0, 0, size, size));
+        allocated = 0;
         full = false;
     }
 

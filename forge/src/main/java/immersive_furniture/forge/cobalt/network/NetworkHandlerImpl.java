@@ -17,7 +17,7 @@ public class NetworkHandlerImpl extends NetworkHandler.Impl {
     private static final String PROTOCOL_VERSION = "1";
 
     private final SimpleChannel channel = NetworkRegistry.newSimpleChannel(
-            new ResourceLocation(Common.SHORT_MOD_ID, "main"),
+            new ResourceLocation(Common.MOD_ID, "main"),
             () -> PROTOCOL_VERSION,
             PROTOCOL_VERSION::equals,
             PROTOCOL_VERSION::equals

@@ -9,7 +9,6 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -31,11 +30,16 @@ public class FurnitureItem extends BlockItem {
 
     @Override
     public Component getName(ItemStack stack) {
-        return Component.literal(getData(stack).getName());
+        return Component.literal(getData(stack).name);
     }
 
-    public static @NotNull FurnitureData getData(ItemStack stack) {
+    public static FurnitureData getData(ItemStack stack) {
         CompoundTag tag = BlockItem.getBlockEntityData(stack);
         return tag == null ? FurnitureData.EMPTY : new FurnitureData(tag.getCompound(FURNITURE));
+    }
+
+    public static void setData(ItemStack stack, FurnitureData data) {
+        CompoundTag tag = stack.getOrCreateTag();
+        tag.put(FURNITURE, data.toTag());
     }
 }

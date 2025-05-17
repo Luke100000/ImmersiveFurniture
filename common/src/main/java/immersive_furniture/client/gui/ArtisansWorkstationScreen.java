@@ -38,10 +38,11 @@ public abstract class ArtisansWorkstationScreen extends Screen {
         super(TITLE);
     }
 
-    protected void drawRectangle(GuiGraphics graphics, int x, int y, int h, int w) {
-        int originY = 0;
-        int originX = 0;
+    protected void drawRectangle(GuiGraphics graphics, int x, int y, int w, int h) {
+        drawRectangle(graphics, x, y, w, h, 0, 0);
+    }
 
+    protected void drawRectangle(GuiGraphics graphics, int x, int y, int w, int h, int originY, int originX) {
         //corners
         graphics.blit(TEXTURE, x, y, originX, originY, 16, 16, TEXTURE_SIZE, TEXTURE_SIZE);
         graphics.blit(TEXTURE, x + w - 16, y, originX + 32, originY, 16, 16, TEXTURE_SIZE, TEXTURE_SIZE);
@@ -111,6 +112,8 @@ public abstract class ArtisansWorkstationScreen extends Screen {
 
     @Override
     protected void init() {
+        clearWidgets();
+
         super.init();
 
         this.leftPos = (this.width - this.windowWidth) / 2;

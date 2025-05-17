@@ -4,26 +4,26 @@ Initial release
 
 # TODO
 
-Adding more renderers is apparently impossible.
-However, it seems quite common to animated the texture atlas.
-So, lets add a huge placeholder texture (512x) and update it.
+* Scrap shapes, finish global effects
+* Finish material selector
+* Fix material texture fetcher
+* Add inventory and settings page
+* Add finish page
+* Add particle emitter
+    * Instance the particle and emulate it, it should be possible fine
+* Add furniture export
+* Baked textures support
 
-```
-net.minecraft.client.renderer.texture.TextureAtlas#upload
-net.minecraft.client.renderer.texture.TextureAtlas#cycleAnimationFrames
-net.minecraft.client.renderer.block.BlockRenderDispatcher#renderBatched(net.minecraft.world.level.block.state.BlockState, net.minecraft.core.BlockPos, net.minecraft.world.level.BlockAndTintGetter, com.mojang.blaze3d.vertex.PoseStack, com.mojang.blaze3d.vertex.VertexConsumer, boolean, net.minecraft.util.RandomSource, net.minecraftforge.client.model.data.ModelData, net.minecraft.client.renderer.RenderType)
-```
+# Export
 
-* Server maintains a furniture registry
-* Server syncs with the client
-* Server spawns a block entity for furniture with special functionality
-* The Client decides on whether to bake or render (only baking for non-entities)
+* Export as PNG with data in metadata
+* Data is exported as nbt for simplicity
 
-However, it would be much easier to skip the registry, storing the data directly in the nbt.
-For a simple 8 cuboid model with settings thats around a 1kb of data tho. Place 1000 fences and you have 1mb of data.
+# Sharing
 
-Alternatively, later on a BakedFurniture can be introduced without entity, relying on said registry to resolve to the
-data. No need to decide on that yet.
+* Furniture is stored as identifiers username:name (username local is mapped respectively)
+* In the list, local furniture can be uploaded (will overwrite existing)
+    * When creating furniture, auto share doesn't make sense imo because people may "just play around"
 
 # GUI
 
@@ -120,3 +120,22 @@ Generate (sometimes lazy) volumes to be used by effects.
 * Global settings
 
 Left the settings, right the element list
+
+## Library adjustments
+
+* Improve tags endpoint to return a dict with usage count, cropped to 1000 tags.
+* Deprecate v1/list from the api list if possible.
+* Why dafuq is meta not part of the search? It feels like the whole point of meta is to be part of it?
+    * Since it breaks MCA, v2 is required (or a include meta flag)
+    * Then also extract it because wtf why is it a string like the rest?
+    * Probably add a header field "meta=none|decoded|raw" to the search" and call the possibity of not using json
+      compatible strings a feature lol (E.g. java might actually profit from that)
+        * Same with upload, if a string is present it gets parsed.
+    * Then, v2 just contains "meta=none" by default because often it is not needed anyway
+    * And content endpoint gets a v2 with meta=decoded default, with v1 passing meta=raw
+    * And think about additional stuff to add to v2
+    * Finish the post processing hook and add a dry field, also return logs and performance stats.
+    * Add processors to MCA, we need to ramp up security:
+        * Image stripper: Load the png, strip it from all metadata, and save it again, rejecting any "non png, non
+          64x64, non 32bpp" images
+        * Metadata validator: Check if the metadata is valid json, and all fields are of valid type, and not too long.

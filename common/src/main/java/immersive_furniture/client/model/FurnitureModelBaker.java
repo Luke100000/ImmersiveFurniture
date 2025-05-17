@@ -31,7 +31,11 @@ public class FurnitureModelBaker {
     public static BakedModel getModel(FurnitureData data) {
         DynamicAtlas atlas = DynamicAtlas.SCRATCH;
         // TODO: Cache
-        return FurnitureModelFactory.getModel(data, atlas).bake(modelBaker, material
-                -> atlas == DynamicAtlas.ENTITY ? material.sprite() : atlas.sprite, BlockModelRotation.by(0, 0), LOCATION);
+        return FurnitureModelFactory.getModel(data, atlas)
+                .bake(modelBaker,
+                        material -> atlas == DynamicAtlas.ENTITY ? material.sprite() : atlas.sprite,
+                        BlockModelRotation.by(0, 0),
+                        LOCATION
+                );
     }
 }

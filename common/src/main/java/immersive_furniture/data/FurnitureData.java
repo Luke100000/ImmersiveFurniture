@@ -1,10 +1,10 @@
 package immersive_furniture.data;
 
+import com.mojang.math.Axis;
 import immersive_furniture.client.model.MaterialSource;
 import net.minecraft.client.renderer.block.model.BlockElementRotation;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
 import org.joml.Vector3f;
 import org.joml.Vector3i;
 
@@ -14,31 +14,32 @@ import java.util.List;
 public class FurnitureData {
     public static final FurnitureData EMPTY = new FurnitureData();
 
-    static {
-        // TODO: Debug
-        EMPTY.elements.add(new Element());
-    }
+    public int contentid;
 
-    private final String name;
+    public String name;
+    public String tag;
+    public String material;
+    public int lightLevel;
 
     public final List<Element> elements = new LinkedList<>();
 
     public FurnitureData() {
         name = "Empty";
+        elements.add(new Element());
     }
 
     public FurnitureData(CompoundTag tag) {
         name = tag.getString("Name");
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public Tag toTag() {
+    public CompoundTag toTag() {
         CompoundTag tag = new CompoundTag();
         tag.putString("Name", name);
         return tag;
+    }
+
+    public int getCost() {
+        return 1;
     }
 
     public static class Element {
@@ -66,11 +67,19 @@ public class FurnitureData {
         }
 
         public Vector3f getOrigin() {
-            return new Vector3f(
+            Vector3f origin = new Vector3f(
                     (from.x + to.x) / 32.0f,
                     (from.y + to.y) / 32.0f,
                     (from.z + to.z) / 32.0f
             );
+
+            switch (axis) {
+                case X -> Axis.XP.rotationDegrees(rotation).transform(origin);
+                case Y -> Axis.YP.rotationDegrees(rotation).transform(origin);
+                case Z -> Axis.ZP.rotationDegrees(rotation).transform(origin);
+            }
+
+            return origin;
         }
     }
 
@@ -78,6 +87,8 @@ public class FurnitureData {
         public MaterialSource source = MaterialSource.DEFAULT;
         public int margin = 4;
         public WrapMode wrap = WrapMode.EXPAND;
+        public boolean rotate = false;
+        public boolean flip = false;
     }
 
     public enum WrapMode {

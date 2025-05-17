@@ -130,6 +130,11 @@ public class ModelComponent extends ScreenComponent {
             ry.setEnabled(false);
             rz.setEnabled(true);
         });
+
+        rx.setEnabled(screen.selectedElement.axis == Direction.Axis.X);
+        ry.setEnabled(screen.selectedElement.axis == Direction.Axis.Y);
+        rz.setEnabled(screen.selectedElement.axis == Direction.Axis.Z);
+
         addButton(leftPos + 62, topPos + 78, 14, 26, 228, () ->
                 screen.selectedElement.rotation = (screen.selectedElement.rotation + 22.5f) % 360);
         addButton(leftPos + 78, topPos + 78, 14, 42, 228, () ->
@@ -151,12 +156,6 @@ public class ModelComponent extends ScreenComponent {
         rx.setEnabled(screen.selectedElement.axis == Direction.Axis.X);
         ry.setEnabled(screen.selectedElement.axis == Direction.Axis.Y);
         rz.setEnabled(screen.selectedElement.axis == Direction.Axis.Z);
-    }
-
-    private StateImageButton addButton(int x, int y, int size, int u, int v, Runnable clicked) {
-        return screen.addRenderableWidget(
-                new StateImageButton(x, y, size, size, u, v, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE, b -> clicked.run(), Component.literal(""))
-        );
     }
 
     private EditBox addNewFloatBox(int x, int y, int width) {

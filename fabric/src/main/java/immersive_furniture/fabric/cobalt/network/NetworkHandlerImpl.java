@@ -26,7 +26,7 @@ public class NetworkHandlerImpl extends NetworkHandler.Impl {
     private int id = 0;
 
     private <T> ResourceLocation createMessageIdentifier(Class<T> msg) {
-        return new ResourceLocation(Common.SHORT_MOD_ID, msg.getSimpleName().toLowerCase(Locale.ROOT).substring(0, 8) + id++);
+        return new ResourceLocation(Common.MOD_ID, msg.getSimpleName().toLowerCase(Locale.ROOT).substring(0, 8) + id++);
     }
 
     private ResourceLocation getMessageIdentifier(Message msg) {

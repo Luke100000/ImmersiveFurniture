@@ -4,8 +4,10 @@ import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.math.Axis;
 import immersive_furniture.client.Utils;
+import immersive_furniture.client.gui.components.EffectsComponent;
 import immersive_furniture.client.gui.components.MaterialsComponent;
 import immersive_furniture.client.gui.components.ModelComponent;
+import immersive_furniture.client.gui.components.SettingsComponent;
 import immersive_furniture.client.gui.widgets.StateImageButton;
 import immersive_furniture.client.model.ModelUtils;
 import immersive_furniture.data.FurnitureData;
@@ -32,7 +34,7 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
     float camPitch = (float) (-Math.PI / 4);
     float camZoom = 100.0f;
 
-    public FurnitureData data = new FurnitureData();
+    public FurnitureData data;
     public FurnitureData.Element hoveredElement;
     public FurnitureData.Element selectedElement;
     public Direction hoveredDirection;
@@ -47,16 +49,20 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
 
     MaterialsComponent materialsComponent = new MaterialsComponent(this);
     ModelComponent modelComponent = new ModelComponent(this);
+    EffectsComponent effectsComponent = new EffectsComponent(this);
+    SettingsComponent settingsComponent = new SettingsComponent(this);
 
     Page currentPage = Page.MODEL;
 
     public enum Page {
         MODEL,
         MATERIALS,
-        SHAPES,
         EFFECTS,
-        SETTINGS,
-        FINISH
+        SETTINGS
+    }
+
+    public ArtisansWorkstationEditorScreen(FurnitureData data) {
+        this.data = data;
     }
 
     @Override
@@ -67,12 +73,11 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
 
         minecraft = Minecraft.getInstance();
 
-        // TODO
-        data = FurnitureData.EMPTY;
-
         switch (currentPage) {
             case MODEL -> modelComponent.init(leftPos, topPos, TOOLS_WIDTH, windowHeight);
             case MATERIALS -> materialsComponent.init(leftPos, topPos, TOOLS_WIDTH, windowHeight);
+            case EFFECTS -> effectsComponent.init(leftPos, topPos, TOOLS_WIDTH, windowHeight);
+            case SETTINGS -> settingsComponent.init(leftPos, topPos, TOOLS_WIDTH, windowHeight);
         }
 
         // Page buttons
@@ -103,12 +108,13 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
         super.renderBackground(context);
 
         // Background
-        drawRectangle(context, leftPos, topPos, windowHeight, TOOLS_WIDTH);
-        drawRectangle(context, leftPos + TOOLS_WIDTH, topPos, windowHeight, windowWidth - TOOLS_WIDTH);
+        drawRectangle(context, leftPos, topPos, TOOLS_WIDTH, windowHeight);
+        drawRectangle(context, leftPos + TOOLS_WIDTH, topPos, windowWidth - TOOLS_WIDTH, windowHeight);
 
         switch (currentPage) {
             case MODEL -> modelComponent.render(context);
             case MATERIALS -> materialsComponent.render(context);
+            case SETTINGS -> settingsComponent.render(context);
         }
     }
 
@@ -124,13 +130,13 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
-        if (draggingContext == null) {
+        if (draggingContext == null && isOverRightWindow(mouseX, mouseY)) {
             camYaw += (float) (dragX * 0.015f);
             camPitch -= (float) (dragY * 0.015f);
         }
 
         if (draggingContext != null) {
-            Vector3f normal = draggingContext.resize ? draggingContext.direction.step() : draggingContext.getNormal();
+            Vector3f normal = draggingContext.resize ? draggingContext.direction.step().mul(1, -1, 1) : draggingContext.getNormal();
             normal.mul(draggingContext.getOffset(mouseX, mouseY));
 
             // Snap to grid
@@ -145,8 +151,6 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
                     holdingShift ? -normal.y : 0.0f,
                     holdingShift ? -normal.z : 0.0f
             ) : normal;
-
-            // TODO: Resize on rotated objects feels off
 
             if (draggingContext.direction == Direction.DOWN || draggingContext.direction == Direction.WEST || draggingContext.direction == Direction.NORTH) {
                 draggingContext.element.from.x = Math.min(draggingContext.element.to.x, draggingContext.originalFrom.x + normal.x);
@@ -166,7 +170,9 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
                 draggingContext.element.from.z = Math.min(draggingContext.element.to.z, draggingContext.originalFrom.z + normal2.z);
             }
 
-            modelComponent.update();
+            if (currentPage == Page.MODEL) {
+                modelComponent.update();
+            }
 
             return true;
         }
@@ -198,12 +204,16 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
         }
 
         // Deselect element
-        if (selectedElement != null && hoveredElement == null && lastMouseX == (int) mouseX && lastMouseY == (int) mouseY && mouseX > leftPos + TOOLS_WIDTH && mouseX < leftPos + windowWidth && mouseY > topPos && mouseY < topPos + windowHeight) {
+        if (selectedElement != null && hoveredElement == null && lastMouseX == (int) mouseX && lastMouseY == (int) mouseY && isOverRightWindow(mouseX, mouseY)) {
             selectedElement = null;
             init();
         }
 
         return super.mouseReleased(mouseX, mouseY, button);
+    }
+
+    private boolean isOverRightWindow(double mouseX, double mouseY) {
+        return mouseX > leftPos + TOOLS_WIDTH && mouseX < leftPos + windowWidth && mouseY > topPos && mouseY < topPos + windowHeight;
     }
 
     @Override
@@ -277,10 +287,11 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
         private Vector3f getNormal() {
             Vector3f normal = direction.step();
             switch (this.element.axis) {
-                case X -> Axis.XN.rotationDegrees(this.element.rotation).transform(normal);
-                case Y -> Axis.YN.rotationDegrees(this.element.rotation).transform(normal);
-                case Z -> Axis.ZN.rotationDegrees(this.element.rotation).transform(normal);
+                case X -> Axis.XP.rotationDegrees(this.element.rotation).transform(normal);
+                case Y -> Axis.YP.rotationDegrees(this.element.rotation).transform(normal);
+                case Z -> Axis.ZP.rotationDegrees(this.element.rotation).transform(normal);
             }
+            normal.mul(1, -1, 1);
             return normal;
         }
     }
@@ -325,7 +336,10 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
         for (FurnitureData.Element element : data.elements) {
             float[] fs = ModelUtils.getShapeData(element);
             for (Direction facing : Direction.values()) {
-                Vector3f n = normal.transform(new Vector3f(facing.step()).mul(1, -1, 1));
+                Vector3f n = new Vector3f(facing.step());
+                n = ModelUtils.getElementRotation(element.getRotation()).transform(n);
+                n.mul(1, -1, 1);
+                normal.transform(n);
                 if (n.z() < 0) continue;
 
                 Vector3f[] vertices = ModelUtils.getVertices(element, facing, fs, pose);
