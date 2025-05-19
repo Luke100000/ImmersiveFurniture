@@ -46,7 +46,7 @@ public class MaterialButton extends StateImageButton {
         TextureAtlasSprite east = material.east().sprite();
 
         // Cube vertices in isometric perspective
-        float size = mouseX > getX() && mouseX < getX() + width && mouseY > getY() && mouseY < getY() + height ? 10 : 8;
+        float size = width * 0.5f * (mouseX > getX() && mouseX < getX() + width && mouseY > getY() && mouseY < getY() + height ? 1.1f : 1.0f);
         float x = getX() + width / 2.0f;
         float y = getY() + height / 2.0f - size / 4 * 2.5f;
 
@@ -57,33 +57,31 @@ public class MaterialButton extends StateImageButton {
         bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR_TEX);
 
         float lx = x - size;
-        float cx = x;
         float rx = x + size;
         float py = y - size / 2;
-        float ty = y;
         float cy = y + size / 2;
         float by = y + size / 4 * 5;
         float ry = y + size / 4 * 7;
 
         // Up
-        bufferBuilder.vertex(matrix4f, cx, py, 0).color(1.0f, 1.0f, 1.0f, 1.0f).uv(up.getU0(), up.getV1()).endVertex();
-        bufferBuilder.vertex(matrix4f, lx, ty, 0).color(1.0f, 1.0f, 1.0f, 1.0f).uv(up.getU1(), up.getV1()).endVertex();
-        bufferBuilder.vertex(matrix4f, cx, cy, 0).color(1.0f, 1.0f, 1.0f, 1.0f).uv(up.getU1(), up.getV0()).endVertex();
-        bufferBuilder.vertex(matrix4f, rx, ty, 0).color(1.0f, 1.0f, 1.0f, 1.0f).uv(up.getU0(), up.getV0()).endVertex();
+        bufferBuilder.vertex(matrix4f, x, py, 0).color(1.0f, 1.0f, 1.0f, 1.0f).uv(up.getU0(), up.getV1()).endVertex();
+        bufferBuilder.vertex(matrix4f, lx, y, 0).color(1.0f, 1.0f, 1.0f, 1.0f).uv(up.getU1(), up.getV1()).endVertex();
+        bufferBuilder.vertex(matrix4f, x, cy, 0).color(1.0f, 1.0f, 1.0f, 1.0f).uv(up.getU1(), up.getV0()).endVertex();
+        bufferBuilder.vertex(matrix4f, rx, y, 0).color(1.0f, 1.0f, 1.0f, 1.0f).uv(up.getU0(), up.getV0()).endVertex();
 
         // North
         float ng = 0.8f;
-        bufferBuilder.vertex(matrix4f, rx, ty, 0).color(ng, ng, ng, 1.0f).uv(north.getU1(), north.getV0()).endVertex();
-        bufferBuilder.vertex(matrix4f, cx, cy, 0).color(ng, ng, ng, 1.0f).uv(north.getU0(), north.getV0()).endVertex();
-        bufferBuilder.vertex(matrix4f, cx, ry, 0).color(ng, ng, ng, 1.0f).uv(north.getU0(), north.getV1()).endVertex();
+        bufferBuilder.vertex(matrix4f, rx, y, 0).color(ng, ng, ng, 1.0f).uv(north.getU1(), north.getV0()).endVertex();
+        bufferBuilder.vertex(matrix4f, x, cy, 0).color(ng, ng, ng, 1.0f).uv(north.getU0(), north.getV0()).endVertex();
+        bufferBuilder.vertex(matrix4f, x, ry, 0).color(ng, ng, ng, 1.0f).uv(north.getU0(), north.getV1()).endVertex();
         bufferBuilder.vertex(matrix4f, rx, by, 0).color(ng, ng, ng, 1.0f).uv(north.getU1(), north.getV1()).endVertex();
 
         // East
         float eg = 0.6f;
-        bufferBuilder.vertex(matrix4f, cx, cy, 0).color(eg, eg, eg, 1.0f).uv(east.getU1(), east.getV0()).endVertex();
-        bufferBuilder.vertex(matrix4f, lx, ty, 0).color(eg, eg, eg, 1.0f).uv(east.getU0(), east.getV0()).endVertex();
+        bufferBuilder.vertex(matrix4f, x, cy, 0).color(eg, eg, eg, 1.0f).uv(east.getU1(), east.getV0()).endVertex();
+        bufferBuilder.vertex(matrix4f, lx, y, 0).color(eg, eg, eg, 1.0f).uv(east.getU0(), east.getV0()).endVertex();
         bufferBuilder.vertex(matrix4f, lx, by, 0).color(eg, eg, eg, 1.0f).uv(east.getU0(), east.getV1()).endVertex();
-        bufferBuilder.vertex(matrix4f, cx, ry, 0).color(eg, eg, eg, 1.0f).uv(east.getU1(), east.getV1()).endVertex();
+        bufferBuilder.vertex(matrix4f, x, ry, 0).color(eg, eg, eg, 1.0f).uv(east.getU1(), east.getV1()).endVertex();
 
         BufferUploader.drawWithShader(bufferBuilder.end());
     }

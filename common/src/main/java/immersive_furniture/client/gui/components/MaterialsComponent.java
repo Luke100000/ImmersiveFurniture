@@ -33,22 +33,21 @@ public class MaterialsComponent extends ScreenComponent {
             new Group("wood", new ResourceLocation("oak_planks")),
             new Group("stone", new ResourceLocation("stone")),
             new Group("fabric", new ResourceLocation("white_wool")),
-            new Group("mechanical", new ResourceLocation("piston")),
+            new Group("mechanical", new ResourceLocation("piston_inventory")),
             new Group("all", new ResourceLocation("bricks"))
     );
 
     EditBox searchBox;
-    List<MaterialButton> groupButtons = new ArrayList<>();
-    List<MaterialButton> materialButtons = new ArrayList<>();
+    final List<MaterialButton> groupButtons = new ArrayList<>();
+    final List<MaterialButton> materialButtons = new ArrayList<>();
 
     int page = 0;
     String currentGroup = "favorites";
 
     StateImageButton rotateButton;
     StateImageButton flipButton;
-    StateImageButton favoriteButton;
-    StateImageButton expandButton;
     StateImageButton repeatButton;
+    StateImageButton favoriteButton;
 
     public MaterialsComponent(ArtisansWorkstationEditorScreen screen) {
         super(screen);
@@ -70,33 +69,33 @@ public class MaterialsComponent extends ScreenComponent {
         // Material settings
         if (screen.selectedElement != null) {
             // Toggle 90° rotation
-            rotateButton = addButton(leftPos + 6, topPos + 20, 16, 48, 96, Component.translatable("gui.immersive_furniture.rotate"), () -> {
+            rotateButton = addButton(leftPos + 6, topPos + 20, 16, 96, 96, Component.translatable("gui.immersive_furniture.rotate"), () -> {
                 screen.selectedElement.material.rotate = !screen.selectedElement.material.rotate;
                 rotateButton.setEnabled(screen.selectedElement.material.rotate);
             });
             rotateButton.setEnabled(screen.selectedElement.material.rotate);
 
             // Toggle flip
-            flipButton = addButton(leftPos + 6 + 16, topPos + 20, 16, 48, 96, Component.translatable("gui.immersive_furniture.flip"), () -> {
+            flipButton = addButton(leftPos + 6 + 16, topPos + 20, 16, 112, 96, Component.translatable("gui.immersive_furniture.flip"), () -> {
                 screen.selectedElement.material.flip = !screen.selectedElement.material.flip;
                 flipButton.setEnabled(screen.selectedElement.material.flip);
             });
             flipButton.setEnabled(screen.selectedElement.material.flip);
 
             // Toggle repeat
-            expandButton = addButton(leftPos + 6 + 32, topPos + 20, 16, 48, 96, Component.translatable("gui.immersive_furniture.expand"), () -> {
+            repeatButton = addButton(leftPos + 6 + 32, topPos + 20, 16, 144, 96, Component.translatable("gui.immersive_furniture.repeat"), () -> {
                 if (screen.selectedElement.material.wrap == FurnitureData.WrapMode.EXPAND) {
                     screen.selectedElement.material.wrap = FurnitureData.WrapMode.REPEAT;
-                    expandButton.setEnabled(false);
+                    repeatButton.setEnabled(false);
                 } else {
                     screen.selectedElement.material.wrap = FurnitureData.WrapMode.EXPAND;
-                    expandButton.setEnabled(true);
+                    repeatButton.setEnabled(true);
                 }
             });
-            expandButton.setEnabled(screen.selectedElement.material.wrap == FurnitureData.WrapMode.EXPAND);
+            repeatButton.setEnabled(screen.selectedElement.material.wrap == FurnitureData.WrapMode.EXPAND);
 
             // Mark as favorite
-            favoriteButton = addButton(leftPos + 100 - 6 - 16, topPos + 20, 16, 48, 96, Component.translatable("gui.immersive_furniture.favorite"), () -> {
+            favoriteButton = addButton(leftPos + 100 - 6 - 16, topPos + 20, 16, 128, 96, Component.translatable("gui.immersive_furniture.favorite"), () -> {
                 String location = screen.selectedElement.material.source.location().toString();
                 if (Config.getInstance().favorites.contains(location)) {
                     Config.getInstance().favorites.remove(location);
@@ -112,9 +111,11 @@ public class MaterialsComponent extends ScreenComponent {
         // Material groups
         for (int i = 0; i < GROUPS.size(); i++) {
             final int index = i;
+            int x = i % 5;
+            int y = i / 5;
             MaterialButton button = new MaterialButton(
-                    leftPos + 6 + i * 22, topPos + 38,
-                    22, 22, 0, 96,
+                    leftPos + 6 + x * 17, topPos + 38 + y * 17,
+                    16, 16, 0, 96,
                     b -> {
                         currentGroup = GROUPS.get(index).name;
                         updateSearch(searchBox.getValue());
@@ -129,11 +130,11 @@ public class MaterialsComponent extends ScreenComponent {
 
         // Material buttons
         materialButtons.clear();
-        for (int y = 0; y < 5; y++) {
+        for (int y = 0; y < 4; y++) {
             for (int x = 0; x < 4; x++) {
                 MaterialButton button = new MaterialButton(
-                        leftPos + 6 + x * 22, topPos + 54 + y * 22,
-                        22, 22, 233, 130,
+                        leftPos + 6 + x * 22, topPos + 70 + y * 22,
+                        22, 22, 234, 130,
                         b -> {
                             if (screen.selectedElement != null) {
                                 screen.selectedElement.material.source = ((MaterialButton) b).getMaterial();

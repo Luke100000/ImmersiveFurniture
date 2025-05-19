@@ -10,7 +10,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
 public class JsonDataLoaderWrapper implements IdentifiableResourceReloadListener {
-
     private final ResourceLocation id;
     private final PreparableReloadListener dataLoader;
 
@@ -28,5 +27,4 @@ public class JsonDataLoaderWrapper implements IdentifiableResourceReloadListener
     public CompletableFuture<Void> reload(PreparationBarrier synchronizer, ResourceManager manager, ProfilerFiller prepareProfiler, ProfilerFiller applyProfiler, Executor prepareExecutor, Executor applyExecutor) {
         return dataLoader.reload(synchronizer, manager, prepareProfiler, applyProfiler, prepareExecutor, applyExecutor);
     }
-
 }

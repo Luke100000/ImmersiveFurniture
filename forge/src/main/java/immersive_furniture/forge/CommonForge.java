@@ -16,12 +16,11 @@ import static net.minecraft.core.registries.Registries.CREATIVE_MODE_TAB;
 @Mod.EventBusSubscriber(modid = Common.MOD_ID, bus = Bus.MOD)
 public final class CommonForge {
     static {
-        Common.MOD_LOADER = "forge";
-
         new RegistrationImpl();
         new NetworkHandlerImpl();
     }
 
+    @SuppressWarnings("unused")
     public CommonForge() {
         Items.bootstrap();
         Blocks.bootstrap();

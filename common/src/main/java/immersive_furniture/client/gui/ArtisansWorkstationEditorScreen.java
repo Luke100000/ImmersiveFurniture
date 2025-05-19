@@ -28,18 +28,19 @@ import java.util.List;
 import java.util.Locale;
 
 public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
-    public static int TOOLS_WIDTH = 100;
+    public static final int TOOLS_WIDTH = 100;
 
     float camYaw = (float) (-Math.PI / 4 * 3);
     float camPitch = (float) (-Math.PI / 4);
     float camZoom = 100.0f;
 
-    public FurnitureData data;
+    public final FurnitureData data;
     public FurnitureData.Element hoveredElement;
     public FurnitureData.Element selectedElement;
     public Direction hoveredDirection;
 
     DraggingContext draggingContext;
+    boolean isRotatingView;
     boolean holdingShift = false;
     boolean holdingCtrl = false;
     boolean holdingSpace = false;
@@ -47,10 +48,10 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
     int lastMouseX;
     int lastMouseY;
 
-    MaterialsComponent materialsComponent = new MaterialsComponent(this);
-    ModelComponent modelComponent = new ModelComponent(this);
-    EffectsComponent effectsComponent = new EffectsComponent(this);
-    SettingsComponent settingsComponent = new SettingsComponent(this);
+    final MaterialsComponent materialsComponent = new MaterialsComponent(this);
+    final ModelComponent modelComponent = new ModelComponent(this);
+    final EffectsComponent effectsComponent = new EffectsComponent(this);
+    final SettingsComponent settingsComponent = new SettingsComponent(this);
 
     Page currentPage = Page.MODEL;
 
@@ -130,7 +131,7 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
-        if (draggingContext == null && isOverRightWindow(mouseX, mouseY)) {
+        if (isRotatingView) {
             camYaw += (float) (dragX * 0.015f);
             camPitch -= (float) (dragY * 0.015f);
         }
@@ -182,14 +183,13 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (button == 0 || button == 1) {
-            if (hoveredElement != null) {
-                selectedElement = hoveredElement;
-                init();
-
-                draggingContext = new DraggingContext(hoveredElement, hoveredDirection, mouseX, mouseY, button == 1);
-            }
+        if ((button == 0 || button == 1) && hoveredElement != null) {
+            selectedElement = hoveredElement;
+            draggingContext = new DraggingContext(hoveredElement, hoveredDirection, mouseX, mouseY, button == 1);
+            init();
         }
+
+        isRotatingView = isOverRightWindow(mouseX, mouseY);
 
         lastMouseX = (int) mouseX;
         lastMouseY = (int) mouseY;
@@ -303,7 +303,7 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
         graphics.pose().pushPose();
         graphics.pose().translate(x, y, 100.0);
         graphics.pose().translate(0.5, 1.0, 0.5);
-        graphics.pose().mulPoseMatrix(new Matrix4f().scaling(size, size, size));
+        graphics.pose().mulPoseMatrix(new Matrix4f().scaling(size));
         graphics.pose().mulPose(new Quaternionf().rotateX(pitch).rotateY(yaw));
         graphics.pose().translate(-0.5, 0.4, -0.5);
         graphics.pose().mulPoseMatrix(new Matrix4f().scaling(1, -1, 1));

@@ -26,7 +26,7 @@ public class FurnitureModelBaker {
         }
     }
 
-    static ModelBakerImpl modelBaker = new ModelBakerImpl();
+    static final ModelBakerImpl modelBaker = new ModelBakerImpl();
 
     public static BakedModel getModel(FurnitureData data) {
         DynamicAtlas atlas = DynamicAtlas.SCRATCH;

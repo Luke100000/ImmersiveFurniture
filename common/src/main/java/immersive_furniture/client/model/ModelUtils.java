@@ -4,7 +4,6 @@ import immersive_furniture.data.FurnitureData;
 import net.minecraft.client.renderer.FaceInfo;
 import net.minecraft.client.renderer.block.model.BlockElementRotation;
 import net.minecraft.core.Direction;
-import org.jetbrains.annotations.NotNull;
 import org.joml.*;
 
 import java.lang.Math;
@@ -81,9 +80,6 @@ public class ModelUtils {
             default -> throw new IllegalArgumentException("Invalid direction: " + direction);
         }
     }
-
-    private static final float RESCALE_22_5 = 1.0f / (float) Math.cos(0.3926991f) - 1.0f;
-    private static final float RESCALE_45 = 1.0f / (float) Math.cos(0.7853981852531433) - 1.0f;
 
     public static Vector3f getVertex(Direction facing, int vertex, float[] fs, BlockElementRotation rotation, Matrix4f transform) {
         FaceInfo.VertexInfo vertexInfo = FaceInfo.fromFacing(facing).getVertexInfo(vertex);

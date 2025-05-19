@@ -9,7 +9,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.resources.ResourceLocation;
 import org.apache.commons.io.FileUtils;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,22 +19,16 @@ import java.util.concurrent.ConcurrentHashMap;
 import static immersive_furniture.data.api.API.request;
 
 public class FurnitureDataManager {
-    public static Map<ResourceLocation, FurnitureData> MODELS = new ConcurrentHashMap<>();
-    public static Set<ResourceLocation> REQUESTED_MODELS = ConcurrentHashMap.newKeySet();
-
-    private static String toFileName(ResourceLocation id) {
-        return (id.getNamespace() + "-" + id.getPath()).replace("/", "_");
-    }
+    public static final Map<ResourceLocation, FurnitureData> MODELS = new ConcurrentHashMap<>();
+    public static final Set<ResourceLocation> REQUESTED_MODELS = ConcurrentHashMap.newKeySet();
 
     private static File getFile(ResourceLocation id) {
+        File file = new File("./immersive_furniture/" + id.getNamespace() + "/" + id.getPath() + ".nbt");
+
         //noinspection ResultOfMethodCallIgnored
-        new File("./immersive_furniture/").mkdirs();
+        file.getParentFile().mkdirs();
 
-        return new File("./immersive_furniture/" + toFileName(id) + ".nbt");
-    }
-
-    private static @NotNull ResourceLocation getSafeLocalLocation(FurnitureData data) {
-        return new ResourceLocation("local", toSafeName(data.name));
+        return file;
     }
 
     private static File getLocalFile(FurnitureData data) {
@@ -55,6 +48,10 @@ public class FurnitureDataManager {
         }
     }
 
+    public static String toSafeName(String input) {
+        return input.replaceAll("[^a-z0-9_\\-.]", "_");
+    }
+
     public static List<ResourceLocation> getLocalFiles() {
         File cache = new File("./immersive_furniture/local");
         File[] files = cache.listFiles();
@@ -68,8 +65,8 @@ public class FurnitureDataManager {
                 .toList();
     }
 
-    public static String toSafeName(String input) {
-        return input.replaceAll("[^a-z0-9_\\-.]", "_");
+    public static ResourceLocation getSafeLocalLocation(FurnitureData data) {
+        return new ResourceLocation("local", toSafeName(data.name.toLowerCase(Locale.ROOT)));
     }
 
     public static boolean localFileExists(FurnitureData data) {
@@ -80,7 +77,7 @@ public class FurnitureDataManager {
         delete(getLocalFile(MODELS.get(selected)));
     }
 
-    public static void safeLocalFile(FurnitureData data) {
+    public static void saveLocalFile(FurnitureData data) {
         File cache = getLocalFile(data);
         try {
             NbtIo.write(data.toTag(), cache);
@@ -101,12 +98,15 @@ public class FurnitureDataManager {
                     CompoundTag tag = NbtIo.read(cache);
                     if (tag == null) {
                         delete(cache);
+                        Common.logger.error("Failed to read file: {}", cache);
                     } else {
                         FurnitureData data = new FurnitureData(tag);
                         MODELS.put(id, data);
+                        return data;
                     }
                 } catch (IOException e) {
                     delete(cache);
+                    Common.logger.error("Failed to read file: {}", cache, e);
                 }
             }
 
@@ -124,13 +124,13 @@ public class FurnitureDataManager {
 
                 // Download assets when versions mismatch
                 CompletableFuture.runAsync(() -> {
-                    Response response = request(API.HttpMethod.GET, ContentResponse.class, "content/mca/" + contentid, Map.of("version", String.valueOf(version)));
+                    Response response = request(API.HttpMethod.GET, ContentResponse::new, "content/furniture/" + contentid, Map.of("version", String.valueOf(version)));
                     if (response instanceof ContentResponse contentResponse) {
                         write(cache, Base64.getDecoder().decode(contentResponse.content().data()));
                     }
                 });
             } else {
-                // TODO: Request from server
+                // TODO: Request from server as part of data-packs
             }
         }
         return MODELS.get(id);

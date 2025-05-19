@@ -1,13 +1,9 @@
 package immersive_furniture.forge.cobalt.registration;
 
 import immersive_furniture.cobalt.registration.Registration;
-import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -27,11 +23,6 @@ public class RegistrationImpl extends Registration.Impl {
         return repos.computeIfAbsent(namespace, RegistryRepo::new);
     }
 
-    @Override
-    public <T extends Entity> void registerEntityRenderer(EntityType<T> type, EntityRendererProvider<T> constructor) {
-        EntityRenderers.register(type, constructor);
-    }
-
     @SuppressWarnings({"unchecked", "rawtypes"})
     @Override
     public <T> Supplier<T> register(Registry<? super T> registry, ResourceLocation id, Supplier<T> obj) {
@@ -40,7 +31,7 @@ public class RegistrationImpl extends Registration.Impl {
     }
 
     @Override
-    public <T extends BlockEntity> BlockEntityType.Builder<T> blockEntityTypeBuilder(Registration.CoboltBlockEntitySupplier<T> supplier, Block block) {
+    public <T extends BlockEntity> BlockEntityType.Builder<T> blockEntityTypeBuilder(Registration.CobaltBlockEntitySupplier<T> supplier, Block block) {
         return BlockEntityType.Builder.of(supplier::create, block);
     }
 

@@ -21,15 +21,6 @@
     ],
     "client": [
       "immersive_furniture.fabric.ClientFabric"
-    ],
-    "modmenu": [
-      "immersive_furniture.config.ModMenuIntegration"
-    ],
-    "jei_mod_plugin": [
-      "immersive_furniture.combat.JEICCombat"
-    ],
-    "rei_client": [
-      "immersive_furniture.combat.REICombat"
     ]
   },
   "mixins": [

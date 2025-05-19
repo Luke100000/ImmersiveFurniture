@@ -9,19 +9,19 @@ public class AmbientOcclusion {
     public static final AmbientOcclusion INSTANCE = new AmbientOcclusion();
     private static final float STEP_SIZE = (float) (1.0f / Math.sqrt(3));
 
-    boolean[] solid;
-    Map<Long, Float> cache = new HashMap<>();
+    final boolean[] solid;
+    final Map<Long, Float> cache = new HashMap<>();
 
-    int width;
-    int height;
-    int depth;
+    final int width;
+    final int height;
+    final int depth;
 
-    int offsetX;
-    int offsetY;
-    int offsetZ;
+    final int offsetX;
+    final int offsetY;
+    final int offsetZ;
 
     int totalKernelWeight = 0;
-    List<Vector4i> kernel = new ArrayList<>();
+    final List<Vector4i> kernel = new ArrayList<>();
 
     public AmbientOcclusion() {
         width = 52;

@@ -14,9 +14,9 @@ import java.util.List;
 import java.util.Objects;
 
 public class DynamicAtlas extends DynamicTexture {
-    public static DynamicAtlas BAKED = new DynamicAtlas(512, "baked");
-    public static DynamicAtlas ENTITY = new DynamicAtlas(512, "entity");
-    public static DynamicAtlas SCRATCH = new DynamicAtlas(512, "scratch");
+    public static final DynamicAtlas BAKED = new DynamicAtlas(512, "baked");
+    public static final DynamicAtlas ENTITY = new DynamicAtlas(512, "entity");
+    public static final DynamicAtlas SCRATCH = new DynamicAtlas(512, "scratch");
 
     boolean full;
     int allocated;

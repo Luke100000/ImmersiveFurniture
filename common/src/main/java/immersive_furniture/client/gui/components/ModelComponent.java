@@ -61,6 +61,13 @@ public class ModelComponent extends ScreenComponent {
             screen.init();
         });
 
+        // Duplicate
+        addButton(leftPos + 42, topPos + height - 22, 16, 160, 96, () -> {
+            screen.selectedElement = new FurnitureData.Element(screen.selectedElement);
+            screen.data.elements.add(screen.selectedElement);
+            screen.init();
+        });
+
         // Position
         px = addNewFloatBox(leftPos + 6, topPos + 17, 28);
         px.setValue(Float.toString(screen.selectedElement.from.x));

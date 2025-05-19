@@ -16,15 +16,11 @@ import java.util.function.Supplier;
 public class Registration {
     private static Impl INSTANCE;
 
-    public static <T extends Entity> void register(EntityType<T> type, EntityRendererProvider<T> constructor) {
-        INSTANCE.registerEntityRenderer(type, constructor);
-    }
-
     public static <T> Supplier<T> register(Registry<? super T> registry, ResourceLocation id, Supplier<T> obj) {
         return INSTANCE.register(registry, id, obj);
     }
 
-    public static <T extends BlockEntity> BlockEntityType.Builder<T> blockEntityTypeBuilder(CoboltBlockEntitySupplier<T> supplier, Block block) {
+    public static <T extends BlockEntity> BlockEntityType.Builder<T> blockEntityTypeBuilder(CobaltBlockEntitySupplier<T> supplier, Block block) {
         return INSTANCE.blockEntityTypeBuilder(supplier, block);
     }
 
@@ -33,15 +29,12 @@ public class Registration {
             INSTANCE = this;
         }
 
-        public abstract <T extends Entity> void registerEntityRenderer(EntityType<T> type, EntityRendererProvider<T> constructor);
-
-
         public abstract <T> Supplier<T> register(Registry<? super T> registry, ResourceLocation id, Supplier<T> obj);
 
-        public abstract <T extends BlockEntity> BlockEntityType.Builder<T> blockEntityTypeBuilder(CoboltBlockEntitySupplier<T> supplier, Block block);
+        public abstract <T extends BlockEntity> BlockEntityType.Builder<T> blockEntityTypeBuilder(CobaltBlockEntitySupplier<T> supplier, Block block);
     }
 
-    public interface CoboltBlockEntitySupplier<T extends BlockEntity> {
+    public interface CobaltBlockEntitySupplier<T extends BlockEntity> {
         T create(BlockPos blockPos, BlockState blockState);
     }
 }

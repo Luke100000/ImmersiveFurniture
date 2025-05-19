@@ -7,7 +7,6 @@ import org.apache.logging.log4j.Logger;
 
 public final class Common {
     public static final String MOD_ID = "immersive_furniture";
-    public static String MOD_LOADER = "unknown";
     public static NetworkManager networkManager;
 
     public static ClientHandler clientHandler = new ClientHandler() {
