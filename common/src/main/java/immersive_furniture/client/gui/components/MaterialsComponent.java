@@ -69,21 +69,21 @@ public class MaterialsComponent extends ScreenComponent {
         // Material settings
         if (screen.selectedElement != null) {
             // Toggle 90° rotation
-            rotateButton = addButton(leftPos + 6, topPos + 20, 16, 96, 96, Component.translatable("gui.immersive_furniture.rotate"), () -> {
+            rotateButton = addToggleButton(leftPos + 6, topPos + 20, 16, 96, 96, "gui.immersive_furniture.rotate", () -> {
                 screen.selectedElement.material.rotate = !screen.selectedElement.material.rotate;
                 rotateButton.setEnabled(screen.selectedElement.material.rotate);
             });
             rotateButton.setEnabled(screen.selectedElement.material.rotate);
 
             // Toggle flip
-            flipButton = addButton(leftPos + 6 + 16, topPos + 20, 16, 112, 96, Component.translatable("gui.immersive_furniture.flip"), () -> {
+            flipButton = addToggleButton(leftPos + 6 + 18, topPos + 20, 16, 112, 96, "gui.immersive_furniture.flip", () -> {
                 screen.selectedElement.material.flip = !screen.selectedElement.material.flip;
                 flipButton.setEnabled(screen.selectedElement.material.flip);
             });
             flipButton.setEnabled(screen.selectedElement.material.flip);
 
             // Toggle repeat
-            repeatButton = addButton(leftPos + 6 + 32, topPos + 20, 16, 144, 96, Component.translatable("gui.immersive_furniture.repeat"), () -> {
+            repeatButton = addToggleButton(leftPos + 6 + 36, topPos + 20, 16, 144, 96, "gui.immersive_furniture.repeat", () -> {
                 if (screen.selectedElement.material.wrap == FurnitureData.WrapMode.EXPAND) {
                     screen.selectedElement.material.wrap = FurnitureData.WrapMode.REPEAT;
                     repeatButton.setEnabled(false);
@@ -95,7 +95,7 @@ public class MaterialsComponent extends ScreenComponent {
             repeatButton.setEnabled(screen.selectedElement.material.wrap == FurnitureData.WrapMode.EXPAND);
 
             // Mark as favorite
-            favoriteButton = addButton(leftPos + 100 - 6 - 16, topPos + 20, 16, 128, 96, Component.translatable("gui.immersive_furniture.favorite"), () -> {
+            favoriteButton = addToggleButton(leftPos + 100 - 6 - 16, topPos + 20, 16, 128, 96, "gui.immersive_furniture.favorite", () -> {
                 String location = screen.selectedElement.material.source.location().toString();
                 if (Config.getInstance().favorites.contains(location)) {
                     Config.getInstance().favorites.remove(location);
@@ -114,7 +114,7 @@ public class MaterialsComponent extends ScreenComponent {
             int x = i % 5;
             int y = i / 5;
             MaterialButton button = new MaterialButton(
-                    leftPos + 6 + x * 17, topPos + 38 + y * 17,
+                    leftPos + 6 + x * 18, topPos + 37 + y * 17,
                     16, 16, 0, 96,
                     b -> {
                         currentGroup = GROUPS.get(index).name;
@@ -133,7 +133,7 @@ public class MaterialsComponent extends ScreenComponent {
         for (int y = 0; y < 4; y++) {
             for (int x = 0; x < 4; x++) {
                 MaterialButton button = new MaterialButton(
-                        leftPos + 6 + x * 22, topPos + 70 + y * 22,
+                        leftPos + 6 + x * 22, topPos + 72 + y * 22,
                         22, 22, 234, 130,
                         b -> {
                             if (screen.selectedElement != null) {
@@ -150,13 +150,13 @@ public class MaterialsComponent extends ScreenComponent {
 
         // Page buttons
         screen.addRenderableWidget(
-                new ImageButton(leftPos + 6, topPos + height - 20, 12, 15, 13, 226, 15, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE, b -> {
+                new ImageButton(leftPos + 6, topPos + height - 19, 12, 15, 13, 226, 15, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE, b -> {
                     page = Math.max(0, page - 1);
                     updateSearch(searchBox.getValue());
                 })
         );
         screen.addRenderableWidget(
-                new ImageButton(leftPos + width - 18, topPos + height - 20, 12, 15, 0, 226, 15, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE, b -> {
+                new ImageButton(leftPos + width - 18, topPos + height - 19, 12, 15, 0, 226, 15, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE, b -> {
                     page += 1;
                     updateSearch(searchBox.getValue());
                 })

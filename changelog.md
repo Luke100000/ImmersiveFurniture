@@ -6,6 +6,8 @@ Initial release
 
 * Scrap shapes, finish global effects
 * Finish material selector
+* I believe north and south is swapped
+* Add cancel button to editor
 * Fix rotations
     * Fix AO
 * Fix material texture fetcher

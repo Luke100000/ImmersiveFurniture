@@ -34,7 +34,7 @@ public class FurnitureItem extends BlockItem {
     }
 
     public static FurnitureData getData(ItemStack stack) {
-        CompoundTag tag = BlockItem.getBlockEntityData(stack);
+        CompoundTag tag = stack.getOrCreateTag();// BlockItem.getBlockEntityData(stack);
         return tag == null ? FurnitureData.EMPTY : new FurnitureData(tag.getCompound(FURNITURE));
     }
 

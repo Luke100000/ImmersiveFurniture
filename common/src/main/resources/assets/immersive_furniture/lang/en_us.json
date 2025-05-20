@@ -11,6 +11,9 @@
   "gui.immersive_furniture.tag.decorative": "Decorative",
   "gui.immersive_furniture.tag.functional": "Functional",
 
+  "gui.immersive_furniture.new_element": "New element",
+  "gui.immersive_furniture.delete_element": "Delete element",
+  "gui.immersive_furniture.duplicate_element": "Duplicate element",
   "gui.immersive_furniture.select": "Select an element",
   "gui.immersive_furniture.position": "Position",
   "gui.immersive_furniture.size": "Size",
@@ -49,6 +52,8 @@
 
   "gui.immersive_furniture.sort.date": "Sort by date",
   "gui.immersive_furniture.sort.favorites": "Sort by favorites",
+
+  "gui.immersive_furniture.tab.cancel": "Cancel",
 
   "gui.immersive_furniture.tab.local": "Local",
   "gui.immersive_furniture.tab.local.hint": "Local creations you created.",

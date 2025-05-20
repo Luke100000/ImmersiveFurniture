@@ -25,7 +25,7 @@ public class FurnitureData {
     public int lightLevel;
     public int inventorySize;
 
-    public int contentid;
+    public int contentid = -1;
 
     public final List<Element> elements = new LinkedList<>();
 

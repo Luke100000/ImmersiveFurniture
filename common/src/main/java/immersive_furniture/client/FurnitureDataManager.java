@@ -114,7 +114,7 @@ public class FurnitureDataManager {
             if (id.getNamespace().equals("library")) {
                 int contentid, version;
                 try {
-                    String[] split = id.getPath().split("/");
+                    String[] split = id.getPath().split("\\.");
                     contentid = Integer.parseInt(split[0]);
                     version = Integer.parseInt(split[1]);
                 } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
@@ -127,6 +127,10 @@ public class FurnitureDataManager {
                     Response response = request(API.HttpMethod.GET, ContentResponse::new, "content/furniture/" + contentid, Map.of("version", String.valueOf(version)));
                     if (response instanceof ContentResponse contentResponse) {
                         write(cache, Base64.getDecoder().decode(contentResponse.content().data()));
+                        FurnitureData model = getModel(id);
+                        if (model != null) {
+                            model.contentid = contentResponse.content().contentid();
+                        }
                     }
                 });
             } else {

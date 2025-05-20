@@ -3,6 +3,7 @@ package immersive_furniture.client.gui.components;
 import immersive_furniture.client.gui.ArtisansWorkstationEditorScreen;
 import immersive_furniture.client.gui.widgets.StateImageButton;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.network.chat.Component;
 
@@ -30,19 +31,29 @@ public class ScreenComponent {
         this.height = height;
     }
 
-    protected StateImageButton addButton(int x, int y, int size, int u, int v, Runnable clicked) {
-        return addButton(x, y, size, u, v, null, clicked);
-    }
-
-    protected StateImageButton addButton(int x, int y, int size, int u, int v, Component tooltip, Runnable clicked) {
-        StateImageButton button = screen.addRenderableWidget(
-                new StateImageButton(x, y, size, size, u, v, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE,
+    protected ImageButton addButton(int x, int y, int size, int u, int v, String tooltip, Runnable clicked) {
+        ImageButton button = screen.addRenderableWidget(
+                new ImageButton(x, y, size, size, u, v, size, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE,
                         b -> clicked.run(),
-                        tooltip == null ? Component.literal("") : tooltip)
+                        tooltip == null ? Component.literal("") : Component.translatable(tooltip))
         );
 
         if (tooltip != null) {
-            button.setTooltip(Tooltip.create(tooltip));
+            button.setTooltip(Tooltip.create(Component.translatable(tooltip)));
+        }
+
+        return button;
+    }
+
+    protected StateImageButton addToggleButton(int x, int y, int size, int u, int v, String tooltip, Runnable clicked) {
+        StateImageButton button = screen.addRenderableWidget(
+                new StateImageButton(x, y, size, size, u, v, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE,
+                        b -> clicked.run(),
+                        tooltip == null ? Component.literal("") : Component.translatable(tooltip))
+        );
+
+        if (tooltip != null) {
+            button.setTooltip(Tooltip.create(Component.translatable(tooltip)));
         }
 
         return button;

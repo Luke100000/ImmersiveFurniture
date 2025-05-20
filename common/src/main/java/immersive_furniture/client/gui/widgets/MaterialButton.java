@@ -46,7 +46,7 @@ public class MaterialButton extends StateImageButton {
         TextureAtlasSprite east = material.east().sprite();
 
         // Cube vertices in isometric perspective
-        float size = width * 0.5f * (mouseX > getX() && mouseX < getX() + width && mouseY > getY() && mouseY < getY() + height ? 1.1f : 1.0f);
+        float size = width * 0.4f * (mouseX > getX() && mouseX < getX() + width && mouseY > getY() && mouseY < getY() + height ? 1.1f : 1.0f);
         float x = getX() + width / 2.0f;
         float y = getY() + height / 2.0f - size / 4 * 2.5f;
 

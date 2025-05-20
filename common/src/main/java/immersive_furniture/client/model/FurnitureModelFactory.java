@@ -116,6 +116,7 @@ public class FurnitureModelFactory {
     }
 
     public static BlockModel getModel(FurnitureData data, DynamicAtlas atlas) {
+        // Render AO lookup
         AmbientOcclusion ao = AmbientOcclusion.INSTANCE;
         ao.clear();
         for (FurnitureData.Element element : data.elements) {

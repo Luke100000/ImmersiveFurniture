@@ -46,7 +46,7 @@ public class ModelComponent extends ScreenComponent {
         super.init(leftPos, topPos, width, height);
 
         // New
-        addButton(leftPos + 6, topPos + height - 22, 16, 64, 96, () -> {
+        addButton(leftPos + 6, topPos + height - 22, 16, 64, 96, "gui.immersive_furniture.new_element", () -> {
             screen.selectedElement = new FurnitureData.Element();
             screen.data.elements.add(screen.selectedElement);
             screen.init();
@@ -55,14 +55,14 @@ public class ModelComponent extends ScreenComponent {
         if (screen.selectedElement == null) return;
 
         // Delete
-        addButton(leftPos + 24, topPos + height - 22, 16, 80, 96, () -> {
+        addButton(leftPos + 24, topPos + height - 22, 16, 80, 96, "gui.immersive_furniture.delete_element", () -> {
             screen.data.elements.remove(screen.selectedElement);
             screen.selectedElement = null;
             screen.init();
         });
 
         // Duplicate
-        addButton(leftPos + 42, topPos + height - 22, 16, 160, 96, () -> {
+        addButton(leftPos + 42, topPos + height - 22, 16, 160, 96, "gui.immersive_furniture.duplicate_element", () -> {
             screen.selectedElement = new FurnitureData.Element(screen.selectedElement);
             screen.data.elements.add(screen.selectedElement);
             screen.init();
@@ -119,19 +119,19 @@ public class ModelComponent extends ScreenComponent {
         });
 
         // Rotation
-        rx = addButton(leftPos + 6, topPos + 77, 16, 16, 96, () -> {
+        rx = addToggleButton(leftPos + 6, topPos + 77, 16, 16, 96, null, () -> {
             screen.selectedElement.axis = Direction.Axis.X;
             rx.setEnabled(true);
             ry.setEnabled(false);
             rz.setEnabled(false);
         });
-        ry = addButton(leftPos + 24, topPos + 77, 16, 32, 96, () -> {
+        ry = addToggleButton(leftPos + 24, topPos + 77, 16, 32, 96, null, () -> {
             screen.selectedElement.axis = Direction.Axis.Y;
             rx.setEnabled(false);
             ry.setEnabled(true);
             rz.setEnabled(false);
         });
-        rz = addButton(leftPos + 42, topPos + 77, 16, 48, 96, () -> {
+        rz = addToggleButton(leftPos + 42, topPos + 77, 16, 48, 96, null, () -> {
             screen.selectedElement.axis = Direction.Axis.Z;
             rx.setEnabled(false);
             ry.setEnabled(false);
@@ -142,9 +142,9 @@ public class ModelComponent extends ScreenComponent {
         ry.setEnabled(screen.selectedElement.axis == Direction.Axis.Y);
         rz.setEnabled(screen.selectedElement.axis == Direction.Axis.Z);
 
-        addButton(leftPos + 62, topPos + 78, 14, 26, 228, () ->
+        addButton(leftPos + 62, topPos + 78, 14, 26, 228, null, () ->
                 screen.selectedElement.rotation = (screen.selectedElement.rotation + 22.5f) % 360);
-        addButton(leftPos + 78, topPos + 78, 14, 42, 228, () ->
+        addButton(leftPos + 78, topPos + 78, 14, 42, 228, null, () ->
                 screen.selectedElement.rotation = (screen.selectedElement.rotation - 22.5f) % 360);
     }
 

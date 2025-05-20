@@ -81,11 +81,19 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
             case SETTINGS -> settingsComponent.init(leftPos, topPos, TOOLS_WIDTH, windowHeight);
         }
 
+        // Close
+        MutableComponent text = Component.translatable("gui.immersive_furniture.tab.close");
+        StateImageButton button = new StateImageButton(
+                16, topPos - 24, 26, 28,
+                130, 128, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE,
+                b -> Minecraft.getInstance().setScreen(new ArtisansWorkstationLibraryScreen()), text);
+        button.setTooltip(Tooltip.create(text));
+        addRenderableWidget(button);
+
         // Page buttons
         int x = 0;
         for (Page page : Page.values()) {
-            StateImageButton button = pagePageButton(page, x);
-            addRenderableWidget(button);
+            addRenderableWidget(pagePageButton(page, x));
             x += 26;
         }
     }
@@ -186,10 +194,11 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
         if ((button == 0 || button == 1) && hoveredElement != null) {
             selectedElement = hoveredElement;
             draggingContext = new DraggingContext(hoveredElement, hoveredDirection, mouseX, mouseY, button == 1);
+            isRotatingView = false;
             init();
+        } else {
+            isRotatingView = isOverRightWindow(mouseX, mouseY);
         }
-
-        isRotatingView = isOverRightWindow(mouseX, mouseY);
 
         lastMouseX = (int) mouseX;
         lastMouseY = (int) mouseY;
@@ -391,5 +400,10 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
         }
 
         graphics.flush();
+    }
+
+    @Override
+    public boolean shouldCloseOnEsc() {
+        return false;
     }
 }

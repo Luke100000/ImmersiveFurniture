@@ -10,12 +10,9 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
 
 import java.util.List;
 import java.util.Locale;
-
-import static immersive_furniture.client.gui.ArtisansWorkstationEditorScreen.TOOLS_WIDTH;
 
 public class SettingsComponent extends ScreenComponent {
     static final Component SEARCH_TITLE = Component.translatable("gui.immersive_furniture.name");
@@ -59,8 +56,9 @@ public class SettingsComponent extends ScreenComponent {
         int x = leftPos + 6;
         int y = topPos + 22;
         for (String tag : TAGS) {
-            MutableComponent text = Component.translatable("gui.immersive_furniture.tag." + tag.toLowerCase(Locale.ROOT));
-            addButton(x, y, 16, 48, 96, text, () -> screen.data.tag = tag).setEnabled(!tag.equals("light"));
+            addToggleButton(x, y, 16, 48, 96,
+                    "gui.immersive_furniture.tag." + tag.toLowerCase(Locale.ROOT),
+                    () -> screen.data.tag = tag).setEnabled(!tag.equals("light"));
             x += 18;
             if (x > leftPos + width - 6) {
                 x = leftPos + 6;
@@ -85,6 +83,7 @@ public class SettingsComponent extends ScreenComponent {
             // Switch to library screen
             ArtisansWorkstationLibraryScreen libraryScreen = new ArtisansWorkstationLibraryScreen();
             libraryScreen.setSelected(FurnitureDataManager.getSafeLocalLocation(screen.data));
+            libraryScreen.setTab(ArtisansWorkstationLibraryScreen.Tab.LOCAL);
             Minecraft.getInstance().setScreen(libraryScreen);
         }, leftPos + 6, topPos + 154, width - 12);
     }
