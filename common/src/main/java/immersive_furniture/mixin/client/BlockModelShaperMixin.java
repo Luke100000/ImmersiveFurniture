@@ -16,6 +16,7 @@ public class BlockModelShaperMixin {
     @Inject(method = "getBlockModel(Lnet/minecraft/world/level/block/state/BlockState;)Lnet/minecraft/client/resources/model/BakedModel;", at = @At("HEAD"), cancellable = true)
     private void immersiveFuture$getBlockModel(BlockState state, CallbackInfoReturnable<BakedModel> cir) {
         if (state.getBlock() instanceof FurnitureBlock) {
+            // TODO: Requires global state to FurnitureData lookup.
             cir.setReturnValue(FurnitureModelBaker.getModel(FurnitureData.EMPTY));
         }
     }

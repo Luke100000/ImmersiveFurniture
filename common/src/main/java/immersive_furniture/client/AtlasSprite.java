@@ -2,6 +2,7 @@ package immersive_furniture.client;
 
 import com.mojang.blaze3d.platform.NativeImage;
 import immersive_furniture.mixin.client.SpriteContentsAccessor;
+import net.minecraft.client.renderer.texture.MipmapGenerator;
 import net.minecraft.client.renderer.texture.SpriteContents;
 import net.minecraft.client.renderer.texture.SpriteTicker;
 
@@ -11,8 +12,6 @@ public class AtlasSprite {
     public static class Ticker implements SpriteTicker {
         private final SpriteContents spriteContents;
         private final SpriteContentsAccessor spriteContentsAccessor;
-
-        private final Random random = new Random();
 
         public Ticker(SpriteContents spriteContents) {
             this.spriteContents = spriteContents;
@@ -27,9 +26,11 @@ public class AtlasSprite {
 
         @Override
         public void tickAndUpload(int x, int y) {
-            spriteContentsAccessor.getMipLevelData()[0].fillRect(x, y, spriteContents.width(), spriteContents.height(), random.nextInt());
-            // TODO: MipmapGenerator.generateMipmaps(spriteContentsAccessor.getMipLevelData());
-            upload(x, y, spriteContentsAccessor.getMipLevelData());
+            NativeImage[] content = spriteContentsAccessor.getMipLevelData();
+            // TODO: Paste the dynamic block atlas here
+            content[0].fillRect(x, y, spriteContents.width(), spriteContents.height(), 0xFFFF0000);
+            // Remember about mipmaps!
+            upload(x, y, content);
         }
 
         @Override

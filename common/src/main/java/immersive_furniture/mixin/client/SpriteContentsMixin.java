@@ -18,7 +18,7 @@ public abstract class SpriteContentsMixin {
 
     @Inject(method = "createTicker()Lnet/minecraft/client/renderer/texture/SpriteTicker;", at = @At("HEAD"), cancellable = true)
     private void immersiveFurniture$createTicker(CallbackInfoReturnable<SpriteTicker> cir) {
-        // Cancel the method
+        // We use a custom ticker which keeps the block atlas in sync with the dynamic furniture atlas.
         if (this.name().equals(Common.locate("block/furniture"))) {
             cir.setReturnValue(new AtlasSprite.Ticker((SpriteContents) (Object) this));
         }

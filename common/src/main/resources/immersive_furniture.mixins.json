@@ -10,6 +10,6 @@
   },
   "client": [
     "client.BlockModelAccessor", "client.BlockModelShaperMixin", "client.ItemModelShaperMixin",
-    "client.ModelBakeryMixin", "client.SpriteContentsAccessor", "client.SpriteContentsMixin"
+    "client.ItemRendererMixin", "client.ModelBakeryMixin", "client.SpriteContentsAccessor", "client.SpriteContentsMixin"
   ]
 }

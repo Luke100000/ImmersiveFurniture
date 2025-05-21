@@ -37,6 +37,7 @@ public class ModelBakeryMixin {
 
     @Inject(method = "bakeModels(Ljava/util/function/BiFunction;)V", at = @At("HEAD"))
     private void onBakeModels(BiFunction<ResourceLocation, Material, TextureAtlasSprite> biFunction, CallbackInfo ci) {
+        // Remember all the cube models as potential material sources
         for (BlockModel model : modelResources.values()) {
             if (model.name.contains(":block/") && immersive_furniture$isCube(model)) {
                 MaterialSource source = MaterialSource.create(model);
