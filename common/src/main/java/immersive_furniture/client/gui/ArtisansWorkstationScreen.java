@@ -61,7 +61,7 @@ public abstract class ArtisansWorkstationScreen extends Screen {
     }
 
     static void renderModel(GuiGraphics graphics, FurnitureData data, double x, double y, double size, boolean rotate) {
-        float rot = (float) (rotate ? Math.PI / 4 : (System.currentTimeMillis() % 10000) / 10000.0f * Math.PI * 2.0f);
+        float rot = (float) (rotate ? -Math.PI / 4 * 3 : (System.currentTimeMillis() % 10000) / 10000.0f * Math.PI * 2.0f);
         graphics.pose().pushPose();
         graphics.pose().translate(x, y, 100.0);
         graphics.pose().mulPoseMatrix(new Matrix4f().scaling((float) (size / Math.max(0.5, data.getSize() / 16.0) * 0.3)));

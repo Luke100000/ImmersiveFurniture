@@ -87,7 +87,7 @@ public class FurnitureDataManager {
         }
     }
 
-    public static FurnitureData getModel(ResourceLocation id) {
+    public static FurnitureData getData(ResourceLocation id) {
         if (!MODELS.containsKey(id) && !REQUESTED_MODELS.contains(id)) {
             REQUESTED_MODELS.add(id);
 
@@ -127,9 +127,10 @@ public class FurnitureDataManager {
                     Response response = request(API.HttpMethod.GET, ContentResponse::new, "content/furniture/" + contentid, Map.of("version", String.valueOf(version)));
                     if (response instanceof ContentResponse contentResponse) {
                         write(cache, Base64.getDecoder().decode(contentResponse.content().data()));
-                        FurnitureData model = getModel(id);
+                        FurnitureData model = getData(id);
                         if (model != null) {
                             model.contentid = contentResponse.content().contentid();
+                            model.author = contentResponse.content().username();
                         }
                     }
                 });

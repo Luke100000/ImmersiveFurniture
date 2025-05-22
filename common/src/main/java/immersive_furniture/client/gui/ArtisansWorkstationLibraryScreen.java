@@ -162,7 +162,7 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
                                     authenticated = false;
                                     authenticating = false;
                                 } else {
-                                    // Open browser and start explicit authentication
+                                    // Open a browser and start explicit authentication
                                     Auth.authenticate(getPlayerName());
                                     authenticating = true;
                                     isBrowserOpen = true;
@@ -193,7 +193,7 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
             if (!selected.getNamespace().equals("local")) {
                 addToggleButton(x - 50 - 11, y, 22, 0, 48, "gui.immersive_furniture.favorite", b -> {
                     if (authenticated) {
-                        FurnitureData model = FurnitureDataManager.getModel(selected);
+                        FurnitureData model = FurnitureDataManager.getData(selected);
                         if (model != null) {
                             if (b.isEnabled()) {
                                 request(API.HttpMethod.DELETE, "like/furniture/" + model.contentid);
@@ -212,7 +212,7 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
             if (selected.getNamespace().equals("local")) {
                 addButton(x - 25 - 11, y, 22, 22 * 6, 48, "gui.immersive_furniture.publish", () -> {
                     if (authenticated) {
-                        FurnitureData model = FurnitureDataManager.getModel(selected);
+                        FurnitureData model = FurnitureDataManager.getData(selected);
                         if (model != null) {
                             publish(model);
                         }
@@ -226,7 +226,7 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
             if (tab == Tab.SUBMISSIONS || tab == Tab.LOCAL) {
                 addButton(x - 11, y, 22, 22 * 2, 48, "gui.immersive_furniture.delete", () -> {
                     if (tab == Tab.SUBMISSIONS) {
-                        FurnitureData model = FurnitureDataManager.getModel(selected);
+                        FurnitureData model = FurnitureDataManager.getData(selected);
                         if (model != null) {
                             request(API.HttpMethod.DELETE, "content/furniture/" + model.contentid);
                         } else {
@@ -242,7 +242,7 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
 
             // Modify
             addButton(x + 25 - 11, y, 22, 22, 48, "gui.immersive_furniture.modify", () -> {
-                FurnitureData model = FurnitureDataManager.getModel(selected);
+                FurnitureData model = FurnitureDataManager.getData(selected);
                 if (minecraft != null && model != null) {
                     minecraft.setScreen(new ArtisansWorkstationEditorScreen(model));
                 }
@@ -252,7 +252,7 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
             if (tab == Tab.GLOBAL) {
                 addToggleButton(x + 50 - 11, y, 22, 22 * 5, 48, "gui.immersive_furniture.report", b -> {
                     if (authenticated) {
-                        FurnitureData model = FurnitureDataManager.getModel(selected);
+                        FurnitureData model = FurnitureDataManager.getData(selected);
                         if (model != null) {
                             if (b.isEnabled()) {
                                 request(API.HttpMethod.DELETE, "report/furniture/" + model.contentid + "/DEFAULT");
@@ -280,7 +280,7 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
             // Craft
             addRenderableWidget(
                     Button.builder(Component.translatable("gui.immersive_furniture.craft"), b -> {
-                                NetworkHandler.sendToServer(new CraftRequest(FurnitureDataManager.getModel(selected), holdingShift()));
+                                NetworkHandler.sendToServer(new CraftRequest(FurnitureDataManager.getData(selected), holdingShift()));
                                 Minecraft.getInstance().setScreen(null);
                             })
                             .bounds(leftPos + windowWidth - 68, topPos + windowHeight - 24, 64, 20)
@@ -307,14 +307,15 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
                     drawRectangle(graphics, leftPos + x * w, topPos + 38 + y * h, w, h, 0, hovered ? 96 : 48);
 
                     if (i < furniture.size()) {
-                        FurnitureData data = FurnitureDataManager.getModel(furniture.get(i));
+                        FurnitureData data = FurnitureDataManager.getData(furniture.get(i));
                         if (data != null) {
                             renderModel(graphics, data, leftPos + (x + 0.5) * w, topPos + 38 + (y + 0.5) * h, h, !hovered);
 
                             if (hovered) {
                                 graphics.renderTooltip(font, List.of(
                                         Component.literal(data.name).getVisualOrderText(),
-                                        Component.literal(data.tag).withStyle(ChatFormatting.ITALIC).getVisualOrderText()
+                                        getAuthorComponent(data).getVisualOrderText(),
+                                        Component.literal(data.tag).withStyle(ChatFormatting.ITALIC).withStyle(ChatFormatting.GOLD).getVisualOrderText()
                                 ), lastMouseX, lastMouseY);
                             }
                         }
@@ -331,14 +332,19 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
             drawRectangle(graphics, leftPos, topPos, windowWidth, windowHeight - 28, 0, 48);
             drawRectangle(graphics, leftPos, topPos + windowHeight - 28, windowWidth, 28);
 
-            FurnitureData model = FurnitureDataManager.getModel(selected);
+            FurnitureData data = FurnitureDataManager.getData(selected);
 
-            if (model != null) {
-                renderModel(graphics, model, leftPos + windowWidth / 2.0, topPos + windowHeight / 2.0 - 14, windowHeight - 28, true);
+            if (data != null) {
+                renderModel(graphics, data, leftPos + windowWidth / 2.0, topPos + windowHeight / 2.0 - 14, windowHeight - 28, true);
 
-                graphics.drawString(font, model.name, leftPos + 8, topPos + 8, 0xFFFFFF);
+                graphics.drawString(font, data.name, leftPos + 8, topPos + 8, 0xFFFFFF);
+                graphics.drawString(font, getAuthorComponent(data), leftPos + 8, topPos + 18, 0xFFFFFF);
             }
         }
+    }
+
+    private static Component getAuthorComponent(FurnitureData model) {
+        return Component.translatable("gui.immersive_furniture.author", model.author).withStyle(ChatFormatting.ITALIC).withStyle(ChatFormatting.GRAY);
     }
 
     @Override
@@ -424,7 +430,7 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
                         authenticating = false;
 
                         clearError();
-                        init();
+                        Minecraft.getInstance().execute(this::init);
 
                         // Token accepted, save
                         Auth.saveToken();
@@ -528,7 +534,7 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
                     furniture = Arrays.stream(contentListResponse.contents())
                             .map(c -> new ResourceLocation("library", c.contentid() + "." + c.version()))
                             .collect(Collectors.toList());
-                    init();
+                    Minecraft.getInstance().execute(this::init);
                 } else {
                     setError("gui.immersive_furniture.list_fetch_failed");
                 }

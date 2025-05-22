@@ -24,6 +24,11 @@ public class FurnitureItem extends BlockItem {
     public void appendHoverText(ItemStack stack, @Nullable Level world, List<Component> tooltip, TooltipFlag context) {
         FurnitureData data = getData(stack);
         // TODO: Add tooltip for furniture data
+
+        if (!data.author.isEmpty()) {
+            tooltip.add(Component.translatable("gui.immersive_furniture.author", data.author).withStyle(ChatFormatting.GRAY));
+        }
+
         tooltip.add(Component.literal(String.valueOf(data.elements.size())).withStyle(ChatFormatting.GRAY));
 
         super.appendHoverText(stack, world, tooltip, context);

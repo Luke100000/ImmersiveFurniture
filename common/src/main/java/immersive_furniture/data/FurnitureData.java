@@ -26,6 +26,7 @@ public class FurnitureData {
     public int inventorySize;
 
     public int contentid = -1;
+    public String author = "";
 
     public final List<Element> elements = new LinkedList<>();
 
@@ -40,6 +41,7 @@ public class FurnitureData {
         this.lightLevel = tag.getInt("LightLevel");
         this.inventorySize = tag.getInt("InventorySize");
         this.contentid = tag.getInt("ContentID");
+        this.author = tag.getString("Author");
 
         ListTag elementsTag = tag.getList("Elements", 10);
         for (int i = 0; i < elementsTag.size(); i++) {
@@ -55,6 +57,7 @@ public class FurnitureData {
         tag.putInt("LightLevel", lightLevel);
         tag.putInt("InventorySize", inventorySize);
         tag.putInt("ContentID", contentid);
+        tag.putString("Author", author);
 
         ListTag elementsTag = new ListTag();
         for (Element element : elements) {
@@ -89,7 +92,7 @@ public class FurnitureData {
     }
 
     public double getSize() {
-        // High quality size estimation
+        // High-quality size estimation
         BoundingBox boundingBox = boundingBox();
         return Math.max(
                 Math.max(
@@ -107,6 +110,10 @@ public class FurnitureData {
                         )
                 )
         );
+    }
+
+    public boolean isTranslucent() {
+        return false;
     }
 
     public static class Element {

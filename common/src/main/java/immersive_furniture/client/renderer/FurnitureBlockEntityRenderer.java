@@ -2,6 +2,8 @@ package immersive_furniture.client.renderer;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Axis;
+import immersive_furniture.block.FurnitureBlock;
 import immersive_furniture.block.FurnitureBlockEntity;
 import immersive_furniture.client.model.DynamicAtlas;
 import immersive_furniture.client.model.FurnitureModelBaker;
@@ -16,10 +18,12 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.BannerBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.RotationSegment;
 
 public class FurnitureBlockEntityRenderer<T extends FurnitureBlockEntity> implements BlockEntityRenderer<T> {
-    public FurnitureBlockEntityRenderer(BlockEntityRendererProvider.Context context) {
+    public FurnitureBlockEntityRenderer(BlockEntityRendererProvider.Context ignoredContext) {
         // NO-OP
     }
 
@@ -30,13 +34,25 @@ public class FurnitureBlockEntityRenderer<T extends FurnitureBlockEntity> implem
 
     @Override
     public void render(T blockEntity, float partialTick, PoseStack poseStack, MultiBufferSource buffer, int packedLight, int packedOverlay) {
+        poseStack.pushPose();
+
+        BlockState blockState = blockEntity.getBlockState();
+        if (blockState.getBlock() instanceof FurnitureBlock) {
+            float yaw = -blockState.getValue(FurnitureBlock.FACING).toYRot();
+            poseStack.translate(0.5F, 0.5F, 0.5F);
+            poseStack.mulPose(Axis.YP.rotationDegrees(yaw));
+            poseStack.translate(-0.5F, -0.5F, -0.5F);
+        }
+
         FurnitureData data = blockEntity.getData();
         BlockState state = blockEntity.getBlockState();
         renderFurniture(state, poseStack, buffer, packedLight, packedOverlay, data);
+
+        poseStack.popPose();
     }
 
     private static void renderFurniture(BlockState state, PoseStack poseStack, MultiBufferSource buffer, int packedLight, int packedOverlay, FurnitureData data) {
-        boolean translucent = false; // TODO: Enable when needed
+        boolean translucent = data.isTranslucent();
         BlockRenderDispatcher blockRenderer = Minecraft.getInstance().getBlockRenderer();
         BakedModel bakedModel = FurnitureModelBaker.getModel(data);
         ResourceLocation location = DynamicAtlas.SCRATCH.getLocation();

@@ -21,17 +21,6 @@ public class FurnitureModelFactory {
             "0", Either.left(new Material(InventoryMenu.BLOCK_ATLAS, Common.locate("block/furniture")))
     );
 
-    private static final ItemTransforms TRANSFORMS = new ItemTransforms(
-            new ItemTransform(new Vector3f(), new Vector3f(), new Vector3f(1.0f, 1.0f, 1.0f)),
-            new ItemTransform(new Vector3f(), new Vector3f(), new Vector3f(1.0f, 1.0f, 1.0f)),
-            new ItemTransform(new Vector3f(), new Vector3f(), new Vector3f(1.0f, 1.0f, 1.0f)),
-            new ItemTransform(new Vector3f(), new Vector3f(), new Vector3f(1.0f, 1.0f, 1.0f)),
-            new ItemTransform(new Vector3f(), new Vector3f(), new Vector3f(1.0f, 1.0f, 1.0f)),
-            new ItemTransform(new Vector3f(30, 225, 0), new Vector3f(), new Vector3f(1.0f, 1.0f, 1.0f)),
-            new ItemTransform(new Vector3f(), new Vector3f(), new Vector3f(1.0f, 1.0f, 1.0f)),
-            new ItemTransform(new Vector3f(), new Vector3f(), new Vector3f(1.0f, 1.0f, 1.0f))
-    );
-
     private final FurnitureData data;
     private final DynamicAtlas atlas;
 
@@ -110,8 +99,22 @@ public class FurnitureModelFactory {
                 TEXTURE_MAP,
                 true,
                 BlockModel.GuiLight.SIDE,
-                TRANSFORMS,
+                getTransforms(),
                 List.of()
+        );
+    }
+
+    private ItemTransforms getTransforms() {
+        float scale = (float) (Math.max(8.0, data.getSize()) / 16.0);
+        return new ItemTransforms(
+                new ItemTransform(new Vector3f(75, 225, 0), new Vector3f(0, 2.5f, 0), new Vector3f(0.375f * scale)),
+                new ItemTransform(new Vector3f(75, 45, 0), new Vector3f(0, 2.5f, 0), new Vector3f(0.375f * scale)),
+                new ItemTransform(new Vector3f(0, 225, 0), new Vector3f(), new Vector3f(0.4f * scale)),
+                new ItemTransform(new Vector3f(), new Vector3f(0, 45, 0), new Vector3f(0.4f * scale)),
+                new ItemTransform(new Vector3f(), new Vector3f(), new Vector3f(1.0f)),
+                new ItemTransform(new Vector3f(30, 225, 0), new Vector3f(), new Vector3f(0.625f * scale)),
+                new ItemTransform(new Vector3f(), new Vector3f(0, 3, 0), new Vector3f(0.25f * scale)),
+                new ItemTransform(new Vector3f(), new Vector3f(), new Vector3f(0.5f * scale))
         );
     }
 

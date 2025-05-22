@@ -82,12 +82,13 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
         }
 
         // Close
-        MutableComponent text = Component.translatable("gui.immersive_furniture.tab.close");
+        MutableComponent text = Component.translatable("gui.immersive_furniture.tab.cancel");
         StateImageButton button = new StateImageButton(
-                16, topPos - 24, 26, 28,
+                leftPos + 4, topPos - 24, 26, 28,
                 130, 128, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE,
                 b -> Minecraft.getInstance().setScreen(new ArtisansWorkstationLibraryScreen()), text);
         button.setTooltip(Tooltip.create(text));
+        button.setEnabled(false);
         addRenderableWidget(button);
 
         // Page buttons

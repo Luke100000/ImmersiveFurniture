@@ -50,6 +50,8 @@
   "gui.immersive_furniture.upload_failed": "Upload failed. Woops.",
   "gui.immersive_furniture.back": "Back",
 
+  "gui.immersive_furniture.author": "By %s",
+
   "gui.immersive_furniture.sort.date": "Sort by date",
   "gui.immersive_furniture.sort.favorites": "Sort by favorites",
 
