@@ -35,12 +35,12 @@ public class FurnitureItem extends BlockItem {
     }
 
     public static FurnitureData getData(ItemStack stack) {
-        CompoundTag tag = stack.getTag();
+        CompoundTag tag = stack.getTagElement(BLOCK_ENTITY_TAG);
         return tag == null ? FurnitureData.EMPTY : new FurnitureData(tag.getCompound(FURNITURE));
     }
 
     public static void setData(ItemStack stack, FurnitureData data) {
-        CompoundTag tag = stack.getOrCreateTag();
+        CompoundTag tag = stack.getOrCreateTagElement(BLOCK_ENTITY_TAG);
         tag.put(FURNITURE, data.toTag());
     }
 }

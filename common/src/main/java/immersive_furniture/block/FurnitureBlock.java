@@ -1,6 +1,7 @@
 package immersive_furniture.block;
 
 import immersive_furniture.BlockEntityTypes;
+import immersive_furniture.item.FurnitureItem;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
@@ -9,6 +10,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -154,6 +156,17 @@ public class FurnitureBlock extends BaseEntityBlock implements SimpleWaterlogged
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new FurnitureBlockEntity(pos, state);
+    }
+
+    @Override
+    public ItemStack getCloneItemStack(BlockGetter level, BlockPos pos, BlockState state) {
+        if (level.getBlockEntity(pos) instanceof FurnitureBlockEntity furnitureBlockEntity) {
+            ItemStack itemStack = new ItemStack(asItem());
+            FurnitureItem.setData(itemStack, furnitureBlockEntity.getData());
+            return itemStack;
+        } else {
+            return super.getCloneItemStack(level, pos, state);
+        }
     }
 
     @Override
