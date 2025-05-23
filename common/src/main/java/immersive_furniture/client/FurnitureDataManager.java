@@ -8,10 +8,9 @@ import immersive_furniture.data.api.responses.Response;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.resources.ResourceLocation;
-import org.apache.commons.io.FileUtils;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
@@ -19,8 +18,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import static immersive_furniture.data.api.API.request;
 
 public class FurnitureDataManager {
-    public static final Map<ResourceLocation, FurnitureData> MODELS = new ConcurrentHashMap<>();
-    public static final Set<ResourceLocation> REQUESTED_MODELS = ConcurrentHashMap.newKeySet();
+    public static final Map<ResourceLocation, FurnitureData> DATA = new ConcurrentHashMap<>();
+    public static final Set<ResourceLocation> REQUESTED_DATA = ConcurrentHashMap.newKeySet();
 
     private static File getFile(ResourceLocation id) {
         File file = new File("./immersive_furniture/" + id.getNamespace() + "/" + id.getPath() + ".nbt");
@@ -38,14 +37,6 @@ public class FurnitureDataManager {
     private static void delete(File file) {
         //noinspection ResultOfMethodCallIgnored
         file.delete();
-    }
-
-    private static void write(File file, byte[] content) {
-        try {
-            FileUtils.writeByteArrayToFile(file, content, false);
-        } catch (IOException e) {
-            Common.logger.error("Failed to write file: {}", file, e);
-        }
     }
 
     public static String toSafeName(String input) {
@@ -74,22 +65,22 @@ public class FurnitureDataManager {
     }
 
     public static void deleteLocalFile(ResourceLocation selected) {
-        delete(getLocalFile(MODELS.get(selected)));
+        delete(getLocalFile(DATA.get(selected)));
     }
 
     public static void saveLocalFile(FurnitureData data) {
         File cache = getLocalFile(data);
         try {
             NbtIo.write(data.toTag(), cache);
-            MODELS.put(getSafeLocalLocation(data), data);
+            DATA.put(getSafeLocalLocation(data), data);
         } catch (IOException e) {
             Common.logger.error("Failed to save local file: {}", cache.getPath(), e);
         }
     }
 
     public static FurnitureData getData(ResourceLocation id) {
-        if (!MODELS.containsKey(id) && !REQUESTED_MODELS.contains(id)) {
-            REQUESTED_MODELS.add(id);
+        if (!DATA.containsKey(id) && !REQUESTED_DATA.contains(id)) {
+            REQUESTED_DATA.add(id);
 
             // Load if it exists
             File cache = getFile(id);
@@ -101,7 +92,7 @@ public class FurnitureDataManager {
                         Common.logger.error("Failed to read file: {}", cache);
                     } else {
                         FurnitureData data = new FurnitureData(tag);
-                        MODELS.put(id, data);
+                        DATA.put(id, data);
                         return data;
                     }
                 } catch (IOException e) {
@@ -126,11 +117,14 @@ public class FurnitureDataManager {
                 CompletableFuture.runAsync(() -> {
                     Response response = request(API.HttpMethod.GET, ContentResponse::new, "content/furniture/" + contentid, Map.of("version", String.valueOf(version)));
                     if (response instanceof ContentResponse contentResponse) {
-                        write(cache, Base64.getDecoder().decode(contentResponse.content().data()));
-                        FurnitureData model = getData(id);
-                        if (model != null) {
-                            model.contentid = contentResponse.content().contentid();
-                            model.author = contentResponse.content().username();
+                        DataInput in = new DataInputStream(new ByteArrayInputStream(contentResponse.content().data().getBytes(StandardCharsets.UTF_8)));
+                        try {
+                            FurnitureData data = new FurnitureData(NbtIo.read(in));
+                            data.contentid = contentid;
+                            data.author = contentResponse.content().username();
+                            NbtIo.write(data.toTag(), cache);
+                        } catch (IOException e) {
+                            Common.logger.error("Failed to read content response: {}", contentResponse, e);
                         }
                     }
                 });
@@ -138,6 +132,6 @@ public class FurnitureDataManager {
                 // TODO: Request from server as part of data-packs
             }
         }
-        return MODELS.get(id);
+        return DATA.get(id);
     }
 }

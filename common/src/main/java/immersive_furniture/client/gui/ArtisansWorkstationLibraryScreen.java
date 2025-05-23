@@ -28,7 +28,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import static immersive_furniture.client.FurnitureDataManager.REQUESTED_MODELS;
+import static immersive_furniture.client.FurnitureDataManager.REQUESTED_DATA;
 import static immersive_furniture.client.gui.components.SettingsComponent.TAGS;
 import static immersive_furniture.data.api.API.request;
 
@@ -80,7 +80,7 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
         authenticating = Auth.loadToken() != null;
 
         // Just in case a few jobs failed
-        REQUESTED_MODELS.clear();
+        REQUESTED_DATA.clear();
     }
 
     @Override
