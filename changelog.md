@@ -2,6 +2,11 @@
 
 Initial release
 
+# Roadmap 1.0.0
+
+* High-performance block renderer
+* Blockbench/JSON block and item model import
+
 # Renderer
 
 There are two rendering pipelines:
@@ -24,8 +29,6 @@ For items, one can also use the default rendering over the item renderer, which 
 
 * Scrap shapes, finish global effects
 * Finish material selector
-* I believe north and south is swapped
-* Add cancel button to editor
 * Fix rotations
     * Fix AO
 * Fix material texture fetcher
@@ -34,7 +37,6 @@ For items, one can also use the default rendering over the item renderer, which 
     * With ambient sound
 * Added entity interaction (sit, lay, etc.)
 * Add cost calculation and "Nails and Timber" resource
-* Baked textures support
 * Retire Cobalt
 * Dataloader support and networking
 * Inventory

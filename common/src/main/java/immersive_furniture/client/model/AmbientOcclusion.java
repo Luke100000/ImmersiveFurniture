@@ -1,16 +1,19 @@
 package immersive_furniture.client.model;
 
-import org.joml.*;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
+import org.joml.Vector3i;
+import org.joml.Vector4f;
 
-import java.lang.Math;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class AmbientOcclusion {
     public static final AmbientOcclusion INSTANCE = new AmbientOcclusion();
     private static final float STEP_SIZE = (float) (1.0f / Math.sqrt(3));
 
     final boolean[] solid;
-    final Map<Long, Float> cache = new HashMap<>();
 
     final int width;
     final int height;
@@ -20,8 +23,8 @@ public class AmbientOcclusion {
     final int offsetY;
     final int offsetZ;
 
-    int totalKernelWeight = 0;
-    final List<Vector4i> kernel = new ArrayList<>();
+    float totalKernelWeight = 0;
+    final List<Vector4f> kernel = new ArrayList<>();
 
     public AmbientOcclusion() {
         width = 52;
@@ -33,14 +36,16 @@ public class AmbientOcclusion {
         solid = new boolean[width * height * depth];
 
         int radius = 4;
-        for (int x = -radius; x <= radius; x++) {
-            for (int y = -radius; y <= radius; y++) {
-                for (int z = -radius; z <= radius; z++) {
-                    int distance = x * x + y * y + z * z;
+        for (float x = -radius; x <= radius; x++) {
+            for (float y = -radius; y <= radius; y++) {
+                for (float z = -radius; z <= radius; z++) {
+                    float distance = x * x + y * y + z * z;
                     if (distance > 0 && distance <= radius * radius) {
-                        int weight = radius * radius - distance;
-                        kernel.add(new Vector4i(x, y, z, weight));
-                        totalKernelWeight += weight;
+                        float weight = radius * radius - distance;
+                        if (weight > 0) {
+                            kernel.add(new Vector4f(x, y, z, weight));
+                            totalKernelWeight += weight;
+                        }
                     }
                 }
             }
@@ -56,6 +61,22 @@ public class AmbientOcclusion {
         }
     }
 
+    public float random(float a) {
+        int seed = Float.floatToIntBits(a) * 73428767;
+        seed ^= seed >>> 13;
+        seed *= 0x5bd1e995;
+        seed ^= seed >>> 15;
+        return (seed & 0xFFFFFF) / (float) 0x1000000 - 0.5f;
+    }
+
+    public boolean is(float x, float y, float z) {
+        float s = x + y + z;
+        float rx = random(s * 0.7f);
+        float ry = random(s * 1.7f);
+        float rz = random(s * 2.3f);
+        return is(Math.round(x + rx), Math.round(y + ry), Math.round(z + rz));
+    }
+
     public boolean is(int x, int y, int z) {
         x += offsetX;
         y += offsetY;
@@ -69,10 +90,9 @@ public class AmbientOcclusion {
 
     public void clear() {
         Arrays.fill(solid, false);
-        cache.clear();
     }
 
-    public void place(Vector3i size, Vector3f origin, Quaternionf rotation) {
+    public void place(Vector3i size, Vector3f center, Quaternionf rotation) {
         Vector3f nx = rotation.transform(new Vector3f(size.x(), 0, 0));
         Vector3f ny = rotation.transform(new Vector3f(0, size.y(), 0));
         Vector3f nz = rotation.transform(new Vector3f(0, 0, size.z()));
@@ -84,13 +104,14 @@ public class AmbientOcclusion {
         for (int ix = 0; ix <= width; ix++) {
             for (int iy = 0; iy <= height; iy++) {
                 for (int iz = 0; iz <= depth; iz++) {
-                    float x = (float) ix / width;
-                    float y = (float) iy / height;
-                    float z = (float) iz / depth;
+                    float buffer = 1.0f / STEP_SIZE;
+                    float x = (ix - width / 2.0f) / (width + buffer);
+                    float y = (iy - height / 2.0f) / (height + buffer);
+                    float z = (iz - depth / 2.0f) / (depth + buffer);
 
-                    int gx = Math.round(nx.x * x + ny.x * y + nz.x * z + origin.x);
-                    int gy = Math.round(nx.y * x + ny.y * y + nz.y * z + origin.y);
-                    int gz = Math.round(nx.z * x + ny.z * y + nz.z * z + origin.z);
+                    int gx = Math.round(nx.x * x + ny.x * y + nz.x * z + center.x);
+                    int gy = Math.round(nx.y * x + ny.y * y + nz.y * z + center.y);
+                    int gz = Math.round(nx.z * x + ny.z * y + nz.z * z + center.z);
 
                     set(gx, gy, gz);
                 }
@@ -98,25 +119,10 @@ public class AmbientOcclusion {
         }
     }
 
-
     public float getValue(Vector3f pos) {
-        // TODO: Tri-linear filtering
-        return getValue(
-                (int) Math.floor(pos.x + 0.5f),
-                (int) Math.floor(pos.y + 0.5f),
-                (int) Math.floor(pos.z + 0.5f)
-        );
-    }
-
-    public float getValue(int x, int y, int z) {
-        long key = (long) x << 32 | (long) y << 16 | (long) z;
-        return cache.computeIfAbsent(key, k -> getUncachedValue(x, y, z));
-    }
-
-    private float getUncachedValue(int x, int y, int z) {
         float value = 0.0f;
-        for (Vector4i offset : kernel) {
-            if (is(x + offset.x, y + offset.y, z + offset.z)) {
+        for (Vector4f offset : kernel) {
+            if (is(pos.x + offset.x, pos.y + offset.y, pos.z + offset.z)) {
                 value += offset.w;
             }
         }

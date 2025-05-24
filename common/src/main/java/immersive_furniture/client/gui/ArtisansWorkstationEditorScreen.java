@@ -138,6 +138,17 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
         graphics.disableScissor();
     }
 
+    public Vector3f quantVector(Vector3f normal, float offset, boolean quantize) {
+        normal.mul(offset);
+
+        float stepSize = quantize ? 4.0f : 1.0f;
+        normal.x = (float) Math.floor(normal.x * stepSize + 0.5f) / stepSize;
+        normal.y = (float) Math.floor(normal.y * stepSize + 0.5f) / stepSize;
+        normal.z = (float) Math.floor(normal.z * stepSize + 0.5f) / stepSize;
+
+        return normal;
+    }
+
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
         if (isRotatingView) {
@@ -146,21 +157,28 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
         }
 
         if (draggingContext != null) {
-            Vector3f normal = draggingContext.resize ? draggingContext.direction.step().mul(1, -1, 1) : draggingContext.getNormal();
-            normal.mul(draggingContext.getOffset(mouseX, mouseY));
+            float offset = draggingContext.getOffset(mouseX, mouseY);
+            Vector3f local = quantVector(draggingContext.direction.step().mul(1, -1, 1), offset, false);
+            Vector3f global = quantVector(draggingContext.getNormal(), offset, holdingCtrl && !draggingContext.resize);
 
-            // Snap to grid
-            float stepSize = !draggingContext.resize && holdingCtrl ? 8.0f : 1.0f;
-            normal.x = (float) Math.floor(normal.x * stepSize + 0.5f) / stepSize;
-            normal.y = (float) Math.floor(normal.y * stepSize + 0.5f) / stepSize;
-            normal.z = (float) Math.floor(normal.z * stepSize + 0.5f) / stepSize;
-
-            // Offset of the opposite face
-            Vector3f normal2 = draggingContext.resize ? new Vector3f(
-                    holdingShift ? -normal.x : 0.0f,
-                    holdingShift ? -normal.y : 0.0f,
-                    holdingShift ? -normal.z : 0.0f
-            ) : normal;
+            Vector3f normal;
+            Vector3f normal2;
+            if (draggingContext.resize) {
+                if (holdingShift) {
+                    // Offset into both directions
+                    normal = new Vector3f(local);
+                    normal2 = local.negate();
+                } else {
+                    // Offset one face, but move the object to negate the origin offset
+                    Vector3f o = new Vector3f(local).sub(global).mul(0.5f);
+                    normal = new Vector3f(local).sub(o);
+                    normal2 = new Vector3f(0.0f).sub(o);
+                }
+            } else {
+                // Offset object by global axis
+                normal = global;
+                normal2 = global;
+            }
 
             if (draggingContext.direction == Direction.DOWN || draggingContext.direction == Direction.WEST || draggingContext.direction == Direction.NORTH) {
                 draggingContext.element.from.x = Math.min(draggingContext.element.to.x, draggingContext.originalFrom.x + normal.x);

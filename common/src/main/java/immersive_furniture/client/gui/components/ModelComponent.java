@@ -6,15 +6,9 @@ import immersive_furniture.data.FurnitureData;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.client.gui.components.ImageButton;
-import net.minecraft.client.gui.narration.NarrationSupplier;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
-import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3i;
-
-import static immersive_furniture.client.gui.ArtisansWorkstationScreen.TEXTURE;
-import static immersive_furniture.client.gui.ArtisansWorkstationScreen.TEXTURE_SIZE;
 
 public class ModelComponent extends ScreenComponent {
     static final Component SELECT_TITLE = Component.translatable("gui.immersive_furniture.select");
@@ -22,8 +16,7 @@ public class ModelComponent extends ScreenComponent {
     static final Component SIZE_TITLE = Component.translatable("gui.immersive_furniture.size");
     static final Component ROTATION_TITLE = Component.translatable("gui.immersive_furniture.rotation");
 
-    static final Component FIELD_TITLE = Component.translatable("gui.immersive_furniture.field");
-    static final Component FIELD_HINT = Component.translatable("gui.immersive_furniture.field_hint").withStyle(ChatFormatting.ITALIC).withStyle(ChatFormatting.GRAY);
+    static final Component FIELD_TITLE = Component.literal("");
 
     private EditBox px;
     private EditBox py;
@@ -168,7 +161,6 @@ public class ModelComponent extends ScreenComponent {
     private EditBox addNewFloatBox(int x, int y, int width) {
         EditBox searchBox = new EditBox(minecraft.font, x, y, width, minecraft.font.lineHeight + 3, FIELD_TITLE);
         searchBox.setMaxLength(8);
-        searchBox.setHint(FIELD_HINT);
         screen.addRenderableWidget(searchBox);
         return searchBox;
     }

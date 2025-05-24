@@ -101,7 +101,6 @@ public class ModelUtils {
 
     public static void applyElementRotation(Vector3f vec, BlockElementRotation rotation) {
         if (rotation == null) return;
-
         Quaternionf quaternionf = getElementRotation(rotation);
         vec.sub(rotation.origin());
         quaternionf.transform(vec);

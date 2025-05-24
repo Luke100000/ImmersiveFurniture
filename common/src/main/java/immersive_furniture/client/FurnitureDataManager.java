@@ -10,7 +10,6 @@ import net.minecraft.nbt.NbtIo;
 import net.minecraft.resources.ResourceLocation;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
@@ -117,13 +116,14 @@ public class FurnitureDataManager {
                 CompletableFuture.runAsync(() -> {
                     Response response = request(API.HttpMethod.GET, ContentResponse::new, "content/furniture/" + contentid, Map.of("version", String.valueOf(version)));
                     if (response instanceof ContentResponse contentResponse) {
-                        DataInput in = new DataInputStream(new ByteArrayInputStream(contentResponse.content().data().getBytes(StandardCharsets.UTF_8)));
+                        DataInput in = new DataInputStream(new ByteArrayInputStream(Base64.getDecoder().decode(contentResponse.content().data())));
                         try {
                             FurnitureData data = new FurnitureData(NbtIo.read(in));
                             data.contentid = contentid;
                             data.author = contentResponse.content().username();
                             NbtIo.write(data.toTag(), cache);
-                        } catch (IOException e) {
+                            DATA.put(id, data);
+                        } catch (Exception e) {
                             Common.logger.error("Failed to read content response: {}", contentResponse, e);
                         }
                     }

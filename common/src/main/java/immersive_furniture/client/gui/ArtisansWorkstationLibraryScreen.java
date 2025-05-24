@@ -5,6 +5,8 @@ import immersive_furniture.Common;
 import immersive_furniture.Utils;
 import immersive_furniture.client.FurnitureDataManager;
 import immersive_furniture.client.gui.widgets.StateImageButton;
+import immersive_furniture.client.model.DynamicAtlas;
+import immersive_furniture.client.model.FurnitureModelBaker;
 import immersive_furniture.cobalt.network.NetworkHandler;
 import immersive_furniture.data.FurnitureData;
 import immersive_furniture.data.api.API;
@@ -242,9 +244,9 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
 
             // Modify
             addButton(x + 25 - 11, y, 22, 22, 48, "gui.immersive_furniture.modify", () -> {
-                FurnitureData model = FurnitureDataManager.getData(selected);
-                if (minecraft != null && model != null) {
-                    minecraft.setScreen(new ArtisansWorkstationEditorScreen(model));
+                FurnitureData data = FurnitureDataManager.getData(selected);
+                if (minecraft != null && data != null) {
+                    minecraft.setScreen(new ArtisansWorkstationEditorScreen(new FurnitureData(data)));
                 }
             });
 
@@ -546,6 +548,10 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
     private void publish(FurnitureData data) {
         if (uploading) return;
         uploading = true;
+
+        // Bake the model and save the face textures
+        FurnitureModelBaker.bakeTexture(data);
+
         CompletableFuture.runAsync(() -> {
             if (!Auth.hasToken()) return;
 

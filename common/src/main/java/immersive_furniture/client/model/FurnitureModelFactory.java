@@ -34,33 +34,46 @@ public class FurnitureModelFactory {
         Vector2i dimensions = ModelUtils.getFaceDimensions(element, direction);
         DynamicAtlas.Quad quad = atlas.allocate(dimensions.x, dimensions.y);
 
-        // Render
-        NativeImage pixels = atlas.getPixels();
-        assert pixels != null;
-        for (int x = 0; x < dimensions.x; x++) {
-            for (int y = 0; y < dimensions.y; y++) {
-                int color = MaterialSource.fromCube(element.material, direction, x, y, dimensions.x, dimensions.y);
-                int r = ((color >> 16) & 0xFF);
-                int g = ((color >> 8) & 0xFF);
-                int b = (color & 0xFF);
-                int a = ((color >> 24) & 0xFF);
+        if (quad.w() > 0 && quad.h() > 0) {
+            // Render
+            NativeImage pixels = atlas.getPixels();
+            assert pixels != null;
 
-                Vector3f pos = new Vector3f(ModelUtils.to3D(element, direction, x, y));
-                ModelUtils.applyElementRotation(pos, element.getRotation());
-                float ao = Math.min(1.0f, Math.max(0.0f, 2.0f - AmbientOcclusion.INSTANCE.getValue(pos) * 2.0f));
-                r = (int) (r * ao);
-                g = (int) (g * ao);
-                b = (int) (b * ao);
+            // Use baked texture if available
+            int[] baked = element.bakedTexture.get(direction);
+            if (baked != null && baked.length != dimensions.x * dimensions.y) baked = null;
 
-                color = (a << 24) | (r << 16) | (g << 8) | b;
-                pixels.setPixelRGBA(quad.x() + x, quad.y() + y, color);
+            for (int x = 0; x < dimensions.x; x++) {
+                for (int y = 0; y < dimensions.y; y++) {
+                    int color;
+                    if (baked == null) {
+                        color = MaterialSource.fromCube(element.material, direction, x, y, dimensions.x, dimensions.y);
+                        int r = ((color >> 16) & 0xFF);
+                        int g = ((color >> 8) & 0xFF);
+                        int b = (color & 0xFF);
+                        int a = ((color >> 24) & 0xFF);
+
+                        Vector3f pos = new Vector3f(ModelUtils.to3D(element, direction, x, y));
+                        ModelUtils.applyElementRotation(pos.mul(1.0f / 16.0f), element.getRotation());
+                        pos.mul(16.0f);
+                        float ao = Math.min(1.0f, Math.max(0.0f, 2.0f - AmbientOcclusion.INSTANCE.getValue(pos) * 2.0f));
+                        r = (int) (r * ao);
+                        g = (int) (g * ao);
+                        b = (int) (b * ao);
+
+                        color = (a << 24) | (r << 16) | (g << 8) | b;
+                    } else {
+                        color = baked[x + y * dimensions.x];
+                    }
+                    pixels.setPixelRGBA(quad.x() + x, quad.y() + y, color);
+                }
             }
+
+            atlas.upload();
         }
 
-        atlas.upload();
-
         return new BlockElementFace(
-                null,
+                null, // TODO
                 -1,
                 "#0",
                 new BlockFaceUV(
@@ -105,7 +118,7 @@ public class FurnitureModelFactory {
     }
 
     private ItemTransforms getTransforms() {
-        float scale = (float) (Math.max(8.0, data.getSize()) / 16.0);
+        float scale = (float) (1.0 / (Math.max(8.0, data.getSize()) / 16.0));
         return new ItemTransforms(
                 new ItemTransform(new Vector3f(75, 225, 0), new Vector3f(0, 2.5f, 0), new Vector3f(0.375f * scale)),
                 new ItemTransform(new Vector3f(75, 45, 0), new Vector3f(0, 2.5f, 0), new Vector3f(0.375f * scale)),
@@ -123,12 +136,8 @@ public class FurnitureModelFactory {
         AmbientOcclusion ao = AmbientOcclusion.INSTANCE;
         ao.clear();
         for (FurnitureData.Element element : data.elements) {
-            BlockElementRotation r = element.getRotation();
             Quaternionf rotation = ModelUtils.getElementRotation(element.getRotation());
-            Vector3f origin = new Vector3f(element.from).mul(1.0f / 16.0f);
-            ModelUtils.applyElementRotation(origin, r);
-            origin.mul(16.0f);
-            ao.place(element.getSize(), origin, rotation);
+            ao.place(element.getSize(), element.getCenter(), rotation);
         }
 
         atlas.clear(); // TODO

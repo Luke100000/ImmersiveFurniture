@@ -99,8 +99,8 @@ public record MaterialSource(
 
         Material down = model.getMaterial(element.faces.get(Direction.DOWN).texture);
         Material up = model.getMaterial(element.faces.get(Direction.UP).texture);
-        Material north = model.getMaterial(element.faces.get(Direction.SOUTH).texture);
-        Material south = model.getMaterial(element.faces.get(Direction.NORTH).texture);
+        Material north = model.getMaterial(element.faces.get(Direction.NORTH).texture);
+        Material south = model.getMaterial(element.faces.get(Direction.SOUTH).texture);
         Material west = model.getMaterial(element.faces.get(Direction.WEST).texture);
         Material east = model.getMaterial(element.faces.get(Direction.EAST).texture);
 

@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(net.minecraft.client.renderer.texture.SpriteContents.class)
+@Mixin(SpriteContents.class)
 public abstract class SpriteContentsMixin {
     @Shadow
     public abstract ResourceLocation name();

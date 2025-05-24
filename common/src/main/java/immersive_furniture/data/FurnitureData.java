@@ -1,6 +1,5 @@
 package immersive_furniture.data;
 
-import com.mojang.math.Axis;
 import immersive_furniture.Utils;
 import immersive_furniture.client.model.MaterialRegistry;
 import immersive_furniture.client.model.MaterialSource;
@@ -13,8 +12,10 @@ import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import org.joml.Vector3f;
 import org.joml.Vector3i;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 public class FurnitureData {
     public static final FurnitureData EMPTY = new FurnitureData();
@@ -49,6 +50,20 @@ public class FurnitureData {
         }
     }
 
+    public FurnitureData(FurnitureData data) {
+        this.name = data.name;
+        this.tag = data.tag;
+        this.material = data.material;
+        this.lightLevel = data.lightLevel;
+        this.inventorySize = data.inventorySize;
+        this.contentid = data.contentid;
+        this.author = data.author;
+
+        for (Element element : data.elements) {
+            this.elements.add(new Element(element));
+        }
+    }
+
     public CompoundTag toTag() {
         CompoundTag tag = new CompoundTag();
         tag.putString("Name", name);
@@ -73,6 +88,10 @@ public class FurnitureData {
     }
 
     public BoundingBox boundingBox() {
+        if (elements.isEmpty()) {
+            return new BoundingBox(0, 0, 0, 0, 0, 0);
+        }
+
         int minX = Integer.MAX_VALUE, minY = Integer.MAX_VALUE, minZ = Integer.MAX_VALUE;
         int maxX = Integer.MIN_VALUE, maxY = Integer.MIN_VALUE, maxZ = Integer.MIN_VALUE;
 
@@ -122,6 +141,7 @@ public class FurnitureData {
         public Direction.Axis axis;
         public float rotation;
         public Material material;
+        public Map<Direction, int[]> bakedTexture = new HashMap<>();
 
         public Element() {
             from = new Vector3f(2, 2, 2);
@@ -137,6 +157,12 @@ public class FurnitureData {
             this.axis = Direction.Axis.byName(tag.getString("Axis"));
             this.rotation = tag.getFloat("Rotation");
             this.material = new Material(tag.getCompound("Material"));
+
+            this.bakedTexture = new HashMap<>();
+            CompoundTag bakedTextureTag = tag.getCompound("BakedTexture");
+            for (String key : bakedTextureTag.getAllKeys()) {
+                bakedTexture.put(Direction.CODEC.byName(key), bakedTextureTag.getIntArray(key));
+            }
         }
 
         public Element(Element element) {
@@ -145,6 +171,7 @@ public class FurnitureData {
             this.axis = element.axis;
             this.rotation = element.rotation;
             this.material = element.material;
+            this.bakedTexture = new HashMap<>();
         }
 
         public CompoundTag toTag() {
@@ -154,6 +181,13 @@ public class FurnitureData {
             tag.putString("Axis", axis.getSerializedName());
             tag.putFloat("Rotation", rotation);
             tag.put("Material", material.toTag());
+
+            CompoundTag bakedTextureTag = new CompoundTag();
+            for (Map.Entry<Direction, int[]> entry : bakedTexture.entrySet()) {
+                bakedTextureTag.putIntArray(entry.getKey().getSerializedName(), entry.getValue());
+            }
+            tag.put("BakedTexture", bakedTextureTag);
+
             return tag;
         }
 
@@ -162,6 +196,14 @@ public class FurnitureData {
                     Math.abs((int) (to.x - from.x)),
                     Math.abs((int) (to.y - from.y)),
                     Math.abs((int) (to.z - from.z))
+            );
+        }
+
+        public Vector3f getCenter() {
+            return new Vector3f(
+                    (from.x + to.x) / 2.0f,
+                    (from.y + to.y) / 2.0f,
+                    (from.z + to.z) / 2.0f
             );
         }
 
@@ -175,19 +217,11 @@ public class FurnitureData {
         }
 
         public Vector3f getOrigin() {
-            Vector3f origin = new Vector3f(
+            return new Vector3f(
                     (from.x + to.x) / 32.0f,
                     (from.y + to.y) / 32.0f,
                     (from.z + to.z) / 32.0f
             );
-
-            switch (axis) {
-                case X -> Axis.XP.rotationDegrees(rotation).transform(origin);
-                case Y -> Axis.YP.rotationDegrees(rotation).transform(origin);
-                case Z -> Axis.ZP.rotationDegrees(rotation).transform(origin);
-            }
-
-            return origin;
         }
     }
 
