@@ -223,6 +223,16 @@ public class FurnitureData {
                     (from.z + to.z) / 32.0f
             );
         }
+
+        public void sanityCheck() {
+            float maxSize = 16.0f;
+            to.x = Math.max(-maxSize, Math.min(16.0f + maxSize, to.x));
+            to.y = Math.max(-maxSize, Math.min(16.0f + maxSize, to.y));
+            to.z = Math.max(-maxSize, Math.min(16.0f + maxSize, to.z));
+            from.x = Math.max(-maxSize, Math.min(16.0f + maxSize, from.x));
+            from.y = Math.max(-maxSize, Math.min(16.0f + maxSize, from.y));
+            from.z = Math.max(-maxSize, Math.min(16.0f + maxSize, from.z));
+        }
     }
 
     public static class Material {

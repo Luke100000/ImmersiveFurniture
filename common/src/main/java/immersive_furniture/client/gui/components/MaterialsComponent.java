@@ -14,9 +14,7 @@ import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static immersive_furniture.client.gui.ArtisansWorkstationScreen.TEXTURE;
 import static immersive_furniture.client.gui.ArtisansWorkstationScreen.TEXTURE_SIZE;
@@ -25,24 +23,12 @@ public class MaterialsComponent extends ScreenComponent {
     static final Component SEARCH_TITLE = Component.translatable("itemGroup.search");
     static final Component SEARCH_HINT = Component.translatable("gui.recipebook.search_hint").withStyle(ChatFormatting.ITALIC).withStyle(ChatFormatting.GRAY);
 
-    record Group(String name, ResourceLocation preview) {
-    }
-
-    static final List<Group> GROUPS = List.of(
-            new Group("favorites", new ResourceLocation("light_blue_glazed_terracotta")),
-            new Group("wood", new ResourceLocation("oak_planks")),
-            new Group("stone", new ResourceLocation("stone")),
-            new Group("fabric", new ResourceLocation("white_wool")),
-            new Group("mechanical", new ResourceLocation("piston_inventory")),
-            new Group("all", new ResourceLocation("bricks"))
-    );
+    private final List<Map.Entry<ResourceLocation, MaterialSource>> filteredMaterials = new LinkedList<>();
 
     EditBox searchBox;
-    final List<MaterialButton> groupButtons = new ArrayList<>();
     final List<MaterialButton> materialButtons = new ArrayList<>();
 
     int page = 0;
-    String currentGroup = "favorites";
 
     StateImageButton rotateButton;
     StateImageButton flipButton;
@@ -99,41 +85,22 @@ public class MaterialsComponent extends ScreenComponent {
                 String location = screen.selectedElement.material.source.location().toString();
                 if (Config.getInstance().favorites.contains(location)) {
                     Config.getInstance().favorites.remove(location);
-                    favoriteButton.setEnabled(false);
+                    favoriteButton.setEnabled(true);
                 } else {
                     Config.getInstance().favorites.add(location);
-                    favoriteButton.setEnabled(true);
+                    favoriteButton.setEnabled(false);
                 }
+                Config.getInstance().save();
             });
-            favoriteButton.setEnabled(Config.getInstance().favorites.contains(screen.selectedElement.material.source.location().toString()));
-        }
-
-        // Material groups
-        for (int i = 0; i < GROUPS.size(); i++) {
-            final int index = i;
-            int x = i % 5;
-            int y = i / 5;
-            MaterialButton button = new MaterialButton(
-                    leftPos + 6 + x * 18, topPos + 37 + y * 17,
-                    16, 16, 0, 96,
-                    b -> {
-                        currentGroup = GROUPS.get(index).name;
-                        updateSearch(searchBox.getValue());
-                        setGroupButtons();
-                    }
-            );
-            setGroupButtons();
-            button.setMaterial(MaterialRegistry.INSTANCE.materials.get(GROUPS.get(i).preview()));
-            groupButtons.add(button);
-            screen.addRenderableWidget(button);
+            favoriteButton.setEnabled(!Config.getInstance().favorites.contains(screen.selectedElement.material.source.location().toString()));
         }
 
         // Material buttons
         materialButtons.clear();
-        for (int y = 0; y < 4; y++) {
+        for (int y = 0; y < 5; y++) {
             for (int x = 0; x < 4; x++) {
                 MaterialButton button = new MaterialButton(
-                        leftPos + 6 + x * 22, topPos + 72 + y * 22,
+                        leftPos + 6 + x * 22, topPos + 50 + y * 22,
                         22, 22, 234, 130,
                         b -> {
                             if (screen.selectedElement != null) {
@@ -165,31 +132,33 @@ public class MaterialsComponent extends ScreenComponent {
         updateSearch("");
     }
 
-    private void setGroupButtons() {
-        for (MaterialButton button : groupButtons) {
-            button.setEnabled(button.getMaterial() != null && button.getMaterial().location().toString().equals(currentGroup));
-        }
+    private int getPages() {
+        return (filteredMaterials.size() - 1) / 16 + 1;
     }
 
     private void updateSearch(String search) {
-        for (MaterialButton button : materialButtons) {
-            button.setMaterial(null);
-        }
-        int i = -page * materialButtons.size();
-        for (Map.Entry<ResourceLocation, MaterialSource> entry : MaterialRegistry.INSTANCE.materials.entrySet()) {
-            if (search.isEmpty() || entry.getKey().toString().contains(search)) {
-                if (i >= 0) {
-                    materialButtons.get(i).setMaterial(entry.getValue());
-                }
-                i++;
-                if (i >= materialButtons.size()) {
-                    break;
-                }
+        // Filter materials
+        filteredMaterials.clear();
+        MaterialRegistry.INSTANCE.materials.entrySet().stream()
+                .filter(entry -> search.isEmpty() || entry.getKey().toString().contains(search))
+                .sorted(Comparator.comparingInt(a -> (Config.getInstance().favorites.contains(a.getKey().toString()) ? 1 : 0)))
+                .forEach(filteredMaterials::add);
+
+        page = Math.max(0, Math.min(page, (filteredMaterials.size() - 1) / 16));
+
+        for (int i = 0; i < materialButtons.size(); i++) {
+            int li = i + page * materialButtons.size();
+            if (li < filteredMaterials.size()) {
+                materialButtons.get(i).setMaterial(filteredMaterials.get(li).getValue());
+                materialButtons.get(i).setEnabled(true);
+            } else {
+                materialButtons.get(i).setMaterial(null);
+                materialButtons.get(i).setEnabled(false);
             }
         }
     }
 
     public void render(GuiGraphics context) {
-        context.drawCenteredString(minecraft.font, String.valueOf(page + 1), leftPos + width / 2, topPos + height - 16, 0xFFFFFF);
+        context.drawCenteredString(minecraft.font, String.format("%s / %S", page + 1, getPages() + 1), leftPos + width / 2, topPos + height - 16, 0xFFFFFF);
     }
 }

@@ -137,7 +137,7 @@ public record MaterialSource(
     public static int smartWrap(int coord, int size, int textureSize, int margin) {
         if (coord < margin || coord >= size - margin) {
             // Outer part, mirror the last few pixels
-            return coord > size / 2 ? textureSize - (size - coord) : coord;
+            return coord >= size / 2 ? textureSize - (size - coord) : coord;
         } else {
             // Inner part, mirror repeat
             int w = Math.max(1, textureSize - margin * 2);
@@ -148,6 +148,21 @@ public record MaterialSource(
 
     public static int fromCube(FurnitureData.Material material, Direction direction, int x, int y, int w, int h) {
         NativeImage texture = material.source.get(direction);
+
+        if (material.flip) {
+            x = w - x - 1;
+        }
+
+        if (material.rotate) {
+            int temp = x;
+            //noinspection SuspiciousNameCombination
+            x = y;
+            y = temp;
+
+            temp = w;
+            w = h;
+            h = temp;
+        }
 
         if (material.wrap == FurnitureData.WrapMode.EXPAND) {
             x = smartWrap(x, w, texture.getWidth(), material.margin);

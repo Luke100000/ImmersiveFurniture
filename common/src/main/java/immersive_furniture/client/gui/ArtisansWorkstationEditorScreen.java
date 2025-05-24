@@ -198,6 +198,8 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
                 draggingContext.element.from.z = Math.min(draggingContext.element.to.z, draggingContext.originalFrom.z + normal2.z);
             }
 
+            draggingContext.element.sanityCheck();
+
             if (currentPage == Page.MODEL) {
                 modelComponent.update();
             }
@@ -252,6 +254,12 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
             holdingCtrl = true;
         } else if (keyCode == 32) {
             holdingSpace = true;
+        } else if (keyCode == 261) {
+            if (selectedElement != null) {
+                data.elements.remove(selectedElement);
+                selectedElement = null;
+                init();
+            }
         }
 
         return super.keyPressed(keyCode, scanCode, modifiers);

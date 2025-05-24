@@ -65,66 +65,81 @@ public class ModelComponent extends ScreenComponent {
         px = addNewFloatBox(leftPos + 6, topPos + 17, 28);
         px.setValue(Float.toString(screen.selectedElement.from.x));
         px.setResponder(b -> {
+            if (screen.selectedElement == null) return;
             float offset = parse(px.getValue(), screen.selectedElement.from.x) - screen.selectedElement.from.x;
             screen.selectedElement.from.x += offset;
             screen.selectedElement.to.x += offset;
+            screen.selectedElement.sanityCheck();
         });
         py = addNewFloatBox(leftPos + 6 + 30, topPos + 17, 28);
         py.setValue(Float.toString(screen.selectedElement.from.y));
         py.setResponder(b -> {
+            if (screen.selectedElement == null) return;
             float offset = parse(py.getValue(), screen.selectedElement.from.y) - screen.selectedElement.from.y;
             screen.selectedElement.from.y += offset;
             screen.selectedElement.to.y += offset;
+            screen.selectedElement.sanityCheck();
         });
         pz = addNewFloatBox(leftPos + 6 + 30 * 2, topPos + 17, 28);
         pz.setValue(Float.toString(screen.selectedElement.from.z));
         pz.setResponder(b -> {
+            if (screen.selectedElement == null) return;
             float offset = parse(pz.getValue(), screen.selectedElement.from.z) - screen.selectedElement.from.z;
             screen.selectedElement.from.z += offset;
             screen.selectedElement.to.z += offset;
+            screen.selectedElement.sanityCheck();
         });
 
         // Size
         Vector3i size = screen.selectedElement.getSize();
-        sx = addNewFloatBox(leftPos + 6, topPos + 47, 24);
+        sx = addNewFloatBox(leftPos + 6, topPos + 47, 28);
         sx.setValue(String.valueOf(size.x));
         sx.setResponder(b -> {
+            if (screen.selectedElement == null) return;
             int oldSize = screen.selectedElement.getSize().x;
             int newSize = Math.max(0, parse(sx.getValue(), oldSize));
             screen.selectedElement.from.x -= (newSize - oldSize) / 2.0f;
             screen.selectedElement.to.x += (newSize - oldSize) / 2.0f;
+            screen.selectedElement.sanityCheck();
         });
         sy = addNewFloatBox(leftPos + 6 + 30, topPos + 47, 28);
         sy.setValue(String.valueOf(size.y));
         sy.setResponder(b -> {
+            if (screen.selectedElement == null) return;
             int oldSize = screen.selectedElement.getSize().y;
             int newSize = Math.max(0, parse(sy.getValue(), oldSize));
             screen.selectedElement.from.y -= (newSize - oldSize) / 2.0f;
             screen.selectedElement.to.y += (newSize - oldSize) / 2.0f;
+            screen.selectedElement.sanityCheck();
         });
         sz = addNewFloatBox(leftPos + 6 + 30 * 2, topPos + 47, 28);
         sz.setValue(String.valueOf(size.z));
         sz.setResponder(b -> {
+            if (screen.selectedElement == null) return;
             int oldSize = screen.selectedElement.getSize().z;
             int newSize = Math.max(0, parse(sz.getValue(), oldSize));
             screen.selectedElement.from.z -= (newSize - oldSize) / 2.0f;
             screen.selectedElement.to.z += (newSize - oldSize) / 2.0f;
+            screen.selectedElement.sanityCheck();
         });
 
         // Rotation
         rx = addToggleButton(leftPos + 6, topPos + 77, 16, 16, 96, null, () -> {
+            if (screen.selectedElement == null) return;
             screen.selectedElement.axis = Direction.Axis.X;
             rx.setEnabled(true);
             ry.setEnabled(false);
             rz.setEnabled(false);
         });
         ry = addToggleButton(leftPos + 24, topPos + 77, 16, 32, 96, null, () -> {
+            if (screen.selectedElement == null) return;
             screen.selectedElement.axis = Direction.Axis.Y;
             rx.setEnabled(false);
             ry.setEnabled(true);
             rz.setEnabled(false);
         });
         rz = addToggleButton(leftPos + 42, topPos + 77, 16, 48, 96, null, () -> {
+            if (screen.selectedElement == null) return;
             screen.selectedElement.axis = Direction.Axis.Z;
             rx.setEnabled(false);
             ry.setEnabled(false);
