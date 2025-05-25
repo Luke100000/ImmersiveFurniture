@@ -9,7 +9,6 @@ import net.minecraft.client.resources.model.Material;
 import net.minecraft.core.Direction;
 import net.minecraft.world.inventory.InventoryMenu;
 import org.jetbrains.annotations.NotNull;
-import org.joml.Quaternionf;
 import org.joml.Vector2i;
 import org.joml.Vector3f;
 
@@ -53,10 +52,14 @@ public class FurnitureModelFactory {
                         int b = (color & 0xFF);
                         int a = ((color >> 24) & 0xFF);
 
+                        BlockElementRotation rotation = element.getRotation();
                         Vector3f pos = new Vector3f(ModelUtils.to3D(element, direction, x, y));
-                        ModelUtils.applyElementRotation(pos.mul(1.0f / 16.0f), element.getRotation());
+                        ModelUtils.applyElementRotation(pos.mul(1.0f / 16.0f), rotation);
                         pos.mul(16.0f);
-                        float ao = Math.min(1.0f, Math.max(0.0f, 2.0f - AmbientOcclusion.INSTANCE.getValue(pos) * 2.0f));
+
+                        Vector3f normal = ModelUtils.getElementRotation(rotation).transform(direction.step());
+
+                        float ao = Math.min(1.0f, Math.max(0.0f, 1.0f - AmbientOcclusion.INSTANCE.sample(pos, normal) * 1.5f));
                         r = (int) (r * ao);
                         g = (int) (g * ao);
                         b = (int) (b * ao);
@@ -132,12 +135,10 @@ public class FurnitureModelFactory {
     }
 
     public static BlockModel getModel(FurnitureData data, DynamicAtlas atlas) {
-        // Render AO lookup
-        AmbientOcclusion ao = AmbientOcclusion.INSTANCE;
-        ao.clear();
+        // Populate AO lookup
+        AmbientOcclusion.INSTANCE.clear();
         for (FurnitureData.Element element : data.elements) {
-            Quaternionf rotation = ModelUtils.getElementRotation(element.getRotation());
-            ao.place(element.getSize(), element.getCenter(), rotation);
+            AmbientOcclusion.INSTANCE.place(element);
         }
 
         atlas.clear(); // TODO

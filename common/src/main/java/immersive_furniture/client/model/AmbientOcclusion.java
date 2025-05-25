@@ -1,131 +1,104 @@
 package immersive_furniture.client.model;
 
+import immersive_furniture.data.FurnitureData;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.joml.Vector3i;
-import org.joml.Vector4f;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 public class AmbientOcclusion {
     public static final AmbientOcclusion INSTANCE = new AmbientOcclusion();
-    private static final float STEP_SIZE = (float) (1.0f / Math.sqrt(3));
+    private static final double SAMPLE_RESOLUTION = Math.sqrt(3);
+    private static final float RESOLUTION = 0.25f;
 
-    final boolean[] solid;
+    private final Map<Long, Set<FurnitureData.Element>> elementCache = new java.util.HashMap<>();
 
-    final int width;
-    final int height;
-    final int depth;
-
-    final int offsetX;
-    final int offsetY;
-    final int offsetZ;
-
-    float totalKernelWeight = 0;
-    final List<Vector4f> kernel = new ArrayList<>();
+    final List<Vector3f> kernel = new ArrayList<>();
 
     public AmbientOcclusion() {
-        width = 52;
-        height = 52;
-        depth = 52;
-        offsetX = 18;
-        offsetY = 18;
-        offsetZ = 18;
-        solid = new boolean[width * height * depth];
-
         int radius = 4;
         for (float x = -radius; x <= radius; x++) {
             for (float y = -radius; y <= radius; y++) {
                 for (float z = -radius; z <= radius; z++) {
                     float distance = x * x + y * y + z * z;
                     if (distance > 0 && distance <= radius * radius) {
-                        float weight = radius * radius - distance;
-                        if (weight > 0) {
-                            kernel.add(new Vector4f(x, y, z, weight));
-                            totalKernelWeight += weight;
-                        }
+                        kernel.add(new Vector3f(x, y, z));
                     }
                 }
             }
         }
     }
 
-    public void set(int x, int y, int z) {
-        x += offsetX;
-        y += offsetY;
-        z += offsetZ;
-        if (x >= 0 && x < width && y >= 0 && y < height && z >= 0 && z < depth) {
-            solid[x + y * width + z * width * height] = true;
-        }
-    }
-
-    public float random(float a) {
-        int seed = Float.floatToIntBits(a) * 73428767;
-        seed ^= seed >>> 13;
-        seed *= 0x5bd1e995;
-        seed ^= seed >>> 15;
-        return (seed & 0xFFFFFF) / (float) 0x1000000 - 0.5f;
-    }
-
-    public boolean is(float x, float y, float z) {
-        float s = x + y + z;
-        float rx = random(s * 0.7f);
-        float ry = random(s * 1.7f);
-        float rz = random(s * 2.3f);
-        return is(Math.round(x + rx), Math.round(y + ry), Math.round(z + rz));
-    }
-
-    public boolean is(int x, int y, int z) {
-        x += offsetX;
-        y += offsetY;
-        z += offsetZ;
-        if (x >= 0 && x < width && y >= 0 && y < height && z >= 0 && z < depth) {
-            return solid[x + y * width + z * width * height];
-        } else {
-            return false;
-        }
-    }
-
     public void clear() {
-        Arrays.fill(solid, false);
+        elementCache.clear();
     }
 
-    public void place(Vector3i size, Vector3f center, Quaternionf rotation) {
+    private Set<FurnitureData.Element> getElements(float x, float y, float z) {
+        int gx = Math.round(x * RESOLUTION);
+        int gy = Math.round(y * RESOLUTION);
+        int gz = Math.round(z * RESOLUTION);
+        long key = (long) gx << 40 | (long) gy << 20 | (long) gz;
+        return elementCache.computeIfAbsent(key, k -> new HashSet<>());
+    }
+
+    public void place(FurnitureData.Element element) {
+        Vector3f center = element.getCenter();
+        Vector3i size = element.getSize();
+        Quaternionf rotation = ModelUtils.getElementRotation(element.getRotation());
+
         Vector3f nx = rotation.transform(new Vector3f(size.x(), 0, 0));
         Vector3f ny = rotation.transform(new Vector3f(0, size.y(), 0));
         Vector3f nz = rotation.transform(new Vector3f(0, 0, size.z()));
 
-        int width = (int) Math.ceil(size.x() / STEP_SIZE);
-        int height = (int) Math.ceil(size.y() / STEP_SIZE);
-        int depth = (int) Math.ceil(size.z() / STEP_SIZE);
+        int width = (int) Math.ceil(size.x() * SAMPLE_RESOLUTION * RESOLUTION);
+        int height = (int) Math.ceil(size.y() * SAMPLE_RESOLUTION * RESOLUTION);
+        int depth = (int) Math.ceil(size.z() * SAMPLE_RESOLUTION * RESOLUTION);
 
         for (int ix = 0; ix <= width; ix++) {
             for (int iy = 0; iy <= height; iy++) {
                 for (int iz = 0; iz <= depth; iz++) {
-                    float buffer = 1.0f / STEP_SIZE;
-                    float x = (ix - width / 2.0f) / (width + buffer);
-                    float y = (iy - height / 2.0f) / (height + buffer);
-                    float z = (iz - depth / 2.0f) / (depth + buffer);
+                    float buffer = (float) (2.0f * SAMPLE_RESOLUTION * RESOLUTION);
+                    float sx = (ix - width / 2.0f) / (width - buffer);
+                    float sy = (iy - height / 2.0f) / (height - buffer);
+                    float sz = (iz - depth / 2.0f) / (depth - buffer);
 
-                    int gx = Math.round(nx.x * x + ny.x * y + nz.x * z + center.x);
-                    int gy = Math.round(nx.y * x + ny.y * y + nz.y * z + center.y);
-                    int gz = Math.round(nx.z * x + ny.z * y + nz.z * z + center.z);
+                    float x = nx.x * sx + ny.x * sy + nz.x * sz + center.x;
+                    float y = nx.y * sx + ny.y * sy + nz.y * sz + center.y;
+                    float z = nx.z * sx + ny.z * sy + nz.z * sz + center.z;
 
-                    set(gx, gy, gz);
+                    getElements(x, y, z).add(element);
                 }
             }
         }
     }
 
-    public float getValue(Vector3f pos) {
-        float value = 0.0f;
-        for (Vector4f offset : kernel) {
-            if (is(pos.x + offset.x, pos.y + offset.y, pos.z + offset.z)) {
-                value += offset.w;
+    private boolean is(float x, float y, float z) {
+        float e = 0.0001f;
+        for (FurnitureData.Element element : getElements(x, y, z)) {
+            Vector3f pos = new Vector3f(x, y, z);
+            ModelUtils.applyInverseElementRotation(pos.mul(1.0f / 16.0f), element.getRotation());
+            pos.mul(16.0f);
+            if (pos.x > element.from.x() + e && pos.x < element.to.x() - e &&
+                pos.y > element.from.y() + e && pos.y < element.to.y() - e &&
+                pos.z > element.from.z() + e && pos.z < element.to.z() - e) {
+                return true;
             }
         }
-        return value / totalKernelWeight;
+        return false;
+    }
+
+    public float sample(Vector3f pos, Vector3f normal) {
+        float value = 0.0f;
+        float totalWeight = 0.0f;
+        for (Vector3f offset : kernel) {
+            float dot = normal.x * offset.x + normal.y * offset.y + normal.z * offset.z;
+            if (dot < 0) continue;
+            if (is(pos.x + offset.x, pos.y + offset.y, pos.z + offset.z)) {
+                value += 1.0f;
+            }
+            totalWeight += 1.0f;
+        }
+        return value / totalWeight;
     }
 }

@@ -99,12 +99,20 @@ public class ModelUtils {
         return new Quaternionf().rotationAxis(rotation.angle() * ((float) Math.PI / 180), axis);
     }
 
-    public static void applyElementRotation(Vector3f vec, BlockElementRotation rotation) {
+    public static void applyElementRotation(Vector3f pos, BlockElementRotation rotation) {
         if (rotation == null) return;
         Quaternionf quaternionf = getElementRotation(rotation);
-        vec.sub(rotation.origin());
-        quaternionf.transform(vec);
-        vec.add(rotation.origin());
+        pos.sub(rotation.origin());
+        quaternionf.transform(pos);
+        pos.add(rotation.origin());
+    }
+
+    public static void applyInverseElementRotation(Vector3f pos, BlockElementRotation rotation) {
+        if (rotation == null) return;
+        Quaternionf quaternionf = getElementRotation(rotation).conjugate();
+        pos.sub(rotation.origin());
+        quaternionf.transform(pos);
+        pos.add(rotation.origin());
     }
 
     public static float[] getShapeData(FurnitureData.Element element) {
