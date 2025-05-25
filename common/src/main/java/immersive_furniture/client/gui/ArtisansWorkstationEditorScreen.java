@@ -18,11 +18,9 @@ import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import org.jetbrains.annotations.NotNull;
-import org.joml.Matrix3f;
-import org.joml.Matrix4f;
-import org.joml.Quaternionf;
-import org.joml.Vector3f;
+import org.joml.*;
 
+import java.lang.Math;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -307,17 +305,17 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
         }
 
         public float getOffset(double mouseX, double mouseY) {
-            // To global coordinates
+            // View space normal
             Vector3f normal = getNormal();
-
-            // To screen coordinates
             Quaternionf q = new Quaternionf().rotateX(camPitch).rotateY(camYaw);
-            q.transform(normal);
+            q.transform(normal).normalize();
 
+            Vector3f screenNormal = new Vector3f(normal.x, normal.y, 0.0f).normalize();
             Vector3f drag = new Vector3f((float) (mouseX - x), (float) (mouseY - y), 0.0f);
-            float dot = normal.dot(drag);
-            drag.mul(dot / (drag.length() + 0.001f));
-            return drag.length() / camZoom * 16.0f * (dot < 0 ? -1 : 1);
+            float proj = drag.dot(screenNormal);
+
+            float viewDot = (float) Math.sqrt(1.0f - normal.z * normal.z);
+            return proj / camZoom * 16.0f / viewDot;
         }
 
         private Vector3f getNormal() {
