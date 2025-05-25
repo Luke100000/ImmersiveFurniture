@@ -27,6 +27,9 @@
   "gui.immersive_furniture.delete": "Delete",
   "gui.immersive_furniture.report": "Report inappropriate or very low quality content",
 
+  "gui.immersive_furniture.roundness": "Roundness %s",
+  "gui.immersive_furniture.brightness": "Brightness %s",
+  "gui.immersive_furniture.contrast": "Contrast %s",
   "gui.immersive_furniture.light_level": "Light Level %s",
   "gui.immersive_furniture.inventory": "%s Inventory",
   "gui.immersive_furniture.save": "Save",

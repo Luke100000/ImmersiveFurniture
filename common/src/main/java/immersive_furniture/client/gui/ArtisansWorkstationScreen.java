@@ -60,8 +60,7 @@ public abstract class ArtisansWorkstationScreen extends Screen {
         graphics.blit(TEXTURE, x + 16, y + 16, w - 32, h - 32, originX + 16, originY + 16, 16, 16, TEXTURE_SIZE, TEXTURE_SIZE);
     }
 
-    static void renderModel(GuiGraphics graphics, FurnitureData data, double x, double y, double size, boolean rotate) {
-        float rot = (float) (rotate ? -Math.PI / 4 * 3 : (System.currentTimeMillis() % 10000) / 10000.0f * Math.PI * 2.0f);
+    static void renderModel(GuiGraphics graphics, FurnitureData data, double x, double y, double size, float rot) {
         graphics.pose().pushPose();
         graphics.pose().translate(x, y, 100.0);
         graphics.pose().mulPoseMatrix(new Matrix4f().scaling((float) (size / Math.max(0.5, data.getSize() / 16.0) * 0.3)));

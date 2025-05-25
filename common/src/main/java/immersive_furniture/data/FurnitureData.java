@@ -3,6 +3,7 @@ package immersive_furniture.data;
 import immersive_furniture.Utils;
 import immersive_furniture.client.model.MaterialRegistry;
 import immersive_furniture.client.model.MaterialSource;
+import immersive_furniture.client.model.effects.LightMaterialEffect;
 import net.minecraft.client.renderer.block.model.BlockElementRotation;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -242,7 +243,10 @@ public class FurnitureData {
         public boolean rotate = false;
         public boolean flip = false;
 
+        public LightMaterialEffect lightEffect = new LightMaterialEffect();
+
         public Material() {
+
         }
 
         public Material(CompoundTag tag) {
@@ -253,6 +257,7 @@ public class FurnitureData {
             wrap = WrapMode.valueOf(tag.getString("Wrap"));
             rotate = tag.getBoolean("Rotate");
             flip = tag.getBoolean("Flip");
+            lightEffect.load(tag.getCompound("LightEffect"));
         }
 
         public CompoundTag toTag() {
@@ -262,6 +267,7 @@ public class FurnitureData {
             tag.putString("Wrap", wrap.name());
             tag.putBoolean("Rotate", rotate);
             tag.putBoolean("Flip", flip);
+            tag.put("LightEffect", lightEffect.save());
             return tag;
         }
     }

@@ -3,6 +3,7 @@ package immersive_furniture.client.model;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.datafixers.util.Either;
 import immersive_furniture.Common;
+import immersive_furniture.client.model.effects.LightMaterialEffect;
 import immersive_furniture.data.FurnitureData;
 import net.minecraft.client.renderer.block.model.*;
 import net.minecraft.client.resources.model.Material;
@@ -59,10 +60,29 @@ public class FurnitureModelFactory {
 
                         Vector3f normal = ModelUtils.getElementRotation(rotation).transform(direction.step());
 
+                        LightMaterialEffect lightEffect = element.material.lightEffect;
+
+                        // Smooth light
+                        float light = 1.0f;
+                        float roundness = lightEffect.getRoundness() / 75.0f;
+                        if (roundness != 0.0f) {
+                            light = getLight(x, y, dimensions);
+                            light = quantize(x, y, light);
+                            light = light * roundness + (1.0f - roundness * 0.5f);
+                        }
+
+                        // Brightness
+                        light += lightEffect.getBrightness() / 100.0f;
+
+                        // Ambient Occlusion
                         float ao = Math.min(1.0f, Math.max(0.0f, 1.0f - AmbientOcclusion.INSTANCE.sample(pos, normal) * 1.5f));
-                        r = (int) (r * ao);
-                        g = (int) (g * ao);
-                        b = (int) (b * ao);
+                        light *= ao;
+
+                        // Contrast
+                        float contrast = lightEffect.getContrast() / 100.0f;
+                        r = (int) Math.max(0.0, Math.min(255.0, ((r - 128) * (1.0f + contrast) + 128) * light));
+                        g = (int) Math.max(0.0, Math.min(255.0, ((g - 128) * (1.0f + contrast) + 128) * light));
+                        b = (int) Math.max(0.0, Math.min(255.0, ((b - 128) * (1.0f + contrast) + 128) * light));
 
                         color = (a << 24) | (r << 16) | (g << 8) | b;
                     } else {
@@ -89,6 +109,27 @@ public class FurnitureModelFactory {
                         0
                 )
         );
+    }
+
+    private static float getLight(int x, int y, Vector2i dimensions) {
+        float rx = x / (dimensions.x - 1.0f) * 2.0f - 1.0f;
+        float ry = y / (dimensions.y - 1.0f) * 2.0f - 1.0f;
+        float r = 1.0f - Math.max(Math.abs(rx), Math.abs(ry)) * 0.95f;
+        float dist = Math.max(0.0f, 1.0f - (float) Math.sqrt(rx * rx + ry * ry) / 1.42f);
+        return (float) Math.sqrt(r * (1.0f - r) + dist * r);
+    }
+
+    private static float quantize(int x, int y, float light) {
+        int levels = 8;
+        int hash = x * 0x27d4eb2d ^ y * 0x85ebca6b;
+        hash ^= (hash >>> 16);
+        hash *= 0x85ebca6b;
+        hash ^= (hash >>> 13);
+        hash *= 0xc2b2ae35;
+        hash ^= (hash >>> 16);
+        float n = (hash & 0xFFFFFFFFL) / (float) (1L << 32);
+        light = (float) Math.round(light * levels + n) / levels;
+        return light;
     }
 
     private BlockElement getElement(FurnitureData.Element element) {

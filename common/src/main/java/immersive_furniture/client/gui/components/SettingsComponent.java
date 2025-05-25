@@ -67,11 +67,11 @@ public class SettingsComponent extends ScreenComponent {
         }
 
         // Light level
-        this.lightLevelSlider = new BoundedIntSliderButton(leftPos + 6, topPos + 60, width - 12, 20, "gui.immersive_furniture.light_level", 0);
+        this.lightLevelSlider = new BoundedIntSliderButton(leftPos + 6, topPos + 60, width - 12, 20, "gui.immersive_furniture.light_level", 0, 0, 15);
         screen.addRenderableWidget(lightLevelSlider);
 
         // Inventory space
-        this.lightLevelSlider = new BoundedIntSliderButton(leftPos + 6, topPos + 82, width - 12, 20, "gui.immersive_furniture.inventory", 0);
+        this.lightLevelSlider = new BoundedIntSliderButton(leftPos + 6, topPos + 82, width - 12, 20, "gui.immersive_furniture.inventory", 0, 0, 6);
         screen.addRenderableWidget(lightLevelSlider);
 
         // Save
@@ -80,7 +80,7 @@ public class SettingsComponent extends ScreenComponent {
             screen.data.inventorySize = lightLevelSlider.getIntegerValue();
             FurnitureDataManager.saveLocalFile(screen.data);
 
-            // Switch to library screen
+            // Switch to the library screen
             ArtisansWorkstationLibraryScreen libraryScreen = new ArtisansWorkstationLibraryScreen();
             libraryScreen.setSelected(FurnitureDataManager.getSafeLocalLocation(screen.data));
             libraryScreen.setTab(ArtisansWorkstationLibraryScreen.Tab.LOCAL);

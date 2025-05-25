@@ -1,21 +1,12 @@
 package immersive_furniture.client.model.effects;
 
+import immersive_furniture.client.gui.ArtisansWorkstationEditorScreen;
 import net.minecraft.nbt.CompoundTag;
 
-public class MaterialEffect {
-    public void apply(float r, float g, float b, float a) {
-        // Apply the effect
-    }
+public abstract class MaterialEffect {
+    public abstract void load(CompoundTag tag);
 
-    public void initGGUI() {
+    public abstract CompoundTag save();
 
-    }
-
-    public void save(CompoundTag tag) {
-
-    }
-
-    public void load(CompoundTag tag) {
-
-    }
+    public abstract int initGUI(ArtisansWorkstationEditorScreen screen, int x, int y, int width);
 }

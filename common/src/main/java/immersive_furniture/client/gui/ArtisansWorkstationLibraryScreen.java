@@ -5,7 +5,6 @@ import immersive_furniture.Common;
 import immersive_furniture.Utils;
 import immersive_furniture.client.FurnitureDataManager;
 import immersive_furniture.client.gui.widgets.StateImageButton;
-import immersive_furniture.client.model.DynamicAtlas;
 import immersive_furniture.client.model.FurnitureModelBaker;
 import immersive_furniture.cobalt.network.NetworkHandler;
 import immersive_furniture.data.FurnitureData;
@@ -266,7 +265,7 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
                     } else {
                         setError("gui.immersive_furniture.tab.login_required");
                     }
-                });
+                }).setEnabled(true);
             }
 
             // Close
@@ -311,7 +310,8 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
                     if (i < furniture.size()) {
                         FurnitureData data = FurnitureDataManager.getData(furniture.get(i));
                         if (data != null) {
-                            renderModel(graphics, data, leftPos + (x + 0.5) * w, topPos + 38 + (y + 0.5) * h, h, !hovered);
+                            float rot = (float) (hovered ? (System.currentTimeMillis() % 10000) / 10000.0f * Math.PI * 2.0f : -Math.PI / 4 * 3);
+                            renderModel(graphics, data, leftPos + (x + 0.5) * w, topPos + 38 + (y + 0.5) * h, h, rot);
 
                             if (hovered) {
                                 graphics.renderTooltip(font, List.of(
@@ -337,7 +337,8 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
             FurnitureData data = FurnitureDataManager.getData(selected);
 
             if (data != null) {
-                renderModel(graphics, data, leftPos + windowWidth / 2.0, topPos + windowHeight / 2.0 - 14, windowHeight - 28, true);
+                float rot = (float) (lastMouseX - leftPos) / windowWidth - 0.5f;
+                renderModel(graphics, data, leftPos + windowWidth / 2.0, topPos + windowHeight / 2.0 - 14, windowHeight - 28, rot);
 
                 graphics.drawString(font, data.name, leftPos + 8, topPos + 8, 0xFFFFFF);
                 graphics.drawString(font, getAuthorComponent(data), leftPos + 8, topPos + 18, 0xFFFFFF);
