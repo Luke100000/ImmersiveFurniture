@@ -4,6 +4,7 @@ import immersive_furniture.client.FurnitureDataManager;
 import immersive_furniture.client.gui.ArtisansWorkstationEditorScreen;
 import immersive_furniture.client.gui.ArtisansWorkstationLibraryScreen;
 import immersive_furniture.client.gui.widgets.BoundedIntSliderButton;
+import immersive_furniture.client.model.FurnitureModelBaker;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -78,6 +79,10 @@ public class SettingsComponent extends ScreenComponent {
         addButton("gui.immersive_furniture.save", b -> {
             screen.data.lightLevel = lightLevelSlider.getIntegerValue();
             screen.data.inventorySize = lightLevelSlider.getIntegerValue();
+
+            // Bake the model and save the face textures
+            FurnitureModelBaker.bakeTexture(screen.data);
+
             FurnitureDataManager.saveLocalFile(screen.data);
 
             // Switch to the library screen

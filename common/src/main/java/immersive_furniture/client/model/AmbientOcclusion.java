@@ -6,13 +6,14 @@ import org.joml.Vector3f;
 import org.joml.Vector3i;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class AmbientOcclusion {
     public static final AmbientOcclusion INSTANCE = new AmbientOcclusion();
     private static final double SAMPLE_RESOLUTION = Math.sqrt(3);
     private static final float RESOLUTION = 0.25f;
 
-    private final Map<Long, Set<FurnitureData.Element>> elementCache = new java.util.HashMap<>();
+    private final Map<Long, Set<FurnitureData.Element>> elementCache = new ConcurrentHashMap<>();
 
     final List<Vector3f> kernel = new ArrayList<>();
 

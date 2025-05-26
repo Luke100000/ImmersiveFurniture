@@ -337,7 +337,8 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
             FurnitureData data = FurnitureDataManager.getData(selected);
 
             if (data != null) {
-                float rot = (float) (lastMouseX - leftPos) / windowWidth - 0.5f;
+                // TODO: Meh, use drag and velocity styled rotation
+                float rot = (float) (((double) (lastMouseX - leftPos) / windowWidth - 0.5) * Math.PI - Math.PI / 4 * 3);
                 renderModel(graphics, data, leftPos + windowWidth / 2.0, topPos + windowHeight / 2.0 - 14, windowHeight - 28, rot);
 
                 graphics.drawString(font, data.name, leftPos + 8, topPos + 8, 0xFFFFFF);
@@ -549,9 +550,6 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
     private void publish(FurnitureData data) {
         if (uploading) return;
         uploading = true;
-
-        // Bake the model and save the face textures
-        FurnitureModelBaker.bakeTexture(data);
 
         CompletableFuture.runAsync(() -> {
             if (!Auth.hasToken()) return;
