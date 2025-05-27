@@ -7,11 +7,11 @@ import net.minecraft.client.renderer.texture.SpriteContents;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.metadata.animation.AnimationMetadataSection;
 import net.minecraft.client.resources.metadata.animation.FrameSize;
+import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.resources.ResourceLocation;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class DynamicAtlas extends DynamicTexture {
     public static final DynamicAtlas BAKED = new DynamicAtlas(512, "baked");
@@ -24,7 +24,9 @@ public class DynamicAtlas extends DynamicTexture {
     ResourceLocation location;
     List<Quad> quads = new LinkedList<>();
 
-    public final TextureAtlasSprite sprite;
+    Map<String, BakedModel> knownFurniture = new ConcurrentHashMap<>();
+
+    public final TextureAtlasSpriteAccessor sprite;
 
     public DynamicAtlas(int size, String name) {
         super(size, size, false);
@@ -40,7 +42,11 @@ public class DynamicAtlas extends DynamicTexture {
         clear();
     }
 
-    public Quad allocate(int w, int h) {
+    public static void boostrap() {
+        // No-op
+    }
+
+    synchronized public Quad allocate(int w, int h) {
         for (Quad quad : quads) {
             if (quad.w >= w && quad.h >= h) {
                 quads.remove(quad);
@@ -61,11 +67,12 @@ public class DynamicAtlas extends DynamicTexture {
         return new Quad(0, 0, 0, 0);
     }
 
-    public void clear() {
+    synchronized public void clear() {
         quads.clear();
         quads.add(new Quad(0, 0, size, size));
         allocated = 0;
         full = false;
+        knownFurniture.clear();
     }
 
     public boolean isFull() {

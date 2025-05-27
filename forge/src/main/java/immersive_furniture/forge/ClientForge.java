@@ -1,9 +1,11 @@
 package immersive_furniture.forge;
 
 import immersive_furniture.Common;
+import immersive_furniture.CommonClient;
 import net.minecraft.client.Minecraft;
 import net.minecraft.server.packs.resources.ReloadableResourceManager;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
@@ -15,5 +17,12 @@ public final class ClientForge {
     public static void data(FMLConstructModEvent event) {
         ReloadableResourceManager resourceManager = (ReloadableResourceManager) Minecraft.getInstance().getResourceManager();
         ForgeBusEvents.RESOURCE_REGISTRY.getLoaders().forEach(resourceManager::registerReloadListener);
+    }
+
+    @SubscribeEvent
+    public static void tick(TickEvent event) {
+        if (event.type == TickEvent.Type.CLIENT && event.phase == TickEvent.Phase.START) {
+            CommonClient.tick();
+        }
     }
 }

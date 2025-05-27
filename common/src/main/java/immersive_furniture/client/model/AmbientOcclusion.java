@@ -9,15 +9,14 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class AmbientOcclusion {
-    public static final AmbientOcclusion INSTANCE = new AmbientOcclusion();
     private static final double SAMPLE_RESOLUTION = Math.sqrt(3);
     private static final float RESOLUTION = 0.25f;
 
     private final Map<Long, Set<FurnitureData.Element>> elementCache = new ConcurrentHashMap<>();
 
-    final List<Vector3f> kernel = new ArrayList<>();
+    final static List<Vector3f> kernel = new ArrayList<>();
 
-    public AmbientOcclusion() {
+    static {
         int radius = 4;
         for (float x = -radius; x <= radius; x++) {
             for (float y = -radius; y <= radius; y++) {
@@ -29,10 +28,6 @@ public class AmbientOcclusion {
                 }
             }
         }
-    }
-
-    public void clear() {
-        elementCache.clear();
     }
 
     private Set<FurnitureData.Element> getElements(float x, float y, float z) {

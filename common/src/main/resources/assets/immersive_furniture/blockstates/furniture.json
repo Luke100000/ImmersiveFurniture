@@ -1,7 +1,19 @@
 {
   "variants": {
-    "": {
+    "facing=east": {
+      "model": "immersive_furniture:block/furniture",
+      "y": 90
+    },
+    "facing=north": {
       "model": "immersive_furniture:block/furniture"
+    },
+    "facing=south": {
+      "model": "immersive_furniture:block/furniture",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "immersive_furniture:block/furniture",
+      "y": 270
     }
   }
 }

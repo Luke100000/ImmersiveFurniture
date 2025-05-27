@@ -70,7 +70,7 @@ public class FurnitureDataManager {
     public static void saveLocalFile(FurnitureData data) {
         File cache = getLocalFile(data);
         try {
-            NbtIo.write(data.toTag(), cache);
+            NbtIo.writeCompressed(data.toTag(), cache);
             DATA.put(getSafeLocalLocation(data), data);
         } catch (IOException e) {
             Common.logger.error("Failed to save local file: {}", cache.getPath(), e);
@@ -121,7 +121,7 @@ public class FurnitureDataManager {
                             FurnitureData data = new FurnitureData(NbtIo.read(in));
                             data.contentid = contentid;
                             data.author = contentResponse.content().username();
-                            NbtIo.write(data.toTag(), cache);
+                            NbtIo.writeCompressed(data.toTag(), cache);
                             DATA.put(id, data);
                         } catch (Exception e) {
                             Common.logger.error("Failed to read content response: {}", contentResponse, e);

@@ -9,7 +9,8 @@
     "defaultRequire": 1
   },
   "client": [
-    "client.BlockModelAccessor", "client.BlockModelShaperMixin", "client.ItemModelShaperMixin",
-    "client.ItemRendererMixin", "client.ModelBakeryMixin", "client.SpriteContentsAccessor", "client.SpriteContentsMixin"
+    "client.BlockModelAccessor", "client.BlockModelShaperMixin", "client.BlockRenderDispatcherMixin",
+    "client.MinecraftMixin", "client.ItemModelShaperMixin", "client.ItemRendererMixin", "client.ModelBakeryMixin",
+    "client.SpriteContentsAccessor", "client.SpriteContentsMixin"
   ]
 }

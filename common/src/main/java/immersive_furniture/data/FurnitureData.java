@@ -30,6 +30,8 @@ public class FurnitureData {
     public int contentid = -1;
     public String author = "";
 
+    public String hash;
+
     public final List<Element> elements = new LinkedList<>();
 
     public FurnitureData() {
@@ -134,6 +136,22 @@ public class FurnitureData {
 
     public boolean isTranslucent() {
         return false;
+    }
+
+    public boolean requiresBlockEntity() {
+        BoundingBox b = boundingBox();
+        return inventorySize > 0 || b.minX() < 0 || b.minY() < 0 || b.minZ() < 0 || b.maxX() > 16 || b.maxY() > 16 || b.maxZ() > 16;
+    }
+
+    public String getHash() {
+        if (hash == null) {
+            hash = Utils.hashNbt(toTag());
+        }
+        return hash;
+    }
+
+    public void dirty() {
+        hash = null;
     }
 
     public static class Element {

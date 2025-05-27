@@ -74,7 +74,7 @@ public abstract class ArtisansWorkstationScreen extends Screen {
 
     static void renderModel(GuiGraphics graphics, FurnitureData data) {
         BlockRenderDispatcher blockRenderer = Minecraft.getInstance().getBlockRenderer();
-        BakedModel bakedModel = FurnitureModelBaker.getModel(data);
+        BakedModel bakedModel = FurnitureModelBaker.getModel(data, DynamicAtlas.SCRATCH);
         ResourceLocation location = DynamicAtlas.SCRATCH.getLocation();
         VertexConsumer consumer = graphics.bufferSource().getBuffer(RenderType.entityCutout(location));
         blockRenderer.getModelRenderer().renderModel(graphics.pose().last(), consumer, null, bakedModel, 1.0f, 1.0f, 1.0f, 0xF000F0, OverlayTexture.NO_OVERLAY);

@@ -18,9 +18,7 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.BannerBlock;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.RotationSegment;
 
 public class FurnitureBlockEntityRenderer<T extends FurnitureBlockEntity> implements BlockEntityRenderer<T> {
     public FurnitureBlockEntityRenderer(BlockEntityRendererProvider.Context ignoredContext) {
@@ -34,6 +32,9 @@ public class FurnitureBlockEntityRenderer<T extends FurnitureBlockEntity> implem
 
     @Override
     public void render(T blockEntity, float partialTick, PoseStack poseStack, MultiBufferSource buffer, int packedLight, int packedOverlay) {
+        // TODO: Is this ever required? The block renderer injection should work fine in most cases.
+        if (true) return;
+
         poseStack.pushPose();
 
         BlockState blockState = blockEntity.getBlockState();
@@ -45,8 +46,10 @@ public class FurnitureBlockEntityRenderer<T extends FurnitureBlockEntity> implem
         }
 
         FurnitureData data = blockEntity.getData();
-        BlockState state = blockEntity.getBlockState();
-        renderFurniture(state, poseStack, buffer, packedLight, packedOverlay, data);
+        if (data != null) {
+            BlockState state = blockEntity.getBlockState();
+            renderFurniture(state, poseStack, buffer, packedLight, packedOverlay, data);
+        }
 
         poseStack.popPose();
     }
@@ -54,8 +57,8 @@ public class FurnitureBlockEntityRenderer<T extends FurnitureBlockEntity> implem
     private static void renderFurniture(BlockState state, PoseStack poseStack, MultiBufferSource buffer, int packedLight, int packedOverlay, FurnitureData data) {
         boolean translucent = data.isTranslucent();
         BlockRenderDispatcher blockRenderer = Minecraft.getInstance().getBlockRenderer();
-        BakedModel bakedModel = FurnitureModelBaker.getModel(data);
-        ResourceLocation location = DynamicAtlas.SCRATCH.getLocation();
+        BakedModel bakedModel = FurnitureModelBaker.getModel(data, DynamicAtlas.ENTITY);
+        ResourceLocation location = DynamicAtlas.ENTITY.getLocation();
         VertexConsumer consumer = buffer.getBuffer(translucent ? RenderType.entityTranslucent(location) : RenderType.entityCutout(location));
         blockRenderer.getModelRenderer().renderModel(poseStack.last(), consumer, state, bakedModel, 1.0f, 1.0f, 1.0f, packedLight, packedOverlay);
     }

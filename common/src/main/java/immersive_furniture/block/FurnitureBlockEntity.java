@@ -14,7 +14,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class FurnitureBlockEntity extends BlockEntity implements Clearable {
-    private FurnitureData data = FurnitureData.EMPTY;
+    private FurnitureData data;
 
     public FurnitureBlockEntity(BlockPos pos, BlockState blockState) {
         super(BlockEntityTypes.FURNITURE.get(), pos, blockState);
@@ -32,14 +32,18 @@ public class FurnitureBlockEntity extends BlockEntity implements Clearable {
     public void load(CompoundTag tag) {
         super.load(tag);
 
-        this.data = new FurnitureData(tag.getCompound(FurnitureItem.FURNITURE));
+        if (tag.contains(FurnitureItem.FURNITURE)) {
+            this.data = new FurnitureData(tag.getCompound(FurnitureItem.FURNITURE));
+        }
     }
 
     @Override
     protected void saveAdditional(CompoundTag tag) {
         super.saveAdditional(tag);
 
-        tag.put(FurnitureItem.FURNITURE, this.data.toTag());
+        if (this.data != null) {
+            tag.put(FurnitureItem.FURNITURE, this.data.toTag());
+        }
     }
 
     public ClientboundBlockEntityDataPacket getUpdatePacket() {
@@ -61,6 +65,7 @@ public class FurnitureBlockEntity extends BlockEntity implements Clearable {
     }
 
     public FurnitureData getData() {
+        // TODO: Resolve lite block entities
         return data;
     }
 }

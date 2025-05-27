@@ -7,30 +7,46 @@ Initial release
 * High-performance block renderer
 * Blockbench/JSON block and item model import
 
+
+# Today
+
+* If the atlas is full, fall back to realtime rendering
+* Outline but not implement hashed and identifier based data fetching
+* Thread the editor
+* Print usages in F3
+
+# Syncer
+
+* Use the default cache `baked/worldUUID/id`
+* That, however, will fail for the second player the first few chunks
+* What if
+    * Remember failed chunks, rerender them once the data is loaded?
+
+# Data
+
+There are three ways to get furniture data:
+
+* As block entity data (full data)
+* As hash in entity data with lookup (lite data, on the client this results in delayed rendering)
+* As identifier in block state (ultra lite, limited to n variants, results in delayed rendering)
+  * need to find a powerful heuristic on when to switch, there is no way to clean up once a block has been registered. 
+
 # Renderer
 
-There are two rendering pipelines:
+There are three rendering pipelines:
 
-* Over the BlockRenderDispatcher in FurnitureBlockEntityRenderer
-    * This uses the scratch or entity buffer
-    * It injects into item shaper and item renderer (possible breaking points!)
-    * That one is fully dynamic
-* Over the BlockShaper and chunk renderer system
-    * That one needs the static furniture texture and syncing
-    * The state also needs the fixed lookup id, and the server needs to sync the nbt
-
-For items, one can also use the default rendering over the item renderer, which uses the block texture as well.
-
-* Safer (will use the default atlas and wont break in modded scenarios)
-* Less flexible (semi-fixed atlas again, clearing is possible but sketchy)
-* Think about this once block renderer is done, since that's basically the same
+* Dynamic rendering
+    * Via block entity animated or the item injection
+        * Used for scratch, entity which requires an entity anyway, and as a last resort
+    * Via baked block and item renderers
+        * Used for block and item models but only up to 1024 variants
+    * Via injection into the chunk renderer as a block entity
+        * Basically the first approach but with the block entity renderer
+        * That should work since ClientboundLevelChunkWithLightPacket contains the block entity data
+        * Fast rendering but still high memory footprint
 
 # TODO
 
-* Scrap shapes, finish global effects
-* Finish material selector
-* Fix rotations
-    * Fix AO
 * Fix material texture fetcher
 * Add particle emitter
     * Instance the particle and emulate it, it should be possible fine
@@ -41,4 +57,3 @@ For items, one can also use the default rendering over the item renderer, which 
 * Dataloader support and networking
 * Inventory
 * Icon
-* Confirm dont escape in editor

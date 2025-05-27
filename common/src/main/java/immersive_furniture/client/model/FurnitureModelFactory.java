@@ -23,8 +23,15 @@ public class FurnitureModelFactory {
 
     private final FurnitureData data;
     private final DynamicAtlas atlas;
+    private final AmbientOcclusion ao;
 
     private FurnitureModelFactory(FurnitureData data, DynamicAtlas atlas) {
+        // Populate AO lookup
+        ao = new AmbientOcclusion();
+        for (FurnitureData.Element element : data.elements) {
+            ao.place(element);
+        }
+
         this.data = data;
         this.atlas = atlas;
     }
@@ -75,7 +82,7 @@ public class FurnitureModelFactory {
                         light += lightEffect.getBrightness() / 100.0f;
 
                         // Ambient Occlusion
-                        float ao = Math.min(1.0f, Math.max(0.0f, 1.0f - AmbientOcclusion.INSTANCE.sample(pos, normal) * 1.5f));
+                        float ao = Math.min(1.0f, Math.max(0.0f, 1.0f - this.ao.sample(pos, normal) * 1.5f));
                         light *= ao;
 
                         // Contrast
@@ -95,16 +102,17 @@ public class FurnitureModelFactory {
             atlas.upload();
         }
 
+        float uvScale = 16.0f / atlas.size;
         return new BlockElementFace(
                 null, // TODO
                 -1,
                 "#0",
                 new BlockFaceUV(
                         new float[]{
-                                quad.x(),
-                                quad.y(),
-                                (quad.x() + quad.w()),
-                                (quad.y() + quad.h())
+                                quad.x() * uvScale,
+                                quad.y() * uvScale,
+                                (quad.x() + quad.w()) * uvScale,
+                                (quad.y() + quad.h()) * uvScale
                         },
                         0
                 )
@@ -176,13 +184,6 @@ public class FurnitureModelFactory {
     }
 
     public static BlockModel getModel(FurnitureData data, DynamicAtlas atlas) {
-        // Populate AO lookup
-        AmbientOcclusion.INSTANCE.clear();
-        for (FurnitureData.Element element : data.elements) {
-            AmbientOcclusion.INSTANCE.place(element);
-        }
-
-        atlas.clear(); // TODO
         return new FurnitureModelFactory(data, atlas).getModel();
     }
 }

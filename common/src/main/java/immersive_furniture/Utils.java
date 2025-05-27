@@ -7,11 +7,14 @@ import net.minecraft.nbt.NbtIo;
 import org.joml.Vector3f;
 
 import java.io.*;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.HexFormat;
 
 public class Utils {
     public static CompoundTag fromBytes(byte[] bytes) {
         try {
-            return NbtIo.read(new DataInputStream(new ByteArrayInputStream(bytes)));
+            return NbtIo.readCompressed(new DataInputStream(new ByteArrayInputStream(bytes)));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -22,7 +25,7 @@ public class Utils {
         DataOutputStream dataOutput = new DataOutputStream(byteStream);
 
         try {
-            NbtIo.write(tag, dataOutput);
+            NbtIo.writeCompressed(tag, dataOutput);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -44,5 +47,24 @@ public class Utils {
                 from.getFloat(1),
                 from.getFloat(2)
         );
+    }
+
+    public static String hashNbt(CompoundTag tag) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        DataOutputStream dataOutput = new DataOutputStream(baos);
+        try {
+            NbtIo.write(tag, dataOutput);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        byte[] bytes = baos.toByteArray();
+        MessageDigest digest;
+        try {
+            digest = MessageDigest.getInstance("SHA-256");
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
+        byte[] hash = digest.digest(bytes);
+        return HexFormat.of().formatHex(hash);
     }
 }

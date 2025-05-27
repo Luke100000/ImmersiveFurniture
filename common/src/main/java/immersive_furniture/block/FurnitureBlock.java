@@ -1,6 +1,7 @@
 package immersive_furniture.block;
 
 import immersive_furniture.BlockEntityTypes;
+import immersive_furniture.data.FurnitureData;
 import immersive_furniture.item.FurnitureItem;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -101,9 +102,7 @@ public class FurnitureBlock extends BaseEntityBlock implements SimpleWaterlogged
 
     @Override
     public RenderShape getRenderShape(BlockState state) {
-        // return RenderShape.MODEL;
-        // TODO: Maybe use two different blocks (Dynamic and Baked)?
-        return RenderShape.ENTITYBLOCK_ANIMATED;
+        return state.getValue(IDENTIFIER) == 0 ? RenderShape.ENTITYBLOCK_ANIMATED : RenderShape.MODEL;
     }
 
     @Override
@@ -154,19 +153,31 @@ public class FurnitureBlock extends BaseEntityBlock implements SimpleWaterlogged
     }
 
     @Override
-    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return new FurnitureBlockEntity(pos, state);
-    }
-
-    @Override
     public ItemStack getCloneItemStack(BlockGetter level, BlockPos pos, BlockState state) {
         if (level.getBlockEntity(pos) instanceof FurnitureBlockEntity furnitureBlockEntity) {
             ItemStack itemStack = new ItemStack(asItem());
-            FurnitureItem.setData(itemStack, furnitureBlockEntity.getData());
+            FurnitureData data = furnitureBlockEntity.getData();
+            if (data != null) {
+                FurnitureItem.setData(itemStack, data);
+            }
             return itemStack;
         } else {
             return super.getCloneItemStack(level, pos, state);
         }
+    }
+
+    @Override
+    public boolean isPathfindable(BlockState state, BlockGetter level, BlockPos pos, PathComputationType type) {
+        return false;
+    }
+
+    @Override
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+        if (state.getValue(IDENTIFIER) > 0) {
+            // This is an ultra-lite block without block entity data
+            return null;
+        }
+        return new FurnitureBlockEntity(pos, state);
     }
 
     @Override
@@ -177,11 +188,6 @@ public class FurnitureBlock extends BaseEntityBlock implements SimpleWaterlogged
         } else {
             return FurnitureBlock.createTickerHelper(blockEntityType, BlockEntityTypes.FURNITURE.get(), FurnitureBlockEntity::serverTick);
         }
-    }
-
-    @Override
-    public boolean isPathfindable(BlockState state, BlockGetter level, BlockPos pos, PathComputationType type) {
-        return false;
     }
 }
 
