@@ -76,6 +76,9 @@ public class FurnitureBlock extends BaseEntityBlock implements SimpleWaterlogged
     @Override
     @Nullable
     public BlockState getStateForPlacement(BlockPlaceContext context) {
+        ItemStack stack = context.getItemInHand();
+        // TODO: Here, decide on whether to and identifier should be assigned, which will then prevent block entity creation.
+
         BlockPos blockPos = context.getClickedPos();
         Level levelAccessor = context.getLevel();
         boolean waterlogged = levelAccessor.getFluidState(blockPos).getType() == Fluids.WATER;

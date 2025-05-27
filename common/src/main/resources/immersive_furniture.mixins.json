@@ -10,7 +10,7 @@
   },
   "client": [
     "client.BlockModelAccessor", "client.BlockModelShaperMixin", "client.BlockRenderDispatcherMixin",
-    "client.MinecraftMixin", "client.ItemModelShaperMixin", "client.ItemRendererMixin", "client.ModelBakeryMixin",
-    "client.SpriteContentsAccessor", "client.SpriteContentsMixin"
+    "client.DebugScreenOverlayMixin", "client.ItemModelShaperMixin", "client.ItemRendererMixin",
+    "client.MinecraftMixin", "client.ModelBakeryMixin", "client.SpriteContentsAccessor", "client.SpriteContentsMixin"
   ]
 }

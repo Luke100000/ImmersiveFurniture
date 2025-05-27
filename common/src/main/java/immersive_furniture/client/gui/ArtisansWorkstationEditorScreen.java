@@ -130,6 +130,9 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
     public void render(@NotNull GuiGraphics graphics, int mouseX, int mouseY, float delta) {
         super.render(graphics, mouseX, mouseY, delta);
 
+        // Recompute hash
+        data.dirty();
+
         // Model
         graphics.enableScissor(leftPos + TOOLS_WIDTH + 3, topPos + 3, leftPos + windowWidth - 3, topPos + windowHeight - 3);
         drawModel(graphics, data, leftPos + TOOLS_WIDTH + (windowWidth - TOOLS_WIDTH) / 2, topPos + windowHeight / 2, camZoom, camYaw, camPitch, mouseX, mouseY);

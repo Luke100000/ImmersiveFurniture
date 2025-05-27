@@ -1,6 +1,6 @@
 package immersive_furniture.data;
 
-import immersive_furniture.Utils;
+import immersive_furniture.utils.Utils;
 import immersive_furniture.client.model.MaterialRegistry;
 import immersive_furniture.client.model.MaterialSource;
 import immersive_furniture.client.model.effects.LightMaterialEffect;

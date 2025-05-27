@@ -37,6 +37,8 @@ public class FurnitureModelFactory {
     }
 
     private BlockElementFace getFace(FurnitureData.Element element, Direction direction) {
+        // TODO: Cull
+
         // Allocate pixels
         Vector2i dimensions = ModelUtils.getFaceDimensions(element, direction);
         DynamicAtlas.Quad quad = atlas.allocate(dimensions.x, dimensions.y);

@@ -2,10 +2,9 @@ package immersive_furniture.client.gui;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import immersive_furniture.Common;
-import immersive_furniture.Utils;
+import immersive_furniture.utils.Utils;
 import immersive_furniture.client.FurnitureDataManager;
 import immersive_furniture.client.gui.widgets.StateImageButton;
-import immersive_furniture.client.model.FurnitureModelBaker;
 import immersive_furniture.cobalt.network.NetworkHandler;
 import immersive_furniture.data.FurnitureData;
 import immersive_furniture.data.api.API;

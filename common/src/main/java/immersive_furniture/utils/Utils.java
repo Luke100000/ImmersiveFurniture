@@ -1,4 +1,4 @@
-package immersive_furniture;
+package immersive_furniture.utils;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.FloatTag;

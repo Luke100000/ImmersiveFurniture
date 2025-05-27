@@ -16,7 +16,7 @@ public class ItemModelShaperMixin {
     @Inject(method = "getItemModel(Lnet/minecraft/world/item/ItemStack;)Lnet/minecraft/client/resources/model/BakedModel;", at = @At("HEAD"), cancellable = true)
     private void immersiveFuture$getItemModel(ItemStack stack, CallbackInfoReturnable<BakedModel> cir) {
         if (stack.getItem() instanceof FurnitureItem) {
-            // TODO: Is this even required? If yes, use a white placeholder texture.
+            // This is required not because of the model itself but because of the transformation
             cir.setReturnValue(FurnitureModelBaker.getModel(FurnitureItem.getData(stack), DynamicAtlas.ENTITY));
         }
     }

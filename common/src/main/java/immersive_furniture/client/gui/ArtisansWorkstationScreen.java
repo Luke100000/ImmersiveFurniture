@@ -69,7 +69,6 @@ public abstract class ArtisansWorkstationScreen extends Screen {
         graphics.pose().mulPoseMatrix(new Matrix4f().scaling(1, -1, 1));
         renderModel(graphics, data);
         graphics.pose().popPose();
-        graphics.flush(); // TODO: Flush is required because the scratch atlas is currently cleared after each model, not tick.
     }
 
     static void renderModel(GuiGraphics graphics, FurnitureData data) {

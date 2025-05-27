@@ -1,18 +1,15 @@
 package immersive_furniture.network.s2c;
 
-import immersive_furniture.Utils;
+import immersive_furniture.utils.Utils;
 import immersive_furniture.cobalt.network.Message;
 import immersive_furniture.data.FurnitureData;
 import immersive_furniture.item.FurnitureItem;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtIo;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-
-import java.io.*;
 
 import static immersive_furniture.Items.FURNITURE;
 

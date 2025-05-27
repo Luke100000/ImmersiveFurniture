@@ -32,7 +32,7 @@ public class FurnitureBlockEntityRenderer<T extends FurnitureBlockEntity> implem
 
     @Override
     public void render(T blockEntity, float partialTick, PoseStack poseStack, MultiBufferSource buffer, int packedLight, int packedOverlay) {
-        // TODO: Is this ever required? The block renderer injection should work fine in most cases.
+        // TODO: Only  trigger when the baked atlas is full.
         if (true) return;
 
         poseStack.pushPose();

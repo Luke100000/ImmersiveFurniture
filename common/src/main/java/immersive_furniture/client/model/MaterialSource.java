@@ -75,7 +75,7 @@ public record MaterialSource(
         return fallback;
     }
 
-    // TODO: This is for custom materials
+    // TODO: This is for custom materials, added via resource packs or config
     public static MaterialSource create(ResourceLocation location) {
         Material material = getMaterial(location);
         if (material == null) return null;

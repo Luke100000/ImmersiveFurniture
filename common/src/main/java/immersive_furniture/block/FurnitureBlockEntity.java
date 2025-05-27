@@ -32,6 +32,8 @@ public class FurnitureBlockEntity extends BlockEntity implements Clearable {
     public void load(CompoundTag tag) {
         super.load(tag);
 
+        // TODO: On a server, check here if the tag should get offloaded to the registry
+
         if (tag.contains(FurnitureItem.FURNITURE)) {
             this.data = new FurnitureData(tag.getCompound(FurnitureItem.FURNITURE));
         }
