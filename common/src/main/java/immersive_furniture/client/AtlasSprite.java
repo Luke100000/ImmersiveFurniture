@@ -10,6 +10,7 @@ public class AtlasSprite {
     public static class Ticker implements SpriteTicker {
         private final SpriteContents spriteContents;
         private final SpriteContentsAccessor spriteContentsAccessor;
+        private float lastUtilization = 0.0f;
 
         public Ticker(SpriteContents spriteContents) {
             this.spriteContents = spriteContents;
@@ -24,19 +25,60 @@ public class AtlasSprite {
 
         @Override
         public void tickAndUpload(int x, int y) {
-            NativeImage[] content = spriteContentsAccessor.getMipLevelData();
-
-            // TODO: Only copy when there is something to copy
-            // TODO: Resize when spriteContents width/height mismatches
+            float usage = DynamicAtlas.BAKED.getUsage();
+            if (lastUtilization == usage || usage == 0) return;
+            lastUtilization = usage;
 
             NativeImage source = DynamicAtlas.BAKED.getPixels();
             assert source != null;
+            NativeImage[] content = spriteContentsAccessor.getMipLevelData();
 
-            content[0].copyFrom(source);
-            content[0].copyRect(source, 0, 0, x, y, spriteContents.width(), spriteContents.height(), false, false);
+            // Copy the main image
+            copyRect(source, content[0], x, y, spriteContents.width(), spriteContents.height());
 
-            // Remember about mipmaps!
+            // Create mipmaps
+            for (int i = 1; i < content.length; ++i) {
+                mipTheMap(content[i - 1], content[i], x >> i, y >> i, spriteContents.width() >> i, spriteContents.height() >> i);
+            }
+
             upload(x, y, content);
+        }
+
+        public void copyRect(NativeImage source, NativeImage destination, int xTo, int yTo, int width, int height) {
+            for (int i = 0; i < height; ++i) {
+                for (int j = 0; j < width; ++j) {
+                    int m = source.getPixelRGBA(j, i);
+                    destination.setPixelRGBA(xTo + j, yTo + i, m);
+                }
+            }
+        }
+
+        static int blend(int... colors) {
+            int r = 0, g = 0, b = 0, a = 0;
+            for (int c : colors) {
+                r += (c >> 24) & 0xFF;
+                g += (c >> 16) & 0xFF;
+                b += (c >> 8) & 0xFF;
+                a = Math.max(a, c & 0xFF);
+            }
+            r /= colors.length;
+            g /= colors.length;
+            b /= colors.length;
+            return (r << 24) | (g << 16) | (b << 8) | a;
+        }
+
+        public void mipTheMap(NativeImage source, NativeImage destination, int xTo, int yTo, int width, int height) {
+            for (int i = 0; i < height; ++i) {
+                for (int j = 0; j < width; ++j) {
+                    int m = blend(
+                            source.getPixelRGBA(j * 2, i * 2),
+                            source.getPixelRGBA(j * 2 + 1, i * 2),
+                            source.getPixelRGBA(j * 2, i * 2 + 1),
+                            source.getPixelRGBA(j * 2 + 1, i * 2 + 1)
+                    );
+                    destination.setPixelRGBA(xTo + j, yTo + i, m);
+                }
+            }
         }
 
         @Override

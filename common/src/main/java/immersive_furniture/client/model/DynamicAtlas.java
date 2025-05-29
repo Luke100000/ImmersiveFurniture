@@ -4,13 +4,14 @@ import immersive_furniture.Common;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.renderer.texture.SpriteContents;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.metadata.animation.AnimationMetadataSection;
 import net.minecraft.client.resources.metadata.animation.FrameSize;
-import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.resources.ResourceLocation;
 
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class DynamicAtlas extends DynamicTexture {
@@ -33,6 +34,7 @@ public class DynamicAtlas extends DynamicTexture {
 
         this.size = size;
 
+        // Register the texture with the Minecraft texture manager
         location = Common.locate("immersive_furniture_atlas/" + name);
         Minecraft.getInstance().getTextureManager().register(location, this);
 
@@ -85,6 +87,10 @@ public class DynamicAtlas extends DynamicTexture {
 
     public ResourceLocation getLocation() {
         return location;
+    }
+
+    public int getSize() {
+        return size;
     }
 
     public record Quad(int x, int y, int w, int h) {

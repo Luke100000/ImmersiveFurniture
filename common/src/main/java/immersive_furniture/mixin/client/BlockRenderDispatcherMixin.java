@@ -39,7 +39,7 @@ public abstract class BlockRenderDispatcherMixin {
     @Unique
     private void immersive_furniture$render(BlockState state, BlockPos pos, BlockAndTintGetter level, PoseStack poseStack, VertexConsumer consumer, boolean checkSides, RandomSource random) {
         // Check if data is available already
-        FurnitureRenderer.Status status = FurnitureRenderer.getLoadedStatus(level, pos);
+        FurnitureRenderer.Status status = FurnitureRenderer.getLoadedStatus(pos);
 
         // Render it
         if (status.data() != null) {

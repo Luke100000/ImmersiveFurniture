@@ -33,6 +33,11 @@ public class ServerFurnitureRegistry {
             return 0;
         }
 
+        if (registry.hashToIdentifier.containsKey(hash)) {
+            // Already registered
+            return registry.hashToIdentifier.get(hash);
+        }
+
         int identifier = registry.hashToIdentifier.size() + 1;
         if (identifier < 1024) {
             // Register new identifier

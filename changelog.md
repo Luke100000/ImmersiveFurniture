@@ -9,13 +9,11 @@ Initial release
 
 # Today
 
-* Remove rotation from blockstate (not required, its done on demand)
-* Why is the identifier renderer not working?
 * Switch to copy atlas instead of copyRect (thats slow af)
   * Then just render the mipmaps on the dynamic atlas on demand
   * While it should be safe to just work on the real data, lets rather not
-* If the atlas is full, fall back to realtime rendering
 * Thread the editor
+* Test fallback to realtime renderer
 
 # Syncer
 

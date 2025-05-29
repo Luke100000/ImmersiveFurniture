@@ -175,12 +175,12 @@ public class FurnitureModelFactory {
         float scale = (float) (1.0 / (Math.max(16.0, data.getSize()) / 16.0));
         return new ItemTransforms(
                 new ItemTransform(new Vector3f(75, 225, 0), new Vector3f(0, 2.5f / 16.0f, 0), new Vector3f(0.375f * scale)),
-                new ItemTransform(new Vector3f(75, 45, 0), new Vector3f(0, 2.5f, 0), new Vector3f(0.375f * scale)),
+                new ItemTransform(new Vector3f(75, 45, 0), new Vector3f(0, 2.5f / 16.0f, 0), new Vector3f(0.375f * scale)),
                 new ItemTransform(new Vector3f(0, 225, 0), new Vector3f(), new Vector3f(0.4f * scale)),
-                new ItemTransform(new Vector3f(), new Vector3f(0, 45, 0), new Vector3f(0.4f * scale)),
+                new ItemTransform(new Vector3f(0, 45, 0), new Vector3f(), new Vector3f(0.4f * scale)),
                 new ItemTransform(new Vector3f(), new Vector3f(), new Vector3f(1.0f)),
                 new ItemTransform(new Vector3f(30, 225, 0), new Vector3f(), new Vector3f(0.625f * scale)),
-                new ItemTransform(new Vector3f(), new Vector3f(0, 3, 0), new Vector3f(0.25f * scale)),
+                new ItemTransform(new Vector3f(), new Vector3f(0, 3.0f / 16.0f, 0), new Vector3f(0.25f * scale)),
                 new ItemTransform(new Vector3f(), new Vector3f(), new Vector3f(0.5f * scale))
         );
     }
