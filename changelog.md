@@ -4,16 +4,18 @@ Initial release
 
 # Roadmap 1.0.0
 
-* High-performance block renderer
 * Blockbench/JSON block and item model import
 
 
 # Today
 
+* Remove rotation from blockstate (not required, its done on demand)
+* Why is the identifier renderer not working?
+* Switch to copy atlas instead of copyRect (thats slow af)
+  * Then just render the mipmaps on the dynamic atlas on demand
+  * While it should be safe to just work on the real data, lets rather not
 * If the atlas is full, fall back to realtime rendering
-* Outline but not implement hashed and identifier based data fetching
 * Thread the editor
-* Print usages in F3
 
 # Syncer
 

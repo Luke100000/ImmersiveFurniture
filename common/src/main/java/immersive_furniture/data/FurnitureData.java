@@ -30,7 +30,7 @@ public class FurnitureData {
     public int contentid = -1;
     public String author = "";
 
-    public String hash;
+    private String hash;
 
     public final List<Element> elements = new LinkedList<>();
 
@@ -61,6 +61,7 @@ public class FurnitureData {
         this.inventorySize = data.inventorySize;
         this.contentid = data.contentid;
         this.author = data.author;
+        this.hash = null;
 
         for (Element element : data.elements) {
             this.elements.add(new Element(element));

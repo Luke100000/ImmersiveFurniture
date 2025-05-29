@@ -1,10 +1,14 @@
 package immersive_furniture.block;
 
 import immersive_furniture.BlockEntityTypes;
+import immersive_furniture.data.ClientFurnitureRegistry;
 import immersive_furniture.data.FurnitureData;
+import immersive_furniture.data.FurnitureDataManager;
+import immersive_furniture.data.ServerFurnitureRegistry;
 import immersive_furniture.item.FurnitureItem;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
@@ -34,6 +38,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
+import org.spongepowered.asm.mixin.Unique;
 
 public class FurnitureBlock extends BaseEntityBlock implements SimpleWaterloggedBlock {
     protected static final VoxelShape SHAPE = Block.box(2.0, 2.0, 2.0, 14.0, 14.0, 14.0);
@@ -76,15 +81,24 @@ public class FurnitureBlock extends BaseEntityBlock implements SimpleWaterlogged
     @Override
     @Nullable
     public BlockState getStateForPlacement(BlockPlaceContext context) {
+        // If the block has been placed often enough, it will have an identifier.
+        int identifier = 0;
         ItemStack stack = context.getItemInHand();
-        // TODO: Here, decide on whether to and identifier should be assigned, which will then prevent block entity creation.
+        FurnitureData data = FurnitureItem.getData(stack);
+        if (!data.requiresBlockEntity()) {
+            if (context.getLevel() instanceof ServerLevel level) {
+                identifier = ServerFurnitureRegistry.registerIdentifier(level, data);
+            } else {
+                identifier = ClientFurnitureRegistry.resolve(data.getHash());
+            }
+        }
 
         BlockPos blockPos = context.getClickedPos();
         Level levelAccessor = context.getLevel();
         boolean waterlogged = levelAccessor.getFluidState(blockPos).getType() == Fluids.WATER;
         return this.defaultBlockState()
                 .setValue(WATERLOGGED, waterlogged)
-                .setValue(IDENTIFIER, 0)
+                .setValue(IDENTIFIER, identifier)
                 .setValue(FACING, context.getHorizontalDirection());
     }
 
@@ -105,7 +119,7 @@ public class FurnitureBlock extends BaseEntityBlock implements SimpleWaterlogged
 
     @Override
     public RenderShape getRenderShape(BlockState state) {
-        return state.getValue(IDENTIFIER) == 0 ? RenderShape.ENTITYBLOCK_ANIMATED : RenderShape.MODEL;
+        return RenderShape.ENTITYBLOCK_ANIMATED;
     }
 
     @Override

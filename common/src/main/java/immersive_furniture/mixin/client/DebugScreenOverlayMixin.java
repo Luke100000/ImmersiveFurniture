@@ -13,10 +13,13 @@ import java.util.List;
 public class DebugScreenOverlayMixin {
     @Inject(at = @At("RETURN"), method = "getGameInformation")
     protected void getLeftText(CallbackInfoReturnable<List<String>> info) {
-        info.getReturnValue().add("[IF] B: %s%%, E: %s%%, S: %s%%".formatted(
+        info.getReturnValue().add("[IF] B: %s%% (%s), E: %s%% (%s), S: %s%% (%s)".formatted(
                 (int) (DynamicAtlas.BAKED.getUsage() * 100),
+                DynamicAtlas.BAKED.knownFurniture.size(),
                 (int) (DynamicAtlas.ENTITY.getUsage() * 100),
-                (int) (DynamicAtlas.SCRATCH.getUsage() * 100)
+                DynamicAtlas.ENTITY.knownFurniture.size(),
+                (int) (DynamicAtlas.SCRATCH.getUsage() * 100),
+                DynamicAtlas.SCRATCH.knownFurniture.size()
         ));
     }
 }

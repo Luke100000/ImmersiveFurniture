@@ -1,5 +1,22 @@
 {
+  "parent": "block/block",
   "texture_size": [16, 16],
-  "textures": {},
-  "elements": []
+  "textures": {
+    "0": "minecraft:block/oak_log",
+    "particle": "minecraft:block/oak_log"
+  },
+  "elements": [
+    {
+      "from": [2, 2, 2],
+      "to": [12, 12, 12],
+      "faces": {
+        "north": {"uv": [2, 2, 14, 14], "texture": "#0"},
+        "east": {"uv": [2, 2, 14, 14], "texture": "#0"},
+        "south": {"uv": [2, 2, 14, 14], "texture": "#0"},
+        "west": {"uv": [2, 2, 14, 14], "texture": "#0"},
+        "up": {"uv": [2, 2, 14, 14], "texture": "#0"},
+        "down": {"uv": [2, 2, 14, 14], "texture": "#0"}
+      }
+    }
+  ]
 }

@@ -1,6 +1,6 @@
 package immersive_furniture.client.gui.components;
 
-import immersive_furniture.client.FurnitureDataManager;
+import immersive_furniture.data.FurnitureDataManager;
 import immersive_furniture.client.gui.ArtisansWorkstationEditorScreen;
 import immersive_furniture.client.gui.ArtisansWorkstationLibraryScreen;
 import immersive_furniture.client.gui.widgets.BoundedIntSliderButton;

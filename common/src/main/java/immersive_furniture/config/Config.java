@@ -11,9 +11,15 @@ public final class Config extends JsonConfig {
     public List<String> favorites = new LinkedList<>();
     public String immersiveLibraryUrl = "http://localhost:8000";
 
-    public Config() {
-        super("default");
-    }
+    // How many times the same furniture needs to be placed before low-memory mode is activated.
+    // That mode is limited to 1024 unique furniture and cannot be cleaned up again.
+    // All other furniture is more expensive since they require a block entity.
+    public int lowMemoryModeThreshold = 10;
+
+    // Furniture data is somewhat large and not deduplicated by default.
+    // By only storing the hash and using a separate registry, this can be resolved.
+    // This speeds up networking, world saving, loading, and memory usage.
+    public boolean saveAsHash = true;
 
     public Config(String name) {
         super(name);

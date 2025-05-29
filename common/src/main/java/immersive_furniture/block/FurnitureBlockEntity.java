@@ -1,12 +1,15 @@
 package immersive_furniture.block;
 
 import immersive_furniture.BlockEntityTypes;
+import immersive_furniture.config.Config;
 import immersive_furniture.data.FurnitureData;
+import immersive_furniture.data.FurnitureDataManager;
 import immersive_furniture.item.FurnitureItem;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Clearable;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -14,6 +17,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class FurnitureBlockEntity extends BlockEntity implements Clearable {
+    private String hash;
     private FurnitureData data;
 
     public FurnitureBlockEntity(BlockPos pos, BlockState blockState) {
@@ -32,10 +36,11 @@ public class FurnitureBlockEntity extends BlockEntity implements Clearable {
     public void load(CompoundTag tag) {
         super.load(tag);
 
-        // TODO: On a server, check here if the tag should get offloaded to the registry
-
         if (tag.contains(FurnitureItem.FURNITURE)) {
             this.data = new FurnitureData(tag.getCompound(FurnitureItem.FURNITURE));
+        } else if (tag.contains(FurnitureItem.FURNITURE_HASH)) {
+            // Delay loading
+            hash = tag.getString(FurnitureItem.FURNITURE_HASH);
         }
     }
 
@@ -44,7 +49,12 @@ public class FurnitureBlockEntity extends BlockEntity implements Clearable {
         super.saveAdditional(tag);
 
         if (this.data != null) {
-            tag.put(FurnitureItem.FURNITURE, this.data.toTag());
+            if (Config.getInstance().saveAsHash) {
+                FurnitureDataManager.save(data, new ResourceLocation("hash", this.data.getHash()));
+                tag.putString(FurnitureItem.FURNITURE_HASH, this.data.getHash());
+            } else {
+                tag.put(FurnitureItem.FURNITURE, this.data.toTag());
+            }
         }
     }
 
@@ -67,7 +77,12 @@ public class FurnitureBlockEntity extends BlockEntity implements Clearable {
     }
 
     public FurnitureData getData() {
-        // TODO: Resolve lite block entities
+        if (hash != null) {
+            data = FurnitureDataManager.getData(hash);
+            if (data != null) {
+                hash = null;
+            }
+        }
         return data;
     }
 }

@@ -62,15 +62,33 @@ public class FurnitureModelBaker {
     }
 
     public static BakedModel getModel(FurnitureData data, DynamicAtlas atlas) {
-        return getModel(data, atlas, 0);
+        return getModel(data, atlas, 0, true);
     }
 
-    public static BakedModel getModel(FurnitureData data, DynamicAtlas atlas, int yRot) {
+    public static BakedModel getModel(FurnitureData data, DynamicAtlas atlas, int yRot, boolean force) {
         String hash = data.getHash();
-        return atlas.knownFurniture.computeIfAbsent(hash, k -> {
+        boolean exist = atlas.knownFurniture.containsKey(hash);
+
+        // The atlas is full, cannot continue
+        if (!force && !exist && atlas.isFull()) {
+            return null;
+        }
+
+        if (exist) {
+            return atlas.knownFurniture.get(hash).get(yRot);
+        } else {
             BlockModel model = FurnitureModelFactory.getModel(data, atlas);
-            return new CachedBakedModelSet(atlas, model);
-        }).get(yRot);
+            CachedBakedModelSet modelSet = new CachedBakedModelSet(atlas, model);
+            atlas.knownFurniture.put(hash, modelSet);
+
+            // Only add when forced or the atlas had space
+            if (force || !atlas.isFull()) {
+                return modelSet.get(yRot);
+            } else {
+                atlas.knownFurniture.remove(hash);
+            }
+        }
+        return null;
     }
 
     private static BakedModel bakeModel(DynamicAtlas atlas, BlockModel model, int yRot) {

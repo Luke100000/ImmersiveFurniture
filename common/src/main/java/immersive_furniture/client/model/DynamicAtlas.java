@@ -24,7 +24,7 @@ public class DynamicAtlas extends DynamicTexture {
     ResourceLocation location;
     List<Quad> quads = new LinkedList<>();
 
-    Map<String, FurnitureModelBaker.CachedBakedModelSet> knownFurniture = new ConcurrentHashMap<>();
+    public Map<String, FurnitureModelBaker.CachedBakedModelSet> knownFurniture = new ConcurrentHashMap<>();
 
     public final TextureAtlasSpriteAccessor sprite;
 

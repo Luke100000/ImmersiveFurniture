@@ -3,7 +3,7 @@ package immersive_furniture.client.gui;
 import com.mojang.blaze3d.platform.InputConstants;
 import immersive_furniture.Common;
 import immersive_furniture.utils.Utils;
-import immersive_furniture.client.FurnitureDataManager;
+import immersive_furniture.data.FurnitureDataManager;
 import immersive_furniture.client.gui.widgets.StateImageButton;
 import immersive_furniture.cobalt.network.NetworkHandler;
 import immersive_furniture.data.FurnitureData;
@@ -28,7 +28,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import static immersive_furniture.client.FurnitureDataManager.REQUESTED_DATA;
+import static immersive_furniture.data.FurnitureDataManager.REQUESTED_DATA;
 import static immersive_furniture.client.gui.components.SettingsComponent.TAGS;
 import static immersive_furniture.data.api.API.request;
 

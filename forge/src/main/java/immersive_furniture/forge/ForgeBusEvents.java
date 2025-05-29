@@ -2,10 +2,13 @@ package immersive_furniture.forge;
 
 import immersive_furniture.Common;
 import immersive_furniture.CommonClient;
+import immersive_furniture.data.ServerFurnitureRegistry;
 import immersive_furniture.forge.cobalt.registration.RegistrationImpl.DataLoaderRegister;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -28,11 +31,18 @@ public class ForgeBusEvents {
     }
 
     @SubscribeEvent
-    public static void addReloadListenerEvent(AddReloadListenerEvent event) {
+    public static void onAddReloadListenerEvent(AddReloadListenerEvent event) {
         if (DATA_REGISTRY != null) {
             for (PreparableReloadListener loader : DATA_REGISTRY.getLoaders()) {
                 event.addListener(loader);
             }
+        }
+    }
+
+    @SubscribeEvent
+    public static void onEntityJoinLevel(EntityJoinLevelEvent event) {
+        if (event.getEntity() instanceof ServerPlayer player) {
+            ServerFurnitureRegistry.syncWithPlayer(player);
         }
     }
 }

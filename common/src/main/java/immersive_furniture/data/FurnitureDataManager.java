@@ -1,10 +1,11 @@
-package immersive_furniture.client;
+package immersive_furniture.data;
 
 import immersive_furniture.Common;
-import immersive_furniture.data.FurnitureData;
+import immersive_furniture.cobalt.network.NetworkHandler;
 import immersive_furniture.data.api.API;
 import immersive_furniture.data.api.responses.ContentResponse;
 import immersive_furniture.data.api.responses.Response;
+import immersive_furniture.network.c2s.FurnitureDataRequest;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.resources.ResourceLocation;
@@ -68,13 +69,21 @@ public class FurnitureDataManager {
     }
 
     public static void saveLocalFile(FurnitureData data) {
-        File cache = getLocalFile(data);
+        save(data, getSafeLocalLocation(data));
+    }
+
+    public static void save(FurnitureData data, ResourceLocation id) {
+        File cache = getFile(id);
         try {
             NbtIo.writeCompressed(data.toTag(), cache);
             DATA.put(getSafeLocalLocation(data), data);
         } catch (IOException e) {
             Common.logger.error("Failed to save local file: {}", cache.getPath(), e);
         }
+    }
+
+    public static FurnitureData getData(String hash) {
+        return getData(new ResourceLocation("hash", hash));
     }
 
     public static FurnitureData getData(ResourceLocation id) {
@@ -85,15 +94,10 @@ public class FurnitureDataManager {
             File cache = getFile(id);
             if (cache.exists()) {
                 try {
-                    CompoundTag tag = NbtIo.read(cache);
-                    if (tag == null) {
-                        delete(cache);
-                        Common.logger.error("Failed to read file: {}", cache);
-                    } else {
-                        FurnitureData data = new FurnitureData(tag);
-                        DATA.put(id, data);
-                        return data;
-                    }
+                    CompoundTag tag = NbtIo.readCompressed(cache);
+                    FurnitureData data = new FurnitureData(tag);
+                    DATA.put(id, data);
+                    return data;
                 } catch (IOException e) {
                     delete(cache);
                     Common.logger.error("Failed to read file: {}", cache, e);
@@ -116,9 +120,9 @@ public class FurnitureDataManager {
                 CompletableFuture.runAsync(() -> {
                     Response response = request(API.HttpMethod.GET, ContentResponse::new, "content/furniture/" + contentid, Map.of("version", String.valueOf(version)));
                     if (response instanceof ContentResponse contentResponse) {
-                        DataInput in = new DataInputStream(new ByteArrayInputStream(Base64.getDecoder().decode(contentResponse.content().data())));
+                        ByteArrayInputStream in = new ByteArrayInputStream(Base64.getDecoder().decode(contentResponse.content().data()));
                         try {
-                            FurnitureData data = new FurnitureData(NbtIo.read(in));
+                            FurnitureData data = new FurnitureData(NbtIo.readCompressed(in));
                             data.contentid = contentid;
                             data.author = contentResponse.content().username();
                             NbtIo.writeCompressed(data.toTag(), cache);
@@ -128,8 +132,8 @@ public class FurnitureDataManager {
                         }
                     }
                 });
-            } else {
-                // TODO: Request from server as part of data-packs
+            } else if (id.getNamespace().equals("hash")) {
+                NetworkHandler.sendToServer(new FurnitureDataRequest(id.getPath()));
             }
         }
         return DATA.get(id);

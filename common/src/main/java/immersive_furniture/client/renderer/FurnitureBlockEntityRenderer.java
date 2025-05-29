@@ -32,8 +32,13 @@ public class FurnitureBlockEntityRenderer<T extends FurnitureBlockEntity> implem
 
     @Override
     public void render(T blockEntity, float partialTick, PoseStack poseStack, MultiBufferSource buffer, int packedLight, int packedOverlay) {
-        // TODO: Only  trigger when the baked atlas is full.
-        if (true) return;
+        FurnitureData data = blockEntity.getData();
+        if (data == null) return;
+
+        // If the texture has been baked, we assume it got rendered via the block renderer
+        if (DynamicAtlas.BAKED.knownFurniture.containsKey(data.getHash())) {
+            return;
+        }
 
         poseStack.pushPose();
 
@@ -45,11 +50,8 @@ public class FurnitureBlockEntityRenderer<T extends FurnitureBlockEntity> implem
             poseStack.translate(-0.5F, -0.5F, -0.5F);
         }
 
-        FurnitureData data = blockEntity.getData();
-        if (data != null) {
-            BlockState state = blockEntity.getBlockState();
-            renderFurniture(state, poseStack, buffer, packedLight, packedOverlay, data);
-        }
+        BlockState state = blockEntity.getBlockState();
+        renderFurniture(state, poseStack, buffer, packedLight, packedOverlay, data);
 
         poseStack.popPose();
     }

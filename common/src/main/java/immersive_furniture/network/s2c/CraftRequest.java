@@ -23,8 +23,7 @@ public class CraftRequest extends Message {
     }
 
     public CraftRequest(FriendlyByteBuf b) {
-        CompoundTag tag = Utils.fromBytes(b.readByteArray());
-        data = new FurnitureData(tag);
+        data = new FurnitureData(Utils.fromBytes(b.readByteArray()));
         shift = b.readBoolean();
     }
 
