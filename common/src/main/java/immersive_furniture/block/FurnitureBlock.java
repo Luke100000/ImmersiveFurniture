@@ -38,11 +38,8 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
-import org.spongepowered.asm.mixin.Unique;
 
 public class FurnitureBlock extends BaseEntityBlock implements SimpleWaterloggedBlock {
-    protected static final VoxelShape SHAPE = Block.box(2.0, 2.0, 2.0, 14.0, 14.0, 14.0);
-
     public static final IntegerProperty IDENTIFIER = IntegerProperty.create("identifier", 0, 1023);
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
@@ -113,8 +110,26 @@ public class FurnitureBlock extends BaseEntityBlock implements SimpleWaterlogged
 
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-        // TODO: Dynamic shape
-        return SHAPE;
+        FurnitureData data = getData(state, level, pos);
+        if (data != null) {
+            return data.getShape(state.getValue(FACING));
+        }
+
+        // Bigger than one block to toggle `cache.largeCollisionShape`
+        return Block.box(-1.0f, -1.0f, -1.0f, 18.0f, 18.0f, 18.0f);
+    }
+
+    public FurnitureData getData(BlockState state, BlockGetter level, BlockPos pos) {
+        int identifier = state.getValue(FurnitureBlock.IDENTIFIER);
+        if (identifier == 0) {
+            if (level.getBlockEntity(pos) instanceof FurnitureBlockEntity blockEntity) {
+                return blockEntity.getData();
+            }
+        } else {
+            String hash = ClientFurnitureRegistry.resolve(identifier);
+            return hash != null ? FurnitureDataManager.getData(hash) : null;
+        }
+        return null;
     }
 
     @Override

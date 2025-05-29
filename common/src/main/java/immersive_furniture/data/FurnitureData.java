@@ -1,15 +1,18 @@
 package immersive_furniture.data;
 
-import immersive_furniture.utils.Utils;
 import immersive_furniture.client.model.MaterialRegistry;
 import immersive_furniture.client.model.MaterialSource;
 import immersive_furniture.client.model.effects.LightMaterialEffect;
+import immersive_furniture.utils.Utils;
 import net.minecraft.client.renderer.block.model.BlockElementRotation;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import org.joml.Vector3f;
 import org.joml.Vector3i;
 
@@ -30,9 +33,10 @@ public class FurnitureData {
     public int contentid = -1;
     public String author = "";
 
-    private String hash;
-
     public final List<Element> elements = new LinkedList<>();
+
+    private String hash;
+    private Map<Direction, VoxelShape> cachedShapes = new HashMap<>();
 
     public FurnitureData() {
         elements.add(new Element());
@@ -62,6 +66,7 @@ public class FurnitureData {
         this.contentid = data.contentid;
         this.author = data.author;
         this.hash = null;
+        this.cachedShapes = new HashMap<>();
 
         for (Element element : data.elements) {
             this.elements.add(new Element(element));
@@ -153,6 +158,45 @@ public class FurnitureData {
 
     public void dirty() {
         hash = null;
+        cachedShapes.clear();
+    }
+
+    public VoxelShape getShape(Direction rotation) {
+        return cachedShapes.computeIfAbsent(rotation, this::computeShape);
+    }
+
+    private VoxelShape computeShape(Direction r) {
+        return elements.stream().map(element -> getBox(element, r)).reduce(Shapes::or).orElse(Shapes.empty());
+    }
+
+    private static VoxelShape getBox(Element element, Direction rotation) {
+        switch (rotation) {
+            case NORTH -> {
+                return Block.box(
+                        element.from.x, element.from.y, element.from.z,
+                        element.to.x, element.to.y, element.to.z
+                );
+            }
+            case SOUTH -> {
+                return Block.box(
+                        16 - element.to.x, element.from.y, 16 - element.to.z,
+                        16 - element.from.x, element.to.y, 16 - element.from.z
+                );
+            }
+            case WEST -> {
+                return Block.box(
+                        element.from.z, element.from.y, 16 - element.to.x,
+                        element.to.z, element.to.y, 16 - element.from.x
+                );
+            }
+            case EAST -> {
+                return Block.box(
+                        16 - element.to.z, element.from.y, element.from.x,
+                        16 - element.from.z, element.to.y, element.to.x
+                );
+            }
+        }
+        return Shapes.empty();
     }
 
     public static class Element {
