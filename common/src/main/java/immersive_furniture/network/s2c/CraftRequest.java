@@ -6,6 +6,7 @@ import immersive_furniture.data.FurnitureData;
 import immersive_furniture.item.FurnitureItem;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -46,8 +47,12 @@ public class CraftRequest extends Message {
         if (shift) amount = Math.min(available / cost, 64);
         if (amount == 0) return;
 
-        useResources(e, amount * cost);
-        giveFurniture(e, data, amount);
+        if (available < cost * amount) {
+            e.displayClientMessage(Component.translatable("immersive_furniture.not_enough_material"), true);
+        } else {
+            useResources(e, amount * cost);
+            giveFurniture(e, data, amount);
+        }
     }
 
     private static boolean isValid(FurnitureData data) {

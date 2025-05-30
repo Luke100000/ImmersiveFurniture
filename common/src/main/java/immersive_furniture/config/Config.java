@@ -21,6 +21,9 @@ public final class Config extends JsonConfig {
     // This speeds up networking, world saving, loading, and memory usage.
     public boolean saveAsHash = true;
 
+    // Cost multiplier for furniture crafting costs.
+    public float costMultiplier = 1.0f;
+
     public Config(String name) {
         super(name);
     }

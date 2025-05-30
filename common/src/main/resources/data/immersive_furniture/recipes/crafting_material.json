@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "minecraft:iron_ingot"
+    },
+    {
+      "item": "minecraft:cobblestone"
+    },
+    {
+      "item": "minecraft:cobblestone"
+    },
+    {
+      "item": "#minecraft:logs"
+    },
+    {
+      "item": "#minecraft:logs"
+    }
+  ],
+  "result": {
+    "id": "immersive_furniture:crafting_material",
+    "count": 16
+  }
+}

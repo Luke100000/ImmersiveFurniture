@@ -82,7 +82,7 @@ public class SettingsComponent extends ScreenComponent {
 
             // Bake the model and save the face textures
             FurnitureModelBaker.bakeTexture(screen.data);
-
+            screen.data.author = Minecraft.getInstance().getUser().getName();
             FurnitureDataManager.saveLocalFile(screen.data);
 
             // Switch to the library screen

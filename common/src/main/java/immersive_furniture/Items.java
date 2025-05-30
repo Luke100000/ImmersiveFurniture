@@ -16,6 +16,7 @@ public interface Items {
 
     Supplier<Item> ARTISANS_WORKSTATION = register("artisans_workstation", () -> new BlockItem(Blocks.ARTISANS_WORKSTATION.get(), baseProps()));
     Supplier<Item> FURNITURE = register("furniture", () -> new FurnitureItem(baseProps()));
+    Supplier<Item> CRAFTING_MATERIAL = register("crafting_material", () -> new Item(baseProps()));
 
     static Supplier<Item> register(String name, Supplier<Item> item) {
         Supplier<Item> register = Registration.register(BuiltInRegistries.ITEM, Common.locate(name), item);

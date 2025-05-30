@@ -3,6 +3,7 @@ package immersive_furniture.data;
 import immersive_furniture.client.model.MaterialRegistry;
 import immersive_furniture.client.model.MaterialSource;
 import immersive_furniture.client.model.effects.LightMaterialEffect;
+import immersive_furniture.config.Config;
 import immersive_furniture.utils.Utils;
 import net.minecraft.client.renderer.block.model.BlockElementRotation;
 import net.minecraft.core.Direction;
@@ -93,7 +94,11 @@ public class FurnitureData {
     }
 
     public int getCost() {
-        return 1;
+        float volume = getVolume() / 4096.0f;
+        BoundingBox bb = boundingBox();
+        float size = bb.getXSpan() * bb.getYSpan() * bb.getZSpan() / 4096.0f;
+        float cost = volume + size + inventorySize + lightLevel / 15.0f + elements.size() / 4.0f;
+        return (int) Math.ceil(cost * Config.getInstance().costMultiplier);
     }
 
     public BoundingBox boundingBox() {
@@ -117,6 +122,15 @@ public class FurnitureData {
         }
 
         return new BoundingBox(minX, minY, minZ, maxX, maxY, maxZ);
+    }
+
+    public int getVolume() {
+        int volume = 0;
+        for (Element element : elements) {
+            Vector3i size = element.getSize();
+            volume += size.x * size.y * size.z;
+        }
+        return volume;
     }
 
     public double getSize() {

@@ -2,15 +2,16 @@ package immersive_furniture.client.gui;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import immersive_furniture.Common;
-import immersive_furniture.utils.Utils;
-import immersive_furniture.data.FurnitureDataManager;
+import immersive_furniture.Items;
 import immersive_furniture.client.gui.widgets.StateImageButton;
 import immersive_furniture.cobalt.network.NetworkHandler;
 import immersive_furniture.data.FurnitureData;
+import immersive_furniture.data.FurnitureDataManager;
 import immersive_furniture.data.api.API;
 import immersive_furniture.data.api.Auth;
 import immersive_furniture.data.api.responses.*;
 import immersive_furniture.network.s2c.CraftRequest;
+import immersive_furniture.utils.Utils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -21,6 +22,7 @@ import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.TooltipFlag;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -28,8 +30,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import static immersive_furniture.data.FurnitureDataManager.REQUESTED_DATA;
 import static immersive_furniture.client.gui.components.SettingsComponent.TAGS;
+import static immersive_furniture.data.FurnitureDataManager.REQUESTED_DATA;
 import static immersive_furniture.data.api.API.request;
 
 public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen {
@@ -70,6 +72,9 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
 
     int lastMouseX;
     int lastMouseY;
+
+    float previewYaw = 0.0f;
+    float previewPitch = 0.0f;
 
     public ArtisansWorkstationLibraryScreen() {
         super();
@@ -294,6 +299,25 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
         super.renderBackground(graphics);
 
         if (selected == null) {
+            drawRectangle(graphics, leftPos, topPos, windowWidth, 38);
+            drawRectangle(graphics, leftPos, topPos + windowHeight - 28, windowWidth, 28);
+        } else {
+            // Background
+            drawRectangle(graphics, leftPos, topPos, windowWidth, windowHeight - 28, 0, 48);
+            drawRectangle(graphics, leftPos, topPos + windowHeight - 28, windowWidth, 28);
+        }
+    }
+
+    @Override
+    public void render(@NotNull GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+        this.lastMouseX = mouseX;
+        this.lastMouseY = mouseY;
+
+        super.render(graphics, mouseX, mouseY, delta);
+
+        List<Component> tooltip = null;
+
+        if (selected == null) {
             search();
 
             int w = windowWidth / 4;
@@ -310,52 +334,46 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
                         FurnitureData data = FurnitureDataManager.getData(furniture.get(i));
                         if (data != null) {
                             float rot = (float) (hovered ? (System.currentTimeMillis() % 10000) / 10000.0f * Math.PI * 2.0f : -Math.PI / 4 * 3);
-                            renderModel(graphics, data, leftPos + (x + 0.5) * w, topPos + 38 + (y + 0.5) * h, h, rot);
+                            renderModel(graphics, data, leftPos + (x + 0.5) * w, topPos + 38 + (y + 0.5) * h, h, rot, (float) (-Math.PI / 4));
 
                             if (hovered) {
-                                graphics.renderTooltip(font, List.of(
-                                        Component.literal(data.name).getVisualOrderText(),
-                                        getAuthorComponent(data).getVisualOrderText(),
-                                        Component.literal(data.tag).withStyle(ChatFormatting.ITALIC).withStyle(ChatFormatting.GOLD).getVisualOrderText()
-                                ), lastMouseX, lastMouseY);
+                                tooltip = List.of(
+                                        Component.literal(data.name),
+                                        getAuthorComponent(data),
+                                        Component.literal(data.tag).withStyle(ChatFormatting.ITALIC).withStyle(ChatFormatting.GOLD)
+                                );
                             }
                         }
                     }
                 }
             }
 
-            drawRectangle(graphics, leftPos, topPos, windowWidth, 38);
-            drawRectangle(graphics, leftPos, topPos + windowHeight - 28, windowWidth, 28);
-
             graphics.drawCenteredString(font, String.valueOf(page + 1), leftPos + windowWidth / 2, topPos + windowHeight - 17, 0xFFFFFF);
         } else {
-            // Background
-            drawRectangle(graphics, leftPos, topPos, windowWidth, windowHeight - 28, 0, 48);
-            drawRectangle(graphics, leftPos, topPos + windowHeight - 28, windowWidth, 28);
-
             FurnitureData data = FurnitureDataManager.getData(selected);
 
             if (data != null) {
-                // TODO: Meh, use drag and velocity styled rotation
-                float rot = (float) (((double) (lastMouseX - leftPos) / windowWidth - 0.5) * Math.PI - Math.PI / 4 * 3);
-                renderModel(graphics, data, leftPos + windowWidth / 2.0, topPos + windowHeight / 2.0 - 14, windowHeight - 28, rot);
+                renderModel(graphics, data, leftPos + windowWidth / 2.0, topPos + windowHeight / 2.0 - 14, windowHeight - 28, previewYaw, previewPitch);
 
+                // Title and author
                 graphics.drawString(font, data.name, leftPos + 8, topPos + 8, 0xFFFFFF);
                 graphics.drawString(font, getAuthorComponent(data), leftPos + 8, topPos + 18, 0xFFFFFF);
+
+                // Icon and cost
+                graphics.pose().pushPose();
+                graphics.pose().translate(leftPos + windowWidth, topPos + windowHeight - 28, 0);
+                graphics.pose().scale(1.5f, 1.5f, 1.5f);
+                MutableComponent cost = Component.literal(String.valueOf(data.getCost()));
+                graphics.drawString(font, cost, -font.width(cost) - 26, -17, 0xFFFFFF);
+                graphics.renderFakeItem(Items.CRAFTING_MATERIAL.get().getDefaultInstance(), -22, -22);
+                graphics.pose().popPose();
+
+                // Material tooltip
+                if (lastMouseX >= leftPos + windowWidth - 32 - 6 && lastMouseX < leftPos + windowWidth - 6 && lastMouseY >= topPos + windowHeight - 32 - 32 && lastMouseY < topPos + windowHeight - 32) {
+                    tooltip = Items.CRAFTING_MATERIAL.get().getDefaultInstance().getTooltipLines(null, TooltipFlag.Default.NORMAL);
+                }
             }
         }
-    }
-
-    private static Component getAuthorComponent(FurnitureData model) {
-        return Component.translatable("gui.immersive_furniture.author", model.author).withStyle(ChatFormatting.ITALIC).withStyle(ChatFormatting.GRAY);
-    }
-
-    @Override
-    public void render(@NotNull GuiGraphics graphics, int mouseX, int mouseY, float delta) {
-        this.lastMouseX = mouseX;
-        this.lastMouseY = mouseY;
-
-        super.render(graphics, mouseX, mouseY, delta);
 
         if (authenticating) {
             tickAuthentication();
@@ -378,6 +396,14 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
                 error = null;
             }
         }
+
+        if (tooltip != null) {
+            graphics.renderTooltip(font, tooltip, Optional.empty(), lastMouseX, lastMouseY);
+        }
+    }
+
+    private static Component getAuthorComponent(FurnitureData model) {
+        return Component.translatable("gui.immersive_furniture.author", model.author).withStyle(ChatFormatting.ITALIC).withStyle(ChatFormatting.GRAY);
     }
 
     private boolean isTileHovered(int x, int y) {
@@ -468,6 +494,8 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
                     int index = x + y * 4;
                     if (index < furniture.size() && isTileHovered(x, y)) {
                         selected = furniture.get(index);
+                        previewYaw = (float) (-Math.PI / 4 * 3);
+                        previewPitch = (float) (-Math.PI / 4);
                         init();
                         return true;
                     }
@@ -589,5 +617,18 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
             }
             uploading = false;
         });
+    }
+
+    @Override
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
+        if (selected != null) {
+            if (button == 0) {
+                previewYaw += (float) (dragX * 0.015f);
+                previewPitch -= (float) (dragY * 0.015f);
+            }
+            return true;
+        }
+
+        return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
     }
 }
