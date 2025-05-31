@@ -30,6 +30,10 @@ public class FurnitureDataRequest extends Message {
     public void receive(Player e) {
         if (e instanceof ServerPlayer sp) {
             FurnitureData data = FurnitureDataManager.getData(hash);
+
+            // Cache damaged, it's better to return fallback data
+            if (data == null) data = FurnitureData.EMPTY;
+
             NetworkHandler.sendToPlayer(new FurnitureDataResponse(hash, data), sp);
         }
     }

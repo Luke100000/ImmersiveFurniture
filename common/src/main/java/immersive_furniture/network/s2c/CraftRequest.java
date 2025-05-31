@@ -1,17 +1,20 @@
 package immersive_furniture.network.s2c;
 
-import immersive_furniture.utils.Utils;
+import immersive_furniture.Sounds;
 import immersive_furniture.cobalt.network.Message;
 import immersive_furniture.data.FurnitureData;
 import immersive_furniture.item.FurnitureItem;
+import immersive_furniture.utils.Utils;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 
+import static immersive_furniture.Items.CRAFTING_MATERIAL;
 import static immersive_furniture.Items.FURNITURE;
 
 public class CraftRequest extends Message {
@@ -52,6 +55,7 @@ public class CraftRequest extends Message {
         } else {
             useResources(e, amount * cost);
             giveFurniture(e, data, amount);
+            e.level().playLocalSound(e.getOnPos(), Sounds.REPAIR.get(), SoundSource.BLOCKS, 1.0F, e.getRandom().nextFloat() * 0.5f + 0.75f, false);
         }
     }
 
@@ -60,7 +64,7 @@ public class CraftRequest extends Message {
     }
 
     private static boolean isValidItem(ItemStack stack) {
-        return stack.getItem() == Items.OAK_PLANKS;
+        return stack.getItem() == CRAFTING_MATERIAL.get();
     }
 
     private int getResources(Player e) {

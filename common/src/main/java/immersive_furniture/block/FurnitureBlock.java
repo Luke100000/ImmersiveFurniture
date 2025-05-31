@@ -1,9 +1,9 @@
 package immersive_furniture.block;
 
 import immersive_furniture.BlockEntityTypes;
-import immersive_furniture.data.ClientFurnitureRegistry;
 import immersive_furniture.data.FurnitureData;
 import immersive_furniture.data.FurnitureDataManager;
+import immersive_furniture.data.FurnitureRegistry;
 import immersive_furniture.data.ServerFurnitureRegistry;
 import immersive_furniture.item.FurnitureItem;
 import net.minecraft.core.BlockPos;
@@ -86,7 +86,7 @@ public class FurnitureBlock extends BaseEntityBlock implements SimpleWaterlogged
             if (context.getLevel() instanceof ServerLevel level) {
                 identifier = ServerFurnitureRegistry.registerIdentifier(level, data);
             } else {
-                identifier = ClientFurnitureRegistry.resolve(data.getHash());
+                identifier = FurnitureRegistry.resolve(data.getHash());
             }
         }
 
@@ -126,7 +126,7 @@ public class FurnitureBlock extends BaseEntityBlock implements SimpleWaterlogged
                 return blockEntity.getData();
             }
         } else {
-            String hash = ClientFurnitureRegistry.resolve(identifier);
+            String hash = FurnitureRegistry.resolve(identifier);
             return hash != null ? FurnitureDataManager.getData(hash) : null;
         }
         return null;

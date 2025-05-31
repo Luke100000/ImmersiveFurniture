@@ -15,7 +15,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 public class FurnitureItem extends BlockItem {
     public static final String FURNITURE = "Furniture";
@@ -39,9 +41,16 @@ public class FurnitureItem extends BlockItem {
         return Component.literal(getData(stack).name);
     }
 
+    private final static Map<CompoundTag, FurnitureData> cache = new LinkedHashMap<>(100, 0.75f, true) {
+        @Override
+        protected boolean removeEldestEntry(Map.Entry<CompoundTag, FurnitureData> eldest) {
+            return size() > 100;
+        }
+    };
+
     public static FurnitureData getData(ItemStack stack) {
         CompoundTag tag = stack.getTagElement(BLOCK_ENTITY_TAG);
-        return tag == null ? FurnitureData.EMPTY : new FurnitureData(tag.getCompound(FURNITURE));
+        return tag == null ? FurnitureData.EMPTY : cache.computeIfAbsent(tag.getCompound(FURNITURE), FurnitureData::new);
     }
 
     public static void setData(ItemStack stack, FurnitureData data) {

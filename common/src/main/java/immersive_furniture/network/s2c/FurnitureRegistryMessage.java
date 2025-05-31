@@ -1,8 +1,10 @@
 package immersive_furniture.network.s2c;
 
 import immersive_furniture.cobalt.network.Message;
-import immersive_furniture.data.ClientFurnitureRegistry;
+import immersive_furniture.data.FurnitureDataManager;
+import immersive_furniture.data.FurnitureRegistry;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 
 import java.util.Map;
@@ -25,9 +27,12 @@ public class FurnitureRegistryMessage extends Message {
 
     @Override
     public void receive(Player e) {
-        ClientFurnitureRegistry.idToHash.putAll(registry);
+        FurnitureRegistry.INSTANCE.identifierToHash.putAll(registry);
         for (Map.Entry<Integer, String> entry : registry.entrySet()) {
-            ClientFurnitureRegistry.hashToId.put(entry.getValue(), entry.getKey());
+            FurnitureRegistry.INSTANCE.hashToIdentifier.put(entry.getValue(), entry.getKey());
+
+            // Download all data now, since it's harder to differentiate between server and client later on
+            FurnitureDataManager.getData(new ResourceLocation("hash", entry.getValue()), true);
         }
     }
 }

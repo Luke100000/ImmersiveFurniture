@@ -13,8 +13,11 @@ import org.jetbrains.annotations.NotNull;
 import org.joml.Vector2i;
 import org.joml.Vector3f;
 
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class FurnitureModelFactory {
     private static final Map<@NotNull String, @NotNull Either<Material, String>> TEXTURE_MAP = Map.of(
@@ -37,7 +40,13 @@ public class FurnitureModelFactory {
     }
 
     private BlockElementFace getFace(FurnitureData.Element element, Direction direction) {
-        // TODO: Cull
+        // Cull fully invisible faces
+        float[] fs = ModelUtils.getShapeData(element);
+        Vector3f[] vertices = ModelUtils.getVertices(element, direction, fs, null);
+        for (FurnitureData.Element otherElement : data.elements) {
+            if (otherElement == element) continue;
+            if (fullyContained(otherElement, vertices)) return null;
+        }
 
         // Allocate pixels
         Vector2i dimensions = ModelUtils.getFaceDimensions(element, direction);
@@ -64,8 +73,7 @@ public class FurnitureModelFactory {
 
                         BlockElementRotation rotation = element.getRotation();
                         Vector3f pos = new Vector3f(ModelUtils.to3D(element, direction, x, y));
-                        ModelUtils.applyElementRotation(pos.mul(1.0f / 16.0f), rotation);
-                        pos.mul(16.0f);
+                        ModelUtils.applyElementRotation(pos, rotation);
 
                         Vector3f normal = ModelUtils.getElementRotation(rotation).transform(direction.step());
 
@@ -106,7 +114,7 @@ public class FurnitureModelFactory {
 
         float uvScale = 16.0f / atlas.size;
         return new BlockElementFace(
-                null, // TODO
+                getCulledDirection(vertices),
                 -1,
                 "#0",
                 new BlockFaceUV(
@@ -119,6 +127,41 @@ public class FurnitureModelFactory {
                         0
                 )
         );
+    }
+
+    private Direction getCulledDirection(Vector3f[] vertices) {
+        if (vertices[0].x() == 0.0f && vertices[1].x() == 0.0f &&
+            vertices[2].x() == 0.0f && vertices[3].x() == 0.0f) {
+            return Direction.WEST;
+        } else if (vertices[0].x() == 1.0f && vertices[1].x() == 1.0f &&
+                   vertices[2].x() == 1.0f && vertices[3].x() == 1.0f) {
+            return Direction.EAST;
+        } else if (vertices[0].y() == 0.0f && vertices[1].y() == 0.0f &&
+                   vertices[2].y() == 0.0f && vertices[3].y() == 0.0f) {
+            return Direction.DOWN;
+        } else if (vertices[0].y() == 1.0f && vertices[1].y() == 1.0f &&
+                   vertices[2].y() == 1.0f && vertices[3].y() == 1.0f) {
+            return Direction.UP;
+        } else if (vertices[0].z() == 0.0f && vertices[1].z() == 0.0f &&
+                   vertices[2].z() == 0.0f && vertices[3].z() == 0.0f) {
+            return Direction.NORTH;
+        } else if (vertices[0].z() == 1.0f && vertices[1].z() == 1.0f &&
+                   vertices[2].z() == 1.0f && vertices[3].z() == 1.0f) {
+            return Direction.SOUTH;
+        } else {
+            return null;
+        }
+    }
+
+    private static boolean fullyContained(FurnitureData.Element otherElement, Vector3f[] vertices) {
+        for (Vector3f vertex : vertices) {
+            Vector3f localVertex = new Vector3f(vertex);
+            ModelUtils.applyInverseElementRotation(localVertex.mul(16.0f), otherElement.getRotation());
+            if (!otherElement.contains(localVertex)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private static float getLight(int x, int y, Vector2i dimensions) {
@@ -146,18 +189,20 @@ public class FurnitureModelFactory {
         return new BlockElement(
                 element.from,
                 element.to,
-                Map.of(
-                        Direction.UP, getFace(element, Direction.UP),
-                        Direction.DOWN, getFace(element, Direction.DOWN),
-                        Direction.NORTH, getFace(element, Direction.NORTH),
-                        Direction.SOUTH, getFace(element, Direction.SOUTH),
-                        Direction.WEST, getFace(element, Direction.WEST),
-                        Direction.EAST, getFace(element, Direction.EAST)
-                ),
+                getFaces(element),
                 element.getRotation(),
                 true
         );
     }
+
+    private Map<Direction, BlockElementFace> getFaces(FurnitureData.Element element) {
+        return EnumSet.allOf(Direction.class).stream()
+                .map(dir -> Optional.ofNullable(getFace(element, dir))
+                        .map(face -> Map.entry(dir, face)))
+                .flatMap(Optional::stream)
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    }
+
 
     private BlockModel getModel() {
         return new BlockModel(

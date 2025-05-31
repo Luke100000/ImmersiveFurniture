@@ -55,6 +55,8 @@ public class FurnitureBlockEntity extends BlockEntity implements Clearable {
             } else {
                 tag.put(FurnitureItem.FURNITURE, this.data.toTag());
             }
+        } else if (hash != null) {
+            tag.putString(FurnitureItem.FURNITURE_HASH, hash);
         }
     }
 
@@ -78,7 +80,7 @@ public class FurnitureBlockEntity extends BlockEntity implements Clearable {
 
     public FurnitureData getData() {
         if (hash != null) {
-            data = FurnitureDataManager.getData(hash);
+            data = FurnitureDataManager.getData(new ResourceLocation("hash", hash), true);
             if (data != null) {
                 hash = null;
             }

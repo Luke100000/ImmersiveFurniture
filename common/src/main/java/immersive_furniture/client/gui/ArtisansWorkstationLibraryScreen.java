@@ -493,9 +493,7 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
                 for (int y = 0; y < 2; y++) {
                     int index = x + y * 4;
                     if (index < furniture.size() && isTileHovered(x, y)) {
-                        selected = furniture.get(index);
-                        previewYaw = (float) (-Math.PI / 4 * 3);
-                        previewPitch = (float) (-Math.PI / 4);
+                        setSelected(furniture.get(index));
                         init();
                         return true;
                     }
@@ -517,6 +515,8 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
 
     public void setSelected(ResourceLocation location) {
         this.selected = location;
+        previewYaw = (float) (-Math.PI / 4 * 3);
+        previewPitch = (float) (-Math.PI / 4);
     }
 
     public void setTab(Tab tab) {

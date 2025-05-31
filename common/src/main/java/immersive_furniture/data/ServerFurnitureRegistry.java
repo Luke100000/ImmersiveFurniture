@@ -25,25 +25,25 @@ public class ServerFurnitureRegistry {
 
     public static int registerIdentifier(ServerLevel level, FurnitureData data) {
         String hash = data.getHash();
-        FurnitureRegistrySavedData registry = getData(level);
+        FurnitureRegistrySavedData saveData = getData(level);
 
         // Do not register if the hash is not used enough
-        int count = registry.usageCount.getOrDefault(hash, 0);
+        int count = saveData.usageCount.getOrDefault(hash, 0);
         if (count < Config.getInstance().lowMemoryModeThreshold) {
             return 0;
         }
 
-        if (registry.hashToIdentifier.containsKey(hash)) {
+        if (saveData.registry.hashToIdentifier.containsKey(hash)) {
             // Already registered
-            return registry.hashToIdentifier.get(hash);
+            return saveData.registry.hashToIdentifier.get(hash);
         }
 
-        int identifier = registry.hashToIdentifier.size() + 1;
+        int identifier = saveData.registry.hashToIdentifier.size() + 1;
         if (identifier < 1024) {
             // Register new identifier
-            registry.hashToIdentifier.put(hash, identifier);
-            registry.identifierToHash.put(identifier, hash);
-            registry.setDirty();
+            saveData.registry.hashToIdentifier.put(hash, identifier);
+            saveData.registry.identifierToHash.put(identifier, hash);
+            saveData.setDirty();
 
             // Sync with players
             FurnitureRegistryMessage message = new FurnitureRegistryMessage(Map.of(identifier, hash));
@@ -60,13 +60,13 @@ public class ServerFurnitureRegistry {
 
     public static void syncWithPlayer(ServerPlayer player) {
         int chunkSize = 128;
-        FurnitureRegistrySavedData registry = getData(player.serverLevel());
-        for (int i = 1; i <= registry.identifierToHash.size(); i += chunkSize) {
-            int end = Math.min(i + chunkSize, registry.identifierToHash.size());
+        FurnitureRegistrySavedData savedData = getData(player.serverLevel());
+        for (int i = 1; i <= savedData.registry.identifierToHash.size(); i += chunkSize) {
+            int end = Math.min(i + chunkSize, savedData.registry.identifierToHash.size());
             Map<Integer, String> subMap = new HashMap<>();
             for (int j = i; j <= end; j++) {
-                if (registry.identifierToHash.containsKey(j)) {
-                    subMap.put(j, registry.identifierToHash.get(j));
+                if (savedData.registry.identifierToHash.containsKey(j)) {
+                    subMap.put(j, savedData.registry.identifierToHash.get(j));
                 }
             }
             FurnitureRegistryMessage message = new FurnitureRegistryMessage(subMap);
@@ -76,10 +76,10 @@ public class ServerFurnitureRegistry {
 
     public static class FurnitureRegistrySavedData extends SavedData {
         final Map<String, Integer> usageCount = new HashMap<>();
-        final Map<String, Integer> hashToIdentifier = new HashMap<>();
-        final Map<Integer, String> identifierToHash = new HashMap<>();
+        final FurnitureRegistry registry = FurnitureRegistry.INSTANCE;
 
         public FurnitureRegistrySavedData() {
+
         }
 
         public FurnitureRegistrySavedData(CompoundTag nbt) {
@@ -89,8 +89,8 @@ public class ServerFurnitureRegistry {
 
             CompoundTag hashToIdentifierTag = nbt.getCompound("hashToIdentifier");
             hashToIdentifierTag.getAllKeys().forEach(key -> {
-                hashToIdentifier.put(key, hashToIdentifierTag.getInt(key));
-                identifierToHash.put(hashToIdentifierTag.getInt(key), key);
+                registry.hashToIdentifier.put(key, hashToIdentifierTag.getInt(key));
+                registry.identifierToHash.put(hashToIdentifierTag.getInt(key), key);
             });
         }
 
@@ -101,7 +101,7 @@ public class ServerFurnitureRegistry {
             nbt.put("usageCount", usageCountTag);
 
             CompoundTag hashToIdentifierTag = new CompoundTag();
-            hashToIdentifier.forEach(hashToIdentifierTag::putInt);
+            registry.hashToIdentifier.forEach(hashToIdentifierTag::putInt);
             nbt.put("hashToIdentifier", hashToIdentifierTag);
 
             return nbt;

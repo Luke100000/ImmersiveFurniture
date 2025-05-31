@@ -4,14 +4,13 @@ import immersive_furniture.Common;
 import immersive_furniture.block.FurnitureBlock;
 import immersive_furniture.block.FurnitureBlockEntity;
 import immersive_furniture.client.model.DynamicAtlas;
-import immersive_furniture.data.ClientFurnitureRegistry;
 import immersive_furniture.data.FurnitureData;
 import immersive_furniture.data.FurnitureDataManager;
+import immersive_furniture.data.FurnitureRegistry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
-import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.Iterator;
@@ -23,12 +22,13 @@ public class FurnitureRenderer {
     private static boolean quickCheck = false;
     private static final Map<Long, Function<BlockPos, Status>> delayedRendering = new ConcurrentHashMap<>();
 
-    public static void delayRendering(BlockGetter level, BlockPos pos) {
+    public static void delayRendering(BlockPos pos) {
         delayedRendering.put(pos.asLong(), FurnitureRenderer::getLoadedStatus);
         quickCheck = true;
     }
 
     public static void tick() {
+        // Clear the dynamic atlases if it is full or nearly full
         if (DynamicAtlas.SCRATCH.isFull() || DynamicAtlas.SCRATCH.getUsage() > 0.9f) {
             DynamicAtlas.SCRATCH.clear();
         }
@@ -39,7 +39,7 @@ public class FurnitureRenderer {
         // Re-render chunks where furniture failed to render
         Minecraft client = Minecraft.getInstance();
         if (client.level != null && (client.level.getDayTime() % 20 == 0 || quickCheck) && !delayedRendering.isEmpty()) {
-            Common.logger.info("Re-checking {} delayed chunks", delayedRendering.size());
+            Common.logger.info("Re-checking {} delayed blocks", delayedRendering.size());
             quickCheck = false;
 
             Iterator<Map.Entry<Long, Function<BlockPos, Status>>> it = delayedRendering.entrySet().iterator();
@@ -50,7 +50,7 @@ public class FurnitureRenderer {
 
                 // Data available, re-render
                 if (status.data() != null) {
-                    Common.logger.info("Re-rendering chunk {}", entry.getKey());
+                    Common.logger.info("Re-rendering block {}", entry.getKey());
                     client.levelRenderer.setSectionDirty(
                             SectionPos.blockToSectionCoord(pos.getX()),
                             SectionPos.blockToSectionCoord(pos.getY()),
@@ -98,7 +98,7 @@ public class FurnitureRenderer {
                 return new Status(true, null);
             }
         } else {
-            String hash = ClientFurnitureRegistry.resolve(identifier);
+            String hash = FurnitureRegistry.resolve(identifier);
             if (hash == null) {
                 // Hashes are synced very early on, them missing is considered a critical error
                 return new Status(true, null);

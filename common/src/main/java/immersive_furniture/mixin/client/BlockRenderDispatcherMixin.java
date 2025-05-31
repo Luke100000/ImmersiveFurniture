@@ -50,7 +50,7 @@ public abstract class BlockRenderDispatcherMixin {
             }
         } else if (!status.done()) {
             // Schedule a re-render
-            FurnitureRenderer.delayRendering(level, pos);
+            FurnitureRenderer.delayRendering(pos);
         }
     }
 }

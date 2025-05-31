@@ -2,6 +2,7 @@ package immersive_furniture.data;
 
 import immersive_furniture.client.model.MaterialRegistry;
 import immersive_furniture.client.model.MaterialSource;
+import immersive_furniture.client.model.ModelUtils;
 import immersive_furniture.client.model.effects.LightMaterialEffect;
 import immersive_furniture.config.Config;
 import immersive_furniture.utils.Utils;
@@ -67,6 +68,8 @@ public class FurnitureData {
         this.contentid = data.contentid;
         this.author = data.author;
         this.hash = null;
+
+        // TODO: A per hash cache might make more sense here
         this.cachedShapes = new HashMap<>();
 
         for (Element element : data.elements) {
@@ -159,8 +162,7 @@ public class FurnitureData {
     }
 
     public boolean requiresBlockEntity() {
-        BoundingBox b = boundingBox();
-        return inventorySize > 0 || b.minX() < 0 || b.minY() < 0 || b.minZ() < 0 || b.maxX() > 16 || b.maxY() > 16 || b.maxZ() > 16;
+        return inventorySize > 0;
     }
 
     public String getHash() {
@@ -184,29 +186,41 @@ public class FurnitureData {
     }
 
     private static VoxelShape getBox(Element element, Direction rotation) {
+        Vector3f from = new Vector3f(Float.MAX_VALUE, Float.MAX_VALUE, Float.MAX_VALUE);
+        Vector3f to = new Vector3f(Float.MIN_VALUE, Float.MIN_VALUE, Float.MIN_VALUE);
+        Vector3f[] corners = ModelUtils.getCorners(element);
+        for (Vector3f corner : corners) {
+            from.x = Math.min(from.x, corner.x);
+            from.y = Math.min(from.y, corner.y);
+            from.z = Math.min(from.z, corner.z);
+            to.x = Math.max(to.x, corner.x);
+            to.y = Math.max(to.y, corner.y);
+            to.z = Math.max(to.z, corner.z);
+        }
+
         switch (rotation) {
-            case NORTH -> {
-                return Block.box(
-                        element.from.x, element.from.y, element.from.z,
-                        element.to.x, element.to.y, element.to.z
-                );
-            }
             case SOUTH -> {
                 return Block.box(
-                        16 - element.to.x, element.from.y, 16 - element.to.z,
-                        16 - element.from.x, element.to.y, 16 - element.from.z
+                        from.x, from.y, from.z,
+                        to.x, to.y, to.z
                 );
             }
-            case WEST -> {
+            case NORTH -> {
                 return Block.box(
-                        element.from.z, element.from.y, 16 - element.to.x,
-                        element.to.z, element.to.y, 16 - element.from.x
+                        16 - to.x, from.y, 16 - to.z,
+                        16 - from.x, to.y, 16 - from.z
                 );
             }
             case EAST -> {
                 return Block.box(
-                        16 - element.to.z, element.from.y, element.from.x,
-                        16 - element.from.z, element.to.y, element.to.x
+                        from.z, from.y, 16 - to.x,
+                        to.z, to.y, 16 - from.x
+                );
+            }
+            case WEST -> {
+                return Block.box(
+                        16 - to.z, from.y, from.x,
+                        16 - from.z, to.y, to.x
                 );
             }
         }
@@ -310,6 +324,16 @@ public class FurnitureData {
             from.x = Math.max(-maxSize, Math.min(16.0f + maxSize, from.x));
             from.y = Math.max(-maxSize, Math.min(16.0f + maxSize, from.y));
             from.z = Math.max(-maxSize, Math.min(16.0f + maxSize, from.z));
+        }
+
+        public boolean contains(Vector3f pos) {
+            return contains(pos, 0.0001f);
+        }
+
+        public boolean contains(Vector3f pos, float margin) {
+            return pos.x >= from.x - margin && pos.x <= to.x + margin &&
+                   pos.y >= from.y - margin && pos.y <= to.y + margin &&
+                   pos.z >= from.z - margin && pos.z <= to.z + margin;
         }
     }
 

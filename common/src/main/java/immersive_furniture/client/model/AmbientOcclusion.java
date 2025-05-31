@@ -73,8 +73,7 @@ public class AmbientOcclusion {
         float e = 0.0001f;
         for (FurnitureData.Element element : getElements(x, y, z)) {
             Vector3f pos = new Vector3f(x, y, z);
-            ModelUtils.applyInverseElementRotation(pos.mul(1.0f / 16.0f), element.getRotation());
-            pos.mul(16.0f);
+            ModelUtils.applyInverseElementRotation(pos, element.getRotation());
             if (pos.x > element.from.x() + e && pos.x < element.to.x() - e &&
                 pos.y > element.from.y() + e && pos.y < element.to.y() - e &&
                 pos.z > element.from.z() + e && pos.z < element.to.z() - e) {

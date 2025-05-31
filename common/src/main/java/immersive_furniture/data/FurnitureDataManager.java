@@ -10,7 +10,9 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.resources.ResourceLocation;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
@@ -83,11 +85,15 @@ public class FurnitureDataManager {
     }
 
     public static FurnitureData getData(String hash) {
-        return getData(new ResourceLocation("hash", hash));
+        return getData(new ResourceLocation("hash", hash), false);
     }
 
     public static FurnitureData getData(ResourceLocation id) {
-        if (!DATA.containsKey(id) && !REQUESTED_DATA.contains(id)) {
+        return getData(id, true);
+    }
+
+    public static FurnitureData getData(ResourceLocation id, boolean request) {
+        if (request && !DATA.containsKey(id) && !REQUESTED_DATA.contains(id)) {
             REQUESTED_DATA.add(id);
 
             // Load if it exists
@@ -97,7 +103,6 @@ public class FurnitureDataManager {
                     CompoundTag tag = NbtIo.readCompressed(cache);
                     FurnitureData data = new FurnitureData(tag);
                     DATA.put(id, data);
-                    return data;
                 } catch (IOException e) {
                     delete(cache);
                     Common.logger.error("Failed to read file: {}", cache, e);
@@ -125,7 +130,7 @@ public class FurnitureDataManager {
                             FurnitureData data = new FurnitureData(NbtIo.readCompressed(in));
                             data.contentid = contentid;
                             data.author = contentResponse.content().username();
-                            NbtIo.writeCompressed(data.toTag(), cache);
+                            NbtIo.writeCompressed(data.toTag(), getFile(id));
                             DATA.put(id, data);
                         } catch (Exception e) {
                             Common.logger.error("Failed to read content response: {}", contentResponse, e);
