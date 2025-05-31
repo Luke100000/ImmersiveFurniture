@@ -23,9 +23,10 @@ public interface Blocks {
             .mapColor(MapColor.WOOD)
             .strength(2.5f)
             .noLootTable()
-            .sound(SoundType.GLASS)
+            .sound(SoundType.WOOD)
             .lightLevel((blockState) -> 11)
             .pushReaction(PushReaction.BLOCK)
+            .dynamicShape()
     ));
 
     static Supplier<Block> register(String name, Supplier<Block> block) {

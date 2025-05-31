@@ -13,6 +13,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -36,6 +37,7 @@ import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.pathfinder.PathComputationType;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
@@ -56,11 +58,6 @@ public class FurnitureBlock extends BaseEntityBlock implements SimpleWaterlogged
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
         // TODO: Basic Inventory
         return InteractionResult.PASS;
-    }
-
-    @Override
-    public void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
-        super.entityInside(state, level, pos, entity);
     }
 
     @Override
@@ -114,9 +111,7 @@ public class FurnitureBlock extends BaseEntityBlock implements SimpleWaterlogged
         if (data != null) {
             return data.getShape(state.getValue(FACING));
         }
-
-        // Bigger than one block to toggle `cache.largeCollisionShape`
-        return Block.box(-1.0f, -1.0f, -1.0f, 18.0f, 18.0f, 18.0f);
+        return Shapes.empty();
     }
 
     public FurnitureData getData(BlockState state, BlockGetter level, BlockPos pos) {

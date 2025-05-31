@@ -239,6 +239,7 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
                         }
                     } else {
                         FurnitureDataManager.deleteLocalFile(selected);
+                        localFiles = FurnitureDataManager.getLocalFiles();
                     }
                     selected = null;
                     init();
@@ -411,7 +412,7 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
         int h = (windowHeight - 32 - 28) / 2;
 
         return lastMouseX >= leftPos + x * w && lastMouseX < leftPos + (x + 1) * w &&
-               lastMouseY >= topPos + 32 + y * h && lastMouseY < topPos + 32 + (y + 1) * h;
+               lastMouseY >= topPos + 38 + y * h && lastMouseY < topPos + 38 + (y + 1) * h;
     }
 
     private boolean holdingShift() {
