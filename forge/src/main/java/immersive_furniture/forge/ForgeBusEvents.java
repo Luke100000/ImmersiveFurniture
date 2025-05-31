@@ -2,11 +2,14 @@ package immersive_furniture.forge;
 
 import immersive_furniture.Common;
 import immersive_furniture.CommonClient;
+import immersive_furniture.Items;
 import immersive_furniture.data.ServerFurnitureRegistry;
 import immersive_furniture.forge.cobalt.registration.RegistrationImpl.DataLoaderRegister;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
+import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraftforge.event.AddReloadListenerEvent;
+import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -43,6 +46,15 @@ public class ForgeBusEvents {
     public static void onEntityJoinLevel(EntityJoinLevelEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
             ServerFurnitureRegistry.syncWithPlayer(player);
+        }
+    }
+
+    @SubscribeEvent
+    public static void onBuildCreativeModeTabContents(BuildCreativeModeTabContentsEvent event) {
+        if (event.getTabKey() == CreativeModeTabs.FUNCTIONAL_BLOCKS) {
+            event.accept(Items.ARTISANS_WORKSTATION.get());
+        } else if (event.getTabKey() == CreativeModeTabs.INGREDIENTS) {
+            event.accept(Items.CRAFTING_MATERIAL.get());
         }
     }
 }
