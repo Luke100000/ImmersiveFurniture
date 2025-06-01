@@ -1,7 +1,7 @@
 package immersive_furniture;
 
 import immersive_furniture.client.ClientHandlerImpl;
-import immersive_furniture.client.FurnitureRenderer;
+import immersive_furniture.client.DelayedFurnitureRenderer;
 import immersive_furniture.client.model.DynamicAtlas;
 import immersive_furniture.network.ClientNetworkManager;
 
@@ -19,10 +19,10 @@ public class CommonClient {
         DynamicAtlas.SCRATCH.clear();
         DynamicAtlas.ENTITY.clear();
 
-        FurnitureRenderer.clear();
+        DelayedFurnitureRenderer.INSTANCE.clear();
     }
 
     public static void tick() {
-        FurnitureRenderer.tick();
+        DelayedFurnitureRenderer.INSTANCE.tick();
     }
 }

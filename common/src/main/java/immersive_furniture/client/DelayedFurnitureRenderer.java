@@ -2,11 +2,8 @@ package immersive_furniture.client;
 
 import immersive_furniture.Common;
 import immersive_furniture.block.BaseFurnitureBlock;
-import immersive_furniture.block.FurnitureBlockEntity;
 import immersive_furniture.client.model.DynamicAtlas;
 import immersive_furniture.data.FurnitureData;
-import immersive_furniture.data.FurnitureDataManager;
-import immersive_furniture.data.FurnitureRegistry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
@@ -18,16 +15,20 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
-public class FurnitureRenderer {
-    private static boolean quickCheck = false;
-    private static final Map<Long, Function<BlockPos, Status>> delayedRendering = new ConcurrentHashMap<>();
+public class DelayedFurnitureRenderer {
+    public static final DelayedFurnitureRenderer INSTANCE = new DelayedFurnitureRenderer();
 
-    public static void delayRendering(BlockPos pos) {
-        delayedRendering.put(pos.asLong(), FurnitureRenderer::getLoadedStatus);
+    private boolean quickCheck = false;
+
+    private final Map<Long, Integer> attempts = new ConcurrentHashMap<>();
+    private final Map<Long, Function<BlockPos, Status>> delayedRendering = new ConcurrentHashMap<>();
+
+    public void delayRendering(BlockPos pos) {
+        delayedRendering.put(pos.asLong(), this::getLoadedStatus);
         quickCheck = true;
     }
 
-    public static void tick() {
+    public void tick() {
         // Clear the dynamic atlases if it is full or nearly full
         if (DynamicAtlas.SCRATCH.isFull() || DynamicAtlas.SCRATCH.getUsage() > 0.9f) {
             DynamicAtlas.SCRATCH.clear();
@@ -48,6 +49,8 @@ public class FurnitureRenderer {
                 BlockPos pos = BlockPos.of(entry.getKey());
                 Status status = entry.getValue().apply(pos);
 
+                int a = attempts.getOrDefault(entry.getKey(), 0);
+
                 // Data available, re-render
                 if (status.data() != null) {
                     Common.logger.info("Re-rendering block {}", entry.getKey());
@@ -58,14 +61,17 @@ public class FurnitureRenderer {
                     );
                 }
 
-                if (status.done()) {
+                if (status.done() || a >= 10) {
                     it.remove();
+                } else {
+                    attempts.put(entry.getKey(), a + 1);
                 }
             }
         }
     }
 
-    public static void clear() {
+    public void clear() {
+        attempts.clear();
         delayedRendering.clear();
     }
 
@@ -76,7 +82,7 @@ public class FurnitureRenderer {
     Loads the furniture data from either the block entity or the registry via block state identifier.
     Returns whether rechecking later is possible or the loading failed (e.g., block changed or is invalid).
      */
-    public static Status getLoadedStatus(BlockPos pos) {
+    public Status getLoadedStatus(BlockPos pos) {
         ClientLevel level = Minecraft.getInstance().level;
         if (level == null) {
             return new Status(true, null);

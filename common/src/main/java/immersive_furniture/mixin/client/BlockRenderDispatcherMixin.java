@@ -3,7 +3,7 @@ package immersive_furniture.mixin.client;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import immersive_furniture.block.BaseFurnitureBlock;
-import immersive_furniture.client.FurnitureRenderer;
+import immersive_furniture.client.DelayedFurnitureRenderer;
 import immersive_furniture.client.model.DynamicAtlas;
 import immersive_furniture.client.model.FurnitureModelBaker;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
@@ -39,7 +39,7 @@ public abstract class BlockRenderDispatcherMixin {
     @Unique
     private void immersive_furniture$render(BlockState state, BlockPos pos, BlockAndTintGetter level, PoseStack poseStack, VertexConsumer consumer, boolean checkSides, RandomSource random) {
         // Check if data is available already
-        FurnitureRenderer.Status status = FurnitureRenderer.getLoadedStatus(pos);
+        DelayedFurnitureRenderer.Status status = DelayedFurnitureRenderer.INSTANCE.getLoadedStatus(pos);
 
         // Render it
         if (status.data() != null) {
@@ -50,7 +50,7 @@ public abstract class BlockRenderDispatcherMixin {
             }
         } else if (!status.done()) {
             // Schedule a re-render
-            FurnitureRenderer.delayRendering(pos);
+            DelayedFurnitureRenderer.INSTANCE.delayRendering(pos);
         }
     }
 }

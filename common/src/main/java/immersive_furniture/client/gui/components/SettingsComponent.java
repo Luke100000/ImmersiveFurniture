@@ -1,10 +1,10 @@
 package immersive_furniture.client.gui.components;
 
-import immersive_furniture.data.FurnitureDataManager;
 import immersive_furniture.client.gui.ArtisansWorkstationEditorScreen;
 import immersive_furniture.client.gui.ArtisansWorkstationLibraryScreen;
 import immersive_furniture.client.gui.widgets.BoundedIntSliderButton;
 import immersive_furniture.client.model.FurnitureModelBaker;
+import immersive_furniture.data.FurnitureDataManager;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -27,9 +27,6 @@ public class SettingsComponent extends ScreenComponent {
             "decorative",
             "functional"
     );
-
-    private BoundedIntSliderButton lightLevelSlider;
-    private BoundedIntSliderButton inventorySlider;
 
     private boolean localFileExists;
 
@@ -69,18 +66,17 @@ public class SettingsComponent extends ScreenComponent {
         }
 
         // Light level
-        this.lightLevelSlider = new BoundedIntSliderButton(leftPos + 6, topPos + 60, width - 12, 20, "gui.immersive_furniture.light_level", 0, 0, 15);
+        BoundedIntSliderButton lightLevelSlider = new BoundedIntSliderButton(leftPos + 6, topPos + 60, width - 12, 20, "gui.immersive_furniture.light_level", screen.data.lightLevel, 0, 15);
+        lightLevelSlider.setCallback(c -> screen.data.lightLevel = c);
         screen.addRenderableWidget(lightLevelSlider);
 
         // Inventory space
-        this.inventorySlider = new BoundedIntSliderButton(leftPos + 6, topPos + 82, width - 12, 20, "gui.immersive_furniture.inventory", 0, 0, 6);
+        BoundedIntSliderButton inventorySlider = new BoundedIntSliderButton(leftPos + 6, topPos + 82, width - 12, 20, "gui.immersive_furniture.inventory", screen.data.inventorySize, 0, 6);
+        inventorySlider.setCallback(c -> screen.data.inventorySize = c);
         screen.addRenderableWidget(inventorySlider);
 
         // Save
         addButton("gui.immersive_furniture.save", b -> {
-            screen.data.lightLevel = lightLevelSlider.getIntegerValue();
-            screen.data.inventorySize = inventorySlider.getIntegerValue();
-
             // Bake the model and save the face textures
             FurnitureModelBaker.bakeTexture(screen.data);
             screen.data.author = Minecraft.getInstance().getUser().getName();

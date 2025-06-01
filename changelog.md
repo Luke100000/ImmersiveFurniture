@@ -12,15 +12,10 @@ Initial release
 
 # Todo
 
-* What if data cannot be resolved?
-    * E.g. entity data damaged, packet drop, ...
-    * Try 5 times and then give up?
 * Test light blocks
-* Settings not initialized
 * Thread the editor
 * Add particle emitter
     * Instance the particle and emulate it, it should be possible fine
     * With ambient sound
 * Added entity interaction (sit, lay, etc.)
-* Inventory
 * Icon
