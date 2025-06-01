@@ -5,6 +5,8 @@
 
   "immersive_furniture.not_enough_material": "Not enough crafting material!",
 
+  "gui.immersive_furniture.furniture": "Furniture",
+
   "gui.immersive_furniture.tag.table": "Table",
   "gui.immersive_furniture.tag.chair": "Chair",
   "gui.immersive_furniture.tag.storage": "Storage",

@@ -3,7 +3,7 @@ package immersive_furniture.client.renderer;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
-import immersive_furniture.block.FurnitureBlock;
+import immersive_furniture.block.BaseFurnitureBlock;
 import immersive_furniture.block.FurnitureBlockEntity;
 import immersive_furniture.client.model.DynamicAtlas;
 import immersive_furniture.client.model.FurnitureModelBaker;
@@ -43,8 +43,8 @@ public class FurnitureBlockEntityRenderer<T extends FurnitureBlockEntity> implem
         poseStack.pushPose();
 
         BlockState blockState = blockEntity.getBlockState();
-        if (blockState.getBlock() instanceof FurnitureBlock) {
-            float yaw = -blockState.getValue(FurnitureBlock.FACING).toYRot();
+        if (blockState.getBlock() instanceof BaseFurnitureBlock) {
+            float yaw = -blockState.getValue(BaseFurnitureBlock.FACING).toYRot();
             poseStack.translate(0.5F, 0.5F, 0.5F);
             poseStack.mulPose(Axis.YP.rotationDegrees(yaw));
             poseStack.translate(-0.5F, -0.5F, -0.5F);

@@ -1,7 +1,6 @@
 package immersive_furniture;
 
-import immersive_furniture.block.ArtisansWorkstationBlock;
-import immersive_furniture.block.FurnitureBlock;
+import immersive_furniture.block.*;
 import immersive_furniture.cobalt.registration.Registration;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.level.block.Block;
@@ -19,14 +18,14 @@ public interface Blocks {
             .sound(SoundType.WOOD)
     ));
 
-    Supplier<Block> FURNITURE = register("furniture", () -> new FurnitureBlock(baseProps()
-            .mapColor(MapColor.WOOD)
-            .strength(2.5f)
-            .noLootTable()
-            .sound(SoundType.WOOD)
-            .lightLevel((blockState) -> 11)
-            .pushReaction(PushReaction.BLOCK)
-            .dynamicShape()
+    Supplier<Block> FURNITURE = register("furniture", () -> new FurnitureBlock(baseFurnitureProps()));
+
+    Supplier<Block> FURNITURE_ENTITY = register("furniture_entity", () -> new EntityFurnitureBlock(baseFurnitureProps()
+            .lightLevel((blockState) -> blockState.getValue(EntityFurnitureBlock.LIGHT))
+    ));
+
+    Supplier<Block> FURNITURE_LIGHT = register("furniture_light", () -> new LightFurnitureBlock(baseFurnitureProps()
+            .lightLevel((blockState) -> blockState.getValue(LightFurnitureBlock.LIGHT) * 3)
     ));
 
     static Supplier<Block> register(String name, Supplier<Block> block) {
@@ -38,5 +37,15 @@ public interface Blocks {
 
     static BlockBehaviour.Properties baseProps() {
         return BlockBehaviour.Properties.of();
+    }
+
+    static BlockBehaviour.Properties baseFurnitureProps() {
+        return baseProps()
+                .mapColor(MapColor.WOOD)
+                .strength(2.5f)
+                .noLootTable()
+                .sound(SoundType.WOOD)
+                .pushReaction(PushReaction.BLOCK)
+                .dynamicShape();
     }
 }

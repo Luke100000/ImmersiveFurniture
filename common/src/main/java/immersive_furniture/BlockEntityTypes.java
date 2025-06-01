@@ -12,7 +12,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import java.util.function.Supplier;
 
 public interface BlockEntityTypes {
-    Supplier<BlockEntityType<FurnitureBlockEntity>> FURNITURE = register("furniture", () -> Registration.blockEntityTypeBuilder(FurnitureBlockEntity::new, Blocks.FURNITURE.get()));
+    Supplier<BlockEntityType<FurnitureBlockEntity>> FURNITURE = register("furniture", () -> Registration.blockEntityTypeBuilder(FurnitureBlockEntity::new, Blocks.FURNITURE_ENTITY.get()));
 
     static <T extends BlockEntity> Supplier<BlockEntityType<T>> register(String name, Supplier<BlockEntityType.Builder<T>> type) {
         Type<?> datafixerType = Util.fetchChoiceType(References.BLOCK_ENTITY, name);

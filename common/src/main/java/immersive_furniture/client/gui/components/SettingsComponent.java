@@ -29,6 +29,7 @@ public class SettingsComponent extends ScreenComponent {
     );
 
     private BoundedIntSliderButton lightLevelSlider;
+    private BoundedIntSliderButton inventorySlider;
 
     private boolean localFileExists;
 
@@ -72,13 +73,13 @@ public class SettingsComponent extends ScreenComponent {
         screen.addRenderableWidget(lightLevelSlider);
 
         // Inventory space
-        this.lightLevelSlider = new BoundedIntSliderButton(leftPos + 6, topPos + 82, width - 12, 20, "gui.immersive_furniture.inventory", 0, 0, 6);
-        screen.addRenderableWidget(lightLevelSlider);
+        this.inventorySlider = new BoundedIntSliderButton(leftPos + 6, topPos + 82, width - 12, 20, "gui.immersive_furniture.inventory", 0, 0, 6);
+        screen.addRenderableWidget(inventorySlider);
 
         // Save
         addButton("gui.immersive_furniture.save", b -> {
             screen.data.lightLevel = lightLevelSlider.getIntegerValue();
-            screen.data.inventorySize = lightLevelSlider.getIntegerValue();
+            screen.data.inventorySize = inventorySlider.getIntegerValue();
 
             // Bake the model and save the face textures
             FurnitureModelBaker.bakeTexture(screen.data);

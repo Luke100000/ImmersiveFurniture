@@ -23,52 +23,60 @@ public class ServerFurnitureRegistry {
         registry.setDirty();
     }
 
-    public static int registerIdentifier(ServerLevel level, FurnitureData data) {
+    public static int registerIdentifier(ServerLevel level, FurnitureData data, int from, int to) {
         String hash = data.getHash();
         FurnitureRegistrySavedData saveData = getData(level);
+
+        // Already registered
+        if (saveData.registry.hashToIdentifier.containsKey(hash)) {
+            return saveData.registry.hashToIdentifier.get(hash);
+        }
 
         // Do not register if the hash is not used enough
         int count = saveData.usageCount.getOrDefault(hash, 0);
         if (count < Config.getInstance().lowMemoryModeThreshold) {
-            return 0;
+            return -1;
         }
 
-        if (saveData.registry.hashToIdentifier.containsKey(hash)) {
-            // Already registered
-            return saveData.registry.hashToIdentifier.get(hash);
-        }
+        // Search for an available identifier
+        for (int identifier = from; identifier <= to; identifier++) {
+            if (!saveData.registry.identifierToHash.containsKey(identifier)) {
+                // Register new identifier
+                saveData.registry.hashToIdentifier.put(hash, identifier);
+                saveData.registry.identifierToHash.put(identifier, hash);
+                saveData.setDirty();
 
-        int identifier = saveData.registry.hashToIdentifier.size() + 1;
-        if (identifier < 1024) {
-            // Register new identifier
-            saveData.registry.hashToIdentifier.put(hash, identifier);
-            saveData.registry.identifierToHash.put(identifier, hash);
-            saveData.setDirty();
+                // Sync with players
+                FurnitureRegistryMessage message = new FurnitureRegistryMessage(Map.of(identifier, hash));
+                for (ServerPlayer player : level.players()) {
+                    NetworkHandler.sendToPlayer(message, player);
+                }
 
-            // Sync with players
-            FurnitureRegistryMessage message = new FurnitureRegistryMessage(Map.of(identifier, hash));
-            for (ServerPlayer player : level.players()) {
-                NetworkHandler.sendToPlayer(message, player);
+                return identifier;
             }
-
-            return identifier;
-        } else {
-            // The Registry is full
-            return 0;
         }
+
+        // The Registry is full
+        return -1;
     }
 
     public static void syncWithPlayer(ServerPlayer player) {
         int chunkSize = 128;
         FurnitureRegistrySavedData savedData = getData(player.serverLevel());
-        for (int i = 1; i <= savedData.registry.identifierToHash.size(); i += chunkSize) {
-            int end = Math.min(i + chunkSize, savedData.registry.identifierToHash.size());
-            Map<Integer, String> subMap = new HashMap<>();
-            for (int j = i; j <= end; j++) {
-                if (savedData.registry.identifierToHash.containsKey(j)) {
-                    subMap.put(j, savedData.registry.identifierToHash.get(j));
-                }
+
+        Map<Integer, String> subMap = new HashMap<>();
+        for (String hash : savedData.registry.hashToIdentifier.keySet()) {
+            int identifier = savedData.registry.hashToIdentifier.get(hash);
+            subMap.put(identifier, hash);
+
+            if (subMap.size() >= chunkSize) {
+                FurnitureRegistryMessage message = new FurnitureRegistryMessage(subMap);
+                NetworkHandler.sendToPlayer(message, player);
+                subMap.clear();
             }
+        }
+
+        if (!subMap.isEmpty()) {
             FurnitureRegistryMessage message = new FurnitureRegistryMessage(subMap);
             NetworkHandler.sendToPlayer(message, player);
         }

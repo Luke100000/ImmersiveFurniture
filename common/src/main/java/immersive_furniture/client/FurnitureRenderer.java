@@ -1,7 +1,7 @@
 package immersive_furniture.client;
 
 import immersive_furniture.Common;
-import immersive_furniture.block.FurnitureBlock;
+import immersive_furniture.block.BaseFurnitureBlock;
 import immersive_furniture.block.FurnitureBlockEntity;
 import immersive_furniture.client.model.DynamicAtlas;
 import immersive_furniture.data.FurnitureData;
@@ -83,28 +83,11 @@ public class FurnitureRenderer {
         }
 
         BlockState state = level.getBlockState(pos);
-        if (!(state.getBlock() instanceof FurnitureBlock)) {
-            return new Status(true, null);
-        }
-
-        // If this is entity-based furniture, fetch the furniture from its data
-        int identifier = state.getValue(FurnitureBlock.IDENTIFIER);
-        if (identifier == 0) {
-            if (level.getBlockEntity(pos) instanceof FurnitureBlockEntity blockEntity) {
-                FurnitureData data = blockEntity.getData();
-                return new Status(data != null, data);
-            } else {
-                // Expected an entity
-                return new Status(true, null);
-            }
-        } else {
-            String hash = FurnitureRegistry.resolve(identifier);
-            if (hash == null) {
-                // Hashes are synced very early on, them missing is considered a critical error
-                return new Status(true, null);
-            }
-            FurnitureData data = FurnitureDataManager.getData(hash);
+        if (state.getBlock() instanceof BaseFurnitureBlock furnitureBlock) {
+            FurnitureData data = furnitureBlock.getData(state, level, pos);
             return new Status(data != null, data);
+        } else {
+            return new Status(true, null);
         }
     }
 }

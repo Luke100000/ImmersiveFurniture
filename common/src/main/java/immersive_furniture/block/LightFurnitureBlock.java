@@ -15,14 +15,16 @@ import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.material.Fluids;
 import org.jetbrains.annotations.Nullable;
 
-public class FurnitureBlock extends BaseFurnitureBlock {
-    public static final IntegerProperty IDENTIFIER = IntegerProperty.create("identifier", 0, 1023);
+public class LightFurnitureBlock extends BaseFurnitureBlock {
+    public static final IntegerProperty IDENTIFIER = IntegerProperty.create("identifier", 0, 255);
+    public static final IntegerProperty LIGHT = IntegerProperty.create("light", 0, 5);
 
-    public FurnitureBlock(Properties properties) {
+    public LightFurnitureBlock(Properties properties) {
         super(properties);
 
         this.registerDefaultState(this.stateDefinition.any()
                 .setValue(IDENTIFIER, 0)
+                .setValue(LIGHT, 0)
                 .setValue(WATERLOGGED, false)
                 .setValue(FACING, Direction.NORTH));
     }
@@ -40,11 +42,11 @@ public class FurnitureBlock extends BaseFurnitureBlock {
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(IDENTIFIER, WATERLOGGED, FACING);
+        builder.add(IDENTIFIER, LIGHT, WATERLOGGED, FACING);
     }
 
     public FurnitureData getData(BlockState state, BlockGetter level, BlockPos pos) {
-        int identifier = state.getValue(IDENTIFIER);
+        int identifier = state.getValue(IDENTIFIER) + 65536;
         String hash = FurnitureRegistry.resolve(identifier);
         return hash != null ? FurnitureDataManager.getData(hash) : null;
     }

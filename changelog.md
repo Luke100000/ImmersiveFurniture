@@ -12,12 +12,11 @@ Initial release
 
 # Todo
 
-* Create different blocks
-    * One for entity data (I feel like it should be separate)
-    * One for furniture
-    * One for light sources (but 16x more rare)
-* Make registry non-linear (find smallest value between x and y)
-    * Use upper 2 bytes for block type, lower 2 bytes for identifier
+* What if data cannot be resolved?
+    * E.g. entity data damaged, packet drop, ...
+    * Try 5 times and then give up?
+* Test light blocks
+* Settings not initialized
 * Thread the editor
 * Add particle emitter
     * Instance the particle and emulate it, it should be possible fine
