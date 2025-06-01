@@ -338,11 +338,16 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
                             renderModel(graphics, data, leftPos + (x + 0.5) * w, topPos + 38 + (y + 0.5) * h, h, rot, (float) (-Math.PI / 4));
 
                             if (hovered) {
-                                tooltip = List.of(
-                                        Component.literal(data.name),
-                                        getAuthorComponent(data),
-                                        Component.literal(data.tag).withStyle(ChatFormatting.ITALIC).withStyle(ChatFormatting.GOLD)
-                                );
+                                tooltip = new LinkedList<>();
+                                tooltip.add(Component.literal(data.name).withStyle(ChatFormatting.BOLD));
+                                tooltip.add(getAuthorComponent(data));
+                                tooltip.add(Component.literal(data.tag).withStyle(ChatFormatting.ITALIC).withStyle(ChatFormatting.GOLD));
+                                if (data.lightLevel > 0) {
+                                    tooltip.add(Component.translatable("gui.immersive_furniture.light_level", data.lightLevel).withStyle(ChatFormatting.YELLOW));
+                                }
+                                if (data.inventorySize > 0) {
+                                    tooltip.add(Component.translatable("gui.immersive_furniture.inventory", data.inventorySize).withStyle(ChatFormatting.YELLOW));
+                                }
                             }
                         }
                     }

@@ -1,24 +1,19 @@
 package immersive_furniture.block;
 
+import immersive_furniture.InteractionManager;
 import immersive_furniture.data.FurnitureData;
 import immersive_furniture.item.FurnitureItem;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.NonNullList;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.Container;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.ChestMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.*;
-import net.minecraft.world.level.block.entity.BarrelBlockEntity;
-import net.minecraft.world.level.block.entity.ContainerOpenersCounter;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -31,6 +26,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.joml.Vector3f;
 
 public abstract class BaseFurnitureBlock extends Block implements SimpleWaterloggedBlock {
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
@@ -42,8 +38,18 @@ public abstract class BaseFurnitureBlock extends Block implements SimpleWaterlog
 
     @Override
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
-        // TODO
-        return InteractionResult.PASS;
+        FurnitureData data = getData(state, level, pos);
+        if (data != null) {
+            InteractionManager.INSTANCE.addInteraction(player, pos, new Vector3f(), InteractionManager.InteractionPose.SITTING);
+            /*
+            player.startSleepInBed(pos).ifLeft(problem -> {
+                if (problem.getMessage() != null) {
+                    player.displayClientMessage(problem.getMessage(), true);
+                }
+            });
+            */
+        }
+        return InteractionResult.CONSUME;
     }
 
     abstract public FurnitureData getData(BlockState state, BlockGetter level, BlockPos pos);
@@ -72,6 +78,9 @@ public abstract class BaseFurnitureBlock extends Block implements SimpleWaterlog
 
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+        if (InteractionManager.INSTANCE.getInteraction(pos) != null) {
+            return Shapes.empty();
+        }
         FurnitureData data = getData(state, level, pos);
         if (data != null) {
             return data.getShape(state.getValue(FACING));

@@ -11,10 +11,10 @@
       "item": "minecraft:cobblestone"
     },
     {
-      "tag": "minecraft:logs"
+      "item": "#minecraft:logs"
     },
     {
-      "tag": "minecraft:logs"
+      "item": "#minecraft:logs"
     }
   ],
   "result": {

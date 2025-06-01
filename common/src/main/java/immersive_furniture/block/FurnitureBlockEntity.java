@@ -89,7 +89,7 @@ public class FurnitureBlockEntity extends BlockEntity implements Container, Menu
 
     public FurnitureData getData() {
         if (hash != null) {
-            data = FurnitureDataManager.getData(new ResourceLocation("hash", hash), true);
+            data = FurnitureDataManager.getData(new ResourceLocation("hash", hash), level != null && level.isClientSide);
             if (data != null) {
                 hash = null;
             }

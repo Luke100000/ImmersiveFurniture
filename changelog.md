@@ -12,7 +12,6 @@ Initial release
 
 # Todo
 
-* Test light blocks
 * Thread the editor
 * Add particle emitter
     * Instance the particle and emulate it, it should be possible fine
