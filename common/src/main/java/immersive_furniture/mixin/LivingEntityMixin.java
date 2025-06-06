@@ -6,6 +6,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Pose;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
@@ -45,7 +46,7 @@ public abstract class LivingEntityMixin extends Entity {
     @Inject(method = "baseTick()V", at = @At("TAIL"))
     private void immersiveFurniture$baseTick(CallbackInfo ci) {
         InteractionManager.Interaction interaction = InteractionManager.INSTANCE.getInteraction(this);
-        if (interaction != null && interaction.pose() == InteractionManager.InteractionPose.SITTING) {
+        if (interaction != null && interaction.pose() == Pose.SITTING) {
             this.setPos(
                     interaction.pos().getX() + interaction.offset().x(),
                     interaction.pos().getY() + interaction.offset().y(),

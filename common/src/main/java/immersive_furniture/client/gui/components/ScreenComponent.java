@@ -22,6 +22,7 @@ public class ScreenComponent {
     public ScreenComponent(ArtisansWorkstationEditorScreen screen) {
         this.screen = screen;
         this.minecraft = Minecraft.getInstance();
+        assert minecraft.level != null;
     }
 
     public void init(int leftPos, int topPos, int width, int height) {

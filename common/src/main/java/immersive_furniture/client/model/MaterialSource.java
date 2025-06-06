@@ -3,6 +3,7 @@ package immersive_furniture.client.model;
 import com.mojang.blaze3d.platform.NativeImage;
 import immersive_furniture.data.FurnitureData;
 import immersive_furniture.mixin.client.SpriteContentsAccessor;
+import immersive_furniture.utils.Utils;
 import net.minecraft.client.renderer.block.model.BlockElement;
 import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -12,6 +13,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.InventoryMenu;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public record MaterialSource(
@@ -55,8 +57,7 @@ public record MaterialSource(
 
     public Component name() {
         String key = "block." + location.getNamespace() + "." + location.getPath();
-        String fallback = StringUtils.capitalize(location.getPath().replace("/", " ").replace("_", " "));
-        return Component.translatableWithFallback(key, fallback);
+        return Component.translatableWithFallback(key, Utils.capitalize(location));
     }
 
     private static @Nullable Material getMaterial(ResourceLocation location) {

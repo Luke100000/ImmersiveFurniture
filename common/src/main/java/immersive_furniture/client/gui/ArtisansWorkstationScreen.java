@@ -13,6 +13,8 @@ import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
@@ -67,16 +69,37 @@ public abstract class ArtisansWorkstationScreen extends Screen {
         graphics.pose().mulPose(new Quaternionf().rotateX(pitch).rotateY(yaw));
         graphics.pose().translate(-0.5, 0.5, -0.5);
         graphics.pose().mulPoseMatrix(new Matrix4f().scaling(1, -1, 1));
-        renderModel(graphics, data);
+        renderModel(graphics, data, yaw, pitch);
         graphics.pose().popPose();
     }
 
-    static void renderModel(GuiGraphics graphics, FurnitureData data) {
+    static void renderModel(GuiGraphics graphics, FurnitureData data, float yaw, float pitch) {
         BlockRenderDispatcher blockRenderer = Minecraft.getInstance().getBlockRenderer();
         BakedModel bakedModel = FurnitureModelBaker.getModel(data, DynamicAtlas.SCRATCH);
         ResourceLocation location = DynamicAtlas.SCRATCH.getLocation();
         VertexConsumer consumer = graphics.bufferSource().getBuffer(RenderType.entityCutout(location));
         blockRenderer.getModelRenderer().renderModel(graphics.pose().last(), consumer, null, bakedModel, 1.0f, 1.0f, 1.0f, 0xF000F0, OverlayTexture.NO_OVERLAY);
+
+        // Particles
+        long time = System.currentTimeMillis() / 50;
+        float partialTicks = System.currentTimeMillis() % 50 / 50.0f;
+        if (time != data.lastTick) {
+            data.lastTick = time;
+
+            ClientLevel level = Minecraft.getInstance().level;
+            LocalPlayer player = Minecraft.getInstance().player;
+            if (level == null) return;
+            if (player == null) return;
+
+            // We use the animation tick, which is a triangle distribution based on distance to the player,
+            // 0.2f is roughly 4 blocks away
+            if (level.getRandom().nextFloat() < 0.2f) {
+                data.tick(level, player.getOnPos(), level.getRandom(), data.getParticleEngine()::addParticle, true);
+            }
+
+            data.getParticleEngine().tick();
+        }
+        data.getParticleEngine().renderParticles(graphics, yaw, pitch, partialTicks);
     }
 
     void line(GuiGraphics graphics, float x0, float y0, float z0, float x1, float y1, float z1, float width, boolean overlay, float r, float g, float b, float a) {

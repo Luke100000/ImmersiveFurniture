@@ -4,6 +4,9 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.FloatTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtIo;
+import net.minecraft.resources.ResourceLocation;
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
 
 import java.io.*;
@@ -66,5 +69,17 @@ public class Utils {
         }
         byte[] hash = digest.digest(bytes);
         return HexFormat.of().formatHex(hash);
+    }
+
+    public static <E extends Enum<E>> E parseEnum(Class<E> enumClass, String name, E defaultValue) {
+        try {
+            return Enum.valueOf(enumClass, name.toUpperCase());
+        } catch (IllegalArgumentException | NullPointerException e) {
+            return defaultValue;
+        }
+    }
+
+    public static String capitalize(ResourceLocation location) {
+        return StringUtils.capitalize(location.getPath().replace(".", " ").replace("/", " ").replace("_", " "));
     }
 }

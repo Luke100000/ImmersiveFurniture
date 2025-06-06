@@ -4,6 +4,7 @@ import immersive_furniture.InteractionManager;
 import net.minecraft.client.model.AgeableListModel;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Pose;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -14,7 +15,7 @@ public abstract class HumanoidModelMixin<T extends LivingEntity> extends Ageable
     @Inject(method = "setupAnim(Lnet/minecraft/world/entity/LivingEntity;FFFFF)V", at = @At("HEAD"))
     private void immersiveFurniture$setupAnim(T entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, CallbackInfo ci) {
         InteractionManager.Interaction interaction = InteractionManager.INSTANCE.getInteraction(entity);
-        if (interaction != null && interaction.pose() == InteractionManager.InteractionPose.SITTING) {
+        if (interaction != null && interaction.pose() == Pose.SITTING) {
             riding = true;
         }
     }

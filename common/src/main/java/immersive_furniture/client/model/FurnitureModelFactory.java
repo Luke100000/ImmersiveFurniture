@@ -207,7 +207,7 @@ public class FurnitureModelFactory {
     private BlockModel getModel() {
         return new BlockModel(
                 null,
-                data.elements.stream().map(this::getElement).toList(),
+                data.elements.stream().filter(e -> e.type == FurnitureData.ElementType.ELEMENT).map(this::getElement).toList(),
                 TEXTURE_MAP,
                 true,
                 BlockModel.GuiLight.SIDE,

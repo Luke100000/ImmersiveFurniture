@@ -8,6 +8,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
@@ -40,14 +41,23 @@ public abstract class BaseFurnitureBlock extends Block implements SimpleWaterlog
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
         FurnitureData data = getData(state, level, pos);
         if (data != null) {
-            InteractionManager.INSTANCE.addInteraction(player, pos, new Vector3f(), InteractionManager.InteractionPose.SITTING);
-            /*
-            player.startSleepInBed(pos).ifLeft(problem -> {
-                if (problem.getMessage() != null) {
-                    player.displayClientMessage(problem.getMessage(), true);
+            if (!level.isClientSide) {
+                Pose pose = data.getPose(0);
+                if (pose != null) {
+                    InteractionManager.INSTANCE.addInteraction(player, pos, new Vector3f(), pose);
+
+                    // Start sleeping
+                    if (pose == Pose.SLEEPING) {
+                        player.startSleepInBed(pos).ifLeft(problem -> {
+                            if (problem.getMessage() != null) {
+                                player.displayClientMessage(problem.getMessage(), true);
+                            }
+                        });
+                    }
                 }
-            });
-            */
+            }
+
+            data.playInteractSound(level, pos, player);
         }
         return InteractionResult.CONSUME;
     }
@@ -56,15 +66,9 @@ public abstract class BaseFurnitureBlock extends Block implements SimpleWaterlog
 
     @Override
     public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
-        if (random.nextInt(10) == 0) {
-            // level.playLocalSound((double) pos.getX() + 0.5, (double) pos.getY() + 0.5, (double) pos.getZ() + 0.5, SoundEvents.CAMPFIRE_CRACKLE, SoundSource.BLOCKS, 0.5f + random.nextFloat(), random.nextFloat() * 0.7f + 0.6f, false);
-        }
-        if (random.nextInt(5) == 0) {
-            /*
-            for (int i = 0; i < random.nextInt(1) + 1; ++i) {
-                level.addParticle(ParticleTypes.LAVA, (double) pos.getX() + 0.5, (double) pos.getY() + 0.5, (double) pos.getZ() + 0.5, random.nextFloat() / 2.0f, 5.0E-5, random.nextFloat() / 2.0f);
-            }
-             */
+        FurnitureData data = getData(state, level, pos);
+        if (data != null) {
+            data.tick(level, pos, random, level::addParticle, false);
         }
     }
 

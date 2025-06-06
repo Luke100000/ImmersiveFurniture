@@ -9,6 +9,16 @@ public class LightMaterialEffect extends MaterialEffect {
     private float brightness = 0.0f;
     private float contrast = 0.0f;
 
+    public LightMaterialEffect() {
+
+    }
+
+    public LightMaterialEffect(LightMaterialEffect lightEffect) {
+        this.roundness = lightEffect.roundness;
+        this.brightness = lightEffect.brightness;
+        this.contrast = lightEffect.contrast;
+    }
+
     @Override
     public void load(CompoundTag tag) {
         roundness = tag.getFloat("Roundness");

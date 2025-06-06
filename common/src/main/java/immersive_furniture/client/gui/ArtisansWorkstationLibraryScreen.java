@@ -208,7 +208,7 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
                             b.setEnabled(!b.isEnabled());
                         }
                     } else {
-                        setError("gui.immersive_furniture.tab.login_required");
+                        setError("gui.immersive_furniture.login_required");
                     }
                 }).setEnabled(tab == Tab.FAVORITES);
             }
@@ -222,7 +222,7 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
                             publish(model);
                         }
                     } else {
-                        setError("gui.immersive_furniture.tab.login_required");
+                        setError("gui.immersive_furniture.login_required");
                     }
                 });
             }
@@ -268,7 +268,7 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
                             b.setEnabled(!b.isEnabled());
                         }
                     } else {
-                        setError("gui.immersive_furniture.tab.login_required");
+                        setError("gui.immersive_furniture.login_required");
                     }
                 }).setEnabled(true);
             }

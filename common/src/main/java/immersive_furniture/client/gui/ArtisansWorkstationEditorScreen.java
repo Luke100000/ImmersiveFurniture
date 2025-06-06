@@ -4,10 +4,7 @@ import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.math.Axis;
 import immersive_furniture.client.Utils;
-import immersive_furniture.client.gui.components.EffectsComponent;
-import immersive_furniture.client.gui.components.MaterialsComponent;
-import immersive_furniture.client.gui.components.ModelComponent;
-import immersive_furniture.client.gui.components.SettingsComponent;
+import immersive_furniture.client.gui.components.*;
 import immersive_furniture.client.gui.widgets.StateImageButton;
 import immersive_furniture.client.model.ModelUtils;
 import immersive_furniture.data.FurnitureData;
@@ -18,9 +15,11 @@ import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import org.jetbrains.annotations.NotNull;
-import org.joml.*;
+import org.joml.Matrix3f;
+import org.joml.Matrix4f;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 
-import java.lang.Math;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -47,6 +46,8 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
     int lastMouseY;
 
     final MaterialsComponent materialsComponent = new MaterialsComponent(this);
+    final ParticlesComponent particlesComponent = new ParticlesComponent(this);
+    final SoundsComponent poundsComponent = new SoundsComponent(this);
     final ModelComponent modelComponent = new ModelComponent(this);
     final EffectsComponent effectsComponent = new EffectsComponent(this);
     final SettingsComponent settingsComponent = new SettingsComponent(this);
@@ -56,6 +57,8 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
     public enum Page {
         MODEL,
         MATERIALS,
+        PARTICLES,
+        SOUNDS,
         EFFECTS,
         SETTINGS
     }
@@ -75,6 +78,8 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
         switch (currentPage) {
             case MODEL -> modelComponent.init(leftPos, topPos, TOOLS_WIDTH, windowHeight);
             case MATERIALS -> materialsComponent.init(leftPos, topPos, TOOLS_WIDTH, windowHeight);
+            case PARTICLES -> particlesComponent.init(leftPos, topPos, TOOLS_WIDTH, windowHeight);
+            case SOUNDS -> poundsComponent.init(leftPos, topPos, TOOLS_WIDTH, windowHeight);
             case EFFECTS -> effectsComponent.init(leftPos, topPos, TOOLS_WIDTH, windowHeight);
             case SETTINGS -> settingsComponent.init(leftPos, topPos, TOOLS_WIDTH, windowHeight);
         }
@@ -83,7 +88,7 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
         MutableComponent text = Component.translatable("gui.immersive_furniture.tab.cancel");
         StateImageButton button = new StateImageButton(
                 leftPos + 4, topPos - 24, 26, 28,
-                130, 128, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE,
+                130, 160, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE,
                 b -> Minecraft.getInstance().setScreen(new ArtisansWorkstationLibraryScreen()), text);
         button.setTooltip(Tooltip.create(text));
         button.setEnabled(false);
@@ -91,17 +96,28 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
 
         // Page buttons
         int x = 0;
-        for (Page page : Page.values()) {
-            addRenderableWidget(pagePageButton(page, x));
+        addRenderableWidget(pagePageButton(Page.MODEL, x, 0));
+        x += 26;
+        if (selectedElement != null && selectedElement.type == FurnitureData.ElementType.PARTICLE_EMITTER) {
+            addRenderableWidget(pagePageButton(Page.PARTICLES, x, 6 * 26));
+            x += 26;
+        } else if (selectedElement != null && selectedElement.type == FurnitureData.ElementType.SOUND_EMITTER) {
+            addRenderableWidget(pagePageButton(Page.SOUNDS, x, 7 * 26));
+            x += 26;
+        } else {
+            addRenderableWidget(pagePageButton(Page.MATERIALS, x, 26));
+            x += 26;
+            addRenderableWidget(pagePageButton(Page.EFFECTS, x, 2 * 26));
             x += 26;
         }
+        addRenderableWidget(pagePageButton(Page.SETTINGS, x, 3 * 26));
     }
 
-    private StateImageButton pagePageButton(Page page, int x) {
+    private StateImageButton pagePageButton(Page page, int x, int u) {
         MutableComponent text = Component.translatable("gui.immersive_furniture.tab." + page.name().toLowerCase(Locale.ROOT));
         StateImageButton button = new StateImageButton(
                 TOOLS_WIDTH + (windowWidth - TOOLS_WIDTH - 26 * Page.values().length) / 2 + leftPos + x, topPos - 24, 26, 28,
-                x, 128, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE,
+                u, 160, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE,
                 b -> {
                     currentPage = page;
                     init();
@@ -122,6 +138,8 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
         switch (currentPage) {
             case MODEL -> modelComponent.render(context);
             case MATERIALS -> materialsComponent.render(context);
+            case PARTICLES -> particlesComponent.render(context);
+            case SOUNDS -> poundsComponent.render(context);
             case SETTINGS -> settingsComponent.render(context);
         }
     }
@@ -281,7 +299,7 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double delta) {
-        camZoom = Math.max(10.0f, Math.min(200.0f, camZoom + (float) delta * 5.0f));
+        camZoom = Math.max(20.0f, Math.min(120.0f, camZoom + (float) delta * 0.1f * camZoom));
 
         return super.mouseScrolled(mouseX, mouseY, delta);
     }
@@ -349,7 +367,7 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
         Lighting.setupLevel(new Matrix4f().rotateX(pitch).rotateY(yaw));
 
         // Render the model
-        renderModel(graphics, data);
+        renderModel(graphics, data, yaw, pitch);
         graphics.flush();
 
         Lighting.setupFor3DItems();

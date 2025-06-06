@@ -40,7 +40,6 @@ public class MaterialButton extends StateImageButton {
 
         super.renderWidget(graphics, mouseX, mouseY, partialTick);
 
-        // TODO: Sprites do not necessarily have to be on the block atlas!
         TextureAtlasSprite up = material.up().sprite();
         TextureAtlasSprite north = material.north().sprite();
         TextureAtlasSprite east = material.east().sprite();

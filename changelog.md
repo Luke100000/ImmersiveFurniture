@@ -8,13 +8,15 @@ Initial release
 * Custom material packs
 * Datapack support
 * Multi-block proxy
-    * A special block that only defines collisions as states and forwards interactions
+    * A special block that only defines collisions as block states and forward interactions
+* Sprite objects
+    * Has access to transparent textures used in e.g., flowers
 
 # Todo
 
 * Thread the editor
 * Add particle emitter
     * Instance the particle and emulate it, it should be possible fine
-    * With ambient sound
+* Sound emitter
 * Added entity interaction (sit, lay, etc.)
 * Icon

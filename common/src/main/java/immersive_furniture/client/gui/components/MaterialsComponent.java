@@ -7,28 +7,14 @@ import immersive_furniture.client.model.MaterialRegistry;
 import immersive_furniture.client.model.MaterialSource;
 import immersive_furniture.config.Config;
 import immersive_furniture.data.FurnitureData;
-import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.client.gui.components.ImageButton;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.*;
 
-import static immersive_furniture.client.gui.ArtisansWorkstationScreen.TEXTURE;
-import static immersive_furniture.client.gui.ArtisansWorkstationScreen.TEXTURE_SIZE;
-
-public class MaterialsComponent extends ScreenComponent {
-    static final Component SEARCH_TITLE = Component.translatable("itemGroup.search");
-    static final Component SEARCH_HINT = Component.translatable("gui.recipebook.search_hint").withStyle(ChatFormatting.ITALIC).withStyle(ChatFormatting.GRAY);
-
+public class MaterialsComponent extends ListComponent {
     private final List<Map.Entry<ResourceLocation, MaterialSource>> filteredMaterials = new LinkedList<>();
 
-    EditBox searchBox;
     final List<MaterialButton> materialButtons = new ArrayList<>();
-
-    int page = 0;
 
     StateImageButton rotateButton;
     StateImageButton flipButton;
@@ -41,17 +27,6 @@ public class MaterialsComponent extends ScreenComponent {
 
     @Override
     public void init(int leftPos, int topPos, int width, int height) {
-        super.init(leftPos, topPos, width, height);
-
-        // Search box
-        this.searchBox = new EditBox(minecraft.font, leftPos + 6, topPos + 6, width - 12, minecraft.font.lineHeight + 3, SEARCH_TITLE);
-        this.searchBox.setMaxLength(50);
-        this.searchBox.setVisible(true);
-        this.searchBox.setValue("");
-        this.searchBox.setHint(SEARCH_HINT);
-        this.searchBox.setResponder(this::updateSearch);
-        screen.addRenderableWidget(searchBox);
-
         // Material settings
         if (screen.selectedElement != null) {
             // Toggle 90° rotation
@@ -101,7 +76,7 @@ public class MaterialsComponent extends ScreenComponent {
             for (int x = 0; x < 4; x++) {
                 MaterialButton button = new MaterialButton(
                         leftPos + 6 + x * 22, topPos + 44 + y * 22,
-                        22, 22, 234, 130,
+                        22, 22, 234, 162,
                         b -> {
                             if (screen.selectedElement != null) {
                                 screen.selectedElement.material.source = ((MaterialButton) b).getMaterial();
@@ -115,28 +90,16 @@ public class MaterialsComponent extends ScreenComponent {
             }
         }
 
-        // Page buttons
-        screen.addRenderableWidget(
-                new ImageButton(leftPos + 6, topPos + height - 21, 12, 15, 13, 226, 15, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE, b -> {
-                    page = Math.max(0, page - 1);
-                    updateSearch(searchBox.getValue());
-                })
-        );
-        screen.addRenderableWidget(
-                new ImageButton(leftPos + width - 18, topPos + height - 21, 12, 15, 0, 226, 15, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE, b -> {
-                    page += 1;
-                    updateSearch(searchBox.getValue());
-                })
-        );
-
-        updateSearch("");
+        super.init(leftPos, topPos, width, height);
     }
 
-    private int getPages() {
+    @Override
+    int getPages() {
         return (filteredMaterials.size() - 1) / 16 + 1;
     }
 
-    private void updateSearch(String search) {
+    @Override
+    void updateSearch(String search) {
         // Filter materials
         filteredMaterials.clear();
         MaterialRegistry.INSTANCE.materials.entrySet().stream()
@@ -156,9 +119,5 @@ public class MaterialsComponent extends ScreenComponent {
                 materialButtons.get(i).setEnabled(false);
             }
         }
-    }
-
-    public void render(GuiGraphics context) {
-        context.drawCenteredString(minecraft.font, String.format("%s / %S", page + 1, getPages() + 1), leftPos + width / 2, topPos + height - 17, 0xFFFFFF);
     }
 }

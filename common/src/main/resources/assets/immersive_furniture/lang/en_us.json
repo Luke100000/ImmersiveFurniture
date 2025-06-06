@@ -35,7 +35,29 @@
   "gui.immersive_furniture.contrast": "Contrast %s",
   "gui.immersive_furniture.light_level": "Light Level %s",
   "gui.immersive_furniture.inventory": "%s Inventory",
+  "gui.immersive_furniture.directional_velocity": "%s Velocity",
+  "gui.immersive_furniture.directional_velocity.short": "%s V",
+  "gui.immersive_furniture.random_velocity": "%s Randomness",
+  "gui.immersive_furniture.random_velocity.short": "%s R",
+  "gui.immersive_furniture.particle_amount": "%s Amount",
+  "gui.immersive_furniture.particle_amount.short": "%s A",
+  "gui.immersive_furniture.volume": "Volume %s",
+  "gui.immersive_furniture.volume.short": "%s V",
+  "gui.immersive_furniture.pitch": "Pitch %s",
+  "gui.immersive_furniture.pitch.short": "%s P",
+  "gui.immersive_furniture.frequency": "Frequency %s",
+  "gui.immersive_furniture.frequency.short": "%s F",
+  "gui.immersive_furniture.on_interact": "On Interact",
   "gui.immersive_furniture.save": "Save",
+  "gui.immersive_furniture.play_sound": "Play Sound",
+
+  "gui.immersive_furniture.element_type.element": "Element",
+  "gui.immersive_furniture.element_type.particle_emitter": "Particle Emitter",
+  "gui.immersive_furniture.element_type.sound_emitter": "Sound Emitter",
+  "gui.immersive_furniture.element_type.player_pose": "Player Pose",
+
+  "gui.immersive_furniture.player_pose.sitting": "Sitting",
+  "gui.immersive_furniture.player_pose.sleeping": "Sleeping",
 
   "gui.immersive_furniture.login": "Login",
   "gui.immersive_furniture.logout": "Logout",
@@ -54,6 +76,7 @@
   "gui.immersive_furniture.name.hint": "Furniture name",
   "gui.immersive_furniture.upload_duplicate": "That content already exists.",
   "gui.immersive_furniture.upload_failed": "Upload failed. Woops.",
+  "gui.immersive_furniture.login_required": "Login required!",
   "gui.immersive_furniture.back": "Back",
 
   "gui.immersive_furniture.author": "By %s",
@@ -71,10 +94,11 @@
   "gui.immersive_furniture.tab.favorites.hint": "Your favorite global creations.",
   "gui.immersive_furniture.tab.submissions": "Submissions",
   "gui.immersive_furniture.tab.submissions.hint": "Your creations you have shared.",
-  "gui.immersive_furniture.tab.login_required": "Login required!",
 
   "gui.immersive_furniture.tab.model": "Model",
   "gui.immersive_furniture.tab.materials": "Materials",
   "gui.immersive_furniture.tab.effects": "Effects",
+  "gui.immersive_furniture.tab.particles": "Particles",
+  "gui.immersive_furniture.tab.sounds": "Sounds",
   "gui.immersive_furniture.tab.settings": "Settings"
 }

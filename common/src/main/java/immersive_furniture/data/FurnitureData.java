@@ -1,5 +1,6 @@
 package immersive_furniture.data;
 
+import immersive_furniture.client.gui.PreviewParticleEngine;
 import immersive_furniture.client.model.MaterialRegistry;
 import immersive_furniture.client.model.MaterialSource;
 import immersive_furniture.client.model.ModelUtils;
@@ -7,14 +8,24 @@ import immersive_furniture.client.model.effects.LightMaterialEffect;
 import immersive_furniture.config.Config;
 import immersive_furniture.utils.Utils;
 import net.minecraft.client.renderer.block.model.BlockElementRotation;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.particles.SimpleParticleType;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.Pose;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.joml.Vector3i;
 
@@ -33,12 +44,14 @@ public class FurnitureData {
     public int inventorySize;
 
     public int contentid = -1;
-    public String author = "";
+    public String author = "Unknown";
 
     public final List<Element> elements = new LinkedList<>();
 
     private String hash;
     private Map<Direction, VoxelShape> cachedShapes = new HashMap<>();
+    private PreviewParticleEngine particleEngine;
+    public long lastTick = 0;
 
     public FurnitureData() {
         elements.add(new Element());
@@ -69,8 +82,9 @@ public class FurnitureData {
         this.author = data.author;
         this.hash = null;
 
-        // TODO: A per hash cache might make more sense here
         this.cachedShapes = new HashMap<>();
+        this.particleEngine = null;
+        this.lastTick = 0;
 
         for (Element element : data.elements) {
             this.elements.add(new Element(element));
@@ -175,6 +189,89 @@ public class FurnitureData {
     public void dirty() {
         hash = null;
         cachedShapes.clear();
+        for (Element element : elements) {
+            element.rotationAxes = null;
+        }
+    }
+
+    public PreviewParticleEngine getParticleEngine() {
+        if (particleEngine == null) {
+            particleEngine = new PreviewParticleEngine();
+        }
+        return particleEngine;
+    }
+
+    public void playInteractSound(Level level, BlockPos pos, Player player) {
+        for (Element element : elements) {
+            if (element.type == ElementType.SOUND_EMITTER && element.soundEmitter.onInteract) {
+                playSound(level, pos, player.getRandom(), element);
+            }
+        }
+    }
+
+    public interface ParticleConsumer {
+        void addParticle(SimpleParticleType particle, float x, float y, float z, float vx, float vy, float vz);
+    }
+
+    public void tick(Level level, BlockPos pos, RandomSource random, ParticleConsumer particleConsumer, boolean inEditor) {
+        for (Element element : elements) {
+            if (element.type == ElementType.PARTICLE_EMITTER) {
+                SimpleParticleType particle = element.particleEmitter.getParticle();
+                if (particle == null) continue;
+
+                float c = element.particleEmitter.amount - random.nextFloat();
+                while (c > 0.0f) {
+                    c--;
+
+                    Vector3f sampledPos = element.sampleRandomPosition(random).mul(1.0f / 16.0f);
+                    Vector3f up = element.getRotationAxes().up().div(element.to.y - element.from.y);
+
+                    float vr = element.particleEmitter.velocityRandom / 16.0f;
+                    float vd = element.particleEmitter.velocityDirectional / 16.0f;
+
+                    particleConsumer.addParticle(
+                            particle,
+                            sampledPos.x() + (inEditor ? 0.0f : pos.getX()),
+                            sampledPos.y() + (inEditor ? 1024.0f : pos.getY()),
+                            sampledPos.z() + (inEditor ? 0.0f : pos.getZ()),
+                            (random.nextFloat() - 0.5f) * vr + up.x() * vd,
+                            (random.nextFloat() - 0.5f) * vr + up.y() * vd,
+                            (random.nextFloat() - 0.5f) * vr + up.z() * vd
+                    );
+                }
+            } else if (element.type == ElementType.SOUND_EMITTER) {
+                if (random.nextFloat() < element.soundEmitter.frequency) {
+                    playSound(level, pos, random, element);
+                }
+            }
+        }
+    }
+
+    private static void playSound(Level level, BlockPos pos, RandomSource random, Element element) {
+        SoundEvent soundEvent = element.soundEmitter.getSoundEvent();
+        if (soundEvent == null) return;
+        level.playLocalSound(
+                (double) pos.getX() + 0.5,
+                (double) pos.getY() + 0.5,
+                (double) pos.getZ() + 0.5,
+                soundEvent,
+                SoundSource.BLOCKS,
+                (0.75f + random.nextFloat()) * element.soundEmitter.volume,
+                (0.75f + random.nextFloat()) * element.soundEmitter.pitch,
+                false
+        );
+    }
+
+    public Pose getPose(int i) {
+        for (Element element : elements) {
+            if (element.type == ElementType.PLAYER_POSE) {
+                i--;
+                if (i < 0) {
+                    return element.playerPose.pose;
+                }
+            }
+        }
+        return null;
     }
 
     public VoxelShape getShape(Direction rotation) {
@@ -227,13 +324,32 @@ public class FurnitureData {
         return Shapes.empty();
     }
 
+    public enum ElementType {
+        ELEMENT,
+        PARTICLE_EMITTER,
+        SOUND_EMITTER,
+        PLAYER_POSE,
+    }
+
+    public record ElementRotationAxes(Vector3f center, Vector3f right, Vector3f up, Vector3f forward) {
+        public ElementRotationAxes(Vector3f center, Vector3i size) {
+            this(center, new Vector3f(size.x(), 0, 0), new Vector3f(0, size.y(), 0), new Vector3f(0, 0, size.z()));
+        }
+    }
+
     public static class Element {
         public Vector3f from;
         public Vector3f to;
         public Direction.Axis axis;
         public float rotation;
+        public ElementType type = ElementType.ELEMENT;
         public Material material;
+        public ParticleEmitter particleEmitter;
+        public SoundEmitter soundEmitter;
+        public PlayerPose playerPose;
+
         public Map<Direction, int[]> bakedTexture = new HashMap<>();
+        public ElementRotationAxes rotationAxes;
 
         public Element() {
             from = new Vector3f(2, 2, 2);
@@ -241,6 +357,9 @@ public class FurnitureData {
             axis = Direction.Axis.X;
             rotation = 0.0f;
             material = new Material();
+            particleEmitter = new ParticleEmitter();
+            soundEmitter = new SoundEmitter();
+            playerPose = new PlayerPose();
         }
 
         public Element(CompoundTag tag) {
@@ -248,7 +367,11 @@ public class FurnitureData {
             this.to = Utils.fromFloatList(tag.getList("To", 5));
             this.axis = Direction.Axis.byName(tag.getString("Axis"));
             this.rotation = tag.getFloat("Rotation");
+            this.type = Utils.parseEnum(ElementType.class, tag.getString("Type"), ElementType.ELEMENT);
             this.material = new Material(tag.getCompound("Material"));
+            this.particleEmitter = new ParticleEmitter(tag.getCompound("ParticleEmitter"));
+            this.soundEmitter = new SoundEmitter(tag.getCompound("SoundEmitter"));
+            this.playerPose = new PlayerPose(tag.getCompound("PlayerPose"));
 
             this.bakedTexture = new HashMap<>();
             CompoundTag bakedTextureTag = tag.getCompound("BakedTexture");
@@ -262,8 +385,13 @@ public class FurnitureData {
             this.to = new Vector3f(element.to);
             this.axis = element.axis;
             this.rotation = element.rotation;
-            this.material = element.material;
+            this.type = element.type;
+            this.material = new Material(element.material);
+            this.particleEmitter = new ParticleEmitter(element.particleEmitter);
+            this.soundEmitter = new SoundEmitter(element.soundEmitter);
+            this.playerPose = new PlayerPose(element.playerPose);
             this.bakedTexture = new HashMap<>();
+            this.rotationAxes = null;
         }
 
         public CompoundTag toTag() {
@@ -272,7 +400,17 @@ public class FurnitureData {
             tag.put("To", Utils.toFloatList(to));
             tag.putString("Axis", axis.getSerializedName());
             tag.putFloat("Rotation", rotation);
-            tag.put("Material", material.toTag());
+            tag.putString("Type", type.name().toLowerCase());
+
+            if (type == ElementType.ELEMENT) {
+                tag.put("Material", material.toTag());
+            } else if (type == ElementType.PARTICLE_EMITTER) {
+                tag.put("ParticleEmitter", particleEmitter.toTag());
+            } else if (type == ElementType.SOUND_EMITTER) {
+                tag.put("SoundEmitter", soundEmitter.toTag());
+            } else if (type == ElementType.PLAYER_POSE) {
+                tag.put("PlayerPose", playerPose.toTag());
+            }
 
             CompoundTag bakedTextureTag = new CompoundTag();
             for (Map.Entry<Direction, int[]> entry : bakedTexture.entrySet()) {
@@ -299,6 +437,7 @@ public class FurnitureData {
             );
         }
 
+        // TODO: Client sided
         public BlockElementRotation getRotation() {
             return new BlockElementRotation(
                     getOrigin(),
@@ -324,6 +463,17 @@ public class FurnitureData {
             from.x = Math.max(-maxSize, Math.min(16.0f + maxSize, from.x));
             from.y = Math.max(-maxSize, Math.min(16.0f + maxSize, from.y));
             from.z = Math.max(-maxSize, Math.min(16.0f + maxSize, from.z));
+
+            // Pose anchors are the shape of the players' butt
+            if (type == ElementType.PLAYER_POSE) {
+                Vector3f center = getCenter();
+                from.x = center.x - 4.0f;
+                from.y = center.y - 0.5f;
+                from.z = center.z - (playerPose.pose == Pose.SLEEPING ? 14.0f : 4.0f);
+                to.x = center.x + 4.0f;
+                to.y = center.y + 0.5f;
+                to.z = center.z + (playerPose.pose == Pose.SLEEPING ? 14.0f : 4.0f);
+            }
         }
 
         public boolean contains(Vector3f pos) {
@@ -335,6 +485,38 @@ public class FurnitureData {
                    pos.y >= from.y - margin && pos.y <= to.y + margin &&
                    pos.z >= from.z - margin && pos.z <= to.z + margin;
         }
+
+        public ElementRotationAxes getRotationAxes() {
+            if (rotationAxes == null) {
+                rotationAxes = new ElementRotationAxes(getCenter(), getSize());
+
+                BlockElementRotation elementRotation = getRotation();
+                Quaternionf quaternion = ModelUtils.getElementRotation(elementRotation);
+                quaternion.transform(rotationAxes.up);
+                quaternion.transform(rotationAxes.right);
+                quaternion.transform(rotationAxes.forward);
+
+                ModelUtils.applyElementRotation(rotationAxes.center, elementRotation);
+            }
+            return rotationAxes;
+        }
+
+        public Vector3f sampleRandomPosition(RandomSource random) {
+            ElementRotationAxes axes = getRotationAxes();
+            float x = random.nextFloat() - 0.5f;
+            float y = random.nextFloat() - 0.5f;
+            float z = random.nextFloat() - 0.5f;
+            return new Vector3f(
+                    axes.center.x + x * axes.right.x + y * axes.up.x + z * axes.forward.x,
+                    axes.center.y + x * axes.right.y + y * axes.up.y + z * axes.forward.y,
+                    axes.center.z + x * axes.right.z + y * axes.up.z + z * axes.forward.z
+            );
+        }
+    }
+
+    public enum WrapMode {
+        EXPAND,
+        REPEAT,
     }
 
     public static class Material {
@@ -355,10 +537,19 @@ public class FurnitureData {
                     new ResourceLocation(tag.getString("Source")),
                     MaterialSource.DEFAULT
             );
-            wrap = WrapMode.valueOf(tag.getString("Wrap"));
+            wrap = Utils.parseEnum(WrapMode.class, tag.getString("Wrap"), WrapMode.EXPAND);
             rotate = tag.getBoolean("Rotate");
             flip = tag.getBoolean("Flip");
             lightEffect.load(tag.getCompound("LightEffect"));
+        }
+
+        public Material(Material material) {
+            source = material.source;
+            margin = material.margin;
+            wrap = material.wrap;
+            rotate = material.rotate;
+            flip = material.flip;
+            lightEffect = new LightMaterialEffect(material.lightEffect);
         }
 
         public CompoundTag toTag() {
@@ -373,8 +564,108 @@ public class FurnitureData {
         }
     }
 
-    public enum WrapMode {
-        EXPAND,
-        REPEAT,
+    public static class ParticleEmitter {
+        public ResourceLocation particle = new ResourceLocation("minecraft:smoke");
+        public float velocityDirectional = 0.0f;
+        public float velocityRandom = 0.1f;
+        public float amount = 0.5f;
+
+        public ParticleEmitter() {
+
+        }
+
+        public ParticleEmitter(CompoundTag tag) {
+            this.particle = new ResourceLocation(tag.getString("Particle"));
+            this.velocityDirectional = tag.getFloat("VelocityDirectional");
+            this.velocityRandom = tag.getFloat("VelocityRandom");
+            this.amount = tag.getFloat("Amount");
+        }
+
+        public ParticleEmitter(ParticleEmitter particleEmitter) {
+            this.particle = particleEmitter.particle;
+            this.velocityDirectional = particleEmitter.velocityDirectional;
+            this.velocityRandom = particleEmitter.velocityRandom;
+            this.amount = particleEmitter.amount;
+        }
+
+        public CompoundTag toTag() {
+            CompoundTag tag = new CompoundTag();
+            tag.putString("Particle", particle.toString());
+            tag.putFloat("VelocityDirectional", velocityDirectional);
+            tag.putFloat("VelocityRandom", velocityRandom);
+            tag.putFloat("VelocityRandom", velocityRandom);
+            tag.putFloat("Amount", amount);
+            return tag;
+        }
+
+        public SimpleParticleType getParticle() {
+            if (BuiltInRegistries.PARTICLE_TYPE.get(particle) instanceof SimpleParticleType simpleParticleType) {
+                return simpleParticleType;
+            }
+            return null;
+        }
+    }
+
+    public static class SoundEmitter {
+        public ResourceLocation sound = new ResourceLocation("minecraft:entity.item.pickup");
+        public float volume = 1.0f;
+        public float pitch = 1.0f;
+        public float frequency = 0.1f;
+        public boolean onInteract = false;
+
+        public SoundEmitter() {
+
+        }
+
+        public SoundEmitter(CompoundTag tag) {
+            this.sound = new ResourceLocation(tag.getString("Sound"));
+            this.volume = tag.getFloat("Volume");
+            this.pitch = tag.getFloat("Pitch");
+            this.frequency = tag.getFloat("Frequency");
+            this.onInteract = tag.getBoolean("OnInteract");
+        }
+
+        public SoundEmitter(SoundEmitter soundEmitter) {
+            this.sound = soundEmitter.sound;
+            this.volume = soundEmitter.volume;
+            this.pitch = soundEmitter.pitch;
+            this.frequency = soundEmitter.frequency;
+            this.onInteract = soundEmitter.onInteract;
+        }
+
+        public CompoundTag toTag() {
+            CompoundTag tag = new CompoundTag();
+            tag.putString("Sound", sound.toString());
+            tag.putFloat("Volume", volume);
+            tag.putFloat("Pitch", pitch);
+            tag.putFloat("Frequency", frequency);
+            tag.putBoolean("OnInteract", onInteract);
+            return tag;
+        }
+
+        public SoundEvent getSoundEvent() {
+            return BuiltInRegistries.SOUND_EVENT.get(sound);
+        }
+    }
+
+    public static class PlayerPose {
+        public Pose pose = Pose.SITTING;
+
+        public PlayerPose() {
+        }
+
+        public PlayerPose(CompoundTag tag) {
+            this.pose = Utils.parseEnum(Pose.class, tag.getString("Pose"), Pose.SITTING);
+        }
+
+        public PlayerPose(PlayerPose playerPose) {
+            this.pose = playerPose.pose;
+        }
+
+        public CompoundTag toTag() {
+            CompoundTag tag = new CompoundTag();
+            tag.putString("Pose", pose.name());
+            return tag;
+        }
     }
 }
