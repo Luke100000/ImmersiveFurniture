@@ -11,12 +11,14 @@ Initial release
     * A special block that only defines collisions as block states and forward interactions
 * Sprite objects
     * Has access to transparent textures used in e.g., flowers
+* Raw texture
+    * A button next to tiling which uses "raw" mode, linking the texture id directly
+    * Will not render nice textures, but instead allow animations such as water
+    * Will also enforce a max of 16 px, and is default on for animated textures
 
 # Todo
 
 * Thread the editor
-* Add particle emitter
-    * Instance the particle and emulate it, it should be possible fine
-* Sound emitter
-* Added entity interaction (sit, lay, etc.)
+* Finish interaction (sit, lay, etc.)
+* Hash local files rather than plain rename
 * Icon

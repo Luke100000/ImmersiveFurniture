@@ -78,7 +78,7 @@ public class FurnitureDataManager {
         File cache = getFile(id);
         try {
             NbtIo.writeCompressed(data.toTag(), cache);
-            DATA.put(getSafeLocalLocation(data), data);
+            DATA.put(id, data);
         } catch (IOException e) {
             Common.logger.error("Failed to save local file: {}", cache.getPath(), e);
         }

@@ -224,7 +224,7 @@ public class FurnitureData {
                     c--;
 
                     Vector3f sampledPos = element.sampleRandomPosition(random).mul(1.0f / 16.0f);
-                    Vector3f up = element.getRotationAxes().up().div(element.to.y - element.from.y);
+                    Vector3f up = element.getRotationAxes().up().div(Math.abs(element.to.y - element.from.y) + 0.001f);
 
                     float vr = element.particleEmitter.velocityRandom / 16.0f;
                     float vd = element.particleEmitter.velocityDirectional / 16.0f;

@@ -104,7 +104,7 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
         } else if (selectedElement != null && selectedElement.type == FurnitureData.ElementType.SOUND_EMITTER) {
             addRenderableWidget(pagePageButton(Page.SOUNDS, x, 7 * 26));
             x += 26;
-        } else {
+        } else if (selectedElement != null && selectedElement.type == FurnitureData.ElementType.ELEMENT) {
             addRenderableWidget(pagePageButton(Page.MATERIALS, x, 26));
             x += 26;
             addRenderableWidget(pagePageButton(Page.EFFECTS, x, 2 * 26));

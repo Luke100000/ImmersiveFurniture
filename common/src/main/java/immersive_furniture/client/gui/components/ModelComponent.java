@@ -168,6 +168,7 @@ public class ModelComponent extends ScreenComponent {
             addToggleButton(leftPos + 6 + type.ordinal() * 18, topPos + 94, 16, 176 + type.ordinal() * 16, 96, "gui.immersive_furniture.element_type." + type.name().toLowerCase(), () -> {
                 if (screen.selectedElement == null) return;
                 screen.selectedElement.type = type;
+                screen.selectedElement.sanityCheck();
                 screen.init();
             }).setEnabled(screen.selectedElement.type != type);
         }
