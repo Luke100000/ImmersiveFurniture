@@ -1,6 +1,7 @@
 package immersive_furniture.client.model;
 
 import immersive_furniture.data.FurnitureData;
+import immersive_furniture.data.ModelUtils;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.joml.Vector3i;

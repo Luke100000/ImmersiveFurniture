@@ -3,8 +3,9 @@ package immersive_furniture.client.model;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.datafixers.util.Either;
 import immersive_furniture.Common;
-import immersive_furniture.client.model.effects.LightMaterialEffect;
+import immersive_furniture.data.ElementRotation;
 import immersive_furniture.data.FurnitureData;
+import immersive_furniture.data.ModelUtils;
 import net.minecraft.client.renderer.block.model.*;
 import net.minecraft.client.resources.model.Material;
 import net.minecraft.core.Direction;
@@ -41,15 +42,15 @@ public class FurnitureModelFactory {
 
     private BlockElementFace getFace(FurnitureData.Element element, Direction direction) {
         // Cull fully invisible faces
-        float[] fs = ModelUtils.getShapeData(element);
-        Vector3f[] vertices = ModelUtils.getVertices(element, direction, fs, null);
+        float[] fs = ClientModelUtils.getShapeData(element);
+        Vector3f[] vertices = ClientModelUtils.getVertices(element, direction, fs, null);
         for (FurnitureData.Element otherElement : data.elements) {
             if (otherElement == element) continue;
             if (fullyContained(otherElement, vertices)) return null;
         }
 
         // Allocate pixels
-        Vector2i dimensions = ModelUtils.getFaceDimensions(element, direction);
+        Vector2i dimensions = ClientModelUtils.getFaceDimensions(element, direction);
         DynamicAtlas.Quad quad = atlas.allocate(dimensions.x, dimensions.y);
 
         if (quad.w() > 0 && quad.h() > 0) {
@@ -71,17 +72,17 @@ public class FurnitureModelFactory {
                         int b = (color & 0xFF);
                         int a = ((color >> 24) & 0xFF);
 
-                        BlockElementRotation rotation = element.getRotation();
-                        Vector3f pos = new Vector3f(ModelUtils.to3D(element, direction, x, y));
+                        ElementRotation rotation = element.getRotation();
+                        Vector3f pos = new Vector3f(ClientModelUtils.to3D(element, direction, x, y));
                         ModelUtils.applyElementRotation(pos, rotation);
 
                         Vector3f normal = ModelUtils.getElementRotation(rotation).transform(direction.step());
 
-                        LightMaterialEffect lightEffect = element.material.lightEffect;
+                        FurnitureData.LightMaterialEffect lightEffect = element.material.lightEffect;
 
                         // Smooth light
                         float light = 1.0f;
-                        float roundness = lightEffect.getRoundness() / 75.0f;
+                        float roundness = lightEffect.roundness / 75.0f;
                         if (roundness != 0.0f) {
                             light = getLight(x, y, dimensions);
                             light = quantize(x, y, light);
@@ -89,14 +90,14 @@ public class FurnitureModelFactory {
                         }
 
                         // Brightness
-                        light += lightEffect.getBrightness() / 100.0f;
+                        light += lightEffect.brightness / 100.0f;
 
                         // Ambient Occlusion
                         float ao = Math.min(1.0f, Math.max(0.0f, 1.0f - this.ao.sample(pos, normal) * 1.5f));
                         light *= ao;
 
                         // Contrast
-                        float contrast = lightEffect.getContrast() / 100.0f;
+                        float contrast = lightEffect.contrast / 100.0f;
                         r = (int) Math.max(0.0, Math.min(255.0, ((r - 128) * (1.0f + contrast) + 128) * light));
                         g = (int) Math.max(0.0, Math.min(255.0, ((g - 128) * (1.0f + contrast) + 128) * light));
                         b = (int) Math.max(0.0, Math.min(255.0, ((b - 128) * (1.0f + contrast) + 128) * light));
@@ -190,7 +191,7 @@ public class FurnitureModelFactory {
                 element.from,
                 element.to,
                 getFaces(element),
-                element.getRotation(),
+                ClientModelUtils.toBlockElementRotation(element.getRotation()),
                 true
         );
     }

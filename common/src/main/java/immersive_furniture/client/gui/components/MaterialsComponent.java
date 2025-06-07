@@ -3,7 +3,7 @@ package immersive_furniture.client.gui.components;
 import immersive_furniture.client.gui.ArtisansWorkstationEditorScreen;
 import immersive_furniture.client.gui.widgets.MaterialButton;
 import immersive_furniture.client.gui.widgets.StateImageButton;
-import immersive_furniture.client.model.MaterialRegistry;
+import immersive_furniture.data.MaterialRegistry;
 import immersive_furniture.client.model.MaterialSource;
 import immersive_furniture.config.Config;
 import immersive_furniture.data.FurnitureData;
@@ -57,7 +57,7 @@ public class MaterialsComponent extends ListComponent {
 
             // Mark as favorite
             favoriteButton = addToggleButton(leftPos + 100 - 6 - 16, topPos + 22, 16, 128, 96, "gui.immersive_furniture.favorite", () -> {
-                String location = screen.selectedElement.material.source.location().toString();
+                String location = screen.selectedElement.material.source.toString();
                 if (Config.getInstance().favorites.contains(location)) {
                     Config.getInstance().favorites.remove(location);
                     favoriteButton.setEnabled(true);
@@ -67,7 +67,7 @@ public class MaterialsComponent extends ListComponent {
                 }
                 Config.getInstance().save();
             });
-            favoriteButton.setEnabled(!Config.getInstance().favorites.contains(screen.selectedElement.material.source.location().toString()));
+            favoriteButton.setEnabled(!Config.getInstance().favorites.contains(screen.selectedElement.material.source.toString()));
         }
 
         // Material buttons
@@ -79,12 +79,12 @@ public class MaterialsComponent extends ListComponent {
                         22, 22, 234, 162,
                         b -> {
                             if (screen.selectedElement != null) {
-                                screen.selectedElement.material.source = ((MaterialButton) b).getMaterial();
+                                screen.selectedElement.material.source = ((MaterialButton) b).getMaterial().location();
                                 screen.init();
                             }
                         }
                 );
-                button.setEnabled(screen.selectedElement != null && button.getMaterial() == screen.selectedElement.material.source);
+                button.setEnabled(screen.selectedElement != null && button.getMaterial() != null && button.getMaterial().location().equals(screen.selectedElement.material.source));
                 materialButtons.add(button);
                 screen.addRenderableWidget(button);
             }

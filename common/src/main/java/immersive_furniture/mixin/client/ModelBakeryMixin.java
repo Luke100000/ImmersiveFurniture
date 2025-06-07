@@ -1,6 +1,6 @@
 package immersive_furniture.mixin.client;
 
-import immersive_furniture.client.model.MaterialRegistry;
+import immersive_furniture.data.MaterialRegistry;
 import immersive_furniture.client.model.MaterialSource;
 import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;

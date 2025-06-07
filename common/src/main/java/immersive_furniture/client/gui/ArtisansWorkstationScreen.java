@@ -4,6 +4,7 @@ import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import immersive_furniture.Common;
+import immersive_furniture.client.PreviewParticleEngine;
 import immersive_furniture.client.model.DynamicAtlas;
 import immersive_furniture.client.model.FurnitureModelBaker;
 import immersive_furniture.data.FurnitureData;
@@ -25,6 +26,10 @@ import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
+
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 
 public abstract class ArtisansWorkstationScreen extends Screen {
@@ -94,12 +99,13 @@ public abstract class ArtisansWorkstationScreen extends Screen {
             // We use the animation tick, which is a triangle distribution based on distance to the player,
             // 0.2f is roughly 4 blocks away
             if (level.getRandom().nextFloat() < 0.2f) {
-                data.tick(level, player.getOnPos(), level.getRandom(), data.getParticleEngine()::addParticle, true);
+                data.tick(level, player.getOnPos(), level.getRandom(), getParticleEngine(data)::addParticle, true);
             }
 
-            data.getParticleEngine().tick();
+            getParticleEngine(data).tick();
         }
-        data.getParticleEngine().renderParticles(graphics, yaw, pitch, partialTicks);
+
+        getParticleEngine(data).renderParticles(graphics, yaw, pitch, partialTicks);
     }
 
     void line(GuiGraphics graphics, float x0, float y0, float z0, float x1, float y1, float z1, float width, boolean overlay, float r, float g, float b, float a) {
@@ -158,5 +164,17 @@ public abstract class ArtisansWorkstationScreen extends Screen {
     @Override
     public <T extends GuiEventListener & Renderable & NarratableEntry> T addRenderableWidget(T widget) {
         return super.addRenderableWidget(widget);
+    }
+
+    private static final Map<Object, PreviewParticleEngine> objectToParticleEngine =
+            Collections.synchronizedMap(new LinkedHashMap<>(30, 0.75f, true) {
+                @Override
+                protected boolean removeEldestEntry(Map.Entry<Object, PreviewParticleEngine> eldest) {
+                    return size() > 30;
+                }
+            });
+
+    public static PreviewParticleEngine getParticleEngine(FurnitureData data) {
+        return objectToParticleEngine.computeIfAbsent(data, d -> new PreviewParticleEngine());
     }
 }

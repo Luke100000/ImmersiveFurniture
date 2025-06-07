@@ -1,5 +1,6 @@
-package immersive_furniture.client.model;
+package immersive_furniture.data;
 
+import immersive_furniture.client.model.MaterialSource;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.HashMap;

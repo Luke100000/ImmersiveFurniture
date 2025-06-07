@@ -2,6 +2,7 @@ package immersive_furniture.client.model;
 
 import com.mojang.blaze3d.platform.NativeImage;
 import immersive_furniture.data.FurnitureData;
+import immersive_furniture.data.MaterialRegistry;
 import immersive_furniture.mixin.client.SpriteContentsAccessor;
 import immersive_furniture.utils.Utils;
 import net.minecraft.client.renderer.block.model.BlockElement;
@@ -148,7 +149,10 @@ public record MaterialSource(
     }
 
     public static int fromCube(FurnitureData.Material material, Direction direction, int x, int y, int w, int h) {
-        NativeImage texture = material.source.get(direction);
+        NativeImage texture = MaterialRegistry.INSTANCE.materials.getOrDefault(
+                material.source,
+                MaterialSource.DEFAULT
+        ).get(direction);
 
         if (material.flip) {
             x = w - x - 1;

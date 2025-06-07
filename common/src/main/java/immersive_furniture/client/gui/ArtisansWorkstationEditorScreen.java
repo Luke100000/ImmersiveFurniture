@@ -6,8 +6,9 @@ import com.mojang.math.Axis;
 import immersive_furniture.client.Utils;
 import immersive_furniture.client.gui.components.*;
 import immersive_furniture.client.gui.widgets.StateImageButton;
-import immersive_furniture.client.model.ModelUtils;
+import immersive_furniture.client.model.ClientModelUtils;
 import immersive_furniture.data.FurnitureData;
+import immersive_furniture.data.ModelUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Tooltip;
@@ -389,7 +390,7 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
         // Z-cast and get the hovered element
         List<HoverResult> results = new LinkedList<>();
         for (FurnitureData.Element element : data.elements) {
-            float[] fs = ModelUtils.getShapeData(element);
+            float[] fs = ClientModelUtils.getShapeData(element);
             for (Direction facing : Direction.values()) {
                 Vector3f n = new Vector3f(facing.step());
                 n = ModelUtils.getElementRotation(element.getRotation()).transform(n);
@@ -397,7 +398,7 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
                 normal.transform(n);
                 if (n.z() < 0) continue;
 
-                Vector3f[] vertices = ModelUtils.getVertices(element, facing, fs, pose);
+                Vector3f[] vertices = ClientModelUtils.getVertices(element, facing, fs, pose);
                 if (Utils.isWithinQuad(mouseX, mouseY, vertices)) {
                     float depth = vertices[0].z() + vertices[1].z() + vertices[2].z() + vertices[3].z();
                     results.add(new HoverResult(element, facing, depth));
@@ -435,9 +436,9 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
     }
 
     void drawSelection(GuiGraphics graphics, FurnitureData.Element element, Matrix4f pose, float width, boolean overlay) {
-        float[] fs = ModelUtils.getShapeData(element);
+        float[] fs = ClientModelUtils.getShapeData(element);
         for (Direction facing : Direction.values()) {
-            Vector3f[] vertices = ModelUtils.getVertices(element, facing, fs, pose);
+            Vector3f[] vertices = ClientModelUtils.getVertices(element, facing, fs, pose);
             for (int i = 0; i < 4; i++) {
                 Vector3f vertex = vertices[i];
                 Vector3f nextVertex = vertices[(i + 1) % 4];

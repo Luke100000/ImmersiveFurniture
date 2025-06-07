@@ -1,14 +1,14 @@
 package immersive_furniture.client.model;
 
+import immersive_furniture.data.ElementRotation;
 import immersive_furniture.data.FurnitureData;
+import immersive_furniture.data.ModelUtils;
 import net.minecraft.client.renderer.FaceInfo;
 import net.minecraft.client.renderer.block.model.BlockElementRotation;
 import net.minecraft.core.Direction;
 import org.joml.*;
 
-import java.lang.Math;
-
-public class ModelUtils {
+public class ClientModelUtils {
     public static Vector2i getFaceDimensions(FurnitureData.Element element, Direction direction) {
         switch (direction) {
             case UP, DOWN -> {
@@ -81,38 +81,6 @@ public class ModelUtils {
         }
     }
 
-    public static Quaternionf getElementRotation(BlockElementRotation rotation) {
-        Vector3f axis = switch (rotation.axis()) {
-            case X -> new Vector3f(1.0f, 0.0f, 0.0f);
-            case Y -> new Vector3f(0.0f, 1.0f, 0.0f);
-            case Z -> new Vector3f(0.0f, 0.0f, 1.0f);
-        };
-
-        return new Quaternionf().rotationAxis(rotation.angle() * ((float) Math.PI / 180), axis);
-    }
-
-    // Expects pos to be in voxel space (16 units per block)
-    public static void applyElementRotation(Vector3f pos, BlockElementRotation rotation) {
-        if (rotation == null) return;
-        Quaternionf quaternionf = getElementRotation(rotation);
-        pos.mul(1.0f / 16.0f);
-        pos.sub(rotation.origin());
-        quaternionf.transform(pos);
-        pos.add(rotation.origin());
-        pos.mul(16.0f);
-    }
-
-    // Expects pos to be in voxel space (16 units per block)
-    public static void applyInverseElementRotation(Vector3f pos, BlockElementRotation rotation) {
-        if (rotation == null) return;
-        Quaternionf quaternionf = getElementRotation(rotation).conjugate();
-        pos.mul(1.0f / 16.0f);
-        pos.sub(rotation.origin());
-        quaternionf.transform(pos);
-        pos.add(rotation.origin());
-        pos.mul(16.0f);
-    }
-
     public static float[] getShapeData(FurnitureData.Element element) {
         float[] fs = new float[Direction.values().length];
         fs[FaceInfo.Constants.MIN_X] = element.from.x() / 16.0f;
@@ -124,12 +92,12 @@ public class ModelUtils {
         return fs;
     }
 
-    public static Vector3f getVertex(Direction facing, int vertex, float[] fs, BlockElementRotation rotation, Matrix4f transform) {
+    public static Vector3f getVertex(Direction facing, int vertex, float[] fs, ElementRotation rotation, Matrix4f transform) {
         FaceInfo.VertexInfo vertexInfo = FaceInfo.fromFacing(facing).getVertexInfo(vertex);
         Vector3f vec = new Vector3f(fs[vertexInfo.xFace], fs[vertexInfo.yFace], fs[vertexInfo.zFace]);
 
         if (rotation != null) {
-            Quaternionf quaternionf = getElementRotation(rotation);
+            Quaternionf quaternionf = ModelUtils.getElementRotation(rotation);
             vec.sub(rotation.origin());
             quaternionf.transform(vec);
             vec.add(rotation.origin());
@@ -144,29 +112,19 @@ public class ModelUtils {
 
     public static Vector3f[] getVertices(FurnitureData.Element element, Direction facing, float[] fs, Matrix4f transform) {
         return new Vector3f[]{
-                ModelUtils.getVertex(facing, 0, fs, element.getRotation(), transform),
-                ModelUtils.getVertex(facing, 1, fs, element.getRotation(), transform),
-                ModelUtils.getVertex(facing, 2, fs, element.getRotation(), transform),
-                ModelUtils.getVertex(facing, 3, fs, element.getRotation(), transform)
+                ClientModelUtils.getVertex(facing, 0, fs, element.getRotation(), transform),
+                ClientModelUtils.getVertex(facing, 1, fs, element.getRotation(), transform),
+                ClientModelUtils.getVertex(facing, 2, fs, element.getRotation(), transform),
+                ClientModelUtils.getVertex(facing, 3, fs, element.getRotation(), transform)
         };
     }
 
-    public static Vector3f[] getCorners(FurnitureData.Element element) {
-        Vector3f[] corners = new Vector3f[8];
-        corners[0] = new Vector3f(element.from.x(), element.from.y(), element.from.z());
-        corners[1] = new Vector3f(element.from.x(), element.from.y(), element.to.z());
-        corners[2] = new Vector3f(element.from.x(), element.to.y(), element.from.z());
-        corners[3] = new Vector3f(element.from.x(), element.to.y(), element.to.z());
-        corners[4] = new Vector3f(element.to.x(), element.from.y(), element.from.z());
-        corners[5] = new Vector3f(element.to.x(), element.from.y(), element.to.z());
-        corners[6] = new Vector3f(element.to.x(), element.to.y(), element.from.z());
-        corners[7] = new Vector3f(element.to.x(), element.to.y(), element.to.z());
-
-        BlockElementRotation rotation = element.getRotation();
-        for (int i = 0; i < 8; i++) {
-            ModelUtils.applyElementRotation(corners[i], rotation);
-        }
-
-        return corners;
+    public static BlockElementRotation toBlockElementRotation(ElementRotation rotation) {
+        return new BlockElementRotation(
+                rotation.origin(),
+                rotation.axis(),
+                rotation.angle(),
+                rotation.rescale()
+        );
     }
 }

@@ -1,13 +1,7 @@
 package immersive_furniture.data;
 
-import immersive_furniture.client.gui.PreviewParticleEngine;
-import immersive_furniture.client.model.MaterialRegistry;
-import immersive_furniture.client.model.MaterialSource;
-import immersive_furniture.client.model.ModelUtils;
-import immersive_furniture.client.model.effects.LightMaterialEffect;
 import immersive_furniture.config.Config;
 import immersive_furniture.utils.Utils;
-import net.minecraft.client.renderer.block.model.BlockElementRotation;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.SimpleParticleType;
@@ -50,7 +44,6 @@ public class FurnitureData {
 
     private String hash;
     private Map<Direction, VoxelShape> cachedShapes = new HashMap<>();
-    private PreviewParticleEngine particleEngine;
     public long lastTick = 0;
 
     public FurnitureData() {
@@ -83,7 +76,6 @@ public class FurnitureData {
         this.hash = null;
 
         this.cachedShapes = new HashMap<>();
-        this.particleEngine = null;
         this.lastTick = 0;
 
         for (Element element : data.elements) {
@@ -192,13 +184,6 @@ public class FurnitureData {
         for (Element element : elements) {
             element.rotationAxes = null;
         }
-    }
-
-    public PreviewParticleEngine getParticleEngine() {
-        if (particleEngine == null) {
-            particleEngine = new PreviewParticleEngine();
-        }
-        return particleEngine;
     }
 
     public void playInteractSound(Level level, BlockPos pos, Player player) {
@@ -437,9 +422,8 @@ public class FurnitureData {
             );
         }
 
-        // TODO: Client sided
-        public BlockElementRotation getRotation() {
-            return new BlockElementRotation(
+        public ElementRotation getRotation() {
+            return new ElementRotation(
                     getOrigin(),
                     axis,
                     rotation,
@@ -490,7 +474,7 @@ public class FurnitureData {
             if (rotationAxes == null) {
                 rotationAxes = new ElementRotationAxes(getCenter(), getSize());
 
-                BlockElementRotation elementRotation = getRotation();
+                ElementRotation elementRotation = getRotation();
                 Quaternionf quaternion = ModelUtils.getElementRotation(elementRotation);
                 quaternion.transform(rotationAxes.up);
                 quaternion.transform(rotationAxes.right);
@@ -520,7 +504,7 @@ public class FurnitureData {
     }
 
     public static class Material {
-        public MaterialSource source = MaterialSource.DEFAULT;
+        public ResourceLocation source = new ResourceLocation("immersive_furniture:default");
         public int margin = 4;
         public WrapMode wrap = WrapMode.EXPAND;
         public boolean rotate = false;
@@ -533,10 +517,7 @@ public class FurnitureData {
         }
 
         public Material(CompoundTag tag) {
-            source = MaterialRegistry.INSTANCE.materials.getOrDefault(
-                    new ResourceLocation(tag.getString("Source")),
-                    MaterialSource.DEFAULT
-            );
+            source = new ResourceLocation(tag.getString("Source"));
             wrap = Utils.parseEnum(WrapMode.class, tag.getString("Wrap"), WrapMode.EXPAND);
             rotate = tag.getBoolean("Rotate");
             flip = tag.getBoolean("Flip");
@@ -554,7 +535,7 @@ public class FurnitureData {
 
         public CompoundTag toTag() {
             CompoundTag tag = new CompoundTag();
-            tag.putString("Source", source.location().toString());
+            tag.putString("Source", source.toString());
             tag.putInt("Margin", margin);
             tag.putString("Wrap", wrap.name());
             tag.putBoolean("Rotate", rotate);
@@ -665,6 +646,36 @@ public class FurnitureData {
         public CompoundTag toTag() {
             CompoundTag tag = new CompoundTag();
             tag.putString("Pose", pose.name());
+            return tag;
+        }
+    }
+
+    public static class LightMaterialEffect {
+        public float roundness = 0.0f;
+        public float brightness = 0.0f;
+        public float contrast = 0.0f;
+
+        public LightMaterialEffect() {
+
+        }
+
+        public LightMaterialEffect(LightMaterialEffect lightEffect) {
+            this.roundness = lightEffect.roundness;
+            this.brightness = lightEffect.brightness;
+            this.contrast = lightEffect.contrast;
+        }
+
+        public void load(CompoundTag tag) {
+            roundness = tag.getFloat("Roundness");
+            brightness = tag.getFloat("Brightness");
+            contrast = tag.getFloat("Contrast");
+        }
+
+        public CompoundTag save() {
+            CompoundTag tag = new CompoundTag();
+            tag.putFloat("Roundness", roundness);
+            tag.putFloat("Brightness", brightness);
+            tag.putFloat("Contrast", contrast);
             return tag;
         }
     }
