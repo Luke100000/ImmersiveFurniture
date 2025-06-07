@@ -19,6 +19,9 @@ Initial release
 # Todo
 
 * Thread the editor
-* Finish interaction (sit, lay, etc.)
-* Hash local files rather than plain rename
+* Test if textures are loaded rather than generated
+* Text resource-packs, especially high-res ones
 * Icon
+* Retire Cobalt
+* Move to the multi-loader template
+* Test Forge

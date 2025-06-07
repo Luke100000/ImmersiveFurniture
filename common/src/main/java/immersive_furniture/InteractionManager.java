@@ -1,9 +1,8 @@
 package immersive_furniture;
 
+import immersive_furniture.data.FurnitureData;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.Pose;
-import org.joml.Vector3f;
 
 import java.util.Map;
 import java.util.UUID;
@@ -12,34 +11,21 @@ import java.util.concurrent.ConcurrentHashMap;
 public class InteractionManager {
     public static final InteractionManager INSTANCE = new InteractionManager();
 
-    public record Interaction(BlockPos pos, Vector3f offset, Pose pose) {
+    public record Interaction(BlockPos pos, FurnitureData.PoseOffset offset) {
 
     }
 
     private final Map<UUID, Interaction> interactions = new ConcurrentHashMap<>();
-    private final Map<Long, Interaction> blockInteractions = new ConcurrentHashMap<>();
 
-    public void addInteraction(Entity entity, BlockPos pos, Vector3f offset, Pose pose) {
-        if (interactions.containsKey(entity.getUUID())) {
-            clearInteraction(entity);
-        }
-        interactions.put(entity.getUUID(), new Interaction(pos, offset, pose));
-        blockInteractions.put(pos.asLong(), new Interaction(pos, offset, pose));
+    public void addInteraction(Entity entity, BlockPos pos, FurnitureData.PoseOffset offset) {
+        interactions.put(entity.getUUID(), new Interaction(pos, offset));
     }
 
-    public void clearInteraction(Entity entity) {
-        Interaction interaction = getInteraction(entity);
-        if (interaction != null) {
-            blockInteractions.remove(interaction.pos().asLong());
-            interactions.remove(entity.getUUID());
-        }
+    public void clearInteraction() {
+        interactions.clear();
     }
 
     public Interaction getInteraction(Entity entity) {
         return interactions.get(entity.getUUID());
-    }
-
-    public Interaction getInteraction(BlockPos pos) {
-        return blockInteractions.get(pos.asLong());
     }
 }

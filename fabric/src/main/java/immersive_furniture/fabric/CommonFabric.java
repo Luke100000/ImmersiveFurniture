@@ -20,6 +20,7 @@ public final class CommonFabric implements ModInitializer {
         Items.bootstrap();
         Blocks.bootstrap();
         BlockEntityTypes.bootstrap();
+        Entities.bootstrap();
         Sounds.bootstrap();
 
         Messages.loadMessages();

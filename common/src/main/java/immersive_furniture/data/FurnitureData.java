@@ -1,7 +1,9 @@
 package immersive_furniture.data;
 
+import immersive_furniture.Common;
 import immersive_furniture.config.Config;
 import immersive_furniture.utils.Utils;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.SimpleParticleType;
@@ -9,6 +11,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
@@ -17,6 +20,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
+import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.joml.Quaternionf;
@@ -194,6 +198,23 @@ public class FurnitureData {
         }
     }
 
+    public record PoseOffset(Vector3f offset, Pose pose, float rotation) {
+
+    }
+
+    public PoseOffset getClosestPose(Vec3 location, Direction direction) {
+        PoseOffset found = null;
+        for (Element element : elements) {
+            if (element.type == ElementType.PLAYER_POSE) {
+                Vector3f center = rotate(element.getRotationAxes().center(), direction).mul(1.0f / 16.0f);
+                if (found == null || location.distanceToSqr(center.x, center.y, center.z) < location.distanceToSqr(found.offset.x, found.offset.y, found.offset.z)) {
+                    found = new PoseOffset(center, element.playerPose.pose, (element.rotation + direction.toYRot() + 180) % 360.0f);
+                }
+            }
+        }
+        return found;
+    }
+
     public interface ParticleConsumer {
         void addParticle(SimpleParticleType particle, float x, float y, float z, float vx, float vy, float vz);
     }
@@ -247,24 +268,25 @@ public class FurnitureData {
         );
     }
 
-    public Pose getPose(int i) {
-        for (Element element : elements) {
-            if (element.type == ElementType.PLAYER_POSE) {
-                i--;
-                if (i < 0) {
-                    return element.playerPose.pose;
-                }
-            }
-        }
-        return null;
-    }
-
     public VoxelShape getShape(Direction rotation) {
         return cachedShapes.computeIfAbsent(rotation, this::computeShape);
     }
 
     private VoxelShape computeShape(Direction r) {
-        return elements.stream().map(element -> getBox(element, r)).reduce(Shapes::or).orElse(Shapes.empty());
+        return elements.stream()
+                .filter(e -> e.type == ElementType.ELEMENT)
+                .map(element -> getBox(element, r))
+                .reduce(Shapes::or)
+                .orElse(Shapes.empty());
+    }
+
+    private static Vector3f rotate(Vector3f vec, Direction direction) {
+        return switch (direction) {
+            case NORTH -> new Vector3f(16 - vec.x, vec.y, 16 - vec.z);
+            case EAST -> new Vector3f(16 - vec.z, vec.y, vec.x);
+            case WEST -> new Vector3f(vec.z, vec.y, 16 - vec.x);
+            default -> new Vector3f(vec);
+        };
     }
 
     private static VoxelShape getBox(Element element, Direction rotation) {
@@ -280,33 +302,17 @@ public class FurnitureData {
             to.z = Math.max(to.z, corner.z);
         }
 
-        switch (rotation) {
-            case SOUTH -> {
-                return Block.box(
-                        from.x, from.y, from.z,
-                        to.x, to.y, to.z
-                );
-            }
-            case NORTH -> {
-                return Block.box(
-                        16 - to.x, from.y, 16 - to.z,
-                        16 - from.x, to.y, 16 - from.z
-                );
-            }
-            case EAST -> {
-                return Block.box(
-                        from.z, from.y, 16 - to.x,
-                        to.z, to.y, 16 - from.x
-                );
-            }
-            case WEST -> {
-                return Block.box(
-                        16 - to.z, from.y, from.x,
-                        16 - from.z, to.y, to.x
-                );
-            }
-        }
-        return Shapes.empty();
+        Vector3f rotatedFrom = rotate(from, rotation);
+        Vector3f rotatedTo = rotate(to, rotation);
+
+        return Block.box(
+                Math.min(rotatedFrom.x, rotatedTo.x),
+                Math.min(rotatedFrom.y, rotatedTo.y),
+                Math.min(rotatedFrom.z, rotatedTo.z),
+                Math.max(rotatedFrom.x, rotatedTo.x),
+                Math.max(rotatedFrom.y, rotatedTo.y),
+                Math.max(rotatedFrom.z, rotatedTo.z)
+        );
     }
 
     public enum ElementType {
@@ -452,11 +458,13 @@ public class FurnitureData {
             if (type == ElementType.PLAYER_POSE) {
                 Vector3f center = getCenter();
                 from.x = center.x - 4.0f;
-                from.y = center.y - 0.5f;
+                from.y = center.y - 1.0f;
                 from.z = center.z - (playerPose.pose == Pose.SLEEPING ? 14.0f : 4.0f);
                 to.x = center.x + 4.0f;
-                to.y = center.y + 0.5f;
+                to.y = center.y + 1.0f;
                 to.z = center.z + (playerPose.pose == Pose.SLEEPING ? 14.0f : 4.0f);
+                rotation = 0.0f;
+                axis = Direction.Axis.Y;
             }
         }
 
@@ -522,6 +530,12 @@ public class FurnitureData {
             rotate = tag.getBoolean("Rotate");
             flip = tag.getBoolean("Flip");
             lightEffect.load(tag.getCompound("LightEffect"));
+
+            // TODO: Gather sources on export and print them in the tooltip, same with original author on modify
+            ResourceLocation resourceLocation = new ResourceLocation(source.getNamespace(), "textures/block/" + source.getPath() + ".png");
+            Minecraft.getInstance().getResourceManager().getResource(resourceLocation).ifPresent(resource -> {
+                Common.logger.info("Loading material {}", resource.source().packId());
+            });
         }
 
         public Material(Material material) {

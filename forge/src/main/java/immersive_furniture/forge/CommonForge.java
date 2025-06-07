@@ -19,6 +19,7 @@ public final class CommonForge {
         Items.bootstrap();
         Blocks.bootstrap();
         BlockEntityTypes.bootstrap();
+        Entities.bootstrap();
         Sounds.bootstrap();
 
         Messages.loadMessages();

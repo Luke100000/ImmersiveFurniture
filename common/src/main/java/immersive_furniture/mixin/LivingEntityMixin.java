@@ -6,9 +6,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.Pose;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.Vec3;
+import org.joml.Vector3f;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -38,26 +37,10 @@ public abstract class LivingEntityMixin extends Entity {
     private void immersiveFurniture$setPosToBed(BlockPos pos, CallbackInfo ci) {
         InteractionManager.Interaction interaction = InteractionManager.INSTANCE.getInteraction(this);
         if (interaction != null) {
-            this.setPos(pos.getX() + interaction.offset().x(), pos.getY() + interaction.offset().y(), pos.getZ() + interaction.offset().z());
+            Vector3f offset = interaction.offset().offset();
+            this.setPos(pos.getX() + offset.x(), pos.getY() + offset.y(), pos.getZ() + offset.z());
+            this.setYRot(interaction.offset().rotation());
             ci.cancel();
-        }
-    }
-
-    @Inject(method = "baseTick()V", at = @At("TAIL"))
-    private void immersiveFurniture$baseTick(CallbackInfo ci) {
-        InteractionManager.Interaction interaction = InteractionManager.INSTANCE.getInteraction(this);
-        if (interaction != null && interaction.pose() == Pose.SITTING) {
-            this.setPos(
-                    interaction.pos().getX() + interaction.offset().x(),
-                    interaction.pos().getY() + interaction.offset().y(),
-                    interaction.pos().getZ() + interaction.offset().z()
-            );
-
-            // Auto-leave
-            Vec3 movement = getDeltaMovement();
-            if (isCrouching() && movement.x() * movement.x() + movement.z() * movement.z() > 0.1) {
-                InteractionManager.INSTANCE.clearInteraction(this);
-            }
         }
     }
 }

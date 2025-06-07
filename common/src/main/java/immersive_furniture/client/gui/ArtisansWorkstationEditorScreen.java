@@ -433,6 +433,13 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
         if (selectedElement != null) {
             drawSelection(graphics, selectedElement, pose, 0.5f, true);
         }
+
+        // Highlight all non-solid elements
+        for (FurnitureData.Element element : data.elements) {
+            if (element.type != FurnitureData.ElementType.ELEMENT) {
+                drawSelection(graphics, element, pose, 0.4f, true);
+            }
+        }
     }
 
     void drawSelection(GuiGraphics graphics, FurnitureData.Element element, Matrix4f pose, float width, boolean overlay) {

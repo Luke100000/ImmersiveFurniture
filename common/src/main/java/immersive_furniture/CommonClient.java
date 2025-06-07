@@ -20,6 +20,7 @@ public class CommonClient {
         DynamicAtlas.ENTITY.clear();
 
         DelayedFurnitureRenderer.INSTANCE.clear();
+        InteractionManager.INSTANCE.clearInteraction();
     }
 
     public static void tick() {

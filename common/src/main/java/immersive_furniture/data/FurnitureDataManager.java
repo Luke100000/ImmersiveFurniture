@@ -13,6 +13,8 @@ import net.minecraft.resources.ResourceLocation;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
@@ -42,7 +44,16 @@ public class FurnitureDataManager {
     }
 
     public static String toSafeName(String input) {
-        return input.replaceAll("[^a-z0-9_\\-.]", "_");
+        String safe = input.replaceAll("[^a-z0-9_\\-.]", "_");
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(input.getBytes());
+            StringBuilder hex = new StringBuilder();
+            for (byte b : hash) hex.append(String.format("%02x", b));
+            return safe + "_" + hex;
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static List<ResourceLocation> getLocalFiles() {

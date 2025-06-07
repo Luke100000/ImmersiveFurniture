@@ -40,7 +40,9 @@ public class EntityFurnitureBlock extends BaseFurnitureBlock implements EntityBl
         if (!level.isClientSide) {
             BlockEntity blockEntity = level.getBlockEntity(pos);
             if (blockEntity instanceof FurnitureBlockEntity furnitureBlockEntity) {
-                player.openMenu(furnitureBlockEntity);
+                if (player.openMenu(furnitureBlockEntity).isPresent()) {
+                    return InteractionResult.CONSUME;
+                }
             }
         }
         return super.use(state, level, pos, player, hand, hit);

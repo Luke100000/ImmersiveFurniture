@@ -33,7 +33,9 @@ public class FurnitureModelFactory {
         // Populate AO lookup
         ao = new AmbientOcclusion();
         for (FurnitureData.Element element : data.elements) {
-            ao.place(element);
+            if (element.type == FurnitureData.ElementType.ELEMENT) {
+                ao.place(element);
+            }
         }
 
         this.data = data;
