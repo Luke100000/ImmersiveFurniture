@@ -117,7 +117,7 @@ public class FurnitureModelFactory {
                 }
             }
 
-            atlas.upload();
+            atlas.setDirty();
 
             if (!useBaked) {
                 element.bakedTexture.put(direction, baked);

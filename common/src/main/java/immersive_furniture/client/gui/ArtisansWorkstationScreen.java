@@ -74,16 +74,28 @@ public abstract class ArtisansWorkstationScreen extends Screen {
         graphics.pose().mulPose(new Quaternionf().rotateX(pitch).rotateY(yaw));
         graphics.pose().translate(-0.5, 0.5, -0.5);
         graphics.pose().mulPoseMatrix(new Matrix4f().scaling(1, -1, 1));
-        renderModel(graphics, data, yaw, pitch);
+        renderModel(graphics, data, yaw, pitch, false);
         graphics.pose().popPose();
     }
 
-    static void renderModel(GuiGraphics graphics, FurnitureData data, float yaw, float pitch) {
-        BlockRenderDispatcher blockRenderer = Minecraft.getInstance().getBlockRenderer();
-        BakedModel bakedModel = FurnitureModelBaker.getModel(data, DynamicAtlas.SCRATCH);
+    private static BakedModel lastBakedModel = null;
+
+    static void renderModel(GuiGraphics graphics, FurnitureData data, float yaw, float pitch, boolean useLastBakedModel) {
+        BakedModel bakedModel = FurnitureModelBaker.getAsyncModel(data, DynamicAtlas.SCRATCH);
+        if (useLastBakedModel) {
+            if (bakedModel == null) {
+                bakedModel = lastBakedModel;
+            } else {
+                lastBakedModel = bakedModel;
+            }
+        }
         ResourceLocation location = DynamicAtlas.SCRATCH.getLocation();
         VertexConsumer consumer = graphics.bufferSource().getBuffer(RenderType.entityCutout(location));
-        blockRenderer.getModelRenderer().renderModel(graphics.pose().last(), consumer, null, bakedModel, 1.0f, 1.0f, 1.0f, 0xF000F0, OverlayTexture.NO_OVERLAY);
+        if (bakedModel != null) {
+            DynamicAtlas.SCRATCH.uploadIfDirty();
+            BlockRenderDispatcher blockRenderer = Minecraft.getInstance().getBlockRenderer();
+            blockRenderer.getModelRenderer().renderModel(graphics.pose().last(), consumer, null, bakedModel, 1.0f, 1.0f, 1.0f, 0xF000F0, OverlayTexture.NO_OVERLAY);
+        }
 
         // Particles
         long time = System.currentTimeMillis() / 50;

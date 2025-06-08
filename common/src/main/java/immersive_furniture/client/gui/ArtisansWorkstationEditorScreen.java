@@ -368,7 +368,7 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
         Lighting.setupLevel(new Matrix4f().rotateX(pitch).rotateY(yaw));
 
         // Render the model
-        renderModel(graphics, data, yaw, pitch);
+        renderModel(graphics, data, yaw, pitch, true);
         graphics.flush();
 
         Lighting.setupFor3DItems();

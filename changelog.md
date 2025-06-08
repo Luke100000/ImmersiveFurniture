@@ -18,7 +18,6 @@ Initial release
 
 # Todo
 
-* Thread the editor
 * Icon
 * Retire Cobalt
 * Move to the multi-loader template

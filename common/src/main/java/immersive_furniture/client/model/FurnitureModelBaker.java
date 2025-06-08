@@ -7,6 +7,8 @@ import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.resources.model.*;
 import net.minecraft.resources.ResourceLocation;
 
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.function.Supplier;
 
 public class FurnitureModelBaker {
@@ -56,6 +58,24 @@ public class FurnitureModelBaker {
         }
     }
 
+    private final static Executor executor = Executors.newSingleThreadExecutor();
+
+    public static BakedModel getAsyncModel(FurnitureData data, DynamicAtlas atlas) {
+        if (atlas.knownFurniture.containsKey(data.getHash())) {
+            return getModel(data, atlas, 0, false);
+        } else {
+            if (!atlas.asyncRequestedFurniture.contains(data.getHash())) {
+                atlas.asyncRequestedFurniture.add(data.getHash());
+                executor.execute(() -> {
+                    if (getModel(data, atlas, 0, false) == null) {
+                        atlas.asyncRequestedFurniture.remove(data.getHash());
+                    }
+                });
+            }
+            return null;
+        }
+    }
+
     public static BakedModel getModel(FurnitureData data, DynamicAtlas atlas) {
         return getModel(data, atlas, 0, true);
     }
@@ -70,14 +90,18 @@ public class FurnitureModelBaker {
         }
 
         if (exist) {
+            atlas.uploadIfDirty();
             return atlas.knownFurniture.get(hash).get(yRot);
         } else {
+            float previousUsage = atlas.getUsage();
             BlockModel model = FurnitureModelFactory.getModel(data, atlas);
+            atlas.uploadIfDirty();
+
             CachedBakedModelSet modelSet = new CachedBakedModelSet(atlas, model);
             atlas.knownFurniture.put(hash, modelSet);
 
             // Only add when forced or the atlas had space
-            if (force || !atlas.isFull()) {
+            if (force || !atlas.isFull() && atlas.getUsage() >= previousUsage) {
                 return modelSet.get(yRot);
             } else {
                 atlas.knownFurniture.remove(hash);

@@ -1,5 +1,6 @@
 package immersive_furniture.client.model;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import immersive_furniture.Common;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.DynamicTexture;
@@ -8,11 +9,9 @@ import net.minecraft.client.resources.metadata.animation.AnimationMetadataSectio
 import net.minecraft.client.resources.metadata.animation.FrameSize;
 import net.minecraft.resources.ResourceLocation;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 public class DynamicAtlas extends DynamicTexture {
     public static final DynamicAtlas BAKED = new DynamicAtlas(512, "baked");
@@ -26,8 +25,10 @@ public class DynamicAtlas extends DynamicTexture {
     List<Quad> quads = new LinkedList<>();
 
     public Map<String, FurnitureModelBaker.CachedBakedModelSet> knownFurniture = new ConcurrentHashMap<>();
+    public Set<String> asyncRequestedFurniture = new ConcurrentSkipListSet<>();
 
     public final TextureAtlasSpriteAccessor sprite;
+    private boolean dirty = false;
 
     public DynamicAtlas(int size, String name) {
         super(size, size, false);
@@ -75,6 +76,7 @@ public class DynamicAtlas extends DynamicTexture {
         allocated = 0;
         full = false;
         knownFurniture.clear();
+        asyncRequestedFurniture.clear();
     }
 
     public boolean isFull() {
@@ -91,6 +93,17 @@ public class DynamicAtlas extends DynamicTexture {
 
     public int getSize() {
         return size;
+    }
+
+    public void setDirty() {
+        this.dirty = true;
+    }
+
+    public void uploadIfDirty() {
+        if (dirty && RenderSystem.isOnRenderThreadOrInit()) {
+            this.upload();
+            dirty = false;
+        }
     }
 
     public record Quad(int x, int y, int w, int h) {
