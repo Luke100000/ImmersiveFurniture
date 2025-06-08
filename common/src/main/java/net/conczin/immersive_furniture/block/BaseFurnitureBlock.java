@@ -1,10 +1,10 @@
 package net.conczin.immersive_furniture.block;
 
 import net.conczin.immersive_furniture.InteractionManager;
-import net.conczin.immersive_furniture.Items;
 import net.conczin.immersive_furniture.data.FurnitureData;
 import net.conczin.immersive_furniture.entity.SittingEntity;
 import net.conczin.immersive_furniture.item.FurnitureItem;
+import net.conczin.immersive_furniture.item.Items;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
@@ -141,21 +141,17 @@ public abstract class BaseFurnitureBlock extends Block implements SimpleWaterlog
 
     @Override
     public Item asItem() {
-        return Items.FURNITURE.get();
+        return Items.FURNITURE;
     }
 
     @Override
     public ItemStack getCloneItemStack(BlockGetter level, BlockPos pos, BlockState state) {
-        if (level.getBlockEntity(pos) instanceof FurnitureBlockEntity furnitureBlockEntity) {
-            ItemStack itemStack = new ItemStack(asItem());
-            FurnitureData data = furnitureBlockEntity.getData();
-            if (data != null) {
-                FurnitureItem.setData(itemStack, data);
-            }
-            return itemStack;
-        } else {
-            return super.getCloneItemStack(level, pos, state);
+        ItemStack itemStack = new ItemStack(asItem());
+        FurnitureData data = getData(state, level, pos);
+        if (data != null) {
+            FurnitureItem.setData(itemStack, data);
         }
+        return itemStack;
     }
 
     @Override

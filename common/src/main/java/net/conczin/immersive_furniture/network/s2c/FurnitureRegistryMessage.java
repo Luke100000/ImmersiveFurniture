@@ -1,15 +1,15 @@
 package net.conczin.immersive_furniture.network.s2c;
 
-import net.conczin.immersive_furniture.cobalt.network.Message;
 import net.conczin.immersive_furniture.data.FurnitureDataManager;
 import net.conczin.immersive_furniture.data.FurnitureRegistry;
+import net.conczin.immersive_furniture.network.ImmersivePayload;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 
 import java.util.Map;
 
-public class FurnitureRegistryMessage extends Message {
+public class FurnitureRegistryMessage implements ImmersivePayload {
     Map<Integer, String> registry;
 
     public FurnitureRegistryMessage(Map<Integer, String> registry) {
@@ -26,7 +26,7 @@ public class FurnitureRegistryMessage extends Message {
     }
 
     @Override
-    public void receive(Player e) {
+    public void handle(Player e) {
         FurnitureRegistry.INSTANCE.identifierToHash.putAll(registry);
         for (Map.Entry<Integer, String> entry : registry.entrySet()) {
             FurnitureRegistry.INSTANCE.hashToIdentifier.put(entry.getValue(), entry.getKey());

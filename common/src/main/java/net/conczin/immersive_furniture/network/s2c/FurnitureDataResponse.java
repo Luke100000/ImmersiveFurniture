@@ -1,14 +1,14 @@
 package net.conczin.immersive_furniture.network.s2c;
 
-import net.conczin.immersive_furniture.data.FurnitureDataManager;
-import net.conczin.immersive_furniture.cobalt.network.Message;
 import net.conczin.immersive_furniture.data.FurnitureData;
+import net.conczin.immersive_furniture.data.FurnitureDataManager;
+import net.conczin.immersive_furniture.network.ImmersivePayload;
 import net.conczin.immersive_furniture.utils.Utils;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 
-public class FurnitureDataResponse extends Message {
+public class FurnitureDataResponse implements ImmersivePayload {
     public String hash;
     public FurnitureData data;
 
@@ -29,7 +29,7 @@ public class FurnitureDataResponse extends Message {
     }
 
     @Override
-    public void receive(Player e) {
+    public void handle(Player e) {
         FurnitureDataManager.save(data, new ResourceLocation("hash", hash));
     }
 }

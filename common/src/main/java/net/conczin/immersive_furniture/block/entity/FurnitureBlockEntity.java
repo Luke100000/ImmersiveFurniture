@@ -1,6 +1,5 @@
-package net.conczin.immersive_furniture.block;
+package net.conczin.immersive_furniture.block.entity;
 
-import net.conczin.immersive_furniture.BlockEntityTypes;
 import net.conczin.immersive_furniture.config.Config;
 import net.conczin.immersive_furniture.data.FurnitureData;
 import net.conczin.immersive_furniture.data.FurnitureDataManager;
@@ -34,15 +33,7 @@ public class FurnitureBlockEntity extends BlockEntity implements Container, Menu
     private final NonNullList<ItemStack> items = NonNullList.withSize(81, ItemStack.EMPTY);
 
     public FurnitureBlockEntity(BlockPos pos, BlockState blockState) {
-        super(BlockEntityTypes.FURNITURE.get(), pos, blockState);
-    }
-
-    public static void serverTick(Level level, BlockPos pos, BlockState state, FurnitureBlockEntity blockEntity) {
-
-    }
-
-    public static void clientTick(Level level, BlockPos pos, BlockState state, FurnitureBlockEntity blockEntity) {
-        // TODO: If required, this ticker is of higher precision than the random animate tick
+        super(BlockEntityTypes.FURNITURE, pos, blockState);
     }
 
     @Override
@@ -152,10 +143,10 @@ public class FurnitureBlockEntity extends BlockEntity implements Container, Menu
 
     @Override
     public AbstractContainerMenu createMenu(int containerId, Inventory inventory, Player player) {
-        int rows = getData().inventorySize;
-        if (rows == 0) {
-            return null;
-        }
+        FurnitureData data = getData();
+        if (data == null) return null;
+        int rows = data.inventorySize;
+        if (rows == 0) return null;
 
         MenuType<?> menuType = switch (rows) {
             case 6 -> MenuType.GENERIC_9x6;

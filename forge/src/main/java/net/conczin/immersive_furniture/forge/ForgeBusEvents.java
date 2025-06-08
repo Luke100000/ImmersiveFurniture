@@ -2,11 +2,8 @@ package net.conczin.immersive_furniture.forge;
 
 import net.conczin.immersive_furniture.Common;
 import net.conczin.immersive_furniture.CommonClient;
-import net.conczin.immersive_furniture.Items;
 import net.conczin.immersive_furniture.data.ServerFurnitureRegistry;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.item.CreativeModeTabs;
-import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;

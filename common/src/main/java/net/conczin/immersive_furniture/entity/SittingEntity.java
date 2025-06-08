@@ -1,6 +1,5 @@
 package net.conczin.immersive_furniture.entity;
 
-import net.conczin.immersive_furniture.Entities;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
@@ -17,7 +16,7 @@ public class SittingEntity extends Entity {
     }
 
     public SittingEntity(Level level, Vec3 pos, Vec3 dismountPosition) {
-        super(Entities.SITTING.get(), level);
+        super(Entities.SITTING, level);
 
         setPos(pos.x, pos.y, pos.z);
 

@@ -1,10 +1,10 @@
 package net.conczin.immersive_furniture.data;
 
 import net.conczin.immersive_furniture.Common;
-import net.conczin.immersive_furniture.cobalt.network.NetworkHandler;
 import net.conczin.immersive_furniture.data.api.API;
 import net.conczin.immersive_furniture.data.api.responses.ContentResponse;
 import net.conczin.immersive_furniture.data.api.responses.Response;
+import net.conczin.immersive_furniture.network.Network;
 import net.conczin.immersive_furniture.network.c2s.FurnitureDataRequest;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
@@ -149,7 +149,7 @@ public class FurnitureDataManager {
                     }
                 });
             } else if (id.getNamespace().equals("hash")) {
-                NetworkHandler.sendToServer(new FurnitureDataRequest(id.getPath()));
+                Network.sendToServer(new FurnitureDataRequest(id.getPath()));
             }
         }
         return DATA.get(id);

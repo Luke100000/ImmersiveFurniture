@@ -1,15 +1,15 @@
 package net.conczin.immersive_furniture.network.c2s;
 
 import net.conczin.immersive_furniture.data.FurnitureDataManager;
-import net.conczin.immersive_furniture.cobalt.network.Message;
-import net.conczin.immersive_furniture.cobalt.network.NetworkHandler;
 import net.conczin.immersive_furniture.data.FurnitureData;
+import net.conczin.immersive_furniture.network.ImmersivePayload;
+import net.conczin.immersive_furniture.network.Network;
 import net.conczin.immersive_furniture.network.s2c.FurnitureDataResponse;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 
-public class FurnitureDataRequest extends Message {
+public class FurnitureDataRequest implements ImmersivePayload {
     public String hash;
 
     public FurnitureDataRequest(String hash) {
@@ -26,14 +26,14 @@ public class FurnitureDataRequest extends Message {
     }
 
     @Override
-    public void receive(Player e) {
+    public void handle(Player e) {
         if (e instanceof ServerPlayer sp) {
             FurnitureData data = FurnitureDataManager.getData(hash);
 
             // Cache damaged, it's better to return fallback data
             if (data == null) data = FurnitureData.EMPTY;
 
-            NetworkHandler.sendToPlayer(new FurnitureDataResponse(hash, data), sp);
+            Network.sendToPlayer(new FurnitureDataResponse(hash, data), sp);
         }
     }
 }

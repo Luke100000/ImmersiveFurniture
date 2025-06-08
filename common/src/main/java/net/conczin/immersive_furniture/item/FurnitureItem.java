@@ -1,6 +1,6 @@
 package net.conczin.immersive_furniture.item;
 
-import net.conczin.immersive_furniture.Blocks;
+import net.conczin.immersive_furniture.block.Blocks;
 import net.conczin.immersive_furniture.block.EntityFurnitureBlock;
 import net.conczin.immersive_furniture.block.FurnitureBlock;
 import net.conczin.immersive_furniture.block.LightFurnitureBlock;
@@ -29,7 +29,7 @@ public class FurnitureItem extends BlockItem {
     public static final String FURNITURE_HASH = "FurnitureHash";
 
     public FurnitureItem(Properties settings) {
-        super(Blocks.FURNITURE.get(), settings);
+        super(Blocks.FURNITURE, settings);
     }
 
     @Override
@@ -95,14 +95,14 @@ public class FurnitureItem extends BlockItem {
 
         BlockState state;
         if (identifier < 0) {
-            state = Objects.requireNonNull(Blocks.FURNITURE_ENTITY.get().getStateForPlacement(context))
+            state = Objects.requireNonNull(Blocks.FURNITURE_ENTITY.getStateForPlacement(context))
                     .setValue(EntityFurnitureBlock.LIGHT, data.lightLevel);
         } else if (data.lightLevel > 0) {
-            state = Objects.requireNonNull(Blocks.FURNITURE_LIGHT.get().getStateForPlacement(context))
+            state = Objects.requireNonNull(Blocks.FURNITURE_LIGHT.getStateForPlacement(context))
                     .setValue(LightFurnitureBlock.IDENTIFIER, identifier - 65536)
                     .setValue(LightFurnitureBlock.LIGHT, (int) Math.ceil(data.lightLevel / 3.0f));
         } else {
-            state = Objects.requireNonNull(Blocks.FURNITURE.get().getStateForPlacement(context))
+            state = Objects.requireNonNull(Blocks.FURNITURE.getStateForPlacement(context))
                     .setValue(FurnitureBlock.IDENTIFIER, identifier);
         }
 

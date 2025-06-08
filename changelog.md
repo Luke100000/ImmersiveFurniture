@@ -19,6 +19,3 @@ Initial release
 # Todo
 
 * Icon
-* Retire Cobalt
-* Move to the multi-loader template
-* Test Forge

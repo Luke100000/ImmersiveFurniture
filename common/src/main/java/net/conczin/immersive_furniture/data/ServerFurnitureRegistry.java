@@ -1,7 +1,7 @@
 package net.conczin.immersive_furniture.data;
 
-import net.conczin.immersive_furniture.cobalt.network.NetworkHandler;
 import net.conczin.immersive_furniture.config.Config;
+import net.conczin.immersive_furniture.network.Network;
 import net.conczin.immersive_furniture.network.s2c.FurnitureRegistryMessage;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
@@ -13,7 +13,7 @@ import java.util.Map;
 
 public class ServerFurnitureRegistry {
     public static FurnitureRegistrySavedData getData(ServerLevel level) {
-        return level.getServer().overworld().getDataStorage().computeIfAbsent(FurnitureRegistrySavedData::new, FurnitureRegistrySavedData::new, "net/conczin/immersive_furniture");
+        return level.getServer().overworld().getDataStorage().computeIfAbsent(FurnitureRegistrySavedData::new, FurnitureRegistrySavedData::new, "immersive_furniture");
     }
 
     public static void increase(ServerLevel level, FurnitureData data) {
@@ -49,7 +49,7 @@ public class ServerFurnitureRegistry {
                 // Sync with players
                 FurnitureRegistryMessage message = new FurnitureRegistryMessage(Map.of(identifier, hash));
                 for (ServerPlayer player : level.players()) {
-                    NetworkHandler.sendToPlayer(message, player);
+                    Network.sendToPlayer(message, player);
                 }
 
                 return identifier;
@@ -71,14 +71,14 @@ public class ServerFurnitureRegistry {
 
             if (subMap.size() >= chunkSize) {
                 FurnitureRegistryMessage message = new FurnitureRegistryMessage(subMap);
-                NetworkHandler.sendToPlayer(message, player);
+                Network.sendToPlayer(message, player);
                 subMap.clear();
             }
         }
 
         if (!subMap.isEmpty()) {
             FurnitureRegistryMessage message = new FurnitureRegistryMessage(subMap);
-            NetworkHandler.sendToPlayer(message, player);
+            Network.sendToPlayer(message, player);
         }
     }
 

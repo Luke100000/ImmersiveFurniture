@@ -2,14 +2,14 @@ package net.conczin.immersive_furniture.client.gui;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import net.conczin.immersive_furniture.Common;
-import net.conczin.immersive_furniture.Items;
+import net.conczin.immersive_furniture.item.Items;
 import net.conczin.immersive_furniture.client.gui.widgets.StateImageButton;
-import net.conczin.immersive_furniture.cobalt.network.NetworkHandler;
 import net.conczin.immersive_furniture.data.FurnitureData;
 import net.conczin.immersive_furniture.data.FurnitureDataManager;
 import net.conczin.immersive_furniture.data.api.API;
 import net.conczin.immersive_furniture.data.api.Auth;
 import net.conczin.immersive_furniture.data.api.responses.*;
+import net.conczin.immersive_furniture.network.Network;
 import net.conczin.immersive_furniture.network.s2c.CraftRequest;
 import net.conczin.immersive_furniture.utils.Utils;
 import net.minecraft.ChatFormatting;
@@ -286,7 +286,7 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
             // Craft
             addRenderableWidget(
                     Button.builder(Component.translatable("gui.immersive_furniture.craft"), b -> {
-                                NetworkHandler.sendToServer(new CraftRequest(FurnitureDataManager.getData(selected), holdingShift()));
+                                Network.sendToServer(new CraftRequest(FurnitureDataManager.getData(selected), holdingShift()));
                                 Minecraft.getInstance().setScreen(null);
                             })
                             .bounds(leftPos + windowWidth - 68, topPos + windowHeight - 24, 64, 20)
@@ -363,12 +363,12 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
                 graphics.pose().scale(1.5f, 1.5f, 1.5f);
                 MutableComponent cost = Component.literal(String.valueOf(data.getCost()));
                 graphics.drawString(font, cost, -font.width(cost) - 26, -17, 0xFFFFFF);
-                graphics.renderFakeItem(Items.CRAFTING_MATERIAL.get().getDefaultInstance(), -22, -22);
+                graphics.renderFakeItem(Items.CRAFTING_MATERIAL.getDefaultInstance(), -22, -22);
                 graphics.pose().popPose();
 
                 // Material tooltip
                 if (lastMouseX >= leftPos + windowWidth - 32 - 6 && lastMouseX < leftPos + windowWidth - 6 && lastMouseY >= topPos + windowHeight - 32 - 32 && lastMouseY < topPos + windowHeight - 32) {
-                    tooltip = Items.CRAFTING_MATERIAL.get().getDefaultInstance().getTooltipLines(null, TooltipFlag.Default.NORMAL);
+                    tooltip = Items.CRAFTING_MATERIAL.getDefaultInstance().getTooltipLines(null, TooltipFlag.Default.NORMAL);
                 }
             }
         }

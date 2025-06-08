@@ -4,7 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import net.conczin.immersive_furniture.block.BaseFurnitureBlock;
-import net.conczin.immersive_furniture.block.FurnitureBlockEntity;
+import net.conczin.immersive_furniture.block.entity.FurnitureBlockEntity;
 import net.conczin.immersive_furniture.client.model.DynamicAtlas;
 import net.conczin.immersive_furniture.client.model.FurnitureModelBaker;
 import net.conczin.immersive_furniture.data.FurnitureData;

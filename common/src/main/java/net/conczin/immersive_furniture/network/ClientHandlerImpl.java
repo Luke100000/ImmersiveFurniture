@@ -1,6 +1,5 @@
-package net.conczin.immersive_furniture.client;
+package net.conczin.immersive_furniture.network;
 
-import net.conczin.immersive_furniture.ClientHandler;
 import net.conczin.immersive_furniture.client.gui.ArtisansWorkstationLibraryScreen;
 import net.minecraft.client.Minecraft;
 

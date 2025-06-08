@@ -1,8 +1,8 @@
 package net.conczin.immersive_furniture.fabric;
 
-import net.conczin.immersive_furniture.BlockEntityTypes;
+import net.conczin.immersive_furniture.block.entity.BlockEntityTypes;
 import net.conczin.immersive_furniture.CommonClient;
-import net.conczin.immersive_furniture.Entities;
+import net.conczin.immersive_furniture.entity.Entities;
 import net.conczin.immersive_furniture.client.renderer.FurnitureBlockEntityRenderer;
 import net.conczin.immersive_furniture.client.renderer.SittingEntityRenderer;
 import net.fabricmc.api.ClientModInitializer;
@@ -40,7 +40,7 @@ public final class ClientFabric implements ClientModInitializer {
             }
         });
 
-        BlockEntityRenderers.register(BlockEntityTypes.FURNITURE.get(), FurnitureBlockEntityRenderer::new);
-        EntityRendererRegistry.register(Entities.SITTING.get(), SittingEntityRenderer::new);
+        BlockEntityRenderers.register(BlockEntityTypes.FURNITURE, FurnitureBlockEntityRenderer::new);
+        EntityRendererRegistry.register(Entities.SITTING, SittingEntityRenderer::new);
     }
 }

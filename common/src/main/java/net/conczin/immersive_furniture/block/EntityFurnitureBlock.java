@@ -1,6 +1,6 @@
 package net.conczin.immersive_furniture.block;
 
-import net.conczin.immersive_furniture.BlockEntityTypes;
+import net.conczin.immersive_furniture.block.entity.FurnitureBlockEntity;
 import net.conczin.immersive_furniture.data.FurnitureData;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -84,19 +84,5 @@ public class EntityFurnitureBlock extends BaseFurnitureBlock implements EntityBl
             Containers.dropContents(level, pos, ((FurnitureBlockEntity) blockEntity).getItems());
         }
         super.onRemove(state, level, pos, newState, movedByPiston);
-    }
-
-    @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> blockEntityType) {
-        if (level.isClientSide) {
-            return createTickerHelper(blockEntityType, BlockEntityTypes.FURNITURE.get(), FurnitureBlockEntity::clientTick);
-        } else {
-            return createTickerHelper(blockEntityType, BlockEntityTypes.FURNITURE.get(), FurnitureBlockEntity::serverTick);
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    protected static <E extends BlockEntity, A extends BlockEntity> BlockEntityTicker<A> createTickerHelper(BlockEntityType<A> serverType, BlockEntityType<E> clientType, BlockEntityTicker<? super E> ticker) {
-        return clientType == serverType ? (BlockEntityTicker<A>) ticker : null;
     }
 }

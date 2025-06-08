@@ -1,9 +1,9 @@
 package net.conczin.immersive_furniture.network.s2c;
 
 import net.conczin.immersive_furniture.Sounds;
-import net.conczin.immersive_furniture.cobalt.network.Message;
 import net.conczin.immersive_furniture.data.FurnitureData;
 import net.conczin.immersive_furniture.item.FurnitureItem;
+import net.conczin.immersive_furniture.network.ImmersivePayload;
 import net.conczin.immersive_furniture.utils.Utils;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
@@ -13,10 +13,10 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
-import static net.conczin.immersive_furniture.Items.CRAFTING_MATERIAL;
-import static net.conczin.immersive_furniture.Items.FURNITURE;
+import static net.conczin.immersive_furniture.item.Items.CRAFTING_MATERIAL;
+import static net.conczin.immersive_furniture.item.Items.FURNITURE;
 
-public class CraftRequest extends Message {
+public class CraftRequest implements ImmersivePayload {
     FurnitureData data;
     boolean shift;
 
@@ -39,7 +39,7 @@ public class CraftRequest extends Message {
     }
 
     @Override
-    public void receive(Player e) {
+    public void handle(Player e) {
         if (!isValid(data)) return;
 
         int cost = data.getCost();
@@ -58,7 +58,7 @@ public class CraftRequest extends Message {
                 useResources(e, amount * cost);
             }
             giveFurniture(e, data, amount);
-            e.level().playLocalSound(e.getOnPos(), Sounds.REPAIR.get(), SoundSource.BLOCKS, 1.0F, e.getRandom().nextFloat() * 0.5f + 0.75f, false);
+            e.level().playLocalSound(e.getOnPos(), Sounds.REPAIR, SoundSource.BLOCKS, 1.0F, e.getRandom().nextFloat() * 0.5f + 0.75f, false);
         }
     }
 
@@ -67,7 +67,7 @@ public class CraftRequest extends Message {
     }
 
     private static boolean isValidItem(ItemStack stack) {
-        return stack.getItem() == CRAFTING_MATERIAL.get();
+        return stack.getItem() == CRAFTING_MATERIAL;
     }
 
     private int getResources(Player e) {
@@ -99,7 +99,7 @@ public class CraftRequest extends Message {
     }
 
     private void giveFurniture(Player e, FurnitureData data, int count) {
-        ItemStack stack = new ItemStack(FURNITURE.get(), count);
+        ItemStack stack = new ItemStack(FURNITURE, count);
         FurnitureItem.setData(stack, data);
         if (!e.getInventory().add(stack)) {
             e.drop(stack, false);
