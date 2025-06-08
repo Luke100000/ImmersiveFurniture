@@ -343,7 +343,7 @@ public class FurnitureData {
                 .filter(e -> e.type == ElementType.ELEMENT)
                 .map(element -> getBox(element, r))
                 .reduce(Shapes::or)
-                .orElse(Shapes.empty());
+                .orElse(Shapes.block());
     }
 
     private static Vector3f rotate(Vector3f vec, Direction direction) {

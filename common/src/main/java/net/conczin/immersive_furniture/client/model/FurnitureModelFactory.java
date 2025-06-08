@@ -47,6 +47,7 @@ public class FurnitureModelFactory {
         Vector3f[] vertices = ClientModelUtils.getVertices(element, direction, fs, null);
         for (FurnitureData.Element otherElement : data.elements) {
             if (otherElement == element) continue;
+            if (otherElement.type != FurnitureData.ElementType.ELEMENT) continue;
             if (fullyContained(otherElement, vertices)) return null;
         }
 
