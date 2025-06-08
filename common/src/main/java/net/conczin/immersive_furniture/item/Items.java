@@ -1,7 +1,7 @@
 package net.conczin.immersive_furniture.item;
 
-import net.conczin.immersive_furniture.block.Blocks;
 import net.conczin.immersive_furniture.Common;
+import net.conczin.immersive_furniture.block.Blocks;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 

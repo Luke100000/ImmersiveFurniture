@@ -1,8 +1,8 @@
 package net.conczin.immersive_furniture;
 
-import net.conczin.immersive_furniture.network.ClientHandlerImpl;
 import net.conczin.immersive_furniture.client.DelayedFurnitureRenderer;
 import net.conczin.immersive_furniture.client.model.DynamicAtlas;
+import net.conczin.immersive_furniture.network.ClientHandlerImpl;
 
 public class CommonClient {
     public static void postLoad() {

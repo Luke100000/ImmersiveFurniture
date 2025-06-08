@@ -1,7 +1,7 @@
 package net.conczin.immersive_furniture.mixin.client;
 
-import net.conczin.immersive_furniture.data.MaterialRegistry;
 import net.conczin.immersive_furniture.client.model.MaterialSource;
+import net.conczin.immersive_furniture.data.MaterialRegistry;
 import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.Material;

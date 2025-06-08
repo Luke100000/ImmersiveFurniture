@@ -1,7 +1,6 @@
 package net.conczin.immersive_furniture.client;
 
 import org.joml.Vector3f;
-import org.joml.Vector4f;
 
 public class Utils {
     public static boolean isWithinQuad(float x, float y, Vector3f[] quad) {

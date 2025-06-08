@@ -25,7 +25,6 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
-import org.spongepowered.asm.mixin.Unique;
 
 public class FurnitureBlockEntityRenderer<T extends FurnitureBlockEntity> implements BlockEntityRenderer<T> {
     public FurnitureBlockEntityRenderer(BlockEntityRendererProvider.Context ignoredContext) {

@@ -1,7 +1,6 @@
 package net.conczin.immersive_furniture;
 
 import net.conczin.immersive_furniture.network.ClientHandler;
-import net.conczin.immersive_furniture.network.Network;
 import net.minecraft.resources.ResourceLocation;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

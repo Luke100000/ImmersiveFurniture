@@ -1,7 +1,7 @@
 package net.conczin.immersive_furniture.network.c2s;
 
-import net.conczin.immersive_furniture.data.FurnitureDataManager;
 import net.conczin.immersive_furniture.data.FurnitureData;
+import net.conczin.immersive_furniture.data.FurnitureDataManager;
 import net.conczin.immersive_furniture.network.ImmersivePayload;
 import net.conczin.immersive_furniture.network.Network;
 import net.conczin.immersive_furniture.network.s2c.FurnitureDataResponse;

@@ -26,7 +26,8 @@ public abstract class LivingEntityMixin extends Entity {
     @Shadow
     public abstract Optional<BlockPos> getSleepingPos();
 
-    @Shadow public abstract void setYBodyRot(float offset);
+    @Shadow
+    public abstract void setYBodyRot(float offset);
 
     @Inject(method = "checkBedExists()Z", at = @At("HEAD"), cancellable = true)
     private void immersiveFurniture$checkBedExists(CallbackInfoReturnable<Boolean> cir) {

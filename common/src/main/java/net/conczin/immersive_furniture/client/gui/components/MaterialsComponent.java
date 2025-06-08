@@ -3,10 +3,10 @@ package net.conczin.immersive_furniture.client.gui.components;
 import net.conczin.immersive_furniture.client.gui.ArtisansWorkstationEditorScreen;
 import net.conczin.immersive_furniture.client.gui.widgets.MaterialButton;
 import net.conczin.immersive_furniture.client.gui.widgets.StateImageButton;
-import net.conczin.immersive_furniture.data.MaterialRegistry;
 import net.conczin.immersive_furniture.client.model.MaterialSource;
 import net.conczin.immersive_furniture.config.Config;
 import net.conczin.immersive_furniture.data.FurnitureData;
+import net.conczin.immersive_furniture.data.MaterialRegistry;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.*;
