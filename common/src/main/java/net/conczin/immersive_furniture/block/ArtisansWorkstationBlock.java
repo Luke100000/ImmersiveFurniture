@@ -24,8 +24,8 @@ public class ArtisansWorkstationBlock extends Block {
     public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
 
     public static final VoxelShape SHAPE = Shapes.or(
-            Shapes.box(0, 0, 0, 16 / 16.0, 14 / 16.0, 16 / 16.0),
-            Shapes.box(0, 14 / 16.0, 12 / 16.0, 16 / 16.0, 20 / 16.0, 16 / 16.0)
+            Shapes.box(0, 0, 0, 16 / 16.0, 12 / 16.0, 16 / 16.0),
+            Shapes.box(0, 12 / 16.0, 12 / 16.0, 16 / 16.0, 20 / 16.0, 16 / 16.0)
     );
 
     public ArtisansWorkstationBlock(BlockBehaviour.Properties properties) {

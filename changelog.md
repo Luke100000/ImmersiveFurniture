@@ -11,11 +11,4 @@ Initial release
     * A special block that only defines collisions as block states and forward interactions
 * Sprite objects
     * Has access to transparent textures used in e.g., flowers
-* Raw texture
-    * A button next to tiling which uses "raw" mode, linking the texture id directly
-    * It Will not render nice textures but instead allow animations such as water
-    * It Will also enforce a max of 16 px and is default on for animated textures
-
-# Todo
-
-* Icon
+    * Uses native atlas and thus also supports animations (liquids)

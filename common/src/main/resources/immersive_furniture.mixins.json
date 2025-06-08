@@ -6,10 +6,9 @@
   "injectors": {
     "defaultRequire": 1
   },
-  "mixins": ["LivingEntityMixin", "LivingEntityMixin"],
+  "mixins": ["LivingEntityMixin"],
   "client": [
     "client.BlockModelAccessor",
-    "client.BlockRenderDispatcherMixin",
     "client.DebugScreenOverlayMixin",
     "client.ItemModelShaperMixin",
     "client.ItemRendererMixin",

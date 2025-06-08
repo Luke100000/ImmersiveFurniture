@@ -2,13 +2,13 @@ package net.conczin.immersive_furniture.client.gui;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import net.conczin.immersive_furniture.Common;
-import net.conczin.immersive_furniture.item.Items;
 import net.conczin.immersive_furniture.client.gui.widgets.StateImageButton;
 import net.conczin.immersive_furniture.data.FurnitureData;
 import net.conczin.immersive_furniture.data.FurnitureDataManager;
 import net.conczin.immersive_furniture.data.api.API;
 import net.conczin.immersive_furniture.data.api.Auth;
 import net.conczin.immersive_furniture.data.api.responses.*;
+import net.conczin.immersive_furniture.item.Items;
 import net.conczin.immersive_furniture.network.Network;
 import net.conczin.immersive_furniture.network.s2c.CraftRequest;
 import net.conczin.immersive_furniture.utils.Utils;
@@ -536,11 +536,14 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
             // Fetch from local files
             furniture = localFiles.stream()
                     .filter(l -> l.getPath().contains(searchBox.getValue()))
-                    .toList()
-                    .subList(
-                            Math.min(localFiles.size(), page * 8),
-                            Math.min(localFiles.size(), (page + 1) * 8)
-                    );
+                    .toList();
+
+            if (!furniture.isEmpty()) {
+                furniture = furniture.subList(
+                        Math.min(furniture.size() - 1, page * 8),
+                        Math.min(furniture.size(), (page + 1) * 8)
+                );
+            }
         } else {
             // Fetch from the library
             awaitingSearch = true;

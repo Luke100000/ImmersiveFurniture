@@ -26,6 +26,8 @@ public abstract class LivingEntityMixin extends Entity {
     @Shadow
     public abstract Optional<BlockPos> getSleepingPos();
 
+    @Shadow public abstract void setYBodyRot(float offset);
+
     @Inject(method = "checkBedExists()Z", at = @At("HEAD"), cancellable = true)
     private void immersiveFurniture$checkBedExists(CallbackInfoReturnable<Boolean> cir) {
         if (this.getSleepingPos().map(blockPos -> this.level().getBlockState(blockPos).getBlock() instanceof BaseFurnitureBlock).orElse(false)) {
@@ -39,7 +41,7 @@ public abstract class LivingEntityMixin extends Entity {
         if (interaction != null) {
             Vector3f offset = interaction.offset().offset();
             this.setPos(pos.getX() + offset.x(), pos.getY() + offset.y(), pos.getZ() + offset.z());
-            this.setYRot(interaction.offset().rotation());
+            this.setYBodyRot(interaction.offset().rotation());
             ci.cancel();
         }
     }

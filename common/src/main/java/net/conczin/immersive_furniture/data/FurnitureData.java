@@ -245,20 +245,26 @@ public class FurnitureData {
         if (inventorySize > 0) {
             tooltip.add(Component.translatable("gui.immersive_furniture.inventory", inventorySize).withStyle(ChatFormatting.YELLOW));
         }
-        if (advanced) {
-            if (!sources.isEmpty()) {
+        boolean hasAdvanced = false;
+        if (!sources.isEmpty()) {
+            hasAdvanced = true;
+            if (advanced) {
                 tooltip.add(Component.translatable("gui.immersive_furniture.sources").withStyle(ChatFormatting.GRAY));
                 for (String source : sources) {
                     tooltip.add(Component.literal("- " + source).withStyle(ChatFormatting.GRAY));
                 }
             }
-            if (!dependencies.isEmpty()) {
+        }
+        if (!dependencies.isEmpty()) {
+            hasAdvanced = true;
+            if (advanced) {
                 tooltip.add(Component.translatable("gui.immersive_furniture.dependencies").withStyle(ChatFormatting.GRAY));
                 for (String dependency : dependencies) {
                     tooltip.add(Component.literal("- " + dependency).withStyle(ChatFormatting.GRAY));
                 }
             }
-        } else {
+        }
+        if (hasAdvanced && !advanced) {
             tooltip.add(Component.translatable("gui.immersive_furniture.tooltip").withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC));
         }
         return tooltip;
@@ -348,7 +354,7 @@ public class FurnitureData {
 
     private static Vector3f rotate(Vector3f vec, Direction direction) {
         return switch (direction) {
-            case NORTH -> new Vector3f(16 - vec.x, vec.y, 16 - vec.z);
+            case SOUTH -> new Vector3f(16 - vec.x, vec.y, 16 - vec.z);
             case EAST -> new Vector3f(16 - vec.z, vec.y, vec.x);
             case WEST -> new Vector3f(vec.z, vec.y, 16 - vec.x);
             default -> new Vector3f(vec);
