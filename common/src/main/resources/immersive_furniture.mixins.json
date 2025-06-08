@@ -1,15 +1,21 @@
 {
   "required": true,
   "minVersion": "0.7",
-  "package": "immersive_furniture.mixin",
+  "package": "net.conczin.immersive_furniture.mixin",
   "compatibilityLevel": "JAVA_17",
   "injectors": {
     "defaultRequire": 1
   },
-  "mixins": ["LivingEntityMixin"],
+  "mixins": ["LivingEntityMixin", "LivingEntityMixin"],
   "client": [
-    "client.BlockModelAccessor", "client.BlockRenderDispatcherMixin",
-    "client.DebugScreenOverlayMixin", "client.ItemModelShaperMixin", "client.ItemRendererMixin",
-    "client.MinecraftMixin", "client.ModelBakeryMixin", "client.SpriteContentsAccessor", "client.SpriteContentsMixin"
+    "client.BlockModelAccessor",
+    "client.BlockRenderDispatcherMixin",
+    "client.DebugScreenOverlayMixin",
+    "client.ItemModelShaperMixin",
+    "client.ItemRendererMixin",
+    "client.MinecraftMixin",
+    "client.ModelBakeryMixin",
+    "client.SpriteContentsAccessor",
+    "client.SpriteContentsMixin"
   ]
 }

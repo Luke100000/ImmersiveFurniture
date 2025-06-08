@@ -1,35 +1,29 @@
 modLoader = "javafml"
-loaderVersion = "[47,)"
-issueTrackerURL = "https://github.com/Luke100000/ImmersiveFurniture/issues"
-license = "GPL-3.0-only"
+loaderVersion = "${forge_loader_version_range}"
+license = "${license}"
+issueTrackerURL = "${mod_issues}"
 
 [[mods]]
-modId = "immersive_furniture"
+modId = "${mod_id}"
 version = "${version}"
-displayName = "Immersive Furniture"
-displayURL = "https://www.curseforge.com/minecraft/mc-mods/immersive-furniture"
-authors = "Luke100000"
-description = "Create custom and fancy furniture, deco, and objects in game or choose from a vast online library."
+displayName = "${mod_name}"
+displayURL = "${mod_homepage}"
 logoFile = "icon.png"
-itemIcon = "immersive_furniture:biplane"
+credits = ""
+authors = "${mod_author}"
+description = '''${description}'''
+displayTest = "IGNORE_SERVER_VERSION"
 
-[[dependencies.immersive_furniture]]
-modId = "minecraft"
-mandatory = true
-versionRange = "[1.20.1,)"
-ordering = "NONE"
-side = "BOTH"
-
-[[dependencies.immersive_furniture]]
+[[dependencies.${ mod_id }]]
 modId = "forge"
 mandatory = true
-versionRange = "[47,)"
+versionRange = "${forge_loader_version_range}"
 ordering = "NONE"
 side = "BOTH"
 
-[[dependencies.immersive_furniture]]
-modId = "ad_astra"
-mandatory = false
-versionRange = "[1.15.6,)"
+[[dependencies.${ mod_id }]]
+modId = "minecraft"
+mandatory = true
+versionRange = "${minecraft_version_range}"
 ordering = "NONE"
 side = "BOTH"

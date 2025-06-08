@@ -2,36 +2,37 @@
   "schemaVersion": 1,
   "id": "immersive_furniture",
   "version": "${version}",
-  "name": "Immersive Furniture",
-  "description": "Create custom and fancy furniture, deco, and objects in game or choose from a vast online library.",
+  "name": "${mod_name}",
+  "description": "${description}",
   "authors": [
-    "Luke100000"
+    "${mod_author}"
   ],
   "contact": {
-    "homepage": "https://www.curseforge.com/minecraft/mc-mods/immersive-furniture",
-    "sources": "https://github.com/Luke100000/ImmersiveFurniture",
-    "issues": "https://github.com/Luke100000/ImmersiveFurniture/issues"
+    "homepage": "${mod_homepage}",
+    "sources": "${mod_sources}",
+    "issues": "${mod_issues}"
   },
-  "license": "GPL-3.0-only",
-  "icon": "icon.png",
+  "license": "${license}",
+  "icon": "assets/immersive_furniture/icon.png",
   "environment": "*",
   "entrypoints": {
     "main": [
-      "immersive_furniture.fabric.CommonFabric"
+      "net.conczin.immersive_furniture.fabric.CommonFabric"
     ],
     "client": [
-      "immersive_furniture.fabric.ClientFabric"
+      "net.conczin.immersive_furniture.fabric.ClientFabric"
     ]
   },
   "mixins": [
-    "immersive_furniture.mixins.json"
+    "${mod_id}.mixins.json"
   ],
   "depends": {
-    "fabricloader": ">=0.11.3",
-    "java": ">=8",
-    "fabric-api-base": ">=0.1.0"
+    "fabricloader": ">=0.14",
+    "fabric": "*",
+    "minecraft": "${minecraft_version}",
+    "java": ">=17"
   },
-  "breaks": {
-    "ad_astra": "<1.15.6"
+  "suggests": {
   }
 }
+  

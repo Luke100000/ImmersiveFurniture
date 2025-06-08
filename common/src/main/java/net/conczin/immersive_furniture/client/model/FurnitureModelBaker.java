@@ -1,0 +1,132 @@
+package net.conczin.immersive_furniture.client.model;
+
+import net.conczin.immersive_furniture.Common;
+import net.conczin.immersive_furniture.data.FurnitureData;
+import net.conczin.immersive_furniture.utils.CachedSupplier;
+import net.minecraft.client.renderer.block.model.BlockModel;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.resources.model.*;
+import net.minecraft.resources.ResourceLocation;
+
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+import java.util.function.Function;
+import java.util.function.Supplier;
+
+public class FurnitureModelBaker {
+    public static final ResourceLocation LOCATION = Common.locate("block/furniture");
+
+    static class ModelBakerImpl implements ModelBaker {
+        ModelBakerImpl() {
+        }
+
+        @Override
+        public UnbakedModel getModel(ResourceLocation location) {
+            // Unsafe, but my models do not contain overrides or parents.
+            //noinspection DataFlowIssue
+            return null;
+        }
+
+        @Override
+        public BakedModel bake(ResourceLocation location, ModelState transform) {
+            // Unsafe, but my models do not contain overrides or parents.
+            return null;
+        }
+
+        @SuppressWarnings("unused")
+        public BakedModel bake(ResourceLocation var1, ModelState var2, Function<Material, TextureAtlasSprite> var3) {
+            return null;
+        }
+
+        @SuppressWarnings("unused")
+        public Function<Material, TextureAtlasSprite> getModelTextureGetter() {
+            return null;
+        }
+    }
+
+    static final ModelBakerImpl modelBaker = new ModelBakerImpl();
+
+    public static class CachedBakedModelSet {
+        public final Supplier<BakedModel> R0;
+        public final Supplier<BakedModel> R90;
+        public final Supplier<BakedModel> R180;
+        public final Supplier<BakedModel> R270;
+
+        public CachedBakedModelSet(DynamicAtlas atlas, BlockModel model) {
+            this.R0 = new CachedSupplier<>(() -> bakeModel(atlas, model, 0));
+            this.R90 = new CachedSupplier<>(() -> bakeModel(atlas, model, 90));
+            this.R180 = new CachedSupplier<>(() -> bakeModel(atlas, model, 180));
+            this.R270 = new CachedSupplier<>(() -> bakeModel(atlas, model, 270));
+        }
+
+        public BakedModel get(int yRot) {
+            return switch (yRot) {
+                case 0 -> R0.get();
+                case 90 -> R90.get();
+                case 180 -> R180.get();
+                case 270 -> R270.get();
+                default -> throw new IllegalArgumentException("Invalid rotation: " + yRot);
+            };
+        }
+    }
+
+    private final static Executor executor = Executors.newSingleThreadExecutor();
+
+    public static BakedModel getAsyncModel(FurnitureData data, DynamicAtlas atlas) {
+        if (atlas.knownFurniture.containsKey(data.getHash())) {
+            return getModel(data, atlas, 0, false);
+        } else {
+            if (!atlas.asyncRequestedFurniture.contains(data.getHash())) {
+                atlas.asyncRequestedFurniture.add(data.getHash());
+                executor.execute(() -> {
+                    if (getModel(data, atlas, 0, false) == null) {
+                        atlas.asyncRequestedFurniture.remove(data.getHash());
+                    }
+                });
+            }
+            return null;
+        }
+    }
+
+    public static BakedModel getModel(FurnitureData data, DynamicAtlas atlas) {
+        return getModel(data, atlas, 0, true);
+    }
+
+    public static BakedModel getModel(FurnitureData data, DynamicAtlas atlas, int yRot, boolean force) {
+        String hash = data.getHash();
+        boolean exist = atlas.knownFurniture.containsKey(hash);
+
+        // The atlas is full, cannot continue
+        if (!force && !exist && atlas.isFull()) {
+            return null;
+        }
+
+        if (exist) {
+            atlas.uploadIfDirty();
+            return atlas.knownFurniture.get(hash).get(yRot);
+        } else {
+            float previousUsage = atlas.getUsage();
+            BlockModel model = FurnitureModelFactory.getModel(data, atlas);
+            atlas.uploadIfDirty();
+
+            CachedBakedModelSet modelSet = new CachedBakedModelSet(atlas, model);
+            atlas.knownFurniture.put(hash, modelSet);
+
+            // Only add when forced or the atlas had space
+            if (force || !atlas.isFull() && atlas.getUsage() >= previousUsage) {
+                return modelSet.get(yRot);
+            } else {
+                atlas.knownFurniture.remove(hash);
+            }
+        }
+        return null;
+    }
+
+    private static BakedModel bakeModel(DynamicAtlas atlas, BlockModel model, int yRot) {
+        return model.bake(modelBaker,
+                material -> atlas == DynamicAtlas.BAKED ? material.sprite() : atlas.sprite,
+                BlockModelRotation.by(0, yRot),
+                LOCATION
+        );
+    }
+}
