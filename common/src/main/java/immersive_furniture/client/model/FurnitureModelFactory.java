@@ -61,13 +61,17 @@ public class FurnitureModelFactory {
             assert pixels != null;
 
             // Use baked texture if available
+            boolean useBaked = true;
             int[] baked = element.bakedTexture.get(direction);
-            if (baked != null && baked.length != dimensions.x * dimensions.y) baked = null;
+            if (baked == null || baked.length != dimensions.x * dimensions.y) {
+                baked = new int[dimensions.x * dimensions.y];
+                useBaked = false;
+            }
 
             for (int x = 0; x < dimensions.x; x++) {
                 for (int y = 0; y < dimensions.y; y++) {
                     int color;
-                    if (baked == null) {
+                    if (!useBaked) {
                         color = MaterialSource.fromCube(element.material, direction, x, y, dimensions.x, dimensions.y);
                         int r = ((color >> 16) & 0xFF);
                         int g = ((color >> 8) & 0xFF);
@@ -105,6 +109,7 @@ public class FurnitureModelFactory {
                         b = (int) Math.max(0.0, Math.min(255.0, ((b - 128) * (1.0f + contrast) + 128) * light));
 
                         color = (a << 24) | (r << 16) | (g << 8) | b;
+                        baked[x + y * dimensions.x] = color;
                     } else {
                         color = baked[x + y * dimensions.x];
                     }
@@ -113,6 +118,10 @@ public class FurnitureModelFactory {
             }
 
             atlas.upload();
+
+            if (!useBaked) {
+                element.bakedTexture.put(direction, baked);
+            }
         }
 
         float uvScale = 16.0f / atlas.size;

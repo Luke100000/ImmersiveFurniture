@@ -35,6 +35,9 @@
   "gui.immersive_furniture.contrast": "Contrast %s",
   "gui.immersive_furniture.light_level": "%s Light",
   "gui.immersive_furniture.inventory": "%s Inventory",
+  "gui.immersive_furniture.sources": "Uses textures of:",
+  "gui.immersive_furniture.dependencies": "Requires:",
+  "gui.immersive_furniture.tooltip": "Press shift to show more.",
   "gui.immersive_furniture.directional_velocity": "%s Velocity",
   "gui.immersive_furniture.directional_velocity.short": "%s V",
   "gui.immersive_furniture.random_velocity": "%s Randomness",
@@ -80,6 +83,7 @@
   "gui.immersive_furniture.back": "Back",
 
   "gui.immersive_furniture.author": "By %s",
+  "gui.immersive_furniture.original_author": "Originally by %s",
 
   "gui.immersive_furniture.sort.date": "Sort by date",
   "gui.immersive_furniture.sort.favorites": "Sort by favorites",

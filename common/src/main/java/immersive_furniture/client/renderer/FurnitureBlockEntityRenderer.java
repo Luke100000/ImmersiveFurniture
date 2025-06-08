@@ -44,7 +44,7 @@ public class FurnitureBlockEntityRenderer<T extends FurnitureBlockEntity> implem
 
         BlockState blockState = blockEntity.getBlockState();
         if (blockState.getBlock() instanceof BaseFurnitureBlock) {
-            float yaw = -blockState.getValue(BaseFurnitureBlock.FACING).toYRot();
+            float yaw = -blockState.getValue(BaseFurnitureBlock.FACING).getOpposite().toYRot();
             poseStack.translate(0.5F, 0.5F, 0.5F);
             poseStack.mulPose(Axis.YP.rotationDegrees(yaw));
             poseStack.translate(-0.5F, -0.5F, -0.5F);

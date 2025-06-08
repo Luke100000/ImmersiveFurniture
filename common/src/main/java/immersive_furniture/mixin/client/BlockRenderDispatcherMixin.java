@@ -43,7 +43,7 @@ public abstract class BlockRenderDispatcherMixin {
 
         // Render it
         if (status.data() != null) {
-            int yRot = (int) state.getValue(BaseFurnitureBlock.FACING).toYRot();
+            int yRot = (int) state.getValue(BaseFurnitureBlock.FACING).getOpposite().toYRot();
             BakedModel model = FurnitureModelBaker.getModel(status.data(), DynamicAtlas.BAKED, yRot, false);
             if (model != null) {
                 modelRenderer.tesselateBlock(level, model, state, pos, poseStack, consumer, checkSides, random, state.getSeed(pos), OverlayTexture.NO_OVERLAY);

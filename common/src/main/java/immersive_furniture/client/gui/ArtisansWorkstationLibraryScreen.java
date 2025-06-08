@@ -19,6 +19,7 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.components.Tooltip;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
@@ -338,16 +339,8 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
                             renderModel(graphics, data, leftPos + (x + 0.5) * w, topPos + 38 + (y + 0.5) * h, h, rot, (float) (-Math.PI / 4));
 
                             if (hovered) {
-                                tooltip = new LinkedList<>();
-                                tooltip.add(Component.literal(data.name).withStyle(ChatFormatting.BOLD));
-                                tooltip.add(getAuthorComponent(data));
-                                tooltip.add(Component.literal(data.tag).withStyle(ChatFormatting.ITALIC).withStyle(ChatFormatting.GOLD));
-                                if (data.lightLevel > 0) {
-                                    tooltip.add(Component.translatable("gui.immersive_furniture.light_level", data.lightLevel).withStyle(ChatFormatting.YELLOW));
-                                }
-                                if (data.inventorySize > 0) {
-                                    tooltip.add(Component.translatable("gui.immersive_furniture.inventory", data.inventorySize).withStyle(ChatFormatting.YELLOW));
-                                }
+                                tooltip = data.getTooltip(Screen.hasShiftDown());
+                                tooltip.add(0, Component.literal(data.name).withStyle(ChatFormatting.BOLD));
                             }
                         }
                     }
@@ -363,7 +356,7 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
 
                 // Title and author
                 graphics.drawString(font, data.name, leftPos + 8, topPos + 8, 0xFFFFFF);
-                graphics.drawString(font, getAuthorComponent(data), leftPos + 8, topPos + 18, 0xFFFFFF);
+                graphics.drawString(font, Component.translatable("gui.immersive_furniture.author", data.author).withStyle(ChatFormatting.ITALIC).withStyle(ChatFormatting.GRAY), leftPos + 8, topPos + 18, 0xFFFFFF);
 
                 // Icon and cost
                 graphics.pose().pushPose();
@@ -406,10 +399,6 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
         if (tooltip != null) {
             graphics.renderTooltip(font, tooltip, Optional.empty(), lastMouseX, lastMouseY);
         }
-    }
-
-    private static Component getAuthorComponent(FurnitureData model) {
-        return Component.translatable("gui.immersive_furniture.author", model.author).withStyle(ChatFormatting.ITALIC).withStyle(ChatFormatting.GRAY);
     }
 
     private boolean isTileHovered(int x, int y) {

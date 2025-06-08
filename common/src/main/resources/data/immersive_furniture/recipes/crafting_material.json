@@ -11,14 +11,14 @@
       "item": "minecraft:cobblestone"
     },
     {
-      "item": "#minecraft:logs"
+      "tag": "minecraft:logs"
     },
     {
-      "item": "#minecraft:logs"
+      "tag": "minecraft:logs"
     }
   ],
   "result": {
-    "id": "immersive_furniture:crafting_material",
+    "item": "immersive_furniture:crafting_material",
     "count": 16
   }
 }

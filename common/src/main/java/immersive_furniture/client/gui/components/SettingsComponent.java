@@ -3,7 +3,9 @@ package immersive_furniture.client.gui.components;
 import immersive_furniture.client.gui.ArtisansWorkstationEditorScreen;
 import immersive_furniture.client.gui.ArtisansWorkstationLibraryScreen;
 import immersive_furniture.client.gui.widgets.BoundedIntSliderButton;
+import immersive_furniture.client.model.DynamicAtlas;
 import immersive_furniture.client.model.FurnitureModelBaker;
+import immersive_furniture.client.model.FurnitureModelFactory;
 import immersive_furniture.data.FurnitureDataManager;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -77,8 +79,10 @@ public class SettingsComponent extends ScreenComponent {
 
         // Save
         addButton("gui.immersive_furniture.save", b -> {
-            // Bake the model and save the face textures
-            FurnitureModelBaker.bakeTexture(screen.data);
+            // Bake the model and save
+            DynamicAtlas.SCRATCH.clear();
+            FurnitureModelFactory.getModel(screen.data, DynamicAtlas.SCRATCH);
+            screen.data.finish();
             screen.data.author = Minecraft.getInstance().getUser().getName();
             FurnitureDataManager.saveLocalFile(screen.data);
 

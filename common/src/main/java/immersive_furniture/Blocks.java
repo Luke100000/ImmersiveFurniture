@@ -16,6 +16,7 @@ public interface Blocks {
             .mapColor(MapColor.WOOD)
             .strength(2.5f)
             .sound(SoundType.WOOD)
+            .noOcclusion()
     ));
 
     Supplier<Block> FURNITURE = register("furniture", () -> new FurnitureBlock(baseFurnitureProps()));

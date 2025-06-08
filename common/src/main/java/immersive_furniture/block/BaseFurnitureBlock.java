@@ -72,6 +72,7 @@ public abstract class BaseFurnitureBlock extends Block implements SimpleWaterlog
                         level.addFreshEntity(sittingEntity);
                         sittingEntity.setYRot(offset.rotation());
                         player.startRiding(sittingEntity);
+                        sittingEntity.clampRotation(player);
                     }
                 }
             }

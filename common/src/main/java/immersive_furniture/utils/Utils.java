@@ -1,18 +1,16 @@
 package immersive_furniture.utils;
 
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.FloatTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.NbtIo;
+import net.minecraft.nbt.*;
 import net.minecraft.resources.ResourceLocation;
 import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
 
 import java.io.*;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.HashSet;
 import java.util.HexFormat;
+import java.util.Set;
 
 public class Utils {
     public static CompoundTag fromBytes(byte[] bytes) {
@@ -81,5 +79,28 @@ public class Utils {
 
     public static String capitalize(ResourceLocation location) {
         return StringUtils.capitalize(location.getPath().replace(".", " ").replace("/", " ").replace("_", " "));
+    }
+
+    public static ListTag toNbt(Set<String> stringSet) {
+        ListTag listTag = new ListTag();
+        for (String str : stringSet) {
+            listTag.add(StringTag.valueOf(str));
+        }
+        return listTag;
+    }
+
+    public static Set<String> fromNbt(ListTag listTag) {
+        Set<String> stringSet = new HashSet<>();
+        for (Tag tag : listTag) {
+            if (tag instanceof StringTag stringTag) {
+                stringSet.add(stringTag.getAsString());
+            }
+        }
+        return stringSet;
+    }
+
+    public static String beatifyPackID(String s) {
+        String[] split = s.split("/");
+        return split[split.length - 1].replace("_", " ").replace(".zip", "");
     }
 }

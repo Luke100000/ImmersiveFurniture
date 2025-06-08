@@ -7,6 +7,7 @@ import immersive_furniture.block.LightFurnitureBlock;
 import immersive_furniture.data.FurnitureData;
 import immersive_furniture.data.ServerFurnitureRegistry;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -41,9 +42,7 @@ public class FurnitureItem extends BlockItem {
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level world, List<Component> tooltip, TooltipFlag context) {
         FurnitureData data = getData(stack);
-        if (!data.author.isEmpty()) {
-            tooltip.add(Component.translatable("gui.immersive_furniture.author", data.author).withStyle(ChatFormatting.GRAY));
-        }
+        tooltip.addAll(data.getTooltip(Screen.hasShiftDown()));
         super.appendHoverText(stack, world, tooltip, context);
     }
 

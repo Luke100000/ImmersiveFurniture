@@ -46,6 +46,8 @@ public class CraftRequest extends Message {
         int cost = data.getCost();
         int available = getResources(e);
 
+        if (e.isCreative()) available = Integer.MAX_VALUE;
+
         int amount = 1;
         if (shift) amount = Math.min(available / cost, 64);
         if (amount == 0) return;
@@ -53,7 +55,9 @@ public class CraftRequest extends Message {
         if (available < cost * amount) {
             e.displayClientMessage(Component.translatable("immersive_furniture.not_enough_material"), true);
         } else {
-            useResources(e, amount * cost);
+            if (!e.isCreative()) {
+                useResources(e, amount * cost);
+            }
             giveFurniture(e, data, amount);
             e.level().playLocalSound(e.getOnPos(), Sounds.REPAIR.get(), SoundSource.BLOCKS, 1.0F, e.getRandom().nextFloat() * 0.5f + 0.75f, false);
         }

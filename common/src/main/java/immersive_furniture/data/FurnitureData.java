@@ -1,8 +1,8 @@
 package immersive_furniture.data;
 
-import immersive_furniture.Common;
 import immersive_furniture.config.Config;
 import immersive_furniture.utils.Utils;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -10,8 +10,8 @@ import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
@@ -27,10 +27,7 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.joml.Vector3i;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class FurnitureData {
     public static final FurnitureData EMPTY = new FurnitureData();
@@ -43,6 +40,9 @@ public class FurnitureData {
 
     public int contentid = -1;
     public String author = "Unknown";
+    public String originalAuthor = "";
+    public Set<String> sources = new HashSet<>();
+    public Set<String> dependencies = new HashSet<>();
 
     public final List<Element> elements = new LinkedList<>();
 
@@ -62,6 +62,9 @@ public class FurnitureData {
         this.inventorySize = tag.getInt("InventorySize");
         this.contentid = tag.getInt("ContentID");
         this.author = tag.getString("Author");
+        this.originalAuthor = tag.getString("OriginalAuthor");
+        this.sources = Utils.fromNbt(tag.getList("Sources", 8));
+        this.dependencies = Utils.fromNbt(tag.getList("Dependencies", 8));
 
         ListTag elementsTag = tag.getList("Elements", 10);
         for (int i = 0; i < elementsTag.size(); i++) {
@@ -77,6 +80,9 @@ public class FurnitureData {
         this.inventorySize = data.inventorySize;
         this.contentid = data.contentid;
         this.author = data.author;
+        this.originalAuthor = data.originalAuthor.isEmpty() ? data.author : data.originalAuthor;
+        this.sources.addAll(data.sources);
+        this.dependencies.addAll(data.dependencies);
         this.hash = null;
 
         this.cachedShapes = new HashMap<>();
@@ -96,6 +102,10 @@ public class FurnitureData {
         tag.putInt("InventorySize", inventorySize);
         tag.putInt("ContentID", contentid);
         tag.putString("Author", author);
+        tag.putString("OriginalAuthor", originalAuthor);
+
+        tag.put("Sources", Utils.toNbt(sources));
+        tag.put("Dependencies", Utils.toNbt(dependencies));
 
         ListTag elementsTag = new ListTag();
         for (Element element : elements) {
@@ -187,6 +197,7 @@ public class FurnitureData {
         cachedShapes.clear();
         for (Element element : elements) {
             element.rotationAxes = null;
+            element.bakedTexture.clear();
         }
     }
 
@@ -196,6 +207,61 @@ public class FurnitureData {
                 playSound(level, pos, player.getRandom(), element);
             }
         }
+    }
+
+    public void finish() {
+        // Find and log sources of textures
+        sources.clear();
+        for (Element element : elements) {
+            if (element.type != ElementType.ELEMENT) continue;
+            ResourceLocation source = element.material.source;
+            ResourceLocation resourceLocation = new ResourceLocation(source.getNamespace(), "textures/block/" + source.getPath() + ".png");
+            Minecraft.getInstance().getResourceManager().getResource(resourceLocation).ifPresent(resource -> sources.add(Utils.beatifyPackID(resource.sourcePackId())));
+        }
+        sources.remove("vanilla");
+
+        // Find and log dependencies
+        dependencies.clear();
+        for (Element element : elements) {
+            if (element.type == ElementType.PARTICLE_EMITTER) {
+                dependencies.add(element.particleEmitter.particle.getNamespace());
+            } else if (element.type == ElementType.SOUND_EMITTER) {
+                dependencies.add(element.soundEmitter.sound.getNamespace());
+            }
+        }
+        dependencies.remove("minecraft");
+    }
+
+    public List<Component> getTooltip(boolean advanced) {
+        List<Component> tooltip = new LinkedList<>();
+        tooltip.add(Component.translatable("gui.immersive_furniture.author", author).withStyle(ChatFormatting.ITALIC).withStyle(ChatFormatting.GRAY));
+        if (!originalAuthor.isEmpty() && !originalAuthor.equals(author)) {
+            tooltip.add(Component.translatable("gui.immersive_furniture.original_author", originalAuthor).withStyle(ChatFormatting.ITALIC).withStyle(ChatFormatting.GRAY));
+        }
+        tooltip.add(Component.literal(tag).withStyle(ChatFormatting.ITALIC).withStyle(ChatFormatting.GOLD));
+        if (lightLevel > 0) {
+            tooltip.add(Component.translatable("gui.immersive_furniture.light_level", lightLevel).withStyle(ChatFormatting.YELLOW));
+        }
+        if (inventorySize > 0) {
+            tooltip.add(Component.translatable("gui.immersive_furniture.inventory", inventorySize).withStyle(ChatFormatting.YELLOW));
+        }
+        if (advanced) {
+            if (!sources.isEmpty()) {
+                tooltip.add(Component.translatable("gui.immersive_furniture.sources").withStyle(ChatFormatting.GRAY));
+                for (String source : sources) {
+                    tooltip.add(Component.literal("- " + source).withStyle(ChatFormatting.GRAY));
+                }
+            }
+            if (!dependencies.isEmpty()) {
+                tooltip.add(Component.translatable("gui.immersive_furniture.dependencies").withStyle(ChatFormatting.GRAY));
+                for (String dependency : dependencies) {
+                    tooltip.add(Component.literal("- " + dependency).withStyle(ChatFormatting.GRAY));
+                }
+            }
+        } else {
+            tooltip.add(Component.translatable("gui.immersive_furniture.tooltip").withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC));
+        }
+        return tooltip;
     }
 
     public record PoseOffset(Vector3f offset, Pose pose, float rotation) {
@@ -395,6 +461,13 @@ public class FurnitureData {
 
             if (type == ElementType.ELEMENT) {
                 tag.put("Material", material.toTag());
+
+                // Textures
+                CompoundTag bakedTextureTag = new CompoundTag();
+                for (Map.Entry<Direction, int[]> entry : bakedTexture.entrySet()) {
+                    bakedTextureTag.putIntArray(entry.getKey().getSerializedName(), entry.getValue());
+                }
+                tag.put("BakedTexture", bakedTextureTag);
             } else if (type == ElementType.PARTICLE_EMITTER) {
                 tag.put("ParticleEmitter", particleEmitter.toTag());
             } else if (type == ElementType.SOUND_EMITTER) {
@@ -402,12 +475,6 @@ public class FurnitureData {
             } else if (type == ElementType.PLAYER_POSE) {
                 tag.put("PlayerPose", playerPose.toTag());
             }
-
-            CompoundTag bakedTextureTag = new CompoundTag();
-            for (Map.Entry<Direction, int[]> entry : bakedTexture.entrySet()) {
-                bakedTextureTag.putIntArray(entry.getKey().getSerializedName(), entry.getValue());
-            }
-            tag.put("BakedTexture", bakedTextureTag);
 
             return tag;
         }
@@ -512,7 +579,7 @@ public class FurnitureData {
     }
 
     public static class Material {
-        public ResourceLocation source = new ResourceLocation("immersive_furniture:default");
+        public ResourceLocation source = new ResourceLocation("minecraft:oak_log");
         public int margin = 4;
         public WrapMode wrap = WrapMode.EXPAND;
         public boolean rotate = false;
@@ -530,12 +597,6 @@ public class FurnitureData {
             rotate = tag.getBoolean("Rotate");
             flip = tag.getBoolean("Flip");
             lightEffect.load(tag.getCompound("LightEffect"));
-
-            // TODO: Gather sources on export and print them in the tooltip, same with original author on modify
-            ResourceLocation resourceLocation = new ResourceLocation(source.getNamespace(), "textures/block/" + source.getPath() + ".png");
-            Minecraft.getInstance().getResourceManager().getResource(resourceLocation).ifPresent(resource -> {
-                Common.logger.info("Loading material {}", resource.source().packId());
-            });
         }
 
         public Material(Material material) {

@@ -54,7 +54,7 @@ public class SittingEntity extends Entity {
         clampRotation(passenger);
     }
 
-    protected void clampRotation(Entity passenger) {
+    public void clampRotation(Entity passenger) {
         float delta = Mth.wrapDegrees(passenger.getYRot() - this.getYRot());
         float clampedDelta = Mth.clamp(delta, -105.0f, 105.0f);
         passenger.yRotO += clampedDelta - delta;

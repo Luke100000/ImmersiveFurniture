@@ -1,7 +1,19 @@
 {
   "variants": {
-    "": {
+    "facing=east": {
+      "model": "immersive_furniture:block/artisans_workstation",
+      "y": 90
+    },
+    "facing=north": {
       "model": "immersive_furniture:block/artisans_workstation"
+    },
+    "facing=south": {
+      "model": "immersive_furniture:block/artisans_workstation",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "immersive_furniture:block/artisans_workstation",
+      "y": 270
     }
   }
 }

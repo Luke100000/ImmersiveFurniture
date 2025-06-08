@@ -13,14 +13,12 @@ Initial release
     * Has access to transparent textures used in e.g., flowers
 * Raw texture
     * A button next to tiling which uses "raw" mode, linking the texture id directly
-    * Will not render nice textures, but instead allow animations such as water
-    * Will also enforce a max of 16 px, and is default on for animated textures
+    * It Will not render nice textures but instead allow animations such as water
+    * It Will also enforce a max of 16 px and is default on for animated textures
 
 # Todo
 
 * Thread the editor
-* Test if textures are loaded rather than generated
-* Text resource-packs, especially high-res ones
 * Icon
 * Retire Cobalt
 * Move to the multi-loader template

@@ -35,7 +35,7 @@ public class FurnitureBlock extends BaseFurnitureBlock {
         boolean waterlogged = levelAccessor.getFluidState(blockPos).getType() == Fluids.WATER;
         return this.defaultBlockState()
                 .setValue(WATERLOGGED, waterlogged)
-                .setValue(FACING, context.getHorizontalDirection());
+                .setValue(FACING, context.getHorizontalDirection().getOpposite());
     }
 
     @Override
