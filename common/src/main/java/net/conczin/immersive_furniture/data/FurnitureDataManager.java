@@ -77,8 +77,8 @@ public class FurnitureDataManager {
         return getLocalFile(data).exists();
     }
 
-    public static void deleteLocalFile(ResourceLocation selected) {
-        delete(getLocalFile(DATA.get(selected)));
+    public static void deleteLocalFile(ResourceLocation location) {
+        delete(getFile(location));
     }
 
     public static void saveLocalFile(FurnitureData data) {

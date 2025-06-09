@@ -544,6 +544,8 @@ public class FurnitureData {
         }
 
         public void sanityCheck() {
+            // TODO: Math is wrong for rotated elements
+            /*
             float maxSize = 16.0f;
             to.x = Math.max(-maxSize, Math.min(16.0f + maxSize, to.x));
             to.y = Math.max(-maxSize, Math.min(16.0f + maxSize, to.y));
@@ -551,6 +553,7 @@ public class FurnitureData {
             from.x = Math.max(-maxSize, Math.min(16.0f + maxSize, from.x));
             from.y = Math.max(-maxSize, Math.min(16.0f + maxSize, from.y));
             from.z = Math.max(-maxSize, Math.min(16.0f + maxSize, from.z));
+            */
 
             // Pose anchors are the shape of the players' butt
             if (type == ElementType.PLAYER_POSE) {

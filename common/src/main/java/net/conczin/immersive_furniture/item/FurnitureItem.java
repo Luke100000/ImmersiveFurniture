@@ -44,16 +44,22 @@ public class FurnitureItem extends BlockItem {
         super.appendHoverText(stack, world, tooltip, context);
     }
 
-    private final static Map<CompoundTag, FurnitureData> cache = new LinkedHashMap<>(100, 0.75f, true) {
+    private final static Map<Integer, FurnitureData> cache = new LinkedHashMap<>(100, 0.75f, true) {
         @Override
-        protected boolean removeEldestEntry(Map.Entry<CompoundTag, FurnitureData> eldest) {
+        protected boolean removeEldestEntry(Map.Entry<Integer, FurnitureData> eldest) {
             return size() > 100;
         }
     };
 
     public static FurnitureData getData(ItemStack stack) {
         CompoundTag tag = stack.getTagElement(BLOCK_ENTITY_TAG);
-        return tag == null ? FurnitureData.EMPTY : cache.computeIfAbsent(tag.getCompound(FURNITURE), FurnitureData::new);
+        if (tag == null) return FurnitureData.EMPTY;
+        tag = tag.getCompound(FURNITURE);
+        int hash = System.identityHashCode(tag); // Use identity hash since it's way faster
+        if (!cache.containsKey(hash)) {
+            cache.put(hash, new FurnitureData(tag));
+        }
+        return cache.get(hash);
     }
 
     public static void setData(ItemStack stack, FurnitureData data) {

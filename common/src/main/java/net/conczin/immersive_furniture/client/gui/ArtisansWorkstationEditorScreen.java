@@ -368,7 +368,6 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
 
         // Render the model
         renderModel(graphics, data, yaw, pitch, true);
-        graphics.flush();
 
         Lighting.setupFor3DItems();
 
@@ -451,8 +450,6 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
                 line(graphics, vertex.x(), vertex.y(), vertex.z(), nextVertex.x(), nextVertex.y(), nextVertex.z(), width, overlay, 0.0f, 0.0f, 0.0f, 1.0f);
             }
         }
-
-        graphics.flush();
     }
 
     @Override

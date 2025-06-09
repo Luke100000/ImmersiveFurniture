@@ -58,7 +58,7 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
 
     private EditBox searchBox;
     private boolean sortByDate = false;
-    private String tagFilter = "";
+    private String tagFilter = "miscellaneous";
 
     private Component error;
     private long lastErrorTime = 0;
@@ -128,8 +128,9 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
             for (String tag : TAGS) {
                 addToggleButton(tx, topPos + 18, 16, 48 + i * 16, 128, "gui.immersive_furniture.tag." + tag.toLowerCase(Locale.ROOT), b -> {
                     tagFilter = tag;
-                    init();
-                }).setEnabled(!tag.equals(tagFilter));
+                    shouldSearch = true;
+                    b.setEnabled(true);
+                }).setEnabled(tag.equals(tagFilter));
                 tx += 17;
                 i++;
             }
@@ -140,6 +141,7 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
             addRenderableWidget(
                     new ImageButton(leftPos + 3, y, 22, 22, sortByDate ? 66 : 88, 48, 22, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE, b -> {
                         sortByDate = !sortByDate;
+                        shouldSearch = true;
                         init();
                     })
             ).setTooltip(Tooltip.create(Component.translatable(sortByDate ? "gui.immersive_furniture.sort.date" : "gui.immersive_furniture.sort.favorites")));
@@ -273,7 +275,7 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
                     } else {
                         setError("gui.immersive_furniture.login_required");
                     }
-                }).setEnabled(true);
+                }).setEnabled(false);
             }
 
             // Close
@@ -539,7 +541,7 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
             // Fetch from local files
             furniture = localFiles.stream()
                     .filter(l -> l.getPath().contains(searchBox.getValue()))
-                    .filter(l -> tagFilter.isEmpty() || tagFilter.equals("miscellaneous") || getData(l) == null || getData(l).tag.equals(tagFilter))
+                    .filter(l -> tagFilter.equals("miscellaneous") || getData(l) == null || getData(l).tag.equals(tagFilter))
                     .skip((long) page * ENTRIES_PER_PAGE)
                     .limit(ENTRIES_PER_PAGE)
                     .toList();
@@ -548,7 +550,7 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
             awaitingSearch = true;
             CompletableFuture.runAsync(() -> {
                 Response response = request(API.HttpMethod.GET, ContentListResponse::new, "v2/content/furniture", Map.of(
-                        "whitelist", searchBox.getValue() + (tagFilter.isEmpty() || tagFilter.equals("miscellaneous") ? "" : "," + tagFilter),
+                        "whitelist", searchBox.getValue() + (tagFilter.equals("miscellaneous") ? "" : "," + tagFilter),
                         "blacklist", "",
                         "order", sortByDate ? "date" : "likes",
                         "track", tab == Tab.FAVORITES ? "likes" : tab == Tab.SUBMISSIONS ? "submissions" : "all",
@@ -611,6 +613,7 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
                 data.contentid = response.contentid();
                 FurnitureDataManager.saveLocalFile(data);
                 selected = null;
+                init();
             } else if (request instanceof ErrorResponse response) {
                 if (response.code() == 428) {
                     setError("gui.immersive_furniture.upload_duplicate");

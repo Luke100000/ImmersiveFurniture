@@ -63,7 +63,10 @@ public class SettingsComponent extends ScreenComponent {
         for (String tag : TAGS) {
             addToggleButton(x, y, 16, 48 + i * 16, 128,
                     "gui.immersive_furniture.tag." + tag.toLowerCase(Locale.ROOT),
-                    () -> screen.data.tag = tag).setEnabled(!tag.equals("light"));
+                    () -> {
+                        screen.data.tag = tag;
+                        screen.init();
+                    }).setEnabled(tag.equals(screen.data.tag));
             x += 18;
             i++;
             if (x > leftPos + width - 6) {

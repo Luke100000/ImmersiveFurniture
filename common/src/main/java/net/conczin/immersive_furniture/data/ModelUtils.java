@@ -27,7 +27,6 @@ public class ModelUtils {
 
     // Expects pos to be in voxel space (16 units per block)
     public static void applyInverseElementRotation(Vector3f pos, ElementRotation rotation) {
-        if (rotation == null) return;
         Quaternionf quaternionf = getElementRotation(rotation).conjugate();
         pos.mul(1.0f / 16.0f);
         pos.sub(rotation.origin());

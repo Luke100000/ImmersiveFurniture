@@ -6,10 +6,6 @@ Initial release
 
 * Deploy the library
 * Test with sodium
-* Profile at least once
-  * In editor
-  * In library
-  * In game 
 
 # Roadmap 1.0.0
 

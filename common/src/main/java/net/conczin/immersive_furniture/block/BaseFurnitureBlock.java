@@ -45,6 +45,7 @@ public abstract class BaseFurnitureBlock extends Block implements SimpleWaterlog
         if (data != null) {
             if (level.isClientSide) {
                 data.playInteractSound(level, pos, player);
+                return InteractionResult.CONSUME;
             } else {
                 // Find closest pose element
                 Vec3 click = new Vec3(hit.getLocation().x - pos.getX(), hit.getLocation().y - pos.getY(), hit.getLocation().z - pos.getZ());
@@ -73,10 +74,12 @@ public abstract class BaseFurnitureBlock extends Block implements SimpleWaterlog
                         player.startRiding(sittingEntity);
                         sittingEntity.clampRotation(player);
                     }
+
+                    return InteractionResult.CONSUME;
                 }
             }
         }
-        return InteractionResult.CONSUME;
+        return InteractionResult.PASS;
     }
 
     abstract public FurnitureData getData(BlockState state, BlockGetter level, BlockPos pos);

@@ -1,19 +1,28 @@
 package net.conczin.immersive_furniture.client.model;
 
+import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
+import net.conczin.immersive_furniture.data.ElementRotation;
 import net.conczin.immersive_furniture.data.FurnitureData;
-import net.conczin.immersive_furniture.data.ModelUtils;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.joml.Vector3i;
 
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
+import static net.conczin.immersive_furniture.data.ModelUtils.getElementRotation;
 
 public class AmbientOcclusion {
     private static final double SAMPLE_RESOLUTION = Math.sqrt(3);
     private static final float RESOLUTION = 0.25f;
 
-    private final Map<Long, Set<FurnitureData.Element>> elementCache = new ConcurrentHashMap<>();
+    record PrecomputedElement(FurnitureData.Element element, Quaternionf rotation, Vector3f origin) {
+
+    }
+
+    private final Long2ObjectOpenHashMap<ObjectOpenHashSet<PrecomputedElement>> elementCache = new Long2ObjectOpenHashMap<>();
 
     final static List<Vector3f> kernel = new ArrayList<>();
 
@@ -31,18 +40,21 @@ public class AmbientOcclusion {
         }
     }
 
-    private Set<FurnitureData.Element> getElements(float x, float y, float z) {
+    private Set<PrecomputedElement> getElements(float x, float y, float z) {
         int gx = Math.round(x * RESOLUTION);
         int gy = Math.round(y * RESOLUTION);
         int gz = Math.round(z * RESOLUTION);
         long key = (long) gx << 40 | (long) gy << 20 | (long) gz;
-        return elementCache.computeIfAbsent(key, k -> new HashSet<>());
+        return elementCache.computeIfAbsent(key, k -> new ObjectOpenHashSet<>());
     }
 
     public void place(FurnitureData.Element element) {
         Vector3f center = element.getCenter();
         Vector3i size = element.getSize();
-        Quaternionf rotation = ModelUtils.getElementRotation(element.getRotation());
+
+        ElementRotation elementRotation = element.getRotation();
+        Quaternionf rotation = getElementRotation(elementRotation);
+        PrecomputedElement precomputed = new PrecomputedElement(element, new Quaternionf(rotation).conjugate(), element.getOrigin().mul(16.0f));
 
         Vector3f nx = rotation.transform(new Vector3f(size.x(), 0, 0));
         Vector3f ny = rotation.transform(new Vector3f(0, size.y(), 0));
@@ -64,7 +76,7 @@ public class AmbientOcclusion {
                     float y = nx.y * sx + ny.y * sy + nz.y * sz + center.y;
                     float z = nx.z * sx + ny.z * sy + nz.z * sz + center.z;
 
-                    getElements(x, y, z).add(element);
+                    getElements(x, y, z).add(precomputed);
                 }
             }
         }
@@ -72,12 +84,15 @@ public class AmbientOcclusion {
 
     private boolean is(float x, float y, float z) {
         float e = 0.0001f;
-        for (FurnitureData.Element element : getElements(x, y, z)) {
-            Vector3f pos = new Vector3f(x, y, z);
-            ModelUtils.applyInverseElementRotation(pos, element.getRotation());
-            if (pos.x > element.from.x() + e && pos.x < element.to.x() - e &&
-                pos.y > element.from.y() + e && pos.y < element.to.y() - e &&
-                pos.z > element.from.z() + e && pos.z < element.to.z() - e) {
+        Vector3f pos = new Vector3f();
+        for (PrecomputedElement p : getElements(x, y, z)) {
+            pos.set(x - p.origin.x, y - p.origin.y, z - p.origin.z);
+            p.rotation.transform(pos);
+            pos.add(p.origin);
+
+            if (pos.x > p.element.from.x + e && pos.x < p.element.to.x - e &&
+                pos.y > p.element.from.y + e && pos.y < p.element.to.y - e &&
+                pos.z > p.element.from.z + e && pos.z < p.element.to.z - e) {
                 return true;
             }
         }

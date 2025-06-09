@@ -101,7 +101,5 @@ public class PreviewParticleEngine {
         camera.setup(minecraft.level, minecraft.player, false, false, partialTicks, yaw, pitch);
 
         render(context.pose(), minecraft.gameRenderer.lightTexture(), camera, partialTicks);
-
-        context.flush();
     }
 }

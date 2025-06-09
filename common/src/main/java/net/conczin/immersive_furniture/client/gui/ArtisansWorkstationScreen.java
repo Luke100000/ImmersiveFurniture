@@ -117,6 +117,8 @@ public abstract class ArtisansWorkstationScreen extends Screen {
         }
 
         getParticleEngine(data).renderParticles(graphics, yaw, pitch, partialTicks);
+
+        graphics.flush();
     }
 
     void line(GuiGraphics graphics, float x0, float y0, float z0, float x1, float y1, float z1, float width, boolean overlay, float r, float g, float b, float a) {
