@@ -36,13 +36,13 @@ public abstract class LivingEntityMixin extends Entity {
         }
     }
 
-    @Inject(method = "setPosToBed(Lnet/minecraft/core/BlockPos;)V", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "setPosToBed(Lnet/minecraft/core/BlockPos;)V", at = @At("TAIL"), cancellable = true)
     private void immersiveFurniture$setPosToBed(BlockPos pos, CallbackInfo ci) {
         InteractionManager.Interaction interaction = InteractionManager.INSTANCE.getInteraction(this);
         if (interaction != null) {
             Vector3f offset = interaction.offset().offset();
             this.setPos(pos.getX() + offset.x(), pos.getY() + offset.y(), pos.getZ() + offset.z());
-            this.setYBodyRot(interaction.offset().rotation());
+            this.setYBodyRot(interaction.offset().rotation() + 90f);
             ci.cancel();
         }
     }

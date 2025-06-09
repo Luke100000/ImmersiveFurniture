@@ -8,13 +8,8 @@
   },
   "mixins": ["LivingEntityMixin"],
   "client": [
-    "client.BlockModelAccessor",
-    "client.DebugScreenOverlayMixin",
-    "client.ItemModelShaperMixin",
-    "client.ItemRendererMixin",
-    "client.MinecraftMixin",
-    "client.ModelBakeryMixin",
-    "client.SpriteContentsAccessor",
+    "client.BlockModelAccessor", "client.CameraMixin", "client.DebugScreenOverlayMixin", "client.ItemModelShaperMixin",
+    "client.ItemRendererMixin", "client.MinecraftMixin", "client.ModelBakeryMixin", "client.SpriteContentsAccessor",
     "client.SpriteContentsMixin"
   ]
 }

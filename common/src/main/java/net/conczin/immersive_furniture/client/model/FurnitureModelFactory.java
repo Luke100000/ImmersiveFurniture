@@ -48,6 +48,7 @@ public class FurnitureModelFactory {
         for (FurnitureData.Element otherElement : data.elements) {
             if (otherElement == element) continue;
             if (otherElement.type != FurnitureData.ElementType.ELEMENT) continue;
+            if (theSame(element, otherElement) && otherElement.hashCode() < element.hashCode()) continue;
             if (fullyContained(otherElement, vertices)) return null;
         }
 
@@ -163,6 +164,12 @@ public class FurnitureModelFactory {
         } else {
             return null;
         }
+    }
+
+    private static boolean theSame(FurnitureData.Element element, FurnitureData.Element otherElement) {
+        return element.from.equals(otherElement.from) &&
+               element.to.equals(otherElement.to) &&
+               element.getRotation().equals(otherElement.getRotation());
     }
 
     private static boolean fullyContained(FurnitureData.Element otherElement, Vector3f[] vertices) {

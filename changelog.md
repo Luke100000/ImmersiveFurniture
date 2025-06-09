@@ -6,6 +6,7 @@ Initial release
 
 * Deploy the library
 * Test with sodium
+* Test sleeping and multiplayer
 
 # Roadmap 1.0.0
 

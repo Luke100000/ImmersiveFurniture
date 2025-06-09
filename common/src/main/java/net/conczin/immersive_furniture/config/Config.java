@@ -9,7 +9,7 @@ public final class Config extends JsonConfig {
     private static final Config INSTANCE = loadOrCreate(new Config(Common.MOD_ID), Config.class);
 
     public List<String> favorites = new LinkedList<>();
-    public String immersiveLibraryUrl = "http://localhost:8000";
+    public String immersiveLibraryUrl = "https://mca.conczin.net";
 
     // How many times the same furniture needs to be placed before low-memory mode is activated.
     // That mode is limited to 1024 unique furniture and cannot be cleaned up again.

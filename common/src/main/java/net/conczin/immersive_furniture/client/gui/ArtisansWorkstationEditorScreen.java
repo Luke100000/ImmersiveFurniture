@@ -404,7 +404,7 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
             }
         }
 
-        if (results.isEmpty()) {
+        if (results.isEmpty() || !isMouseOver(mouseX, mouseY)) {
             hoveredElement = null;
             hoveredDirection = null;
         } else {

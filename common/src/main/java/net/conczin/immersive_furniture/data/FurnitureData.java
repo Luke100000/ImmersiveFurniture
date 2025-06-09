@@ -34,7 +34,7 @@ public class FurnitureData {
     public static final FurnitureData EMPTY = new FurnitureData();
 
     public String name = "Empty";
-    public String tag = "Misc";
+    public String tag = "Miscellaneous";
     public int lightLevel;
     public int inventorySize;
 
@@ -251,7 +251,7 @@ public class FurnitureData {
         if (!originalAuthor.isEmpty() && !originalAuthor.equals(author)) {
             tooltip.add(Component.translatable("gui.immersive_furniture.original_author", originalAuthor).withStyle(ChatFormatting.ITALIC).withStyle(ChatFormatting.GRAY));
         }
-        tooltip.add(Component.literal(tag).withStyle(ChatFormatting.ITALIC).withStyle(ChatFormatting.GOLD));
+        tooltip.add(Component.translatable("gui.immersive_furniture.tag." + tag.toLowerCase(Locale.ROOT)).withStyle(ChatFormatting.GOLD));
         if (lightLevel > 0) {
             tooltip.add(Component.translatable("gui.immersive_furniture.light_level", lightLevel).withStyle(ChatFormatting.YELLOW));
         }
@@ -305,7 +305,17 @@ public class FurnitureData {
             if (element.type == ElementType.PLAYER_POSE) {
                 Vector3f center = rotate(element.getRotationAxes().center(), direction).mul(1.0f / 16.0f);
                 if (found == null || location.distanceToSqr(center.x, center.y, center.z) < location.distanceToSqr(found.offset.x, found.offset.y, found.offset.z)) {
-                    found = new PoseOffset(center, element.playerPose.pose, (element.rotation + direction.toYRot() + 180) % 360.0f);
+                    if (element.playerPose.pose == Pose.SLEEPING) {
+                        Vector3f forward = rotate(element.getRotationAxes().forward(), direction).mul(1.0f / 16.0f);
+                        center.add(forward.mul(0.5f));
+                    } else {
+                        Vector3f forward = rotate(element.getRotationAxes().forward(), direction).mul(1.0f / 16.0f);
+                        center.add(forward.mul(0.125f));
+
+                        Vector3f up = rotate(element.getRotationAxes().up(), direction).mul(1.0f / 16.0f);
+                        center.sub(up.mul(0.0625f));
+                    }
+                    found = new PoseOffset(center, element.playerPose.pose, element.rotation + direction.toYRot() % 360.0f);
                 }
             }
         }
@@ -440,8 +450,8 @@ public class FurnitureData {
         public ElementRotationAxes rotationAxes;
 
         public Element() {
-            from = new Vector3f(2, 2, 2);
-            to = new Vector3f(14, 14, 14);
+            from = new Vector3f(2, 4, 2);
+            to = new Vector3f(14, 16, 14);
             axis = Direction.Axis.X;
             rotation = 0.0f;
             material = new Material();
