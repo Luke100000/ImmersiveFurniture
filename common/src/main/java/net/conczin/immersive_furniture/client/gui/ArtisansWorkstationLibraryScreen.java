@@ -32,6 +32,7 @@ import java.util.stream.Collectors;
 
 import static net.conczin.immersive_furniture.client.gui.components.SettingsComponent.TAGS;
 import static net.conczin.immersive_furniture.data.FurnitureDataManager.REQUESTED_DATA;
+import static net.conczin.immersive_furniture.data.FurnitureDataManager.getData;
 import static net.conczin.immersive_furniture.data.api.API.request;
 
 public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen {
@@ -122,13 +123,15 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
             addRenderableWidget(searchBox);
 
             // Tags
+            int i = 0;
             int tx = leftPos + 4;
             for (String tag : TAGS) {
-                addToggleButton(tx, topPos + 18, 16, 48, 96, "gui.immersive_furniture.tag." + tag.toLowerCase(Locale.ROOT), b -> {
+                addToggleButton(tx, topPos + 18, 16, 48 + i * 16, 128, "gui.immersive_furniture.tag." + tag.toLowerCase(Locale.ROOT), b -> {
                     tagFilter = tag;
                     init();
                 }).setEnabled(!tag.equals(tagFilter));
                 tx += 17;
+                i++;
             }
 
             int y = topPos + windowHeight - 25;
@@ -536,20 +539,16 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
             // Fetch from local files
             furniture = localFiles.stream()
                     .filter(l -> l.getPath().contains(searchBox.getValue()))
+                    .filter(l -> tagFilter.isEmpty() || tagFilter.equals("miscellaneous") || getData(l) == null || getData(l).tag.equals(tagFilter))
+                    .skip((long) page * ENTRIES_PER_PAGE)
+                    .limit(ENTRIES_PER_PAGE)
                     .toList();
-
-            if (!furniture.isEmpty()) {
-                furniture = furniture.subList(
-                        Math.min(furniture.size() - 1, page * 8),
-                        Math.min(furniture.size(), (page + 1) * 8)
-                );
-            }
         } else {
             // Fetch from the library
             awaitingSearch = true;
             CompletableFuture.runAsync(() -> {
                 Response response = request(API.HttpMethod.GET, ContentListResponse::new, "v2/content/furniture", Map.of(
-                        "whitelist", searchBox.getValue(),
+                        "whitelist", searchBox.getValue() + (tagFilter.isEmpty() || tagFilter.equals("miscellaneous") ? "" : "," + tagFilter),
                         "blacklist", "",
                         "order", sortByDate ? "date" : "likes",
                         "track", tab == Tab.FAVORITES ? "likes" : tab == Tab.SUBMISSIONS ? "submissions" : "all",
@@ -578,16 +577,23 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
         CompletableFuture.runAsync(() -> {
             if (!Auth.hasToken()) return;
 
+            // Gather tags
             List<String> tags = new LinkedList<>();
             tags.add(data.tag);
-            tags.add(data.material);
-            if (data.inventorySize > 0) {
-                tags.add("has_inventory");
-            }
-            if (data.lightLevel > 0) {
-                tags.add("light_source");
-            }
+            if (data.hasParticles()) tags.add("has_particles");
+            if (data.hasSounds()) tags.add("has_sounds");
+            if (data.canSit()) tags.add("can_sit");
+            if (data.canSleep()) tags.add("can_sleep");
+            if (!data.dependencies.isEmpty()) tags.add("has_dependencies");
+            if (!data.sources.isEmpty()) tags.add("has_modded_textures");
+            if (data.inventorySize > 0) tags.add("has_inventory");
+            if (data.lightLevel > 0) tags.add("is_light_source");
+            tags.addAll(data.elements.stream()
+                    .filter(e -> e.type == FurnitureData.ElementType.ELEMENT)
+                    .map(e -> e.material.source.getPath())
+                    .distinct().toList());
 
+            // Upload
             Response request = request(
                     data.contentid == -1 ? API.HttpMethod.POST : API.HttpMethod.PUT,
                     data.contentid == -1 ? ContentIdResponse::new : SuccessResponse::new,

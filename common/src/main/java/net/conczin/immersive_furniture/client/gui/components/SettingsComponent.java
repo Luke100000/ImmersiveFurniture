@@ -21,12 +21,16 @@ public class SettingsComponent extends ScreenComponent {
     static final Component SEARCH_HINT = Component.translatable("gui.immersive_furniture.name.hint").withStyle(ChatFormatting.ITALIC).withStyle(ChatFormatting.GRAY);
 
     public final static List<String> TAGS = List.of(
-            "table",
-            "chair",
+            "living_room",
+            "bed_room",
+            "kitchen",
+            "bath_room",
+            "office",
             "storage",
-            "light",
-            "decorative",
-            "functional"
+            "outdoor",
+            "communal",
+            "workshop",
+            "miscellaneous"
     );
 
     private boolean localFileExists;
@@ -53,13 +57,15 @@ public class SettingsComponent extends ScreenComponent {
         });
         screen.addRenderableWidget(nameBox);
 
+        int i = 0;
         int x = leftPos + 6;
         int y = topPos + 22;
         for (String tag : TAGS) {
-            addToggleButton(x, y, 16, 48, 96,
+            addToggleButton(x, y, 16, 48 + i * 16, 128,
                     "gui.immersive_furniture.tag." + tag.toLowerCase(Locale.ROOT),
                     () -> screen.data.tag = tag).setEnabled(!tag.equals("light"));
             x += 18;
+            i++;
             if (x > leftPos + width - 6) {
                 x = leftPos + 6;
                 y += 18;

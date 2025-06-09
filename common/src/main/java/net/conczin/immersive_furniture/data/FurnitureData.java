@@ -28,13 +28,13 @@ import org.joml.Vector3f;
 import org.joml.Vector3i;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class FurnitureData {
     public static final FurnitureData EMPTY = new FurnitureData();
 
     public String name = "Empty";
     public String tag = "Misc";
-    public String material = "default";
     public int lightLevel;
     public int inventorySize;
 
@@ -47,7 +47,7 @@ public class FurnitureData {
     public final List<Element> elements = new LinkedList<>();
 
     private String hash;
-    private Map<Direction, VoxelShape> cachedShapes = new HashMap<>();
+    private Map<Direction, VoxelShape> cachedShapes = new ConcurrentHashMap<>();
     public long lastTick = 0;
 
     public FurnitureData() {
@@ -57,7 +57,6 @@ public class FurnitureData {
     public FurnitureData(CompoundTag tag) {
         this.name = tag.getString("Name");
         this.tag = tag.getString("Tag");
-        this.material = tag.getString("Material");
         this.lightLevel = tag.getInt("LightLevel");
         this.inventorySize = tag.getInt("InventorySize");
         this.contentid = tag.getInt("ContentID");
@@ -75,7 +74,6 @@ public class FurnitureData {
     public FurnitureData(FurnitureData data) {
         this.name = data.name;
         this.tag = data.tag;
-        this.material = data.material;
         this.lightLevel = data.lightLevel;
         this.inventorySize = data.inventorySize;
         this.contentid = data.contentid;
@@ -97,7 +95,6 @@ public class FurnitureData {
         CompoundTag tag = new CompoundTag();
         tag.putString("Name", name);
         tag.putString("Tag", this.tag);
-        tag.putString("Material", material);
         tag.putInt("LightLevel", lightLevel);
         tag.putInt("InventorySize", inventorySize);
         tag.putInt("ContentID", contentid);
@@ -232,6 +229,22 @@ public class FurnitureData {
         dependencies.remove("minecraft");
     }
 
+    public boolean hasParticles() {
+        return elements.stream().anyMatch(e -> e.type == ElementType.PARTICLE_EMITTER);
+    }
+
+    public boolean hasSounds() {
+        return elements.stream().anyMatch(e -> e.type == ElementType.SOUND_EMITTER);
+    }
+
+    public boolean canSit() {
+        return elements.stream().anyMatch(e -> e.type == ElementType.PLAYER_POSE && e.playerPose.pose == Pose.SITTING);
+    }
+
+    public boolean canSleep() {
+        return elements.stream().anyMatch(e -> e.type == ElementType.PLAYER_POSE && e.playerPose.pose == Pose.SLEEPING);
+    }
+
     public List<Component> getTooltip(boolean advanced) {
         List<Component> tooltip = new LinkedList<>();
         tooltip.add(Component.translatable("gui.immersive_furniture.author", author).withStyle(ChatFormatting.ITALIC).withStyle(ChatFormatting.GRAY));
@@ -244,6 +257,18 @@ public class FurnitureData {
         }
         if (inventorySize > 0) {
             tooltip.add(Component.translatable("gui.immersive_furniture.inventory", inventorySize).withStyle(ChatFormatting.YELLOW));
+        }
+        if (hasParticles()) {
+            tooltip.add(Component.translatable("gui.immersive_furniture.has_particles").withStyle(ChatFormatting.YELLOW));
+        }
+        if (hasSounds()) {
+            tooltip.add(Component.translatable("gui.immersive_furniture.has_sounds").withStyle(ChatFormatting.YELLOW));
+        }
+        if (canSit()) {
+            tooltip.add(Component.translatable("gui.immersive_furniture.can_sit").withStyle(ChatFormatting.YELLOW));
+        }
+        if (canSleep()) {
+            tooltip.add(Component.translatable("gui.immersive_furniture.can_sleep").withStyle(ChatFormatting.YELLOW));
         }
         boolean hasAdvanced = false;
         if (!sources.isEmpty()) {

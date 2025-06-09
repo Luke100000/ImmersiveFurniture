@@ -2,6 +2,15 @@
 
 Initial release
 
+# TODO
+
+* Deploy the library
+* Test with sodium
+* Profile at least once
+  * In editor
+  * In library
+  * In game 
+
 # Roadmap 1.0.0
 
 * Blockbench/JSON block and item model import
