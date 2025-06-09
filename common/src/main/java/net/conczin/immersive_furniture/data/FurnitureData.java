@@ -1,5 +1,6 @@
 package net.conczin.immersive_furniture.data;
 
+import net.conczin.immersive_furniture.client.model.MaterialSource;
 import net.conczin.immersive_furniture.config.Config;
 import net.conczin.immersive_furniture.utils.Utils;
 import net.minecraft.ChatFormatting;
@@ -211,11 +212,18 @@ public class FurnitureData {
         sources.clear();
         for (Element element : elements) {
             if (element.type != ElementType.ELEMENT) continue;
-            ResourceLocation source = element.material.source;
-            ResourceLocation resourceLocation = new ResourceLocation(source.getNamespace(), "textures/block/" + source.getPath() + ".png");
-            Minecraft.getInstance().getResourceManager().getResource(resourceLocation).ifPresent(resource -> sources.add(Utils.beatifyPackID(resource.sourcePackId())));
+            ResourceLocation source = MaterialRegistry.INSTANCE.materials.getOrDefault(element.material.source, MaterialSource.DEFAULT).north().texture();
+            ResourceLocation resourceLocation = new ResourceLocation(source.getNamespace(), "textures/" + source.getPath() + ".png");
+            Minecraft.getInstance().getResourceManager().getResource(resourceLocation)
+                    .ifPresent(resource -> {
+                        if (resource.isBuiltin() || resource.sourcePackId().equals("mod_resources")) {
+                            sources.add(resourceLocation.getNamespace());
+                        } else {
+                            sources.add(Utils.beatifyPackID(resource.sourcePackId()));
+                        }
+                    });
         }
-        sources.remove("vanilla");
+        sources.remove("minecraft");
 
         // Find and log dependencies
         dependencies.clear();
@@ -305,11 +313,10 @@ public class FurnitureData {
             if (element.type == ElementType.PLAYER_POSE) {
                 Vector3f center = rotate(element.getRotationAxes().center(), direction).mul(1.0f / 16.0f);
                 if (found == null || location.distanceToSqr(center.x, center.y, center.z) < location.distanceToSqr(found.offset.x, found.offset.y, found.offset.z)) {
+                    Vector3f forward = rotate(element.getRotationAxes().forward(), direction).mul(1.0f / 16.0f);
                     if (element.playerPose.pose == Pose.SLEEPING) {
-                        Vector3f forward = rotate(element.getRotationAxes().forward(), direction).mul(1.0f / 16.0f);
                         center.add(forward.mul(0.5f));
                     } else {
-                        Vector3f forward = rotate(element.getRotationAxes().forward(), direction).mul(1.0f / 16.0f);
                         center.add(forward.mul(0.125f));
 
                         Vector3f up = rotate(element.getRotationAxes().up(), direction).mul(1.0f / 16.0f);

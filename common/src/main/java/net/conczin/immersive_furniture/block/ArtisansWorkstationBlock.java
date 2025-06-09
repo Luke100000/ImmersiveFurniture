@@ -23,9 +23,24 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 public class ArtisansWorkstationBlock extends Block {
     public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
 
-    public static final VoxelShape SHAPE = Shapes.or(
+    public static final VoxelShape SHAPE_NORTH = Shapes.or(
             Shapes.box(0, 0, 0, 16 / 16.0, 12 / 16.0, 16 / 16.0),
             Shapes.box(0, 12 / 16.0, 12 / 16.0, 16 / 16.0, 20 / 16.0, 16 / 16.0)
+    );
+
+    public static final VoxelShape SHAPE_SOUTH = Shapes.or(
+            Shapes.box(0, 0, 0, 16 / 16.0, 12 / 16.0, 16 / 16.0),
+            Shapes.box(0, 12 / 16.0, 0, 16 / 16.0, 20 / 16.0, 4 / 16.0)
+    );
+
+    public static final VoxelShape SHAPE_WEST = Shapes.or(
+            Shapes.box(0, 0, 0, 16 / 16.0, 12 / 16.0, 16 / 16.0),
+            Shapes.box(12 / 16.0, 12 / 16.0, 0, 16 / 16.0, 20 / 16.0, 16 / 16.0)
+    );
+
+    public static final VoxelShape SHAPE_EAST = Shapes.or(
+            Shapes.box(0, 0, 0, 16 / 16.0, 12 / 16.0, 16 / 16.0),
+            Shapes.box(0, 12 / 16.0, 0, 4 / 16.0, 20 / 16.0, 16 / 16.0)
     );
 
     public ArtisansWorkstationBlock(BlockBehaviour.Properties properties) {
@@ -54,6 +69,12 @@ public class ArtisansWorkstationBlock extends Block {
 
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-        return SHAPE;
+        Direction facing = state.getValue(FACING);
+        return switch (facing) {
+            case SOUTH -> SHAPE_SOUTH;
+            case EAST -> SHAPE_EAST;
+            case WEST -> SHAPE_WEST;
+            default -> SHAPE_NORTH;
+        };
     }
 }

@@ -78,7 +78,11 @@ public class Utils {
     }
 
     public static String capitalize(ResourceLocation location) {
-        return StringUtils.capitalize(location.getPath().replace(".", " ").replace("/", " ").replace("_", " "));
+        return capitalize(location.getPath());
+    }
+
+    public static String capitalize(String location) {
+        return StringUtils.capitalize(location.replace(".", " ").replace("/", " ").replace("_", " "));
     }
 
     public static ListTag toNbt(Set<String> stringSet) {
