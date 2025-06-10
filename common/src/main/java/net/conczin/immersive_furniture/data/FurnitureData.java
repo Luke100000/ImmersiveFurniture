@@ -21,6 +21,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -115,39 +116,38 @@ public class FurnitureData {
     }
 
     public int getCost() {
-        float volume = getVolume() / 4096.0f;
-        BoundingBox bb = boundingBox();
-        float size = bb.getXSpan() * bb.getYSpan() * bb.getZSpan() / 4096.0f;
-        float cost = volume + size + inventorySize + lightLevel / 15.0f + elements.size() / 4.0f;
+        double volume = Math.sqrt(getVolume()) / 32.0;
+        double cost = volume + inventorySize * 0.5 + lightLevel / 15.0 + elements.size() / 4.0;
         return (int) Math.ceil(cost * Config.getInstance().costMultiplier);
     }
 
-    public BoundingBox boundingBox() {
+    public AABB boundingBox() {
         if (elements.isEmpty()) {
-            return new BoundingBox(0, 0, 0, 0, 0, 0);
+            return new AABB(0, 0, 0, 0, 0, 0);
         }
 
-        int minX = Integer.MAX_VALUE, minY = Integer.MAX_VALUE, minZ = Integer.MAX_VALUE;
-        int maxX = Integer.MIN_VALUE, maxY = Integer.MIN_VALUE, maxZ = Integer.MIN_VALUE;
+        float minX = Float.MAX_VALUE, minY = Float.MAX_VALUE, minZ = Float.MAX_VALUE;
+        float maxX = Float.MIN_VALUE, maxY = Float.MIN_VALUE, maxZ = Float.MIN_VALUE;
 
         for (Element element : elements) {
             Vector3f from = element.from;
             Vector3f to = element.to;
 
-            minX = Math.min(minX, (int) from.x);
-            minY = Math.min(minY, (int) from.y);
-            minZ = Math.min(minZ, (int) from.z);
-            maxX = Math.max(maxX, (int) to.x);
-            maxY = Math.max(maxY, (int) to.y);
-            maxZ = Math.max(maxZ, (int) to.z);
+            minX = Math.min(minX, from.x);
+            minY = Math.min(minY, from.y);
+            minZ = Math.min(minZ, from.z);
+            maxX = Math.max(maxX, to.x);
+            maxY = Math.max(maxY, to.y);
+            maxZ = Math.max(maxZ, to.z);
         }
 
-        return new BoundingBox(minX, minY, minZ, maxX, maxY, maxZ);
+        return new AABB(minX, minY, minZ, maxX, maxY, maxZ);
     }
 
     public int getVolume() {
         int volume = 0;
         for (Element element : elements) {
+            if (element.type != ElementType.ELEMENT) continue;
             Vector3i size = element.getSize();
             volume += size.x * size.y * size.z;
         }
@@ -156,20 +156,20 @@ public class FurnitureData {
 
     public double getSize() {
         // High-quality size estimation
-        BoundingBox boundingBox = boundingBox();
+        AABB boundingBox = boundingBox();
         return Math.max(
                 Math.max(
-                        Math.abs(boundingBox.minX() - 8.0f),
-                        Math.abs(boundingBox.minY() - 8.0f)
+                        Math.abs(boundingBox.minX - 8.0f),
+                        Math.abs(boundingBox.minY - 8.0f)
                 ),
                 Math.max(
                         Math.max(
-                                Math.abs(boundingBox.minZ() - 8.0f),
-                                Math.abs(boundingBox.maxX() - 8.0f)
+                                Math.abs(boundingBox.minZ - 8.0f),
+                                Math.abs(boundingBox.maxX - 8.0f)
                         ),
                         Math.max(
-                                Math.abs(boundingBox.maxY() - 8.0f),
-                                Math.abs(boundingBox.maxZ() - 8.0f)
+                                Math.abs(boundingBox.maxY - 8.0f),
+                                Math.abs(boundingBox.maxZ - 8.0f)
                         )
                 )
         );
@@ -391,7 +391,7 @@ public class FurnitureData {
                 .filter(e -> e.type == ElementType.ELEMENT)
                 .map(element -> getBox(element, r))
                 .reduce(Shapes::or)
-                .orElse(Shapes.block());
+                .orElse(Block.box(2, 2, 2, 14, 14, 14));
     }
 
     private static Vector3f rotate(Vector3f vec, Direction direction) {
@@ -457,8 +457,8 @@ public class FurnitureData {
         public ElementRotationAxes rotationAxes;
 
         public Element() {
-            from = new Vector3f(2, 4, 2);
-            to = new Vector3f(14, 16, 14);
+            from = new Vector3f(2, 0, 2);
+            to = new Vector3f(14, 12, 14);
             axis = Direction.Axis.X;
             rotation = 0.0f;
             material = new Material();

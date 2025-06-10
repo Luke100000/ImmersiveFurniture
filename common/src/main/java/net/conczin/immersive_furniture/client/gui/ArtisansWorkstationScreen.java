@@ -23,6 +23,7 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 
@@ -71,7 +72,8 @@ public abstract class ArtisansWorkstationScreen extends Screen {
         graphics.pose().translate(x, y, 100.0);
         graphics.pose().mulPoseMatrix(new Matrix4f().scaling((float) (size / Math.max(0.5, data.getSize() / 16.0) * 0.3)));
         graphics.pose().mulPose(new Quaternionf().rotateX(pitch).rotateY(yaw));
-        graphics.pose().translate(-0.5, 0.5, -0.5);
+        Vec3 center = data.boundingBox().getCenter();
+        graphics.pose().translate(-0.5, center.y / 16.0f, -0.5);
         graphics.pose().mulPoseMatrix(new Matrix4f().scaling(1, -1, 1));
         renderModel(graphics, data, yaw, pitch, false);
         graphics.pose().popPose();

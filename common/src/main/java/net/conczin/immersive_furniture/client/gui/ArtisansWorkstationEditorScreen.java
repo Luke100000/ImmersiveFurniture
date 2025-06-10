@@ -8,14 +8,12 @@ import net.conczin.immersive_furniture.client.gui.components.*;
 import net.conczin.immersive_furniture.client.gui.widgets.StateImageButton;
 import net.conczin.immersive_furniture.client.model.ClientModelUtils;
 import net.conczin.immersive_furniture.data.FurnitureData;
-import net.conczin.immersive_furniture.data.ModelUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
@@ -273,12 +271,6 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
             holdingCtrl = true;
         } else if (keyCode == 32) {
             holdingSpace = true;
-        } else if (keyCode == 261) {
-            if (selectedElement != null) {
-                data.elements.remove(selectedElement);
-                selectedElement = null;
-                init();
-            }
         }
 
         return super.keyPressed(keyCode, scanCode, modifiers);
@@ -381,26 +373,20 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
         graphics.pose().popPose();
 
         Matrix4f pose = graphics.pose().last().pose();
-        Matrix3f normal = graphics.pose().last().normal();
 
         graphics.pose().popPose();
 
-        // Z-cast and get the hovered element
+        // Perform a proper raycast to get the hovered element
         List<HoverResult> results = new LinkedList<>();
-        for (FurnitureData.Element element : data.elements) {
-            float[] fs = ClientModelUtils.getShapeData(element);
-            for (Direction facing : Direction.values()) {
-                Vector3f n = new Vector3f(facing.step());
-                n = ModelUtils.getElementRotation(element.getRotation()).transform(n);
-                n.mul(1, -1, 1);
-                normal.transform(n);
-                if (n.z() < 0) continue;
 
-                Vector3f[] vertices = ClientModelUtils.getVertices(element, facing, fs, pose);
-                if (Utils.isWithinQuad(mouseX, mouseY, vertices)) {
-                    float depth = vertices[0].z() + vertices[1].z() + vertices[2].z() + vertices[3].z();
-                    results.add(new HoverResult(element, facing, depth));
-                }
+        // Create a ray from the mouse position
+        Utils.Ray ray = Utils.inverseTransformRay(mouseX, mouseY, pose);
+
+        // Raycast against each element
+        for (FurnitureData.Element element : data.elements) {
+            Utils.RaycastResult raycastResult = Utils.raycast(ray, element);
+            if (raycastResult != null) {
+                results.add(new HoverResult(element, raycastResult.face(), raycastResult.distance()));
             }
         }
 
@@ -408,15 +394,15 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
             hoveredElement = null;
             hoveredDirection = null;
         } else {
-            results.sort((a, b) -> Float.compare(a.depth, b.depth));
+            results.sort((a, b) -> Float.compare(b.depth, a.depth));
 
-            int index = 0;
+            int index = -1;
             if (lastMouseX == mouseX && lastMouseY == mouseY && selectedElement != null) {
                 for (HoverResult result : results) {
+                    index++;
                     if (result.element == selectedElement) {
                         break;
                     }
-                    index++;
                 }
             }
             HoverResult hoverResult = results.get((index + 1) % results.size());

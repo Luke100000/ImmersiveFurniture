@@ -13,6 +13,7 @@ import java.util.List;
 public class ParticlesComponent extends ListComponent {
     static final int PAGE_SIZE = 7;
 
+    List<ResourceLocation> allLocations = new LinkedList<>();
     List<ResourceLocation> locations = new LinkedList<>();
     List<Button> buttons = new LinkedList<>();
 
@@ -49,14 +50,23 @@ public class ParticlesComponent extends ListComponent {
 
     @Override
     int getPages() {
-        return (BuiltInRegistries.PARTICLE_TYPE.size() - 1) / 16 + 1;
+        return Math.max(0, (allLocations.size() - 1) / PAGE_SIZE + 1);
     }
 
     @Override
     void updateSearch(String search) {
-        locations = BuiltInRegistries.PARTICLE_TYPE.keySet().stream()
+        allLocations = BuiltInRegistries.PARTICLE_TYPE.keySet().stream()
                 .filter(p -> searchBox.getValue().isEmpty() || p.getPath().contains(searchBox.getValue()))
                 .sorted(ResourceLocation::compareTo)
+                .toList();
+
+        page = Math.min(page, getPages() - 1);
+        locations = allLocations.subList(
+                page * PAGE_SIZE,
+                Math.min((page * PAGE_SIZE + PAGE_SIZE), allLocations.size())
+        );
+
+        locations = allLocations.stream()
                 .skip((long) page * PAGE_SIZE)
                 .limit(PAGE_SIZE)
                 .toList();

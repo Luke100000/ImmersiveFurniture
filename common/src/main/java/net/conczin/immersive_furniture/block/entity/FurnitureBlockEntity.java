@@ -180,5 +180,10 @@ public class FurnitureBlockEntity extends BlockEntity implements Container, Menu
         double f = (double) this.worldPosition.getZ() + 0.5;
         this.level.playSound(null, d, e, f, sound, SoundSource.BLOCKS, 0.5f, this.level.random.nextFloat() * 0.1f + 0.9f);
     }
+
+    @Override
+    public void setRemoved() {
+        super.setRemoved();
+    }
 }
 

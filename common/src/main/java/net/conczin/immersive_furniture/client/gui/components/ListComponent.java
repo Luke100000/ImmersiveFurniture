@@ -30,10 +30,11 @@ public abstract class ListComponent extends ScreenComponent {
         super.init(leftPos, topPos, width, height);
 
         // Search box
+        String oldSearch = searchBox != null ? searchBox.getValue() : "";
         this.searchBox = new EditBox(minecraft.font, leftPos + 6, topPos + 6, width - 12, minecraft.font.lineHeight + 3, SEARCH_TITLE);
         this.searchBox.setMaxLength(50);
         this.searchBox.setVisible(true);
-        this.searchBox.setValue("");
+        this.searchBox.setValue(oldSearch);
         this.searchBox.setHint(SEARCH_HINT);
         this.searchBox.setResponder(this::updateSearch); // Meh
         screen.addRenderableWidget(searchBox);

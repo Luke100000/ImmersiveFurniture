@@ -26,10 +26,13 @@ import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.pathfinder.PathComputationType;
+import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+
+import java.util.List;
 
 public abstract class BaseFurnitureBlock extends Block implements SimpleWaterloggedBlock {
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
@@ -56,23 +59,9 @@ public abstract class BaseFurnitureBlock extends Block implements SimpleWaterlog
                     InteractionManager.INSTANCE.addInteraction(player, pos, offset);
 
                     if (offset.pose() == Pose.SLEEPING) {
-                        // Start sleeping
-                        player.startSleepInBed(pos).ifLeft(problem -> {
-                            if (problem.getMessage() != null) {
-                                player.displayClientMessage(problem.getMessage(), true);
-                            }
-                        });
+                        startSleeping(pos, player);
                     } else if (offset.pose() == Pose.SITTING) {
-                        // Create an entity to fake sitting
-                        SittingEntity sittingEntity = new SittingEntity(level, new Vec3(
-                                pos.getX() + offset.offset().x,
-                                pos.getY() + offset.offset().y,
-                                pos.getZ() + offset.offset().z
-                        ), new Vec3(player.getX(), player.getY(), player.getZ()));
-                        level.addFreshEntity(sittingEntity);
-                        sittingEntity.setYRot(offset.rotation());
-                        player.startRiding(sittingEntity);
-                        sittingEntity.clampRotation(player);
+                        startSitting(level, pos, player, offset);
                     }
 
                     return InteractionResult.CONSUME;
@@ -80,6 +69,28 @@ public abstract class BaseFurnitureBlock extends Block implements SimpleWaterlog
             }
         }
         return InteractionResult.PASS;
+    }
+
+    private static void startSleeping(BlockPos pos, Player player) {
+        player.startSleepInBed(pos).ifLeft(problem -> {
+            if (problem.getMessage() != null) {
+                player.displayClientMessage(problem.getMessage(), true);
+            }
+        });
+    }
+
+    private static void startSitting(Level level, BlockPos pos, Player player, FurnitureData.PoseOffset offset) {
+        // Create an entity to fake sitting
+        SittingEntity sittingEntity = new SittingEntity(level, new Vec3(
+                pos.getX() + offset.offset().x,
+                pos.getY() + offset.offset().y,
+                pos.getZ() + offset.offset().z
+        ), new Vec3(player.getX(), player.getY(), player.getZ()));
+        level.addFreshEntity(sittingEntity);
+        sittingEntity.setYRot(offset.rotation());
+        player.startRiding(sittingEntity);
+        sittingEntity.clampRotation(player);
+        player.hasImpulse = true;
     }
 
     abstract public FurnitureData getData(BlockState state, BlockGetter level, BlockPos pos);
@@ -160,6 +171,22 @@ public abstract class BaseFurnitureBlock extends Block implements SimpleWaterlog
     @Override
     public boolean isPathfindable(BlockState state, BlockGetter level, BlockPos pos, PathComputationType type) {
         return false;
+    }
+
+    @Override
+    public List<ItemStack> getDrops(BlockState state, LootParams.Builder params) {
+        return List.of();
+    }
+
+    @Override
+    public void playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
+        if (!level.isClientSide) {
+            // Drop the furniture item with data
+            ItemStack itemStack = getCloneItemStack(level, pos, state);
+            Block.popResource(level, pos, itemStack);
+        }
+
+        super.playerWillDestroy(level, pos, state, player);
     }
 }
 

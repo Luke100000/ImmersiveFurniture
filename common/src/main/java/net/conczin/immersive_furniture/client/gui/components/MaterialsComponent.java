@@ -78,8 +78,9 @@ public class MaterialsComponent extends ListComponent {
                         leftPos + 6 + x * 22, topPos + 44 + y * 22,
                         22, 22, 234, 162,
                         b -> {
-                            if (screen.selectedElement != null) {
-                                screen.selectedElement.material.source = ((MaterialButton) b).getMaterial().location();
+                            MaterialSource material = ((MaterialButton) b).getMaterial();
+                            if (screen.selectedElement != null && material != null) {
+                                screen.selectedElement.material.source = material.location();
                                 screen.init();
                             }
                         }

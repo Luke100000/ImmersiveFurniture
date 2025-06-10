@@ -6,6 +6,14 @@ Initial release
 
 * Test sleeping and multiplayer
 
+DONE
+
+* Drops
+* Costs
+* Fix 0.6 seconds bullshitting's yaw mismatch
+* Make the 16x16 region on the checkerboard slightly darker
+* Apply to search
+
 # Roadmap 1.0.0
 
 * Blockbench/JSON block and item model import
@@ -16,3 +24,4 @@ Initial release
 * Sprite objects
     * Has access to transparent textures used in e.g., flowers
     * Uses native atlas and thus also supports animations (liquids)
+    * Fixed to 16x16x0 cubes and minecraft namespaced textures

@@ -19,6 +19,7 @@ import static net.conczin.immersive_furniture.client.gui.ArtisansWorkstationScre
 public class SoundsComponent extends ListComponent {
     static final int PAGE_SIZE = 7;
 
+    List<ResourceLocation> allLocations = new LinkedList<>();
     List<ResourceLocation> locations = new LinkedList<>();
     List<Button> buttons = new LinkedList<>();
 
@@ -67,17 +68,21 @@ public class SoundsComponent extends ListComponent {
 
     @Override
     int getPages() {
-        return (BuiltInRegistries.SOUND_EVENT.size() - 1) / 16 + 1;
+        return Math.max(0, (allLocations.size() - 1) / PAGE_SIZE + 1);
     }
 
     @Override
     void updateSearch(String search) {
-        locations = BuiltInRegistries.SOUND_EVENT.keySet().stream()
+        allLocations = BuiltInRegistries.SOUND_EVENT.keySet().stream()
                 .filter(p -> searchBox.getValue().isEmpty() || p.getPath().contains(searchBox.getValue()))
                 .sorted(ResourceLocation::compareTo)
-                .skip((long) page * PAGE_SIZE)
-                .limit(PAGE_SIZE)
                 .toList();
+
+        page = Math.min(page, getPages() - 1);
+        locations = allLocations.subList(
+                page * PAGE_SIZE,
+                Math.min((page * PAGE_SIZE + PAGE_SIZE), allLocations.size())
+        );
 
         for (int i = 0; i < buttons.size(); i++) {
             buttons.get(i).setMessage(i < locations.size() ? Component.translatableWithFallback(
