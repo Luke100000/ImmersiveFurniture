@@ -30,9 +30,9 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
     float camZoom = 100.0f;
 
     public final FurnitureData data;
-    public FurnitureData.Element hoveredElement;
     public FurnitureData.Element selectedElement;
-    public Direction hoveredDirection;
+    public HoverResult hoverResult;
+    public HoverResult nextHoverResult;
 
     DraggingContext draggingContext;
     boolean isRotatingView;
@@ -229,9 +229,10 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if ((button == 0 || button == 1) && hoveredElement != null) {
-            selectedElement = hoveredElement;
-            draggingContext = new DraggingContext(hoveredElement, hoveredDirection, mouseX, mouseY, button == 1);
+        if ((button == 0 || button == 1) && hoverResult != null && nextHoverResult != null) {
+            HoverResult result = lastMouseX == (int) mouseX && lastMouseY == (int) mouseY ? nextHoverResult : hoverResult;
+            selectedElement = result.element();
+            draggingContext = new DraggingContext(result.element(), result.direction(), mouseX, mouseY, button == 1);
             isRotatingView = false;
             init();
         } else {
@@ -251,7 +252,7 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
         }
 
         // Deselect element
-        if (selectedElement != null && hoveredElement == null && lastMouseX == (int) mouseX && lastMouseY == (int) mouseY && isOverRightWindow(mouseX, mouseY)) {
+        if (selectedElement != null && hoverResult == null && lastMouseX == (int) mouseX && lastMouseY == (int) mouseY && isOverRightWindow(mouseX, mouseY)) {
             selectedElement = null;
             init();
         }
@@ -343,7 +344,7 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
         }
     }
 
-    record HoverResult(FurnitureData.Element element, Direction direction, float depth) {
+    public record HoverResult(FurnitureData.Element element, Direction direction, float depth) {
     }
 
     protected void drawModel(GuiGraphics graphics, FurnitureData data, int x, int y, float size, float yaw, float pitch, int mouseX, int mouseY) {
@@ -391,26 +392,26 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
         }
 
         if (results.isEmpty() || !isMouseOver(mouseX, mouseY)) {
-            hoveredElement = null;
-            hoveredDirection = null;
+            hoverResult = null;
+            nextHoverResult = null;
         } else {
             results.sort((a, b) -> Float.compare(b.depth, a.depth));
 
             int index = -1;
-            if (lastMouseX == mouseX && lastMouseY == mouseY && selectedElement != null) {
-                for (HoverResult result : results) {
-                    index++;
-                    if (result.element == selectedElement) {
+            if (selectedElement != null) {
+                for (int i = 0; i < results.size(); i++) {
+                    if (results.get(i).element() == selectedElement) {
+                        index = i;
                         break;
                     }
                 }
             }
-            HoverResult hoverResult = results.get((index + 1) % results.size());
-            hoveredElement = hoverResult.element();
-            hoveredDirection = hoverResult.direction();
+
+            hoverResult = results.get(Math.max(0, index));
+            nextHoverResult = results.get((index + 1) % results.size());
 
             // Highlight the hovered element
-            drawSelection(graphics, hoveredElement, pose, 1.0f, false);
+            drawSelection(graphics, hoverResult.element(), pose, 1.0f, false);
         }
 
         // Highlight the selected element

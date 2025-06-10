@@ -13,6 +13,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.InventoryMenu;
+import org.joml.Vector3f;
 
 public record MaterialSource(
         ResourceLocation location,
@@ -145,11 +146,17 @@ public record MaterialSource(
         }
     }
 
-    public static int fromCube(FurnitureData.Material material, Direction direction, int x, int y, int w, int h) {
+    public static int fromCube(FurnitureData.Material material, Direction direction, Vector3f center, int x, int y, int w, int h) {
         NativeImage texture = MaterialRegistry.INSTANCE.materials.getOrDefault(
                 material.source,
                 MaterialSource.DEFAULT
         ).get(direction);
+
+        if (material.wrap == FurnitureData.WrapMode.REPEAT) {
+            //noinspection SuspiciousNameCombination
+            x += (int) (center.x += center.y);
+            y += (int) (center.z += center.y);
+        }
 
         if (material.flip) {
             x = w - x - 1;

@@ -6,14 +6,6 @@ Initial release
 
 * Test sleeping and multiplayer
 
-DONE
-
-* Drops
-* Costs
-* Fix 0.6 seconds bullshitting's yaw mismatch
-* Make the 16x16 region on the checkerboard slightly darker
-* Apply to search
-
 # Roadmap 1.0.0
 
 * Blockbench/JSON block and item model import

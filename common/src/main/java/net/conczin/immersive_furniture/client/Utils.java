@@ -2,7 +2,6 @@ package net.conczin.immersive_furniture.client;
 
 import net.conczin.immersive_furniture.data.FurnitureData;
 import net.minecraft.core.Direction;
-import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
@@ -94,7 +93,7 @@ public class Utils {
         return new RaycastResult(element, face, -tMin, intersection);
     }
 
-    private static @Nullable Direction getDirection(Vector3f intersection, Vector3f min, Vector3f max) {
+    private static Direction getDirection(Vector3f intersection, Vector3f min, Vector3f max) {
         float epsilon = 0.0001f;
         if (Math.abs(intersection.x - min.x) < epsilon) {
             return Direction.WEST;
