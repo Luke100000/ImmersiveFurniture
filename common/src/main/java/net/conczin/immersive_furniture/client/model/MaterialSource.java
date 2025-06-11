@@ -101,12 +101,7 @@ public record MaterialSource(
     private static final RandomSource random = RandomSource.create();
 
     public static MaterialSource create(BlockState state) {
-        BakedModel model;
-        try {
-            model = Minecraft.getInstance().getModelManager().getBlockModelShaper().getBlockModel(state);
-        } catch (Exception e) {
-            return null;
-        }
+        BakedModel model = Minecraft.getInstance().getModelManager().getBlockModelShaper().getBlockModel(state);
 
         Map<Direction, Material> materials = new HashMap<>();
         for (Direction direction : Direction.values()) {
