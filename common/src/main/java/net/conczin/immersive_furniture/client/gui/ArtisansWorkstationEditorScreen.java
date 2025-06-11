@@ -232,6 +232,17 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
         if ((button == 0 || button == 1) && hoverResult != null && nextHoverResult != null) {
             HoverResult result = lastMouseX == (int) mouseX && lastMouseY == (int) mouseY ? nextHoverResult : hoverResult;
             selectedElement = result.element();
+
+            if (currentPage == Page.MATERIALS || currentPage == Page.SOUNDS || currentPage == Page.PARTICLES) {
+                if (selectedElement.type == FurnitureData.ElementType.ELEMENT) {
+                    currentPage = Page.MATERIALS;
+                } else if (selectedElement.type == FurnitureData.ElementType.SOUND_EMITTER) {
+                    currentPage = Page.SOUNDS;
+                } else if (selectedElement.type == FurnitureData.ElementType.PARTICLE_EMITTER) {
+                    currentPage = Page.PARTICLES;
+                }
+            }
+
             draggingContext = new DraggingContext(result.element(), result.direction(), mouseX, mouseY, button == 1);
             isRotatingView = false;
             init();
