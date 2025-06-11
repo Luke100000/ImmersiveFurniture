@@ -479,7 +479,7 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
                 }
                 Thread.sleep(2000);
             } catch (Exception e) {
-                Common.logger.error(e);
+                Common.logger.error("Failed to authenticate!", e);
             }
             awaitingAuthentication = false;
         });

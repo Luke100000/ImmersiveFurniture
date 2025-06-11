@@ -53,7 +53,7 @@ public class Auth {
         try {
             Files.writeString(Paths.get("./immersiveLibraryToken_v2"), currentToken);
         } catch (IOException e) {
-            Common.logger.error(e);
+            Common.logger.error("Failed to save token!", e);
         }
     }
 

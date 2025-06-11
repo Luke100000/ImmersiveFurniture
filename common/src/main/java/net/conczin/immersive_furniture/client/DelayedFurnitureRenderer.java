@@ -40,7 +40,7 @@ public class DelayedFurnitureRenderer {
         // Re-render chunks where furniture failed to render
         Minecraft client = Minecraft.getInstance();
         if (client.level != null && (client.level.getDayTime() % 20 == 0 || quickCheck) && !delayedRendering.isEmpty()) {
-            Common.logger.info("Re-checking {} delayed blocks", delayedRendering.size());
+            Common.delayedRendersChecks++;
             quickCheck = false;
 
             Iterator<Map.Entry<Long, Function<BlockPos, Status>>> it = delayedRendering.entrySet().iterator();
@@ -53,7 +53,7 @@ public class DelayedFurnitureRenderer {
 
                 // Data available, re-render
                 if (status.data() != null) {
-                    Common.logger.info("Re-rendering block {}", entry.getKey());
+                    Common.delayedRenders++;
                     client.levelRenderer.setSectionDirty(
                             SectionPos.blockToSectionCoord(pos.getX()),
                             SectionPos.blockToSectionCoord(pos.getY()),

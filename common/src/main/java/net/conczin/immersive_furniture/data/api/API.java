@@ -92,10 +92,10 @@ public class API {
             JsonObject object = gson.fromJson(response, JsonObject.class);
             return decoder.apply(object);
         } catch (IOException e) {
-            Common.logger.warn(e);
+            Common.logger.warn(e, e);
             return new ErrorResponse(-1, e.toString());
         } catch (Exception e) {
-            Common.logger.error(e);
+            Common.logger.error(e, e);
             return new ErrorResponse(-1, e.toString());
         }
     }

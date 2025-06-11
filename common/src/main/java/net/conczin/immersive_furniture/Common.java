@@ -13,6 +13,9 @@ public final class Common {
 
     public static Logger logger = LogManager.getLogger(MOD_ID);
 
+    public static int delayedRendersChecks = 0;
+    public static int delayedRenders = 0;
+
     public static ResourceLocation locate(String path) {
         return new ResourceLocation(MOD_ID, path);
     }
