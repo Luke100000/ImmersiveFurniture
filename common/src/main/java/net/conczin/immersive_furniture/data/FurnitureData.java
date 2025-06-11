@@ -207,36 +207,6 @@ public class FurnitureData {
         }
     }
 
-    public void finish() {
-        // Find and log sources of textures
-        sources.clear();
-        for (Element element : elements) {
-            if (element.type != ElementType.ELEMENT) continue;
-            ResourceLocation source = MaterialRegistry.INSTANCE.materials.getOrDefault(element.material.source, MaterialSource.DEFAULT).north().texture();
-            ResourceLocation resourceLocation = new ResourceLocation(source.getNamespace(), "textures/" + source.getPath() + ".png");
-            Minecraft.getInstance().getResourceManager().getResource(resourceLocation)
-                    .ifPresent(resource -> {
-                        if (resource.isBuiltin() || resource.sourcePackId().equals("mod_resources")) {
-                            sources.add(resourceLocation.getNamespace());
-                        } else {
-                            sources.add(Utils.beatifyPackID(resource.sourcePackId()));
-                        }
-                    });
-        }
-        sources.remove("minecraft");
-
-        // Find and log dependencies
-        dependencies.clear();
-        for (Element element : elements) {
-            if (element.type == ElementType.PARTICLE_EMITTER) {
-                dependencies.add(element.particleEmitter.particle.getNamespace());
-            } else if (element.type == ElementType.SOUND_EMITTER) {
-                dependencies.add(element.soundEmitter.sound.getNamespace());
-            }
-        }
-        dependencies.remove("minecraft");
-    }
-
     public boolean hasParticles() {
         return elements.stream().anyMatch(e -> e.type == ElementType.PARTICLE_EMITTER);
     }

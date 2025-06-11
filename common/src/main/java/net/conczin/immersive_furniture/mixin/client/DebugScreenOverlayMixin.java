@@ -12,7 +12,7 @@ import java.util.List;
 @Mixin(DebugScreenOverlay.class)
 public class DebugScreenOverlayMixin {
     @Inject(at = @At("RETURN"), method = "getGameInformation")
-    protected void getLeftText(CallbackInfoReturnable<List<String>> info) {
+    protected void immersiveFurniture$getLeftText(CallbackInfoReturnable<List<String>> info) {
         info.getReturnValue().add("[IF] B: %s%% (%s), E: %s%% (%s), S: %s%% (%s)".formatted(
                 (int) (DynamicAtlas.BAKED.getUsage() * 100),
                 DynamicAtlas.BAKED.knownFurniture.size(),

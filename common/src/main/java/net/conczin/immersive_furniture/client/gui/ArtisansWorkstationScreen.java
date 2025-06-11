@@ -7,7 +7,9 @@ import net.conczin.immersive_furniture.Common;
 import net.conczin.immersive_furniture.client.PreviewParticleEngine;
 import net.conczin.immersive_furniture.client.model.DynamicAtlas;
 import net.conczin.immersive_furniture.client.model.FurnitureModelBaker;
+import net.conczin.immersive_furniture.client.model.MaterialSource;
 import net.conczin.immersive_furniture.data.FurnitureData;
+import net.conczin.immersive_furniture.data.MaterialRegistry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Renderable;
@@ -21,8 +23,12 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
@@ -44,6 +50,7 @@ public abstract class ArtisansWorkstationScreen extends Screen {
 
     public ArtisansWorkstationScreen() {
         super(TITLE);
+        MaterialRegistry.INSTANCE.sync();
     }
 
     protected void drawRectangle(GuiGraphics graphics, int x, int y, int w, int h) {

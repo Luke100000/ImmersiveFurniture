@@ -5,15 +5,23 @@ import net.conczin.immersive_furniture.data.FurnitureData;
 import net.conczin.immersive_furniture.data.MaterialRegistry;
 import net.conczin.immersive_furniture.mixin.client.SpriteContentsAccessor;
 import net.conczin.immersive_furniture.utils.Utils;
-import net.minecraft.client.renderer.block.model.BlockElement;
-import net.minecraft.client.renderer.block.model.BlockModel;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.Material;
 import net.minecraft.core.Direction;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.inventory.InventoryMenu;
+import net.minecraft.world.level.block.state.BlockState;
 import org.joml.Vector3f;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public record MaterialSource(
         ResourceLocation location,
@@ -83,40 +91,46 @@ public record MaterialSource(
                 location,
                 findMaterial(location, material, "_down", "_bottom", "_top"),
                 findMaterial(location, material, "_up", "_top"),
-                findMaterial(location, material, "_north", "_side"),
-                findMaterial(location, material, "_south", "_side"),
+                findMaterial(location, material, "_front", "_north", "_side"),
+                findMaterial(location, material, "_back", "_south", "_side"),
                 findMaterial(location, material, "_west", "_side"),
                 findMaterial(location, material, "_east", "_side")
         );
     }
 
-    public static MaterialSource create(BlockModel model) {
-        if (model.getElements().size() != 1) return null;
+    private static final RandomSource random = RandomSource.create();
 
-        BlockElement element = model.getElements().get(0);
-        if (element.from.x() != 0 || element.from.y() != 0 || element.from.z() != 0) return null;
-        if (element.to.x() != 16 || element.to.y() != 16 || element.to.z() != 16) return null;
-
-        Material down = model.getMaterial(element.faces.get(Direction.DOWN).texture);
-        Material up = model.getMaterial(element.faces.get(Direction.UP).texture);
-        Material north = model.getMaterial(element.faces.get(Direction.NORTH).texture);
-        Material south = model.getMaterial(element.faces.get(Direction.SOUTH).texture);
-        Material west = model.getMaterial(element.faces.get(Direction.WEST).texture);
-        Material east = model.getMaterial(element.faces.get(Direction.EAST).texture);
-
-        // Not all models are fully textured
-        if (down.texture().equals(MISSING) || up.texture().equals(MISSING) || north.texture().equals(MISSING) || south.texture().equals(MISSING) || west.texture().equals(MISSING) || east.texture().equals(MISSING)) {
+    public static MaterialSource create(BlockState state) {
+        BakedModel model;
+        try {
+            model = Minecraft.getInstance().getModelManager().getBlockModelShaper().getBlockModel(state);
+        } catch (Exception e) {
             return null;
         }
 
+        Map<Direction, Material> materials = new HashMap<>();
+        for (Direction direction : Direction.values()) {
+            List<BakedQuad> quads = model.getQuads(state, direction, random);
+            if (quads.size() != 1) return null;
+
+            TextureAtlasSprite sprite = quads.get(0).getSprite();
+            int width = sprite.contents().width();
+            int height = sprite.contents().height();
+            if (width != height || Math.pow((int) Math.sqrt(width), 2) != width) return null;
+
+            ResourceLocation name = sprite.contents().name();
+            materials.put(direction, new Material(sprite.atlasLocation(), name));
+        }
+
+        ResourceLocation name = BuiltInRegistries.BLOCK.getKey(state.getBlock());
         return new MaterialSource(
-                new ResourceLocation(model.name.replace(":block/", ":")),
-                down,
-                up,
-                north,
-                south,
-                west,
-                east
+                name,
+                materials.get(Direction.DOWN),
+                materials.get(Direction.UP),
+                materials.get(Direction.NORTH),
+                materials.get(Direction.SOUTH),
+                materials.get(Direction.WEST),
+                materials.get(Direction.EAST)
         );
     }
 

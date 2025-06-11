@@ -5,13 +5,18 @@ import net.conczin.immersive_furniture.client.gui.ArtisansWorkstationLibraryScre
 import net.conczin.immersive_furniture.client.gui.widgets.BoundedIntSliderButton;
 import net.conczin.immersive_furniture.client.model.DynamicAtlas;
 import net.conczin.immersive_furniture.client.model.FurnitureModelFactory;
+import net.conczin.immersive_furniture.client.model.MaterialSource;
+import net.conczin.immersive_furniture.data.FurnitureData;
 import net.conczin.immersive_furniture.data.FurnitureDataManager;
+import net.conczin.immersive_furniture.data.MaterialRegistry;
+import net.conczin.immersive_furniture.utils.Utils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 
 import java.util.List;
 import java.util.Locale;
@@ -87,11 +92,8 @@ public class SettingsComponent extends ScreenComponent {
 
         // Save
         addButton("gui.immersive_furniture.save", b -> {
-            // Bake the model and save
-            DynamicAtlas.SCRATCH.clear();
-            FurnitureModelFactory.getModel(screen.data, DynamicAtlas.SCRATCH);
-            screen.data.finish();
-            screen.data.author = Minecraft.getInstance().getUser().getName();
+            // Finish and bake the model and save
+            finish(screen.data);
             FurnitureDataManager.saveLocalFile(screen.data);
 
             // Switch to the library screen
@@ -118,5 +120,44 @@ public class SettingsComponent extends ScreenComponent {
                         .bounds(x, y, w, 20)
                         .build()
         );
+    }
+
+
+
+    public void finish(FurnitureData data) {
+        // Bake
+        DynamicAtlas.SCRATCH.clear();
+        FurnitureModelFactory.getModel(screen.data, DynamicAtlas.SCRATCH);
+
+        // Set author
+        screen.data.author = Minecraft.getInstance().getUser().getName();
+
+        // Find and log sources of textures
+        data.sources.clear();
+        for (FurnitureData.Element element : data.elements) {
+            if (element.type != FurnitureData.ElementType.ELEMENT) continue;
+            ResourceLocation source = MaterialRegistry.INSTANCE.materials.getOrDefault(element.material.source, MaterialSource.DEFAULT).north().texture();
+            ResourceLocation resourceLocation = new ResourceLocation(source.getNamespace(), "textures/" + source.getPath() + ".png");
+            Minecraft.getInstance().getResourceManager().getResource(resourceLocation)
+                    .ifPresent(resource -> {
+                        if (resource.isBuiltin() || resource.sourcePackId().equals("mod_resources")) {
+                            data.sources.add(resourceLocation.getNamespace());
+                        } else {
+                            data.sources.add(Utils.beatifyPackID(resource.sourcePackId()));
+                        }
+                    });
+        }
+        data.sources.remove("minecraft");
+
+        // Find and log dependencies
+        data.dependencies.clear();
+        for (FurnitureData.Element element : data.elements) {
+            if (element.type == FurnitureData.ElementType.PARTICLE_EMITTER) {
+                data.dependencies.add(element.particleEmitter.particle.getNamespace());
+            } else if (element.type == FurnitureData.ElementType.SOUND_EMITTER) {
+                data.dependencies.add(element.soundEmitter.sound.getNamespace());
+            }
+        }
+        data.dependencies.remove("minecraft");
     }
 }

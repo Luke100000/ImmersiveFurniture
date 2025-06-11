@@ -73,7 +73,7 @@ public class FurnitureModelFactory {
                 for (int y = 0; y < dimensions.y; y++) {
                     int color;
                     if (!useBaked) {
-                        color = MaterialSource.fromCube(element.material, direction, x, y, dimensions.x, dimensions.y);
+                        color = MaterialSource.fromCube(element.material, direction, element.getCenter(), x, y, dimensions.x, dimensions.y);
                         int r = ((color >> 16) & 0xFF);
                         int g = ((color >> 8) & 0xFF);
                         int b = (color & 0xFF);
