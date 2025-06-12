@@ -7,6 +7,7 @@ import net.conczin.immersive_furniture.Common;
 import net.conczin.immersive_furniture.client.PreviewParticleEngine;
 import net.conczin.immersive_furniture.client.model.DynamicAtlas;
 import net.conczin.immersive_furniture.client.model.FurnitureModelBaker;
+import net.conczin.immersive_furniture.client.renderer.FurnitureBlockEntityRenderer;
 import net.conczin.immersive_furniture.data.FurnitureData;
 import net.conczin.immersive_furniture.data.MaterialRegistry;
 import net.minecraft.client.Minecraft;
@@ -18,12 +19,14 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
@@ -95,12 +98,9 @@ public abstract class ArtisansWorkstationScreen extends Screen {
                 lastBakedModel = bakedModel;
             }
         }
-        ResourceLocation location = DynamicAtlas.SCRATCH.getLocation();
-        VertexConsumer consumer = graphics.bufferSource().getBuffer(RenderType.entityCutout(location));
+
         if (bakedModel != null) {
-            DynamicAtlas.SCRATCH.uploadIfDirty();
-            BlockRenderDispatcher blockRenderer = Minecraft.getInstance().getBlockRenderer();
-            blockRenderer.getModelRenderer().renderModel(graphics.pose().last(), consumer, null, bakedModel, 1.0f, 1.0f, 1.0f, 0xF000F0, OverlayTexture.NO_OVERLAY);
+            FurnitureBlockEntityRenderer.renderFurniture(null, graphics.pose(), graphics.bufferSource(), 0xF000F0, OverlayTexture.NO_OVERLAY, data, bakedModel, DynamicAtlas.SCRATCH);
         }
 
         // Particles
@@ -111,8 +111,7 @@ public abstract class ArtisansWorkstationScreen extends Screen {
 
             ClientLevel level = Minecraft.getInstance().level;
             LocalPlayer player = Minecraft.getInstance().player;
-            if (level == null) return;
-            if (player == null) return;
+            if (level == null  || player == null) return;
 
             // We use the animation tick, which is a triangle distribution based on distance to the player,
             // 0.2f is roughly 4 blocks away

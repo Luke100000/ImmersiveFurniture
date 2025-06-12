@@ -3,10 +3,12 @@ package net.conczin.immersive_furniture.client.model;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.datafixers.util.Either;
 import net.conczin.immersive_furniture.Common;
-import net.conczin.immersive_furniture.data.ElementRotation;
-import net.conczin.immersive_furniture.data.FurnitureData;
-import net.conczin.immersive_furniture.data.ModelUtils;
+import net.conczin.immersive_furniture.data.*;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.*;
+import net.minecraft.client.renderer.texture.TextureAtlas;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.Material;
 import net.minecraft.core.Direction;
 import net.minecraft.world.inventory.InventoryMenu;
@@ -122,7 +124,7 @@ public class FurnitureModelFactory {
         return new BlockElementFace(
                 getCulledDirection(vertices),
                 element.color,
-                "#0",
+                "0",
                 new BlockFaceUV(
                         new float[]{
                                 quad.x() * uvScale,
@@ -236,7 +238,7 @@ public class FurnitureModelFactory {
 
     private BlockModel getModel() {
         Map<String, Either<Material, String>> textures = new HashMap<>();
-        textures.put("#0", Either.left(new Material(InventoryMenu.BLOCK_ATLAS, Common.locate("block/furniture"))));
+        textures.put("0", Either.left(new Material(InventoryMenu.BLOCK_ATLAS, Common.locate("block/furniture"))));
         data.elements.stream().filter(e -> e.type == FurnitureData.ElementType.SPRITE)
                 .map(e -> e.sprite.sprite).distinct().forEach(source ->
                         textures.put(source.toString(), Either.left(new Material(InventoryMenu.BLOCK_ATLAS, source))));
@@ -267,6 +269,26 @@ public class FurnitureModelFactory {
     }
 
     public static BlockModel getModel(FurnitureData data, DynamicAtlas atlas) {
+        data.transparency = computeTransparency(data);
         return new FurnitureModelFactory(data, atlas).getModel();
+    }
+
+    private static TransparencyType computeTransparency(FurnitureData data) {
+        TransparencyType transparencyType = TransparencyType.SOLID;
+        for (FurnitureData.Element element : data.elements) {
+            TransparencyType elementTransparencyType = null;
+            if (element.type == FurnitureData.ElementType.SPRITE) {
+                TextureAtlas atlas = Minecraft.getInstance().getModelManager().getAtlas(InventoryMenu.BLOCK_ATLAS);
+                TextureAtlasSprite sprite = atlas.getSprite(element.sprite.sprite);
+                elementTransparencyType = TransparencyManager.INSTANCE.getTransparencyType(sprite.contents());
+            } else if (element.type == FurnitureData.ElementType.ELEMENT) {
+                RenderType renderType = MaterialRegistry.INSTANCE.renderTypes.getOrDefault(element.material.source, RenderType.solid());
+                elementTransparencyType = TransparencyType.fromRenderType(renderType);
+            }
+            if (elementTransparencyType != null && elementTransparencyType.isHigherPriorityThan(transparencyType)) {
+                transparencyType = elementTransparencyType;
+            }
+        }
+        return transparencyType;
     }
 }

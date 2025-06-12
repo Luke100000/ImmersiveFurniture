@@ -10,30 +10,31 @@ import net.conczin.immersive_furniture.client.model.DynamicAtlas;
 import net.conczin.immersive_furniture.client.model.FurnitureModelBaker;
 import net.conczin.immersive_furniture.data.FurnitureData;
 import net.conczin.immersive_furniture.item.FurnitureItem;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.block.ModelBlockRenderer;
+import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
 
+import javax.annotation.Nullable;
+import java.util.List;
+
+import static net.minecraft.world.level.SignalGetter.DIRECTIONS;
+
 public class FurnitureBlockEntityRenderer<T extends FurnitureBlockEntity> implements BlockEntityRenderer<T> {
     public FurnitureBlockEntityRenderer(BlockEntityRendererProvider.Context ignoredContext) {
         // NO-OP
-    }
-
-    public static void renderItem(ItemStack itemStack, PoseStack poseStack, MultiBufferSource buffer, int packedLight, int packedOverlay) {
-        FurnitureData data = FurnitureItem.getData(itemStack);
-        renderFurniture(null, poseStack, buffer, packedLight, packedOverlay, data);
     }
 
     @Override
@@ -62,13 +63,46 @@ public class FurnitureBlockEntityRenderer<T extends FurnitureBlockEntity> implem
         poseStack.popPose();
     }
 
-    private static void renderFurniture(BlockState state, PoseStack poseStack, MultiBufferSource buffer, int packedLight, int packedOverlay, FurnitureData data) {
-        boolean translucent = data.isTranslucent();
-        BlockRenderDispatcher blockRenderer = Minecraft.getInstance().getBlockRenderer();
-        BakedModel bakedModel = FurnitureModelBaker.getModel(data, DynamicAtlas.ENTITY);
-        ResourceLocation location = DynamicAtlas.ENTITY.getLocation();
-        VertexConsumer consumer = buffer.getBuffer(translucent ? RenderType.entityTranslucent(location) : RenderType.entityCutout(location));
-        blockRenderer.getModelRenderer().renderModel(poseStack.last(), consumer, state, bakedModel, 1.0f, 1.0f, 1.0f, packedLight, packedOverlay);
+    public static void renderItem(ItemStack itemStack, PoseStack poseStack, MultiBufferSource buffer, int packedLight, int packedOverlay) {
+        FurnitureData data = FurnitureItem.getData(itemStack);
+        renderFurniture(null, poseStack, buffer, packedLight, packedOverlay, data);
+    }
+
+    public static void renderFurniture(BlockState state, PoseStack poseStack, MultiBufferSource buffer, int packedLight, int packedOverlay, FurnitureData data) {
+        renderFurniture(state, poseStack, buffer, packedLight, packedOverlay, data, FurnitureModelBaker.getModel(data, DynamicAtlas.ENTITY), DynamicAtlas.ENTITY);
+    }
+
+    public static void renderFurniture(BlockState state, PoseStack poseStack, MultiBufferSource buffer, int packedLight, int packedOverlay, FurnitureData data, BakedModel bakedModel, DynamicAtlas atlas) {
+        // Render in two passes since, unliked baked textures, the textures can be on up to two atlases
+        for (int i = 0; i < 2; i++) {
+            ResourceLocation location = i == 0 ? atlas.getLocation() : InventoryMenu.BLOCK_ATLAS;
+
+            // Use the transparency type to determine the render type
+            VertexConsumer consumer = switch (data.transparency) {
+                case TRANSLUCENT -> buffer.getBuffer(RenderType.entityTranslucentCull(location));
+                case CUTOUT, CUTOUT_MIPPED -> buffer.getBuffer(RenderType.entityCutout(location));
+                default -> buffer.getBuffer(RenderType.entitySolid(location));
+            };
+
+            renderModel(poseStack.last(), consumer, state, bakedModel, packedLight, packedOverlay, i == 1);
+        }
+    }
+
+    private static final RandomSource randomsource = RandomSource.create();
+
+    private static void renderModel(PoseStack.Pose pose, VertexConsumer consumer, @Nullable BlockState state, BakedModel model, int packedLight, int packedOverlay, boolean blocksAtlas) {
+        for (Direction direction : DIRECTIONS) {
+            renderQuadList(pose, consumer, model.getQuads(state, direction, randomsource), packedLight, packedOverlay, blocksAtlas);
+        }
+        renderQuadList(pose, consumer, model.getQuads(state, null, randomsource), packedLight, packedOverlay, blocksAtlas);
+    }
+
+    private static void renderQuadList(PoseStack.Pose pose, VertexConsumer consumer, List<BakedQuad> quads, int packedLight, int packedOverlay, boolean blocksAtlas) {
+        for (BakedQuad quad : quads) {
+            ResourceLocation resourceLocation = quad.getSprite().atlasLocation();
+            if (resourceLocation.getNamespace().equals("minecraft") != blocksAtlas) continue;
+            consumer.putBulkData(pose, quad, new float[]{1.0F, 1.0F, 1.0F, 1.0F}, 1.0f, 1.0f, 1.0f, new int[]{packedLight, packedLight, packedLight, packedLight}, packedOverlay, true);
+        }
     }
 
     public static void renderBatched(ModelBlockRenderer modelRenderer, BlockState state, BlockPos pos, BlockAndTintGetter level, PoseStack poseStack, VertexConsumer consumer, boolean checkSides, RandomSource random) {

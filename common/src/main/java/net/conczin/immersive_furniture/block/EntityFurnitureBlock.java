@@ -57,7 +57,7 @@ public class EntityFurnitureBlock extends BaseFurnitureBlock implements EntityBl
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(LIGHT, WATERLOGGED, FACING);
+        builder.add(LIGHT, WATERLOGGED, FACING, TRANSPARENCY);
     }
 
     public FurnitureData getData(BlockState state, BlockGetter level, BlockPos pos) {

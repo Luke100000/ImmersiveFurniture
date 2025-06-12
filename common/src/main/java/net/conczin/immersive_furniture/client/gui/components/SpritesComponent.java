@@ -1,9 +1,10 @@
 package net.conczin.immersive_furniture.client.gui.components;
 
-import com.mojang.blaze3d.platform.NativeImage;
 import net.conczin.immersive_furniture.client.gui.ArtisansWorkstationEditorScreen;
 import net.conczin.immersive_furniture.client.gui.widgets.SpriteButton;
 import net.conczin.immersive_furniture.client.gui.widgets.StateImageButton;
+import net.conczin.immersive_furniture.client.model.TransparencyManager;
+import net.conczin.immersive_furniture.data.TransparencyType;
 import net.conczin.immersive_furniture.mixin.client.SpriteContentsAccessor;
 import net.conczin.immersive_furniture.mixin.client.TextureAtlasAccessor;
 import net.minecraft.client.Minecraft;
@@ -11,7 +12,6 @@ import net.minecraft.client.renderer.texture.SpriteContents;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.FastColor;
 import net.minecraft.world.inventory.InventoryMenu;
 
 import java.util.*;
@@ -19,8 +19,6 @@ import java.util.*;
 public class SpritesComponent extends ListComponent {
     private final List<ResourceLocation> allSprites;
     private final List<ResourceLocation> filteredSprites = new LinkedList<>();
-
-    private final Map<ResourceLocation, Boolean> transparencyCache = new HashMap<>();
 
     final List<SpriteButton> spriteButtons = new ArrayList<>();
 
@@ -40,7 +38,7 @@ public class SpritesComponent extends ListComponent {
         List<SpriteContents> sprites = ((TextureAtlasAccessor) Minecraft.getInstance().getModelManager().getAtlas(InventoryMenu.BLOCK_ATLAS)).getSprites();
         allSprites = sprites.stream()
                 .filter(SpritesComponent::isSquare)
-                .filter(s -> ((SpriteContentsAccessor) s).immersiveFurniture$getFrameCount() > 1 || isTransparent(s))
+                .filter(s -> ((SpriteContentsAccessor) s).immersiveFurniture$getFrameCount() > 1 || TransparencyManager.INSTANCE.getTransparencyType(s) != TransparencyType.SOLID)
                 .map(SpriteContents::name)
                 .toList();
     }
@@ -49,22 +47,6 @@ public class SpritesComponent extends ListComponent {
         int width = spriteContents.width();
         int height = spriteContents.height();
         return width == height && Math.pow((int) Math.sqrt(width), 2) == width;
-    }
-
-    private boolean isTransparent(SpriteContents s) {
-        return transparencyCache.computeIfAbsent(s.name(), location -> computeIsTransparent(s));
-    }
-
-    private boolean computeIsTransparent(SpriteContents s) {
-        NativeImage image = ((SpriteContentsAccessor) s).getMipLevelData()[0];
-        for (int y = 0; y < image.getHeight(); y++) {
-            for (int x = 0; x < image.getWidth(); x++) {
-                if (FastColor.ABGR32.alpha(image.getPixelRGBA(x, y)) == 0) {
-                    return true;
-                }
-            }
-        }
-        return false;
     }
 
     @Override

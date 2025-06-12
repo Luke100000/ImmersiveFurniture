@@ -3,6 +3,7 @@ package net.conczin.immersive_furniture.block;
 import net.conczin.immersive_furniture.data.FurnitureData;
 import net.conczin.immersive_furniture.data.FurnitureDataManager;
 import net.conczin.immersive_furniture.data.FurnitureRegistry;
+import net.conczin.immersive_furniture.data.TransparencyType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -25,7 +26,8 @@ public class LightFurnitureBlock extends BaseFurnitureBlock {
                 .setValue(IDENTIFIER, 0)
                 .setValue(LIGHT, 0)
                 .setValue(WATERLOGGED, false)
-                .setValue(FACING, Direction.NORTH));
+                .setValue(FACING, Direction.NORTH)
+                .setValue(TRANSPARENCY, TransparencyType.SOLID));
     }
 
     @Override
@@ -40,9 +42,10 @@ public class LightFurnitureBlock extends BaseFurnitureBlock {
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(IDENTIFIER, LIGHT, WATERLOGGED, FACING);
+        builder.add(IDENTIFIER, LIGHT, WATERLOGGED, FACING, TRANSPARENCY);
     }
 
+    @Override
     public FurnitureData getData(BlockState state, BlockGetter level, BlockPos pos) {
         int identifier = state.getValue(IDENTIFIER) + 65536;
         String hash = FurnitureRegistry.resolve(identifier);

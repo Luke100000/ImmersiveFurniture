@@ -128,7 +128,7 @@ public class FurnitureModelBaker {
 
     private static BakedModel bakeModel(DynamicAtlas atlas, BlockModel model, int yRot) {
         BakedModel bake = model.bake(modelBaker,
-                material -> atlas == DynamicAtlas.BAKED || !material.atlasLocation().getNamespace().equals("immersive_furniture") ? material.sprite() : atlas.sprite,
+                material -> atlas == DynamicAtlas.BAKED || !material.texture().getNamespace().equals("immersive_furniture") ? material.sprite() : atlas.sprite,
                 BlockModelRotation.by(0, yRot),
                 LOCATION
         );

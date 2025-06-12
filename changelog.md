@@ -9,6 +9,7 @@ Initial release
 * Mixed textures and tint=true custom block model renderer
 * Effects reset to 0
 * Finish sprites menu
+* Dont drop in creative
 
 # Roadmap 1.0.0
 

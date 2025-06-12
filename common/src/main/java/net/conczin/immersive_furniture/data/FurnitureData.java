@@ -42,6 +42,7 @@ public class FurnitureData {
     public String originalAuthor = "";
     public Set<String> sources = new HashSet<>();
     public Set<String> dependencies = new HashSet<>();
+    public TransparencyType transparency = TransparencyType.SOLID;
 
     public final List<Element> elements = new LinkedList<>();
 
@@ -63,6 +64,7 @@ public class FurnitureData {
         this.originalAuthor = tag.getString("OriginalAuthor");
         this.sources = Utils.fromNbt(tag.getList("Sources", 8));
         this.dependencies = Utils.fromNbt(tag.getList("Dependencies", 8));
+        this.transparency = tag.contains("Transparency") ? TransparencyType.valueOf(tag.getString("Transparency")) : TransparencyType.SOLID;
 
         ListTag elementsTag = tag.getList("Elements", 10);
         for (int i = 0; i < elementsTag.size(); i++) {
@@ -80,8 +82,9 @@ public class FurnitureData {
         this.originalAuthor = data.originalAuthor.isEmpty() ? data.author : data.originalAuthor;
         this.sources.addAll(data.sources);
         this.dependencies.addAll(data.dependencies);
-        this.hash = null;
+        this.transparency = data.transparency;
 
+        this.hash = null;
         this.cachedShapes = new HashMap<>();
         this.lastTick = 0;
 
@@ -99,9 +102,9 @@ public class FurnitureData {
         tag.putInt("ContentID", contentid);
         tag.putString("Author", author);
         tag.putString("OriginalAuthor", originalAuthor);
-
         tag.put("Sources", Utils.toNbt(sources));
         tag.put("Dependencies", Utils.toNbt(dependencies));
+        tag.putString("Transparency", this.transparency.name());
 
         ListTag elementsTag = new ListTag();
         for (Element element : elements) {
@@ -170,10 +173,6 @@ public class FurnitureData {
                         )
                 )
         );
-    }
-
-    public boolean isTranslucent() {
-        return false;
     }
 
     public boolean requiresBlockEntity() {
@@ -446,7 +445,7 @@ public class FurnitureData {
             this.axis = Direction.Axis.byName(tag.getString("Axis"));
             this.rotation = tag.getFloat("Rotation");
             this.type = Utils.parseEnum(ElementType.class, tag.getString("Type"), ElementType.ELEMENT);
-            this.color = tag.getInt("Color");
+            this.color = tag.contains("Color") ? tag.getInt("Color") : -1;
             this.material = new Material(tag.getCompound("Material"));
             this.particleEmitter = new ParticleEmitter(tag.getCompound("ParticleEmitter"));
             this.soundEmitter = new SoundEmitter(tag.getCompound("SoundEmitter"));
@@ -764,7 +763,7 @@ public class FurnitureData {
     }
 
     public static class Sprite {
-        public ResourceLocation sprite = new ResourceLocation("minecraft:block/water");
+        public ResourceLocation sprite = new ResourceLocation("minecraft:block/water_still");
 
         public Sprite() {
         }
