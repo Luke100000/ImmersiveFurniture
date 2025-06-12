@@ -1,10 +1,8 @@
 package net.conczin.immersive_furniture.data;
 
-import net.conczin.immersive_furniture.client.model.MaterialSource;
 import net.conczin.immersive_furniture.config.Config;
 import net.conczin.immersive_furniture.utils.Utils;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.SimpleParticleType;
@@ -20,7 +18,6 @@ import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.Shapes;
@@ -404,6 +401,7 @@ public class FurnitureData {
         PARTICLE_EMITTER,
         SOUND_EMITTER,
         PLAYER_POSE,
+        SPRITE,
     }
 
     public record ElementRotationAxes(Vector3f center, Vector3f right, Vector3f up, Vector3f forward) {
@@ -417,11 +415,13 @@ public class FurnitureData {
         public Vector3f to;
         public Direction.Axis axis;
         public float rotation;
-        public ElementType type = ElementType.ELEMENT;
+        public ElementType type;
+        public int color;
         public Material material;
         public ParticleEmitter particleEmitter;
         public SoundEmitter soundEmitter;
         public PlayerPose playerPose;
+        public Sprite sprite;
 
         public Map<Direction, int[]> bakedTexture = new HashMap<>();
         public ElementRotationAxes rotationAxes;
@@ -431,10 +431,13 @@ public class FurnitureData {
             to = new Vector3f(14, 12, 14);
             axis = Direction.Axis.X;
             rotation = 0.0f;
+            type = ElementType.ELEMENT;
+            color = -1;
             material = new Material();
             particleEmitter = new ParticleEmitter();
             soundEmitter = new SoundEmitter();
             playerPose = new PlayerPose();
+            sprite = new Sprite();
         }
 
         public Element(CompoundTag tag) {
@@ -443,10 +446,12 @@ public class FurnitureData {
             this.axis = Direction.Axis.byName(tag.getString("Axis"));
             this.rotation = tag.getFloat("Rotation");
             this.type = Utils.parseEnum(ElementType.class, tag.getString("Type"), ElementType.ELEMENT);
+            this.color = tag.getInt("Color");
             this.material = new Material(tag.getCompound("Material"));
             this.particleEmitter = new ParticleEmitter(tag.getCompound("ParticleEmitter"));
             this.soundEmitter = new SoundEmitter(tag.getCompound("SoundEmitter"));
             this.playerPose = new PlayerPose(tag.getCompound("PlayerPose"));
+            this.sprite = new Sprite(tag.getCompound("Sprite"));
 
             this.bakedTexture = new HashMap<>();
             CompoundTag bakedTextureTag = tag.getCompound("BakedTexture");
@@ -461,10 +466,12 @@ public class FurnitureData {
             this.axis = element.axis;
             this.rotation = element.rotation;
             this.type = element.type;
+            this.color = element.color;
             this.material = new Material(element.material);
             this.particleEmitter = new ParticleEmitter(element.particleEmitter);
             this.soundEmitter = new SoundEmitter(element.soundEmitter);
             this.playerPose = new PlayerPose(element.playerPose);
+            this.sprite = new Sprite(element.sprite);
             this.bakedTexture = new HashMap<>();
             this.rotationAxes = null;
         }
@@ -476,6 +483,7 @@ public class FurnitureData {
             tag.putString("Axis", axis.getSerializedName());
             tag.putFloat("Rotation", rotation);
             tag.putString("Type", type.name().toLowerCase());
+            tag.putInt("Color", color);
 
             if (type == ElementType.ELEMENT) {
                 tag.put("Material", material.toTag());
@@ -492,6 +500,8 @@ public class FurnitureData {
                 tag.put("SoundEmitter", soundEmitter.toTag());
             } else if (type == ElementType.PLAYER_POSE) {
                 tag.put("PlayerPose", playerPose.toTag());
+            } else if (type == ElementType.SPRITE) {
+                tag.put("Sprite", sprite.toTag());
             }
 
             return tag;
@@ -532,15 +542,13 @@ public class FurnitureData {
 
         public void sanityCheck() {
             // TODO: Math is wrong for rotated elements
-            /*
-            float maxSize = 16.0f;
+            float maxSize = 64.0f;
             to.x = Math.max(-maxSize, Math.min(16.0f + maxSize, to.x));
             to.y = Math.max(-maxSize, Math.min(16.0f + maxSize, to.y));
             to.z = Math.max(-maxSize, Math.min(16.0f + maxSize, to.z));
             from.x = Math.max(-maxSize, Math.min(16.0f + maxSize, from.x));
             from.y = Math.max(-maxSize, Math.min(16.0f + maxSize, from.y));
             from.z = Math.max(-maxSize, Math.min(16.0f + maxSize, from.z));
-            */
 
             // Pose anchors are the shape of the players' butt
             if (type == ElementType.PLAYER_POSE) {
@@ -553,6 +561,15 @@ public class FurnitureData {
                 to.z = center.z + (playerPose.pose == Pose.SLEEPING ? 14.0f : 4.0f);
                 rotation = 0.0f;
                 axis = Direction.Axis.Y;
+            } else if (type == ElementType.SPRITE) {
+                // Sprites are forced to be 16x16x0
+                Vector3f center = getCenter();
+                from.x = center.x - 8.0f;
+                from.y = center.y - 8.0f;
+                from.z = center.z;
+                to.x = center.x + 8.0f;
+                to.y = center.y + 8.0f;
+                to.z = center.z;
             }
         }
 
@@ -742,6 +759,27 @@ public class FurnitureData {
         public CompoundTag toTag() {
             CompoundTag tag = new CompoundTag();
             tag.putString("Pose", pose.name());
+            return tag;
+        }
+    }
+
+    public static class Sprite {
+        public ResourceLocation sprite = new ResourceLocation("minecraft:block/water");
+
+        public Sprite() {
+        }
+
+        public Sprite(CompoundTag tag) {
+            this.sprite = new ResourceLocation(tag.getString("Sprite"));
+        }
+
+        public Sprite(Sprite sprite) {
+            this.sprite = sprite.sprite;
+        }
+
+        public CompoundTag toTag() {
+            CompoundTag tag = new CompoundTag();
+            tag.putString("Sprite", sprite.toString());
             return tag;
         }
     }

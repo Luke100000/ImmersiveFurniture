@@ -13,17 +13,10 @@ import net.minecraft.world.inventory.InventoryMenu;
 import org.joml.Vector2i;
 import org.joml.Vector3f;
 
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class FurnitureModelFactory {
-    private static final Map<String, Either<Material, String>> TEXTURE_MAP = Map.of(
-            "0", Either.left(new Material(InventoryMenu.BLOCK_ATLAS, Common.locate("block/furniture")))
-    );
-
     private final FurnitureData data;
     private final DynamicAtlas atlas;
     private final AmbientOcclusion ao;
@@ -128,7 +121,7 @@ public class FurnitureModelFactory {
         float uvScale = 16.0f / atlas.size;
         return new BlockElementFace(
                 getCulledDirection(vertices),
-                -1,
+                element.color,
                 "#0",
                 new BlockFaceUV(
                         new float[]{
@@ -215,19 +208,43 @@ public class FurnitureModelFactory {
     }
 
     private Map<Direction, BlockElementFace> getFaces(FurnitureData.Element element) {
-        return EnumSet.allOf(Direction.class).stream()
-                .map(dir -> Optional.ofNullable(getFace(element, dir))
-                        .map(face -> Map.entry(dir, face)))
-                .flatMap(Optional::stream)
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        if (element.type == FurnitureData.ElementType.SPRITE) {
+            return Map.of(
+                    Direction.NORTH, getSpriteFace(element),
+                    Direction.SOUTH, getSpriteFace(element)
+            );
+        } else {
+            return EnumSet.allOf(Direction.class).stream()
+                    .map(dir -> Optional.ofNullable(getFace(element, dir))
+                            .map(face -> Map.entry(dir, face)))
+                    .flatMap(Optional::stream)
+                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        }
     }
 
+    private static BlockElementFace getSpriteFace(FurnitureData.Element element) {
+        return new BlockElementFace(
+                null,
+                element.color,
+                element.sprite.sprite.toString(),
+                new BlockFaceUV(
+                        new float[]{0, 0, 16, 16},
+                        0
+                )
+        );
+    }
 
     private BlockModel getModel() {
+        Map<String, Either<Material, String>> textures = new HashMap<>();
+        textures.put("#0", Either.left(new Material(InventoryMenu.BLOCK_ATLAS, Common.locate("block/furniture"))));
+        data.elements.stream().filter(e -> e.type == FurnitureData.ElementType.SPRITE)
+                .map(e -> e.sprite.sprite).distinct().forEach(source ->
+                        textures.put(source.toString(), Either.left(new Material(InventoryMenu.BLOCK_ATLAS, source))));
+
         return new BlockModel(
                 null,
-                data.elements.stream().filter(e -> e.type == FurnitureData.ElementType.ELEMENT).map(this::getElement).toList(),
-                TEXTURE_MAP,
+                data.elements.stream().filter(e -> e.type == FurnitureData.ElementType.ELEMENT || e.type == FurnitureData.ElementType.SPRITE).map(this::getElement).toList(),
+                textures,
                 false,
                 BlockModel.GuiLight.SIDE,
                 getTransforms(),

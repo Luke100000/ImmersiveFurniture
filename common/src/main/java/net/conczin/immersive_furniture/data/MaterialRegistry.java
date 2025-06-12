@@ -17,7 +17,6 @@ public class MaterialRegistry {
     public final Map<ResourceLocation, MaterialSource> materials = new ConcurrentHashMap<>();
 
     public void sync() {
-        materials.clear();
         for (Block block : BuiltInRegistries.BLOCK) {
             BlockState state = block.defaultBlockState();
             if (state.getRenderShape() == RenderShape.MODEL) {

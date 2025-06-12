@@ -33,7 +33,6 @@
   "gui.immersive_furniture.publish": "Share your creation",
   "gui.immersive_furniture.delete": "Delete",
   "gui.immersive_furniture.report": "Report inappropriate or very low quality content",
-
   "gui.immersive_furniture.roundness": "Roundness %s",
   "gui.immersive_furniture.brightness": "Brightness %s",
   "gui.immersive_furniture.contrast": "Contrast %s",
@@ -61,11 +60,15 @@
   "gui.immersive_furniture.on_interact": "On Interact",
   "gui.immersive_furniture.save": "Save",
   "gui.immersive_furniture.play_sound": "Play Sound",
+  "gui.immersive_furniture.vanilla_only": "Vanilla Only",
+  "gui.immersive_furniture.transparency_filter": "Has Transparency",
+  "gui.immersive_furniture.animation_filter": "Has Animation",
 
   "gui.immersive_furniture.element_type.element": "Element",
   "gui.immersive_furniture.element_type.particle_emitter": "Particle Emitter",
   "gui.immersive_furniture.element_type.sound_emitter": "Sound Emitter",
   "gui.immersive_furniture.element_type.player_pose": "Player Pose",
+  "gui.immersive_furniture.element_type.sprite": "Sprite",
 
   "gui.immersive_furniture.player_pose.sitting": "Sitting",
   "gui.immersive_furniture.player_pose.sleeping": "Sleeping",
@@ -112,5 +115,6 @@
   "gui.immersive_furniture.tab.effects": "Effects",
   "gui.immersive_furniture.tab.particles": "Particles",
   "gui.immersive_furniture.tab.sounds": "Sounds",
-  "gui.immersive_furniture.tab.settings": "Settings"
+  "gui.immersive_furniture.tab.settings": "Settings",
+  "gui.immersive_furniture.tab.sprites": "Sprites"
 }

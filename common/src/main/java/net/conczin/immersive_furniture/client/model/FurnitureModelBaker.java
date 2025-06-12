@@ -3,10 +3,12 @@ package net.conczin.immersive_furniture.client.model;
 import net.conczin.immersive_furniture.Common;
 import net.conczin.immersive_furniture.data.FurnitureData;
 import net.conczin.immersive_furniture.utils.CachedSupplier;
+import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.*;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.RandomSource;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -122,11 +124,23 @@ public class FurnitureModelBaker {
         return null;
     }
 
+    private final static RandomSource random = RandomSource.create();
+
     private static BakedModel bakeModel(DynamicAtlas atlas, BlockModel model, int yRot) {
-        return model.bake(modelBaker,
-                material -> atlas == DynamicAtlas.BAKED ? material.sprite() : atlas.sprite,
+        BakedModel bake = model.bake(modelBaker,
+                material -> atlas == DynamicAtlas.BAKED || !material.atlasLocation().getNamespace().equals("immersive_furniture") ? material.sprite() : atlas.sprite,
                 BlockModelRotation.by(0, yRot),
                 LOCATION
         );
+
+        // Copy color (stored in tint index)
+        for (BakedQuad quad : bake.getQuads(null, null, random)) {
+            int[] vertices = quad.getVertices();
+            for (int i = 0; i < vertices.length; i += 8) {
+                vertices[i + 3] = quad.getTintIndex();
+            }
+        }
+
+        return bake;
     }
 }

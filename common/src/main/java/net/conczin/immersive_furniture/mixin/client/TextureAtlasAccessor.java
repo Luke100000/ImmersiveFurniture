@@ -1,16 +1,15 @@
 package net.conczin.immersive_furniture.mixin.client;
 
-import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.client.renderer.texture.SpriteContents;
+import net.minecraft.client.renderer.texture.TextureAtlas;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.gen.Invoker;
 
-@Mixin(SpriteContents.class)
-public interface SpriteContentsAccessor {
-    @Accessor("byMipLevel")
-    NativeImage[] getMipLevelData();
+import java.util.List;
 
-    @Invoker("getFrameCount")
-    int immersiveFurniture$getFrameCount();
+@Mixin(TextureAtlas.class)
+public interface TextureAtlasAccessor {
+    @Accessor
+    List<SpriteContents> getSprites();
 }

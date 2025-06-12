@@ -49,6 +49,7 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
     final ModelComponent modelComponent = new ModelComponent(this);
     final EffectsComponent effectsComponent = new EffectsComponent(this);
     final SettingsComponent settingsComponent = new SettingsComponent(this);
+    final SpritesComponent spritesComponent = new SpritesComponent(this);
 
     Page currentPage = Page.MODEL;
 
@@ -58,7 +59,8 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
         PARTICLES,
         SOUNDS,
         EFFECTS,
-        SETTINGS
+        SETTINGS,
+        SPRITES
     }
 
     public ArtisansWorkstationEditorScreen(FurnitureData data) {
@@ -80,6 +82,7 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
             case SOUNDS -> poundsComponent.init(leftPos, topPos, TOOLS_WIDTH, windowHeight);
             case EFFECTS -> effectsComponent.init(leftPos, topPos, TOOLS_WIDTH, windowHeight);
             case SETTINGS -> settingsComponent.init(leftPos, topPos, TOOLS_WIDTH, windowHeight);
+            case SPRITES -> spritesComponent.init(leftPos, topPos, TOOLS_WIDTH, windowHeight);
         }
 
         // Close
@@ -106,6 +109,9 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
             addRenderableWidget(pagePageButton(Page.MATERIALS, x, 26));
             x += 26;
             addRenderableWidget(pagePageButton(Page.EFFECTS, x, 2 * 26));
+            x += 26;
+        } else if (selectedElement != null && selectedElement.type == FurnitureData.ElementType.SPRITE) {
+            addRenderableWidget(pagePageButton(Page.SPRITES, x, 4 * 26));
             x += 26;
         }
         addRenderableWidget(pagePageButton(Page.SETTINGS, x, 3 * 26));
@@ -139,6 +145,7 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
             case PARTICLES -> particlesComponent.render(context);
             case SOUNDS -> poundsComponent.render(context);
             case SETTINGS -> settingsComponent.render(context);
+            case SPRITES -> spritesComponent.render(context);
         }
     }
 
@@ -233,13 +240,15 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
             HoverResult result = lastMouseX == (int) mouseX && lastMouseY == (int) mouseY ? nextHoverResult : hoverResult;
             selectedElement = result.element();
 
-            if (currentPage == Page.MATERIALS || currentPage == Page.SOUNDS || currentPage == Page.PARTICLES) {
+            if (currentPage == Page.MATERIALS || currentPage == Page.SOUNDS || currentPage == Page.PARTICLES || currentPage == Page.SPRITES) {
                 if (selectedElement.type == FurnitureData.ElementType.ELEMENT) {
                     currentPage = Page.MATERIALS;
                 } else if (selectedElement.type == FurnitureData.ElementType.SOUND_EMITTER) {
                     currentPage = Page.SOUNDS;
                 } else if (selectedElement.type == FurnitureData.ElementType.PARTICLE_EMITTER) {
                     currentPage = Page.PARTICLES;
+                } else if (selectedElement.type == FurnitureData.ElementType.SPRITE) {
+                    currentPage = Page.SPRITES;
                 }
             }
 

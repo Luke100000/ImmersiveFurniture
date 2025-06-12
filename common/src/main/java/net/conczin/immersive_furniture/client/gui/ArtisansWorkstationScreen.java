@@ -46,7 +46,9 @@ public abstract class ArtisansWorkstationScreen extends Screen {
     public ArtisansWorkstationScreen() {
         super(TITLE);
 
-        new Thread(MaterialRegistry.INSTANCE::sync).start();
+        if (MaterialRegistry.INSTANCE.materials.isEmpty()) {
+            new Thread(MaterialRegistry.INSTANCE::sync).start();
+        }
     }
 
     protected void drawRectangle(GuiGraphics graphics, int x, int y, int w, int h) {

@@ -11,6 +11,6 @@
   "client": [
     "client.CameraMixin", "client.DebugScreenOverlayMixin", "client.ItemModelShaperMixin",
     "client.ItemRendererMixin", "client.MinecraftMixin", "client.SpriteContentsAccessor",
-    "client.SpriteContentsMixin"
+    "client.SpriteContentsMixin", "client.TextureAtlasAccessor"
   ]
 }
