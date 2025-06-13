@@ -763,7 +763,7 @@ public class FurnitureData {
     }
 
     public static class Sprite {
-        public ResourceLocation sprite = new ResourceLocation("minecraft:block/water_still");
+        public ResourceLocation sprite = new ResourceLocation("minecraft:block/soul_fire_1");
 
         public Sprite() {
         }

@@ -7,7 +7,6 @@ import net.minecraft.client.renderer.texture.SpriteContents;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -18,6 +17,14 @@ public class TransparencyManager {
 
     public TransparencyType getTransparencyType(SpriteContents s) {
         return transparencyCache.computeIfAbsent(s.name(), location -> compute(s));
+    }
+
+    public boolean isCornerTransparent(SpriteContents s) {
+        NativeImage image = ((SpriteContentsAccessor) s).getMipLevelData()[0];
+        return (FastColor.ABGR32.alpha(image.getPixelRGBA(0, 0)) < 128)
+               && (FastColor.ABGR32.alpha(image.getPixelRGBA(image.getWidth() - 1, 0)) < 128)
+               && (FastColor.ABGR32.alpha(image.getPixelRGBA(image.getWidth() - 1, image.getHeight() - 1)) < 128)
+               && (FastColor.ABGR32.alpha(image.getPixelRGBA(0, image.getHeight() - 1)) < 128);
     }
 
     private TransparencyType compute(SpriteContents s) {

@@ -113,6 +113,8 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
         } else if (selectedElement != null && selectedElement.type == FurnitureData.ElementType.SPRITE) {
             addRenderableWidget(pagePageButton(Page.SPRITES, x, 4 * 26));
             x += 26;
+            addRenderableWidget(pagePageButton(Page.EFFECTS, x, 2 * 26));
+            x += 26;
         }
         addRenderableWidget(pagePageButton(Page.SETTINGS, x, 3 * 26));
     }
@@ -441,7 +443,7 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
 
         // Highlight all non-solid elements
         for (FurnitureData.Element element : data.elements) {
-            if (element.type != FurnitureData.ElementType.ELEMENT) {
+            if (element.type != FurnitureData.ElementType.ELEMENT && element.type != FurnitureData.ElementType.SPRITE) {
                 drawSelection(graphics, element, pose, 0.4f, true);
             }
         }

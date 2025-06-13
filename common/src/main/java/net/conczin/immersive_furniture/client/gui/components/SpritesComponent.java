@@ -14,33 +14,42 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.InventoryMenu;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
 
 public class SpritesComponent extends ListComponent {
-    private final List<ResourceLocation> allSprites;
-    private final List<ResourceLocation> filteredSprites = new LinkedList<>();
+    private final List<SpriteContents> allSprites;
+    private List<ResourceLocation> filteredSprites = new LinkedList<>();
 
     final List<SpriteButton> spriteButtons = new ArrayList<>();
 
-    StateImageButton vanillaOnlyButton;
-    StateImageButton transparencyFilterButton;
-    StateImageButton animationFilterButton;
-    StateImageButton itemFilterButton;
+    public enum FilterType {
+        ANIMATIONS,
+        SPRITES,
+        ITEMS,
+        ALL
+    }
 
-    private boolean vanillaOnly = true;
-    private boolean transparencyFilter = false;
-    private boolean animationFilter = false;
-    private boolean itemFilter = false;
+    public FilterType filterType = FilterType.ANIMATIONS;
 
     public SpritesComponent(ArtisansWorkstationEditorScreen screen) {
         super(screen);
 
-        List<SpriteContents> sprites = ((TextureAtlasAccessor) Minecraft.getInstance().getModelManager().getAtlas(InventoryMenu.BLOCK_ATLAS)).getSprites();
+        TextureAtlas atlas = Minecraft.getInstance().getModelManager().getAtlas(InventoryMenu.BLOCK_ATLAS);
+        List<SpriteContents> sprites = ((TextureAtlasAccessor) atlas).getSprites();
         allSprites = sprites.stream()
+                .filter(SpritesComponent::sanityFilter)
                 .filter(SpritesComponent::isSquare)
-                .filter(s -> ((SpriteContentsAccessor) s).immersiveFurniture$getFrameCount() > 1 || TransparencyManager.INSTANCE.getTransparencyType(s) != TransparencyType.SOLID)
-                .map(SpriteContents::name)
                 .toList();
+    }
+
+    private static boolean sanityFilter(SpriteContents s) {
+        if (!s.name().getNamespace().equals("minecraft")) return false;
+        if (s.name().getPath().endsWith("_side")) return false;
+        if (s.name().getPath().endsWith("_bottom")) return false;
+        return !s.name().getPath().endsWith("_top");
     }
 
     private static boolean isSquare(SpriteContents spriteContents) {
@@ -51,41 +60,18 @@ public class SpritesComponent extends ListComponent {
 
     @Override
     public void init(int leftPos, int topPos, int width, int height) {
-        // Toggle vanilla only
-        vanillaOnlyButton = addToggleButton(leftPos + 6, topPos + 22, 16, 96, 96, "gui.immersive_furniture.vanilla_only", () -> {
-            vanillaOnly = !vanillaOnly;
-            vanillaOnlyButton.setEnabled(vanillaOnly);
-            updateSearch(searchBox.getValue());
-        });
-        vanillaOnlyButton.setEnabled(vanillaOnly);
-
-        // Toggle transparency filter
-        transparencyFilterButton = addToggleButton(leftPos + 6 + 18, topPos + 22, 16, 112, 96, "gui.immersive_furniture.transparency_filter", () -> {
-            transparencyFilter = !transparencyFilter;
-            transparencyFilterButton.setEnabled(transparencyFilter);
-            updateSearch(searchBox.getValue());
-        });
-        transparencyFilterButton.setEnabled(transparencyFilter);
-
-        // Toggle animation filter
-        animationFilterButton = addToggleButton(leftPos + 6 + 36, topPos + 22, 16, 144, 96, "gui.immersive_furniture.animation_filter", () -> {
-            animationFilter = !animationFilter;
-            animationFilterButton.setEnabled(animationFilter);
-            updateSearch(searchBox.getValue());
-        });
-        animationFilterButton.setEnabled(animationFilter);
-
-        // Set to water color
-        StateImageButton waterButton = addToggleButton(leftPos + 6 + 54, topPos + 22, 16, 144, 96, "gui.immersive_furniture.set_water_color", () -> {
-            if (screen.selectedElement == null) return;
-            screen.selectedElement.color = screen.selectedElement.color == 0x3F76E4 ? -1 : 0x3F76E4;
-        });
-
-        // Set to foliage color
-        StateImageButton foliageButton = addToggleButton(leftPos + 6 + 72, topPos + 22, 16, 144, 96, "gui.immersive_furniture.set_foliage_color", () -> {
-            if (screen.selectedElement == null) return;
-            screen.selectedElement.color = screen.selectedElement.color == 0x3F76E4 ? -1 : 0x3F76E4;
-        });
+        int tx = 7;
+        int u = 64;
+        for (FilterType value : FilterType.values()) {
+            StateImageButton button = addToggleButton(leftPos + tx, topPos + 22, 16, u, 224,
+                    "gui.immersive_furniture.sprite_filter." + value.name().toLowerCase(Locale.ROOT), () -> {
+                        filterType = value;
+                        screen.init();
+                    });
+            button.setEnabled(filterType == value);
+            tx += 18;
+            u += 16;
+        }
 
         // Sprite buttons
         spriteButtons.clear();
@@ -114,24 +100,27 @@ public class SpritesComponent extends ListComponent {
 
     @Override
     int getPages() {
-        return (filteredSprites.size() - 1) / 20 + 1;
+        return Math.max(0, (filteredSprites.size() - 1) / 20 + 1);
+    }
+
+    private boolean filter(SpriteContents s) {
+        return switch (filterType) {
+            case ANIMATIONS -> ((SpriteContentsAccessor) s).immersiveFurniture$getFrameCount() > 1;
+            case ITEMS -> s.name().toString().contains("item/");
+            case SPRITES -> TransparencyManager.INSTANCE.getTransparencyType(s) != TransparencyType.SOLID
+                            && TransparencyManager.INSTANCE.isCornerTransparent(s)
+                            && !s.name().toString().contains("item/");
+            case ALL -> true;
+        };
     }
 
     @Override
     void updateSearch(String search) {
         // Filter sprites
-        filteredSprites.clear();
-
-        // Filter sprites based on search term and filters
-        for (ResourceLocation location : allSprites) {
-            // Filter by search term
-            if (search.isEmpty() || location.toString().contains(search)) {
-                // Apply vanilla-only filter if enabled
-                if (!vanillaOnly || location.getNamespace().equals("minecraft")) {
-                    filteredSprites.add(location);
-                }
-            }
-        }
+        filteredSprites = allSprites.stream()
+                .filter(s -> s.name().toString().contains(search))
+                .filter(this::filter)
+                .map(SpriteContents::name).toList();
 
         page = Math.max(0, Math.min(page, getPages() - 1));
 

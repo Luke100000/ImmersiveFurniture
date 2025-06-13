@@ -1,6 +1,7 @@
 package net.conczin.immersive_furniture.utils;
 
 import net.minecraft.nbt.*;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import org.apache.commons.lang3.StringUtils;
 import org.joml.Vector3f;
@@ -78,7 +79,19 @@ public class Utils {
     }
 
     public static String capitalize(ResourceLocation location) {
-        return capitalize(location.getPath());
+        String fallback = capitalize(location.getPath());
+        if (location.getPath().startsWith("block/")) {
+            return Component.translatableWithFallback(
+                    "block." + location.getNamespace() + ".." + location.getPath().substring(6),
+                    fallback
+            ).getString();
+        } else if (location.getPath().startsWith("item/")) {
+            return Component.translatableWithFallback(
+                    "item." + location.getNamespace() + "." + location.getPath().substring(5),
+                    fallback
+            ).getString();
+        }
+        return fallback;
     }
 
     public static String capitalize(String location) {

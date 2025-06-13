@@ -60,9 +60,11 @@
   "gui.immersive_furniture.on_interact": "On Interact",
   "gui.immersive_furniture.save": "Save",
   "gui.immersive_furniture.play_sound": "Play Sound",
-  "gui.immersive_furniture.vanilla_only": "Vanilla Only",
-  "gui.immersive_furniture.transparency_filter": "Has Transparency",
-  "gui.immersive_furniture.animation_filter": "Has Animation",
+
+  "gui.immersive_furniture.sprite_filter.animations": "Animations",
+  "gui.immersive_furniture.sprite_filter.sprites": "Sprites",
+  "gui.immersive_furniture.sprite_filter.items": "Items",
+  "gui.immersive_furniture.sprite_filter.all": "All",
 
   "gui.immersive_furniture.element_type.element": "Element",
   "gui.immersive_furniture.element_type.particle_emitter": "Particle Emitter",

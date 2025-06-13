@@ -2,6 +2,8 @@ package net.conczin.immersive_furniture.client.gui.components;
 
 import net.conczin.immersive_furniture.client.gui.ArtisansWorkstationEditorScreen;
 import net.conczin.immersive_furniture.client.gui.widgets.BoundedIntSliderButton;
+import net.conczin.immersive_furniture.client.gui.widgets.HSVColorPicker;
+import net.conczin.immersive_furniture.data.FurnitureData;
 
 public class EffectsComponent extends ScreenComponent {
     public EffectsComponent(ArtisansWorkstationEditorScreen screen) {
@@ -16,11 +18,19 @@ public class EffectsComponent extends ScreenComponent {
 
         int y = topPos + 6;
         y = initLightGUI(screen, leftPos, y, width);
+
+        HSVColorPicker colorSelector = new HSVColorPicker(leftPos + 6, y, width - 12, 60, screen.selectedElement.color, c -> screen.selectedElement.color = c);
+        colorSelector.getWidgets().forEach(screen::addRenderableWidget);
     }
 
     public int initLightGUI(ArtisansWorkstationEditorScreen screen, int x, int y, int width) {
+        if (screen.selectedElement == null) return y;
+        if (screen.selectedElement.type != FurnitureData.ElementType.ELEMENT) return y;
+
         // Roundness
-        BoundedIntSliderButton lightLevelSlider = new BoundedIntSliderButton(x + 6, y, width - 12, 20, "gui.immersive_furniture.roundness", 0, -100, 100);
+        BoundedIntSliderButton lightLevelSlider = new BoundedIntSliderButton(x + 6, y, width - 12, 20,
+                "gui.immersive_furniture.roundness",
+                (int) screen.selectedElement.material.lightEffect.roundness, -100, 100);
         lightLevelSlider.setCallback(i -> {
             if (screen.selectedElement == null) return;
             screen.selectedElement.material.lightEffect.roundness = i;
@@ -29,7 +39,9 @@ public class EffectsComponent extends ScreenComponent {
         y += 22;
 
         // Brightness
-        BoundedIntSliderButton brightnessSlider = new BoundedIntSliderButton(x + 6, y, width - 12, 20, "gui.immersive_furniture.brightness", 0, -100, 100);
+        BoundedIntSliderButton brightnessSlider = new BoundedIntSliderButton(x + 6, y, width - 12, 20,
+                "gui.immersive_furniture.brightness",
+                (int) screen.selectedElement.material.lightEffect.brightness, -100, 100);
         brightnessSlider.setCallback(i -> {
             if (screen.selectedElement == null) return;
             screen.selectedElement.material.lightEffect.brightness = i;
@@ -38,7 +50,9 @@ public class EffectsComponent extends ScreenComponent {
         y += 22;
 
         // Contrast
-        BoundedIntSliderButton contrastSlider = new BoundedIntSliderButton(x + 6, y, width - 12, 20, "gui.immersive_furniture.contrast", 0, -100, 100);
+        BoundedIntSliderButton contrastSlider = new BoundedIntSliderButton(x + 6, y, width - 12, 20,
+                "gui.immersive_furniture.contrast",
+                (int) screen.selectedElement.material.lightEffect.contrast, -100, 100);
         contrastSlider.setCallback(i -> {
             if (screen.selectedElement == null) return;
             screen.selectedElement.material.lightEffect.contrast = i;

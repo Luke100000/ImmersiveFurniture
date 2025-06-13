@@ -36,7 +36,7 @@ public abstract class ListComponent extends ScreenComponent {
         this.searchBox.setVisible(true);
         this.searchBox.setValue(oldSearch);
         this.searchBox.setHint(SEARCH_HINT);
-        this.searchBox.setResponder(this::updateSearch); // Meh
+        this.searchBox.setResponder(this::updateSearch);
         screen.addRenderableWidget(searchBox);
 
         // Page buttons
@@ -53,7 +53,7 @@ public abstract class ListComponent extends ScreenComponent {
                 })
         );
 
-        updateSearch("");
+        updateSearch(searchBox.getValue());
     }
 
     abstract int getPages();
@@ -61,6 +61,6 @@ public abstract class ListComponent extends ScreenComponent {
     abstract void updateSearch(String search);
 
     public void render(GuiGraphics context) {
-        context.drawCenteredString(minecraft.font, String.format("%s / %S", page + 1, getPages() + 1), leftPos + width / 2, topPos + height - 17, 0xFFFFFF);
+        context.drawCenteredString(minecraft.font, String.format("%s / %S", page + 1, getPages()), leftPos + width / 2, topPos + height - 17, 0xFFFFFF);
     }
 }

@@ -5,11 +5,9 @@ Initial release
 # TODO
 
 * Test sleeping and multiplayer
-* Render types
-* Mixed textures and tint=true custom block model renderer
-* Effects reset to 0
-* Finish sprites menu
 * Dont drop in creative
+* Sprites (elements) need to snap to the axis the drag is closest
+* Colorize flag on effects, which uses HSV shift instead of tint
 
 # Roadmap 1.0.0
 
@@ -18,7 +16,3 @@ Initial release
 * Datapack support
 * Multi-block proxy
     * A special block that only defines collisions as block states and forward interactions
-* Sprite objects
-    * Has access to transparent textures used in e.g., flowers
-    * Uses native atlas and thus also supports animations (liquids)
-    * Fixed to 16x16x0 cubes and minecraft namespaced textures
