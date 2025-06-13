@@ -75,14 +75,15 @@ public class FurnitureModelBaker {
     private final static Executor executor = Executors.newSingleThreadExecutor();
 
     public static BakedModel getAsyncModel(FurnitureData data, DynamicAtlas atlas) {
-        if (atlas.knownFurniture.containsKey(data.getHash())) {
+        String hash = data.getHash();
+        if (atlas.knownFurniture.containsKey(hash)) {
             return getModel(data, atlas, 0, false);
         } else {
-            if (!atlas.asyncRequestedFurniture.contains(data.getHash())) {
-                atlas.asyncRequestedFurniture.add(data.getHash());
+            if (!atlas.asyncRequestedFurniture.contains(hash)) {
+                atlas.asyncRequestedFurniture.add(hash);
                 executor.execute(() -> {
                     if (getModel(data, atlas, 0, false) == null) {
-                        atlas.asyncRequestedFurniture.remove(data.getHash());
+                        atlas.asyncRequestedFurniture.remove(hash);
                     }
                 });
             }

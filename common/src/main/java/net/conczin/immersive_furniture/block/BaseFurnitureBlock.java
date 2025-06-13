@@ -184,7 +184,7 @@ public abstract class BaseFurnitureBlock extends Block implements SimpleWaterlog
 
     @Override
     public void playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
-        if (!level.isClientSide) {
+        if (!level.isClientSide && !player.isCreative()) {
             // Drop the furniture item with data
             ItemStack itemStack = getCloneItemStack(level, pos, state);
             Block.popResource(level, pos, itemStack);

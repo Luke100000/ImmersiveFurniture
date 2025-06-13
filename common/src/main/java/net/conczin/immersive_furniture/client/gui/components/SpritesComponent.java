@@ -25,6 +25,8 @@ public class SpritesComponent extends ListComponent {
 
     final List<SpriteButton> spriteButtons = new ArrayList<>();
 
+    private boolean vanillaOnly = true;
+
     public enum FilterType {
         ANIMATIONS,
         SPRITES,
@@ -46,7 +48,6 @@ public class SpritesComponent extends ListComponent {
     }
 
     private static boolean sanityFilter(SpriteContents s) {
-        if (!s.name().getNamespace().equals("minecraft")) return false;
         if (s.name().getPath().endsWith("_side")) return false;
         if (s.name().getPath().endsWith("_bottom")) return false;
         return !s.name().getPath().endsWith("_top");
@@ -73,6 +74,13 @@ public class SpritesComponent extends ListComponent {
             u += 16;
         }
 
+        // Vanilla only toggle
+        addToggleButton(leftPos + 80, topPos + 22, 16, 144, 224,
+                "gui.immersive_furniture.vanilla", () -> {
+                    vanillaOnly = !vanillaOnly;
+                    screen.init();
+                }).setEnabled(vanillaOnly);
+
         // Sprite buttons
         spriteButtons.clear();
         for (int y = 0; y < 5; y++) {
@@ -88,8 +96,10 @@ public class SpritesComponent extends ListComponent {
                             }
                         }
                 );
-                button.setEnabled(screen.selectedElement != null && button.getSpriteLocation() != null &&
-                                  button.getSpriteLocation().equals(screen.selectedElement.sprite.sprite));
+                button.setEnabled(
+                        screen.selectedElement != null && button.getSpriteLocation() != null &&
+                        button.getSpriteLocation().equals(screen.selectedElement.sprite.sprite)
+                );
                 spriteButtons.add(button);
                 screen.addRenderableWidget(button);
             }
@@ -118,6 +128,7 @@ public class SpritesComponent extends ListComponent {
     void updateSearch(String search) {
         // Filter sprites
         filteredSprites = allSprites.stream()
+                .filter(s -> !vanillaOnly || s.name().getNamespace().equals("minecraft"))
                 .filter(s -> s.name().toString().contains(search))
                 .filter(this::filter)
                 .map(SpriteContents::name).toList();

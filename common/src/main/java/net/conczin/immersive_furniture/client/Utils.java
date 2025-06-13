@@ -1,6 +1,7 @@
 package net.conczin.immersive_furniture.client;
 
 import net.conczin.immersive_furniture.data.FurnitureData;
+import net.conczin.immersive_furniture.data.ModelUtils;
 import net.minecraft.core.Direction;
 import net.minecraft.util.FastColor;
 import org.joml.Matrix4f;
@@ -8,7 +9,7 @@ import org.joml.Vector3f;
 import org.joml.Vector4f;
 
 public class Utils {
-    public static Ray inverseTransformRay(float mouseX, float mouseY, Matrix4f modelViewMatrix) {
+    public static Ray inverseTransformRay(float mouseX, float mouseY, Matrix4f modelViewMatrix, FurnitureData.Element element) {
         Vector4f rayStart = new Vector4f(
                 mouseX,
                 mouseY,
@@ -30,12 +31,18 @@ public class Utils {
         rayStartModel.div(rayStartModel.w);
         rayEndModel.div(rayEndModel.w);
 
+        // Convert to local coordinates
+        Vector3f rayStartPos = new Vector3f(rayStartModel.x, rayStartModel.y, rayStartModel.z);
+        ModelUtils.applyInverseElementRotation(rayStartPos, element.getRotation());
+        Vector3f rayEndPos = new Vector3f(rayEndModel.x, rayEndModel.y, rayEndModel.z);
+        ModelUtils.applyInverseElementRotation(rayEndPos, element.getRotation());
+
         // Create ray origin and direction
-        Vector3f origin = new Vector3f(rayStartModel.x, rayStartModel.y, rayStartModel.z);
+        Vector3f origin = new Vector3f(rayStartPos.x, rayStartPos.y, rayStartPos.z);
         Vector3f direction = new Vector3f(
-                rayEndModel.x - rayStartModel.x,
-                rayEndModel.y - rayStartModel.y,
-                rayEndModel.z - rayStartModel.z
+                rayEndPos.x - rayStartPos.x,
+                rayEndPos.y - rayStartPos.y,
+                rayEndPos.z - rayStartPos.z
         ).normalize();
 
         return new Ray(origin, direction);
@@ -122,6 +129,10 @@ public class Utils {
         float r = FastColor.ABGR32.red(color) / 255f;
         float g = FastColor.ABGR32.green(color) / 255f;
         float b = FastColor.ABGR32.blue(color) / 255f;
+        return rgbToHsv(r, g, b);
+    }
+
+    public static float[] rgbToHsv(float r, float g, float b) {
         float max = Math.max(r, Math.max(g, b));
         float min = Math.min(r, Math.min(g, b));
         float delta = max - min;
@@ -137,7 +148,7 @@ public class Utils {
         return new float[]{h, s, max};
     }
 
-    public static int hsvToRgb(float h, float s, float v) {
+    public static float[] hsvToRgbRaw(float h, float s, float v) {
         float c = v * s;
         float x = c * (1 - Math.abs((h / 60f) % 2 - 1));
         float m = v - c;
@@ -169,9 +180,16 @@ public class Utils {
             b = x;
         }
 
-        int ri = Math.round((r + m) * 255);
-        int gi = Math.round((g + m) * 255);
-        int bi = Math.round((b + m) * 255);
-        return (ri << 16) | (gi << 8) | bi;
+        return new float[]{r + m, g + m, b + m};
+    }
+
+    public static int hsvToRgb(float h, float s, float v) {
+        float[] rgb = hsvToRgbRaw(h, s, v);
+        return FastColor.ABGR32.color(
+                255,
+                (int) (rgb[0] * 255),
+                (int) (rgb[1] * 255),
+                (int) (rgb[2] * 255)
+        );
     }
 }

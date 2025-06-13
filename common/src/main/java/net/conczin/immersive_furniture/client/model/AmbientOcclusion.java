@@ -104,7 +104,7 @@ public class AmbientOcclusion {
         float totalWeight = 0.0f;
         for (Vector3f offset : kernel) {
             float dot = normal.x * offset.x + normal.y * offset.y + normal.z * offset.z;
-            if (dot < 0) continue;
+            if (dot <= 0) continue;
             if (is(pos.x + offset.x, pos.y + offset.y, pos.z + offset.z)) {
                 value += 1.0f;
             }

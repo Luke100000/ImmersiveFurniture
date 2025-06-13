@@ -1,5 +1,6 @@
 package net.conczin.immersive_furniture.data;
 
+import com.mojang.math.Axis;
 import net.conczin.immersive_furniture.config.Config;
 import net.conczin.immersive_furniture.utils.Utils;
 import net.minecraft.ChatFormatting;
@@ -608,6 +609,17 @@ public class FurnitureData {
                     axes.center.z + x * axes.right.z + y * axes.up.z + z * axes.forward.z
             );
         }
+
+        public Vector3f getGlobalDirectionNormal(Direction direction) {
+            Vector3f normal = direction.step();
+            switch (axis) {
+                case X -> Axis.XP.rotationDegrees(rotation).transform(normal);
+                case Y -> Axis.YP.rotationDegrees(rotation).transform(normal);
+                case Z -> Axis.ZP.rotationDegrees(rotation).transform(normal);
+            }
+            normal.mul(1, -1, 1);
+            return normal;
+        }
     }
 
     public enum WrapMode {
@@ -788,6 +800,10 @@ public class FurnitureData {
         public float brightness = 0.0f;
         public float contrast = 0.0f;
 
+        public float hue = 0.0f;
+        public float saturation = 0.0f;
+        public float value = 0.0f;
+
         public LightMaterialEffect() {
 
         }
@@ -796,12 +812,20 @@ public class FurnitureData {
             this.roundness = lightEffect.roundness;
             this.brightness = lightEffect.brightness;
             this.contrast = lightEffect.contrast;
+
+            this.hue = lightEffect.hue;
+            this.saturation = lightEffect.saturation;
+            this.value = lightEffect.value;
         }
 
         public void load(CompoundTag tag) {
             roundness = tag.getFloat("Roundness");
             brightness = tag.getFloat("Brightness");
             contrast = tag.getFloat("Contrast");
+
+            hue = tag.getFloat("Hue");
+            saturation = tag.getFloat("Saturation");
+            value = tag.getFloat("Value");
         }
 
         public CompoundTag save() {
@@ -809,6 +833,10 @@ public class FurnitureData {
             tag.putFloat("Roundness", roundness);
             tag.putFloat("Brightness", brightness);
             tag.putFloat("Contrast", contrast);
+
+            tag.putFloat("Hue", hue);
+            tag.putFloat("Saturation", saturation);
+            tag.putFloat("Value", value);
             return tag;
         }
     }

@@ -3,6 +3,7 @@ package net.conczin.immersive_furniture.client.model;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.datafixers.util.Either;
 import net.conczin.immersive_furniture.Common;
+import net.conczin.immersive_furniture.client.Utils;
 import net.conczin.immersive_furniture.data.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderType;
@@ -82,6 +83,16 @@ public class FurnitureModelFactory {
 
                         FurnitureData.LightMaterialEffect lightEffect = element.material.lightEffect;
 
+                        // Apply HSV
+                        float[] hsv = Utils.rgbToHsv(r / 255.0f, g / 255.0f, b / 255.0f);
+                        hsv[0] = (hsv[0] + element.material.lightEffect.hue * 1.8f) % 360.0f;
+                        hsv[1] = Math.max(0.0f, Math.min(1.0f, hsv[1] + element.material.lightEffect.saturation * 0.01f));
+                        hsv[2] = Math.max(0.0f, Math.min(1.0f, hsv[2] + element.material.lightEffect.value * 0.01f));
+                        float[] rgb = Utils.hsvToRgbRaw(hsv[0], hsv[1], hsv[2]);
+                        r = (int) (rgb[0] * 255);
+                        g = (int) (rgb[1] * 255);
+                        b = (int) (rgb[2] * 255);
+
                         // Smooth light
                         float light = 1.0f;
                         float roundness = lightEffect.roundness / 75.0f;
@@ -123,7 +134,7 @@ public class FurnitureModelFactory {
         float uvScale = 16.0f / atlas.size;
         return new BlockElementFace(
                 getCulledDirection(vertices),
-                element.color,
+                -1,
                 "0",
                 new BlockFaceUV(
                         new float[]{
@@ -170,8 +181,8 @@ public class FurnitureModelFactory {
     private static boolean fullyContained(FurnitureData.Element otherElement, Vector3f[] vertices) {
         for (Vector3f vertex : vertices) {
             Vector3f localVertex = new Vector3f(vertex);
-            ModelUtils.applyInverseElementRotation(localVertex.mul(16.0f), otherElement.getRotation());
-            if (!otherElement.contains(localVertex)) {
+            ModelUtils.applyInverseElementRotation(localVertex, otherElement.getRotation());
+            if (!otherElement.contains(localVertex.mul(16.0f))) {
                 return false;
             }
         }

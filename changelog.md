@@ -5,9 +5,6 @@ Initial release
 # TODO
 
 * Test sleeping and multiplayer
-* Dont drop in creative
-* Sprites (elements) need to snap to the axis the drag is closest
-* Colorize flag on effects, which uses HSV shift instead of tint
 
 # Roadmap 1.0.0
 

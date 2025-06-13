@@ -2,7 +2,6 @@ package net.conczin.immersive_furniture.client.gui;
 
 import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.math.Axis;
 import net.conczin.immersive_furniture.client.Utils;
 import net.conczin.immersive_furniture.client.gui.components.*;
 import net.conczin.immersive_furniture.client.gui.widgets.StateImageButton;
@@ -36,9 +35,6 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
 
     DraggingContext draggingContext;
     boolean isRotatingView;
-    boolean holdingShift = false;
-    boolean holdingCtrl = false;
-    boolean holdingSpace = false;
 
     int lastMouseX;
     int lastMouseY;
@@ -96,7 +92,7 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
         addRenderableWidget(button);
 
         // Page buttons
-        int x = 0;
+        int x = 16;
         addRenderableWidget(pagePageButton(Page.MODEL, x, 0));
         x += 26;
         if (selectedElement != null && selectedElement.type == FurnitureData.ElementType.PARTICLE_EMITTER) {
@@ -185,12 +181,12 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
         if (draggingContext != null) {
             float offset = draggingContext.getOffset(mouseX, mouseY);
             Vector3f local = quantVector(draggingContext.direction.step().mul(1, -1, 1), offset, false);
-            Vector3f global = quantVector(draggingContext.getNormal(), offset, holdingCtrl && !draggingContext.resize);
+            Vector3f global = quantVector(draggingContext.getNormal(), offset, hasControlDown() && !draggingContext.resize);
 
             Vector3f normal;
             Vector3f normal2;
             if (draggingContext.resize) {
-                if (holdingShift) {
+                if (hasShiftDown()) {
                     // Offset into both directions
                     normal = new Vector3f(local);
                     normal2 = local.negate();
@@ -288,28 +284,27 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (keyCode == 340) {
-            holdingShift = true;
-        } else if (keyCode == 341) {
-            holdingCtrl = true;
-        } else if (keyCode == 32) {
-            holdingSpace = true;
-        }
+        if (isCopy(keyCode)) {
 
+        } else if (isCut(keyCode)) {
+
+        } else if (isPaste(keyCode)) {
+
+        } else if (isUndo(keyCode)) {
+
+        } else if (isRedo(keyCode)) {
+
+        }
         return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
-    @Override
-    public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
-        if (keyCode == 340) {
-            holdingShift = false;
-        } else if (keyCode == 341) {
-            holdingCtrl = false;
-        } else if (keyCode == 32) {
-            holdingSpace = false;
-        }
+    public static boolean isUndo(int keyCode) {
+        return keyCode == 90 && hasControlDown() && !hasShiftDown() && !hasAltDown();
+    }
 
-        return super.keyReleased(keyCode, scanCode, modifiers);
+    public static boolean isRedo(int keyCode) {
+        return (keyCode == 89 && hasControlDown() && !hasShiftDown() && !hasAltDown()) ||
+               (keyCode == 90 && hasControlDown() && hasShiftDown() && !hasAltDown());
     }
 
     @Override
@@ -321,7 +316,7 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
 
     final class DraggingContext {
         private final FurnitureData.Element element;
-        private final Direction direction;
+        private Direction direction;
         private final double x;
         private final double y;
         private final boolean resize;
@@ -350,19 +345,31 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
             Vector3f drag = new Vector3f((float) (mouseX - x), (float) (mouseY - y), 0.0f);
             float proj = drag.dot(screenNormal);
 
+            // Use the move axis rather than face for flat elements
+            boolean isFlat = element.from.x == element.to.x ||
+                             element.from.y == element.to.y ||
+                             element.from.z == element.to.z;
+            if ((isFlat || hasAltDown()) && drag.lengthSquared() > 1.0f) {
+                Direction bestDirection = Direction.UP;
+                float bestDot = Float.MIN_VALUE;
+                for (Direction value : Direction.values()) {
+                    Vector3f globalDirectionNormal = element.getGlobalDirectionNormal(value);
+                    q.transform(globalDirectionNormal).normalize();
+                    float dot = globalDirectionNormal.dot(drag);
+                    if (dot > bestDot) {
+                        bestDirection = value;
+                        bestDot = dot;
+                    }
+                }
+                direction = bestDirection;
+            }
+
             float viewDot = (float) Math.sqrt(1.0f - normal.z * normal.z);
             return proj / camZoom * 16.0f / viewDot;
         }
 
         private Vector3f getNormal() {
-            Vector3f normal = direction.step();
-            switch (this.element.axis) {
-                case X -> Axis.XP.rotationDegrees(this.element.rotation).transform(normal);
-                case Y -> Axis.YP.rotationDegrees(this.element.rotation).transform(normal);
-                case Z -> Axis.ZP.rotationDegrees(this.element.rotation).transform(normal);
-            }
-            normal.mul(1, -1, 1);
-            return normal;
+            return element.getGlobalDirectionNormal(direction);
         }
     }
 
@@ -402,11 +409,10 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
         // Perform a proper raycast to get the hovered element
         List<HoverResult> results = new LinkedList<>();
 
-        // Create a ray from the mouse position
-        Utils.Ray ray = Utils.inverseTransformRay(mouseX, mouseY, pose);
-
         // Raycast against each element
         for (FurnitureData.Element element : data.elements) {
+            Utils.Ray ray = Utils.inverseTransformRay(mouseX, mouseY, pose, element);
+
             Utils.RaycastResult raycastResult = Utils.raycast(ray, element);
             if (raycastResult != null) {
                 results.add(new HoverResult(element, raycastResult.face(), raycastResult.distance()));

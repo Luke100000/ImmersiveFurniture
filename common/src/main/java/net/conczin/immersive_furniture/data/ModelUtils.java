@@ -25,14 +25,11 @@ public class ModelUtils {
         pos.mul(16.0f);
     }
 
-    // Expects pos to be in voxel space (16 units per block)
     public static void applyInverseElementRotation(Vector3f pos, ElementRotation rotation) {
         Quaternionf quaternionf = getElementRotation(rotation).conjugate();
-        pos.mul(1.0f / 16.0f);
         pos.sub(rotation.origin());
         quaternionf.transform(pos);
         pos.add(rotation.origin());
-        pos.mul(16.0f);
     }
 
     public static Vector3f[] getCorners(FurnitureData.Element element) {
