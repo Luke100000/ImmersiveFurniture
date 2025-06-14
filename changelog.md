@@ -5,8 +5,8 @@ Initial release
 # TODO
 
 * Test sleeping and multiplayer
-* Direction offset (in texture source to allow rotations)
-* Search should flatten all _ and co to spaces for better search
+* Direction offset (in the texture source to allow rotations)
+* Rotate and size sprites 
 
 # Roadmap 1.0.0
 

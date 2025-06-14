@@ -7,6 +7,7 @@ import net.conczin.immersive_furniture.client.model.TransparencyManager;
 import net.conczin.immersive_furniture.data.TransparencyType;
 import net.conczin.immersive_furniture.mixin.client.SpriteContentsAccessor;
 import net.conczin.immersive_furniture.mixin.client.TextureAtlasAccessor;
+import net.conczin.immersive_furniture.utils.Utils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.SpriteContents;
 import net.minecraft.client.renderer.texture.TextureAtlas;
@@ -125,11 +126,11 @@ public class SpritesComponent extends ListComponent {
     }
 
     @Override
-    void updateSearch(String search) {
+    void updateSearch() {
         // Filter sprites
         filteredSprites = allSprites.stream()
                 .filter(s -> !vanillaOnly || s.name().getNamespace().equals("minecraft"))
-                .filter(s -> s.name().toString().contains(search))
+                .filter(s -> Utils.search(searchBox.getValue(), s.name().toString()))
                 .filter(this::filter)
                 .map(SpriteContents::name).toList();
 

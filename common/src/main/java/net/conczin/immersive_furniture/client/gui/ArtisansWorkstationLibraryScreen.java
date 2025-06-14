@@ -1,7 +1,6 @@
 package net.conczin.immersive_furniture.client.gui;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.conczin.immersive_furniture.Common;
 import net.conczin.immersive_furniture.client.gui.widgets.StateImageButton;
 import net.conczin.immersive_furniture.data.FurnitureData;
@@ -546,7 +545,7 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
         if (tab == Tab.LOCAL) {
             // Fetch from local files
             furniture = localFiles.stream()
-                    .filter(l -> l.getPath().contains(searchBox.getValue()))
+                    .filter(l -> Utils.search(searchBox.getValue(), l.toString()))
                     .filter(l -> tagFilter.equals("miscellaneous") || getData(l) == null || getData(l).tag.equals(tagFilter))
                     .skip((long) page * ENTRIES_PER_PAGE)
                     .limit(ENTRIES_PER_PAGE)

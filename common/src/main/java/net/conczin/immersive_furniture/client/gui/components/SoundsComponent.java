@@ -74,9 +74,9 @@ public class SoundsComponent extends ListComponent {
     }
 
     @Override
-    void updateSearch(String search) {
+    void updateSearch() {
         allLocations = BuiltInRegistries.SOUND_EVENT.keySet().stream()
-                .filter(p -> searchBox.getValue().isEmpty() || p.getPath().contains(searchBox.getValue()))
+                .filter(p -> Utils.search(searchBox.getValue(), p.toString()))
                 .sorted(ResourceLocation::compareTo)
                 .toList();
 

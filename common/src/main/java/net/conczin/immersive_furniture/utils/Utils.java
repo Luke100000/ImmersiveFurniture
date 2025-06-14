@@ -1,9 +1,11 @@
 package net.conczin.immersive_furniture.utils;
 
-import net.minecraft.nbt.*;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtIo;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
 import java.security.MessageDigest;
@@ -68,11 +70,22 @@ public class Utils {
     }
 
     public static String capitalize(String location) {
-        return StringUtils.capitalize(location.replace(".", " ").replace("/", " ").replace("_", " "));
+        return StringUtils.capitalize(replaceUglyChars(location));
+    }
+
+    private static @NotNull String replaceUglyChars(String location) {
+        return location.replace(".", " ").replace("/", " ").replace("_", " ");
     }
 
     public static String beatifyPackID(String s) {
         String[] split = s.split("/");
-        return split[split.length - 1].replace("_", " ").replace(".zip", "");
+        return replaceUglyChars(split[split.length - 1]).replace(".zip", "");
+    }
+
+    public static boolean search(String search, String value) {
+        if (search.isEmpty()) return true;
+        String lowerSearch = replaceUglyChars(search.toLowerCase());
+        String lowerValue = replaceUglyChars(value.toLowerCase());
+        return lowerValue.contains(lowerSearch);
     }
 }

@@ -36,29 +36,29 @@ public abstract class ListComponent extends ScreenComponent {
         this.searchBox.setVisible(true);
         this.searchBox.setValue(oldSearch);
         this.searchBox.setHint(SEARCH_HINT);
-        this.searchBox.setResponder(this::updateSearch);
+        this.searchBox.setResponder(s -> updateSearch());
         screen.addRenderableWidget(searchBox);
 
         // Page buttons
         screen.addRenderableWidget(
                 new ImageButton(leftPos + 6, topPos + height - 21, 12, 15, 13, 226, 15, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE, b -> {
                     page = Math.max(0, page - 1);
-                    updateSearch(searchBox.getValue());
+                    updateSearch();
                 })
         );
         screen.addRenderableWidget(
                 new ImageButton(leftPos + width - 18, topPos + height - 21, 12, 15, 0, 226, 15, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE, b -> {
                     page += 1;
-                    updateSearch(searchBox.getValue());
+                    updateSearch();
                 })
         );
 
-        updateSearch(searchBox.getValue());
+        updateSearch();
     }
 
     abstract int getPages();
 
-    abstract void updateSearch(String search);
+    abstract void updateSearch();
 
     public void render(GuiGraphics context) {
         context.drawCenteredString(minecraft.font, String.format("%s / %S", page + 1, getPages()), leftPos + width / 2, topPos + height - 17, 0xFFFFFF);

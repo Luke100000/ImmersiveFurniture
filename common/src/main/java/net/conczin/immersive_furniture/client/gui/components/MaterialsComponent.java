@@ -7,6 +7,7 @@ import net.conczin.immersive_furniture.client.model.MaterialSource;
 import net.conczin.immersive_furniture.config.Config;
 import net.conczin.immersive_furniture.data.FurnitureData;
 import net.conczin.immersive_furniture.client.model.MaterialRegistry;
+import net.conczin.immersive_furniture.utils.Utils;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.*;
@@ -100,11 +101,11 @@ public class MaterialsComponent extends ListComponent {
     }
 
     @Override
-    void updateSearch(String search) {
+    void updateSearch() {
         // Filter materials
         filteredMaterials.clear();
         MaterialRegistry.INSTANCE.materials.entrySet().stream()
-                .filter(entry -> search.isEmpty() || entry.getKey().toString().contains(search))
+                .filter(entry -> Utils.search(searchBox.getValue(), entry.getKey().toString()))
                 .sorted(Comparator.comparingInt(a -> (Config.getInstance().favorites.contains(a.getKey().toString()) ? 1 : 0)))
                 .forEach(filteredMaterials::add);
 

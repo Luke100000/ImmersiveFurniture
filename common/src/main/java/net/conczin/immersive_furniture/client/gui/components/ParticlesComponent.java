@@ -56,9 +56,9 @@ public class ParticlesComponent extends ListComponent {
     }
 
     @Override
-    void updateSearch(String search) {
+    void updateSearch() {
         allLocations = BuiltInRegistries.PARTICLE_TYPE.keySet().stream()
-                .filter(p -> searchBox.getValue().isEmpty() || p.getPath().contains(searchBox.getValue()))
+                .filter(p -> Utils.search(searchBox.getValue(), p.toString()))
                 .sorted(ResourceLocation::compareTo)
                 .toList();
 
