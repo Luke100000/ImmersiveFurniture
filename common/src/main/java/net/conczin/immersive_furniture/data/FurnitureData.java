@@ -356,7 +356,7 @@ public class FurnitureData {
 
     private VoxelShape computeShape(Direction r) {
         return elements.stream()
-                .filter(e -> e.type == ElementType.ELEMENT)
+                .filter(e -> e.type == ElementType.ELEMENT && !e.isFlat())
                 .map(element -> getBox(element, r))
                 .reduce(Shapes::or)
                 .orElse(Block.box(2, 2, 2, 14, 14, 14));
@@ -616,6 +616,10 @@ public class FurnitureData {
             }
             normal.mul(1, -1, 1);
             return normal;
+        }
+
+        public boolean isFlat() {
+            return from.x == to.x || from.y == to.y || from.z == to.z;
         }
     }
 

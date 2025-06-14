@@ -233,8 +233,8 @@ public class FurnitureModelFactory {
     private Map<Direction, BlockElementFace> getFaces(FurnitureData.Element element) {
         if (element.type == FurnitureData.ElementType.SPRITE) {
             return Map.of(
-                    Direction.NORTH, getSpriteFace(element),
-                    Direction.SOUTH, getSpriteFace(element)
+                    Direction.NORTH, getSpriteFace(element, true),
+                    Direction.SOUTH, getSpriteFace(element, false)
             );
         } else {
             return EnumSet.allOf(Direction.class).stream()
@@ -245,13 +245,13 @@ public class FurnitureModelFactory {
         }
     }
 
-    private static BlockElementFace getSpriteFace(FurnitureData.Element element) {
+    private static BlockElementFace getSpriteFace(FurnitureData.Element element, boolean front) {
         return new BlockElementFace(
                 null,
                 element.color,
                 element.sprite.sprite.toString(),
                 new BlockFaceUV(
-                        new float[]{0, 0, 16, 16},
+                        new float[]{front ? 0 : 16, 0, front ? 16 : 0, 16},
                         0
                 )
         );

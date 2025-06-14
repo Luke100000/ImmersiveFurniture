@@ -359,9 +359,7 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
             this.originalFrom = new Vector3f(element.from);
             this.originalTo = new Vector3f(element.to);
 
-            this.isFlat = element.from.x == element.to.x ||
-                          element.from.y == element.to.y ||
-                          element.from.z == element.to.z;
+            this.isFlat = element.isFlat();
         }
 
         public float getOffset(double mouseX, double mouseY) {
@@ -445,7 +443,7 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
             }
         }
 
-        if (results.isEmpty() || !isMouseOver(mouseX, mouseY)) {
+        if (results.isEmpty() || !isOverRightWindow(mouseX, mouseY)) {
             hoverResult = null;
             nextHoverResult = null;
         } else {

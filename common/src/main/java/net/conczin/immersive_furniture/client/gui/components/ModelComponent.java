@@ -220,6 +220,11 @@ public class ModelComponent extends ScreenComponent {
             addToggleButton(leftPos + width - 23, topPos + 136, 16, 32, 128, "gui.immersive_furniture.on_interact", () -> {
                 if (screen.selectedElement == null) return;
                 screen.selectedElement.soundEmitter.onInteract = !screen.selectedElement.soundEmitter.onInteract;
+                if (screen.selectedElement.soundEmitter.onInteract) {
+                    screen.selectedElement.soundEmitter.frequency = 0.0f;
+                } else {
+                    screen.selectedElement.soundEmitter.frequency = 0.1f;
+                }
                 screen.init();
 
                 // Play sound on interacting

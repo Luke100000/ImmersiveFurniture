@@ -69,6 +69,8 @@ public class DelayedFurnitureRenderer {
             }
         }
 
+        Common.entityRendersLast = Common.entityRenders;
+        Common.entityRendersTotalLast = Common.entityRendersTotal;
         Common.entityRenders = 0;
         Common.entityRendersTotal = 0;
     }
