@@ -81,6 +81,11 @@
   "gui.immersive_furniture.player_pose.sitting": "Sitting",
   "gui.immersive_furniture.player_pose.sleeping": "Sleeping",
 
+  "gui.immersive_furniture.rotation.0": "0°",
+  "gui.immersive_furniture.rotation.90": "90°",
+  "gui.immersive_furniture.rotation.180": "180°",
+  "gui.immersive_furniture.rotation.270": "270°",
+
   "gui.immersive_furniture.login": "Login",
   "gui.immersive_furniture.logout": "Logout",
   "gui.immersive_furniture.login.tooltip": "Log in to favorite and share creations! (Opens the browser)",

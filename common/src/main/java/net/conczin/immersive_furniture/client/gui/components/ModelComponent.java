@@ -246,6 +246,16 @@ public class ModelComponent extends ScreenComponent {
                     screen.init();
                 }).setEnabled(screen.selectedElement.playerPose.pose != pose);
             }
+        } else if (screen.selectedElement.type == FurnitureData.ElementType.SPRITE) {
+            // Rotation
+            for (int i = 0; i < 360; i += 90) {
+                final int rotation = i;
+                addToggleButton(leftPos + 6 + i * 18, topPos + 114, 16, 160 + (i / 90) * 16, 224, "gui.immersive_furniture.rotation." + i, () -> {
+                    if (screen.selectedElement == null) return;
+                    screen.selectedElement.sprite.rotation = rotation * 90;
+                    screen.init();
+                }).setEnabled(screen.selectedElement.sprite.rotation != rotation);
+            }
         }
     }
 

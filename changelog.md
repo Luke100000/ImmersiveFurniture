@@ -6,7 +6,6 @@ Initial release
 
 * Test sleeping and multiplayer
 * Direction offset (in the texture source to allow rotations)
-* Rotate and size sprites 
 
 # Roadmap 1.0.0
 

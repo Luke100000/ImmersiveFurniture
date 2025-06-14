@@ -778,21 +778,25 @@ public class FurnitureData {
 
     public static class Sprite {
         public ResourceLocation sprite = new ResourceLocation("minecraft:block/soul_fire_1");
+        public int rotation = 0;
 
         public Sprite() {
         }
 
         public Sprite(CompoundTag tag) {
             this.sprite = NBTHelper.getResourceLocation(tag, "Sprite", sprite);
+            this.rotation = NBTHelper.getInt(tag, "Rotation", rotation);
         }
 
         public Sprite(Sprite sprite) {
             this.sprite = sprite.sprite;
+            this.rotation = sprite.rotation;
         }
 
         public CompoundTag toTag() {
             CompoundTag tag = new CompoundTag();
             tag.putString("Sprite", sprite.toString());
+            tag.putInt("Rotation", rotation);
             return tag;
         }
     }

@@ -252,7 +252,7 @@ public class FurnitureModelFactory {
                 element.sprite.sprite.toString(),
                 new BlockFaceUV(
                         new float[]{front ? 0 : 16, 0, front ? 16 : 0, 16},
-                        0
+                        element.sprite.rotation
                 )
         );
     }
