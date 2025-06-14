@@ -2,6 +2,7 @@ package net.conczin.immersive_furniture.data;
 
 import com.mojang.math.Axis;
 import net.conczin.immersive_furniture.config.Config;
+import net.conczin.immersive_furniture.utils.NBTHelper;
 import net.conczin.immersive_furniture.utils.Utils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -56,16 +57,16 @@ public class FurnitureData {
     }
 
     public FurnitureData(CompoundTag tag) {
-        this.name = tag.getString("Name");
-        this.tag = tag.getString("Tag");
-        this.lightLevel = tag.getInt("LightLevel");
-        this.inventorySize = tag.getInt("InventorySize");
-        this.contentid = tag.getInt("ContentID");
-        this.author = tag.getString("Author");
-        this.originalAuthor = tag.getString("OriginalAuthor");
-        this.sources = Utils.fromNbt(tag.getList("Sources", 8));
-        this.dependencies = Utils.fromNbt(tag.getList("Dependencies", 8));
-        this.transparency = tag.contains("Transparency") ? TransparencyType.valueOf(tag.getString("Transparency")) : TransparencyType.SOLID;
+        this.name = NBTHelper.getString(tag, "Name", name);
+        this.tag = NBTHelper.getString(tag, "Tag", this.tag);
+        this.lightLevel = NBTHelper.getInt(tag, "LightLevel", lightLevel);
+        this.inventorySize = NBTHelper.getInt(tag, "InventorySize", inventorySize);
+        this.contentid = NBTHelper.getInt(tag, "ContentID", contentid);
+        this.author = NBTHelper.getString(tag, "Author", author);
+        this.originalAuthor = NBTHelper.getString(tag, "OriginalAuthor", originalAuthor);
+        this.sources = NBTHelper.getStringSet(tag.getList("Sources", 8));
+        this.dependencies = NBTHelper.getStringSet(tag.getList("Dependencies", 8));
+        this.transparency = NBTHelper.getEnum(tag, TransparencyType.class, "Transparency", TransparencyType.SOLID);
 
         ListTag elementsTag = tag.getList("Elements", 10);
         for (int i = 0; i < elementsTag.size(); i++) {
@@ -103,8 +104,8 @@ public class FurnitureData {
         tag.putInt("ContentID", contentid);
         tag.putString("Author", author);
         tag.putString("OriginalAuthor", originalAuthor);
-        tag.put("Sources", Utils.toNbt(sources));
-        tag.put("Dependencies", Utils.toNbt(dependencies));
+        tag.put("Sources", NBTHelper.getStringList(sources));
+        tag.put("Dependencies", NBTHelper.getStringList(dependencies));
         tag.putString("Transparency", this.transparency.name());
 
         ListTag elementsTag = new ListTag();
@@ -413,10 +414,10 @@ public class FurnitureData {
     public static class Element {
         public Vector3f from;
         public Vector3f to;
-        public Direction.Axis axis;
-        public float rotation;
-        public ElementType type;
-        public int color;
+        public Direction.Axis axis = Direction.Axis.X;
+        public float rotation = 0.0f;
+        public ElementType type = ElementType.ELEMENT;
+        public int color = -1;
         public Material material;
         public ParticleEmitter particleEmitter;
         public SoundEmitter soundEmitter;
@@ -429,10 +430,6 @@ public class FurnitureData {
         public Element() {
             from = new Vector3f(2, 0, 2);
             to = new Vector3f(14, 12, 14);
-            axis = Direction.Axis.X;
-            rotation = 0.0f;
-            type = ElementType.ELEMENT;
-            color = -1;
             material = new Material();
             particleEmitter = new ParticleEmitter();
             soundEmitter = new SoundEmitter();
@@ -441,12 +438,12 @@ public class FurnitureData {
         }
 
         public Element(CompoundTag tag) {
-            this.from = Utils.fromFloatList(tag.getList("From", 5));
-            this.to = Utils.fromFloatList(tag.getList("To", 5));
-            this.axis = Direction.Axis.byName(tag.getString("Axis"));
-            this.rotation = tag.getFloat("Rotation");
-            this.type = Utils.parseEnum(ElementType.class, tag.getString("Type"), ElementType.ELEMENT);
-            this.color = tag.contains("Color") ? tag.getInt("Color") : -1;
+            this.from = NBTHelper.getVector3f(tag.getList("From", 5));
+            this.to = NBTHelper.getVector3f(tag.getList("To", 5));
+            this.axis = NBTHelper.getEnum(tag, Direction.Axis.class, "Axis", axis);
+            this.rotation = NBTHelper.getFloat(tag, "Rotation", rotation);
+            this.type = NBTHelper.getEnum(tag, ElementType.class, "Type", type);
+            this.color = NBTHelper.getInt(tag, "Color", color);
             this.material = new Material(tag.getCompound("Material"));
             this.particleEmitter = new ParticleEmitter(tag.getCompound("ParticleEmitter"));
             this.soundEmitter = new SoundEmitter(tag.getCompound("SoundEmitter"));
@@ -478,8 +475,8 @@ public class FurnitureData {
 
         public CompoundTag toTag() {
             CompoundTag tag = new CompoundTag();
-            tag.put("From", Utils.toFloatList(from));
-            tag.put("To", Utils.toFloatList(to));
+            tag.put("From", NBTHelper.getFloatList(from));
+            tag.put("To", NBTHelper.getFloatList(to));
             tag.putString("Axis", axis.getSerializedName());
             tag.putFloat("Rotation", rotation);
             tag.putString("Type", type.name().toLowerCase());
@@ -641,10 +638,11 @@ public class FurnitureData {
         }
 
         public Material(CompoundTag tag) {
-            source = new ResourceLocation(tag.getString("Source"));
-            wrap = Utils.parseEnum(WrapMode.class, tag.getString("Wrap"), WrapMode.EXPAND);
-            rotate = tag.getBoolean("Rotate");
-            flip = tag.getBoolean("Flip");
+            source = NBTHelper.getResourceLocation(tag, "Source", source);
+            margin = NBTHelper.getInt(tag, "Margin", margin);
+            wrap = NBTHelper.getEnum(tag, WrapMode.class, "Wrap", wrap);
+            rotate = NBTHelper.getBoolean(tag, "Rotate", rotate);
+            flip = NBTHelper.getBoolean(tag, "Flip", flip);
             lightEffect.load(tag.getCompound("LightEffect"));
         }
 
@@ -680,10 +678,10 @@ public class FurnitureData {
         }
 
         public ParticleEmitter(CompoundTag tag) {
-            this.particle = new ResourceLocation(tag.getString("Particle"));
-            this.velocityDirectional = tag.getFloat("VelocityDirectional");
-            this.velocityRandom = tag.getFloat("VelocityRandom");
-            this.amount = tag.getFloat("Amount");
+            this.particle = NBTHelper.getResourceLocation(tag, "Particle", particle);
+            this.velocityDirectional = NBTHelper.getFloat(tag, "VelocityDirectional", velocityDirectional);
+            this.velocityRandom = NBTHelper.getFloat(tag, "VelocityRandom", velocityRandom);
+            this.amount = NBTHelper.getFloat(tag, "Amount", amount);
         }
 
         public ParticleEmitter(ParticleEmitter particleEmitter) {
@@ -723,11 +721,11 @@ public class FurnitureData {
         }
 
         public SoundEmitter(CompoundTag tag) {
-            this.sound = new ResourceLocation(tag.getString("Sound"));
-            this.volume = tag.getFloat("Volume");
-            this.pitch = tag.getFloat("Pitch");
-            this.frequency = tag.getFloat("Frequency");
-            this.onInteract = tag.getBoolean("OnInteract");
+            this.sound = NBTHelper.getResourceLocation(tag, "Sound", sound);
+            this.volume = NBTHelper.getFloat(tag, "Volume", volume);
+            this.pitch = NBTHelper.getFloat(tag, "Pitch", pitch);
+            this.frequency = NBTHelper.getFloat(tag, "Frequency", frequency);
+            this.onInteract = NBTHelper.getBoolean(tag, "OnInteract", onInteract);
         }
 
         public SoundEmitter(SoundEmitter soundEmitter) {
@@ -760,7 +758,7 @@ public class FurnitureData {
         }
 
         public PlayerPose(CompoundTag tag) {
-            this.pose = Utils.parseEnum(Pose.class, tag.getString("Pose"), Pose.SITTING);
+            this.pose = NBTHelper.getEnum(tag, Pose.class, "Pose", pose);
         }
 
         public PlayerPose(PlayerPose playerPose) {
@@ -781,7 +779,7 @@ public class FurnitureData {
         }
 
         public Sprite(CompoundTag tag) {
-            this.sprite = new ResourceLocation(tag.getString("Sprite"));
+            this.sprite = NBTHelper.getResourceLocation(tag, "Sprite", sprite);
         }
 
         public Sprite(Sprite sprite) {
@@ -819,13 +817,13 @@ public class FurnitureData {
         }
 
         public void load(CompoundTag tag) {
-            roundness = tag.getFloat("Roundness");
-            brightness = tag.getFloat("Brightness");
-            contrast = tag.getFloat("Contrast");
+            roundness = NBTHelper.getFloat(tag, "Roundness", roundness);
+            brightness = NBTHelper.getFloat(tag, "Brightness", brightness);
+            contrast = NBTHelper.getFloat(tag, "Contrast", contrast);
 
-            hue = tag.getFloat("Hue");
-            saturation = tag.getFloat("Saturation");
-            value = tag.getFloat("Value");
+            hue = NBTHelper.getFloat(tag, "Hue", hue);
+            saturation = NBTHelper.getFloat(tag, "Saturation", saturation);
+            value = NBTHelper.getFloat(tag, "Value", value);
         }
 
         public CompoundTag save() {
