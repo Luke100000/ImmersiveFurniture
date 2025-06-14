@@ -142,6 +142,21 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
         // Background
         drawRectangle(context, leftPos, topPos, TOOLS_WIDTH, windowHeight);
         drawRectangle(context, leftPos + TOOLS_WIDTH, topPos, windowWidth - TOOLS_WIDTH, windowHeight);
+    }
+
+    @Override
+    public void render(GuiGraphics context, int mouseX, int mouseY, float delta) {
+        super.render(context, mouseX, mouseY, delta);
+
+        // Recompute hash
+        data.dirty();
+
+        // Model
+        context.enableScissor(leftPos + TOOLS_WIDTH + 3, topPos + 3, leftPos + windowWidth - 3, topPos + windowHeight - 3);
+        drawModel(context, data, leftPos + TOOLS_WIDTH + (windowWidth - TOOLS_WIDTH) / 2, topPos + windowHeight / 2, camZoom, camYaw, camPitch, mouseX, mouseY);
+        context.disableScissor();
+
+        context.pose().translate(0, 0, 2048.0f);
 
         switch (currentPage) {
             case MODEL -> modelComponent.render(context);
@@ -151,19 +166,6 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
             case SETTINGS -> settingsComponent.render(context);
             case SPRITES -> spritesComponent.render(context);
         }
-    }
-
-    @Override
-    public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
-        super.render(graphics, mouseX, mouseY, delta);
-
-        // Recompute hash
-        data.dirty();
-
-        // Model
-        graphics.enableScissor(leftPos + TOOLS_WIDTH + 3, topPos + 3, leftPos + windowWidth - 3, topPos + windowHeight - 3);
-        drawModel(graphics, data, leftPos + TOOLS_WIDTH + (windowWidth - TOOLS_WIDTH) / 2, topPos + windowHeight / 2, camZoom, camYaw, camPitch, mouseX, mouseY);
-        graphics.disableScissor();
     }
 
     public Vector3f quantVector(Vector3f normal, float offset, boolean quantize) {

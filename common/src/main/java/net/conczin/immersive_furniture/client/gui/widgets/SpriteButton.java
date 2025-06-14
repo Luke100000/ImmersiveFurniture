@@ -3,6 +3,7 @@ package net.conczin.immersive_furniture.client.gui.widgets;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import net.conczin.immersive_furniture.utils.Utils;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.renderer.GameRenderer;
@@ -30,9 +31,11 @@ public class SpriteButton extends StateImageButton {
     public void setSpriteLocation(ResourceLocation spriteLocation) {
         this.spriteLocation = spriteLocation;
         if (spriteLocation != null) {
-            MutableComponent literal = Component.literal(Utils.capitalize(spriteLocation));
-            setMessage(literal);
-            setTooltip(Tooltip.create(literal));
+            MutableComponent message = Component.literal(Utils.capitalize(spriteLocation));
+            setMessage(message);
+
+            Component namespaceTooltip = Component.literal(Utils.capitalize(spriteLocation.getNamespace())).withStyle(ChatFormatting.GRAY);
+            setTooltip(Tooltip.create(message.copy().append("\n").append(namespaceTooltip)));
         }
     }
 

@@ -3,6 +3,8 @@ package net.conczin.immersive_furniture.client.gui.widgets;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import net.conczin.immersive_furniture.client.model.MaterialSource;
+import net.conczin.immersive_furniture.utils.Utils;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.renderer.GameRenderer;
@@ -27,8 +29,11 @@ public class MaterialButton extends StateImageButton {
     public void setMaterial(MaterialSource material) {
         this.material = material;
         if (material != null) {
-            setMessage(material.name());
-            setTooltip(Tooltip.create(material.name()));
+            Component name = material.name();
+            setMessage(name);
+
+            Component namespaceTooltip = Component.literal(Utils.capitalize(material.location().getNamespace())).withStyle(ChatFormatting.GRAY);
+            setTooltip(Tooltip.create(name.copy().append("\n").append(namespaceTooltip)));
         }
     }
 

@@ -2,7 +2,9 @@ package net.conczin.immersive_furniture.client.gui.components;
 
 import net.conczin.immersive_furniture.client.gui.ArtisansWorkstationEditorScreen;
 import net.conczin.immersive_furniture.utils.Utils;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -72,8 +74,20 @@ public class ParticlesComponent extends ListComponent {
                 .toList();
 
         for (int i = 0; i < buttons.size(); i++) {
-            buttons.get(i).setMessage(Component.literal(i < locations.size() ? Utils.capitalize(locations.get(i)) : ""));
-            buttons.get(i).active = i < locations.size();
+            Button button = buttons.get(i);
+            if (i < locations.size()) {
+                ResourceLocation location = locations.get(i);
+                Component message = Component.literal(Utils.capitalize(location));
+                button.setMessage(message);
+
+                Component namespaceTooltip = Component.literal(Utils.capitalize(location.getNamespace())).withStyle(ChatFormatting.GRAY);
+                button.setTooltip(Tooltip.create(message.copy().append("\n").append(namespaceTooltip)));
+
+                button.active = true;
+            } else {
+                button.setMessage(Component.literal(""));
+                button.active = false;
+            }
         }
     }
 }

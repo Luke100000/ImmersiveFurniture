@@ -2,8 +2,10 @@ package net.conczin.immersive_furniture.client.gui.components;
 
 import net.conczin.immersive_furniture.client.gui.ArtisansWorkstationEditorScreen;
 import net.conczin.immersive_furniture.utils.Utils;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.ImageButton;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
@@ -85,11 +87,22 @@ public class SoundsComponent extends ListComponent {
         );
 
         for (int i = 0; i < buttons.size(); i++) {
-            buttons.get(i).setMessage(i < locations.size() ? Component.translatableWithFallback(
-                    "subtitles." + locations.get(i).getPath(),
-                    Utils.capitalize(locations.get(i))
-            ) : Component.literal(""));
-            buttons.get(i).active = i < locations.size();
+            if (i < locations.size()) {
+                ResourceLocation location = locations.get(i);
+                Component message = Component.translatableWithFallback(
+                        "subtitles." + location.getPath(),
+                        Utils.capitalize(location)
+                );
+                buttons.get(i).setMessage(message);
+
+                Component namespaceTooltip = Component.literal(Utils.capitalize(location.getNamespace())).withStyle(ChatFormatting.GRAY);
+                buttons.get(i).setTooltip(Tooltip.create(message.copy().append("\n").append(namespaceTooltip)));
+
+                buttons.get(i).active = true;
+            } else {
+                buttons.get(i).setMessage(Component.literal(""));
+                buttons.get(i).active = false;
+            }
         }
     }
 }

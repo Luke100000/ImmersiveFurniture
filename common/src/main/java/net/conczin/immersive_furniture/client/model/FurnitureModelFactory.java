@@ -43,6 +43,10 @@ public class FurnitureModelFactory {
         this.atlas = atlas;
     }
 
+    float mod(float a, float b) {
+        return ((a % b) + b) % b;
+    }
+
     private BlockElementFace getFace(FurnitureData.Element element, Direction direction) {
         // Cull fully invisible faces
         float[] fs = ClientModelUtils.getShapeData(element);
@@ -91,7 +95,7 @@ public class FurnitureModelFactory {
 
                         // Apply HSV
                         float[] hsv = Utils.rgbToHsv(r / 255.0f, g / 255.0f, b / 255.0f);
-                        hsv[0] = (hsv[0] + element.material.lightEffect.hue * 1.8f) % 360.0f;
+                        hsv[0] = mod(hsv[0] + element.material.lightEffect.hue * 1.8f, 360f);
                         hsv[1] = Math.max(0.0f, Math.min(1.0f, hsv[1] + element.material.lightEffect.saturation * 0.01f));
                         hsv[2] = Math.max(0.0f, Math.min(1.0f, hsv[2] + element.material.lightEffect.value * 0.01f));
                         float[] rgb = Utils.hsvToRgbRaw(hsv[0], hsv[1], hsv[2]);

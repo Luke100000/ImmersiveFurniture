@@ -6,11 +6,8 @@ Initial release
 
 * Test sleeping and multiplayer
 * Select still works outside the screen
-* Modulus on hue
 * Direction offset (in texture source to allow rotations)
 * Search should flatten all _ and co to spaces for better sear
-* Display namespace to materials when not minecraft
-    * Especially sounds
 * Disable frequency when on interact is on, or at least set it to 0
 * Sprites back sprite is broken
 * 0 thinn collisions not valid
