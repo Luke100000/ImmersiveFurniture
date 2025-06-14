@@ -300,7 +300,7 @@ public class FurnitureData {
         void addParticle(SimpleParticleType particle, float x, float y, float z, float vx, float vy, float vz);
     }
 
-    public void tick(Level level, BlockPos pos, RandomSource random, ParticleConsumer particleConsumer, boolean inEditor) {
+    public void tick(Level level, BlockPos pos, RandomSource random, ParticleConsumer particleConsumer, boolean inScreen, boolean inEditor) {
         for (Element element : elements) {
             if (element.type == ElementType.PARTICLE_EMITTER) {
                 SimpleParticleType particle = element.particleEmitter.getParticle();
@@ -318,16 +318,16 @@ public class FurnitureData {
 
                     particleConsumer.addParticle(
                             particle,
-                            sampledPos.x() + (inEditor ? 0.0f : pos.getX()),
-                            sampledPos.y() + (inEditor ? 1024.0f : pos.getY()),
-                            sampledPos.z() + (inEditor ? 0.0f : pos.getZ()),
+                            sampledPos.x() + (inScreen ? 0.0f : pos.getX()),
+                            sampledPos.y() + (inScreen ? 1024.0f : pos.getY()),
+                            sampledPos.z() + (inScreen ? 0.0f : pos.getZ()),
                             (random.nextFloat() - 0.5f) * vr + up.x() * vd,
                             (random.nextFloat() - 0.5f) * vr + up.y() * vd,
                             (random.nextFloat() - 0.5f) * vr + up.z() * vd
                     );
                 }
             } else if (element.type == ElementType.SOUND_EMITTER) {
-                if (random.nextFloat() < element.soundEmitter.frequency) {
+                if (!inEditor && element.soundEmitter.frequency > 0 && random.nextFloat() < element.soundEmitter.frequency) {
                     playSound(level, pos, random, element);
                 }
             }

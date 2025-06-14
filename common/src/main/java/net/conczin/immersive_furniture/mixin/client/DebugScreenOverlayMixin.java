@@ -26,5 +26,9 @@ public class DebugScreenOverlayMixin {
                 Common.delayedRenders,
                 Common.delayedRendersChecks
         ));
+        info.getReturnValue().add("[IF] Entity renders: %s (%s total)".formatted(
+                Common.entityRenders,
+                Common.entityRendersTotal
+        ));
     }
 }

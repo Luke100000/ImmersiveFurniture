@@ -4,15 +4,21 @@ import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.datafixers.util.Either;
 import net.conczin.immersive_furniture.Common;
 import net.conczin.immersive_furniture.client.Utils;
-import net.conczin.immersive_furniture.data.*;
+import net.conczin.immersive_furniture.data.ElementRotation;
+import net.conczin.immersive_furniture.data.FurnitureData;
+import net.conczin.immersive_furniture.data.ModelUtils;
+import net.conczin.immersive_furniture.data.TransparencyType;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.*;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.Material;
 import net.minecraft.core.Direction;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.inventory.InventoryMenu;
+import net.minecraft.world.level.block.state.BlockState;
 import org.joml.Vector2i;
 import org.joml.Vector3f;
 
@@ -293,13 +299,26 @@ public class FurnitureModelFactory {
                 TextureAtlasSprite sprite = atlas.getSprite(element.sprite.sprite);
                 elementTransparencyType = TransparencyManager.INSTANCE.getTransparencyType(sprite.contents());
             } else if (element.type == FurnitureData.ElementType.ELEMENT) {
-                RenderType renderType = MaterialRegistry.INSTANCE.renderTypes.getOrDefault(element.material.source, RenderType.solid());
-                elementTransparencyType = TransparencyType.fromRenderType(renderType);
+                BlockState state = BuiltInRegistries.BLOCK.get(element.material.source).defaultBlockState();
+                RenderType renderType = ItemBlockRenderTypes.getChunkRenderType(state);
+                elementTransparencyType = fromRenderType(renderType);
             }
             if (elementTransparencyType != null && elementTransparencyType.isHigherPriorityThan(transparencyType)) {
                 transparencyType = elementTransparencyType;
             }
         }
         return transparencyType;
+    }
+
+    public static TransparencyType fromRenderType(RenderType renderType) {
+        if (renderType == RenderType.translucent()) {
+            return TransparencyType.TRANSLUCENT;
+        } else if (renderType == RenderType.cutoutMipped()) {
+            return TransparencyType.CUTOUT_MIPPED;
+        } else if (renderType == RenderType.cutout()) {
+            return TransparencyType.CUTOUT;
+        } else {
+            return TransparencyType.SOLID;
+        }
     }
 }

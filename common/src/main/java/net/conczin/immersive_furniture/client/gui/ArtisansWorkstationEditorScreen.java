@@ -11,15 +11,14 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
     public static final int TOOLS_WIDTH = 100;
@@ -28,10 +27,15 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
     float camPitch = (float) (-Math.PI / 4);
     float camZoom = 100.0f;
 
-    public final FurnitureData data;
+    public FurnitureData data;
     public FurnitureData.Element selectedElement;
     public HoverResult hoverResult;
     public HoverResult nextHoverResult;
+
+    final static int MAX_HISTORY_SIZE = 20;
+    private String lastHistoryHash = "";
+    private final Deque<CompoundTag> history = new ArrayDeque<>(MAX_HISTORY_SIZE);
+    private CompoundTag copiedElement;
 
     DraggingContext draggingContext;
     boolean isRotatingView;
@@ -113,6 +117,8 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
             x += 26;
         }
         addRenderableWidget(pagePageButton(Page.SETTINGS, x, 3 * 26));
+
+        addHistory();
     }
 
     private StateImageButton pagePageButton(Page page, int x, int u) {
@@ -275,6 +281,8 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
             init();
         }
 
+        addHistory();
+
         return super.mouseReleased(mouseX, mouseY, button);
     }
 
@@ -285,26 +293,39 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         if (isCopy(keyCode)) {
-
+            if (selectedElement != null) {
+                copiedElement = selectedElement.toTag();
+            }
         } else if (isCut(keyCode)) {
-
+            if (selectedElement != null) {
+                copiedElement = selectedElement.toTag();
+                data.elements.remove(selectedElement);
+                selectedElement = null;
+                init();
+            }
         } else if (isPaste(keyCode)) {
-
+            if (copiedElement != null) {
+                selectedElement = new FurnitureData.Element(selectedElement);
+                data.elements.add(new FurnitureData.Element(copiedElement));
+                init();
+            }
         } else if (isUndo(keyCode)) {
-
-        } else if (isRedo(keyCode)) {
-
+            if (!history.isEmpty() && lastHistoryHash.equals(data.getHash())) {
+                history.removeFirst();
+            }
+            if (!history.isEmpty()) {
+                CompoundTag oldData = history.removeFirst();
+                if (oldData != null) {
+                    data = new FurnitureData(oldData);
+                    selectedElement = null;
+                }
+            }
         }
         return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
     public static boolean isUndo(int keyCode) {
-        return keyCode == 90 && hasControlDown() && !hasShiftDown() && !hasAltDown();
-    }
-
-    public static boolean isRedo(int keyCode) {
-        return (keyCode == 89 && hasControlDown() && !hasShiftDown() && !hasAltDown()) ||
-               (keyCode == 90 && hasControlDown() && hasShiftDown() && !hasAltDown());
+        return (keyCode == 89 || keyCode == 90) && hasControlDown() && !hasShiftDown() && !hasAltDown();
     }
 
     @Override
@@ -470,5 +491,16 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
     @Override
     public boolean shouldCloseOnEsc() {
         return false;
+    }
+
+    public void addHistory() {
+        String hash = data.getHash();
+        if (!lastHistoryHash.equals(hash)) {
+            lastHistoryHash = hash;
+            if (history.size() >= MAX_HISTORY_SIZE) {
+                history.removeFirst();
+            }
+            history.addFirst(data.toTag());
+        }
     }
 }

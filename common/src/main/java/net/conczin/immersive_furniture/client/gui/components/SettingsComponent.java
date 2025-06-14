@@ -8,7 +8,7 @@ import net.conczin.immersive_furniture.client.model.FurnitureModelFactory;
 import net.conczin.immersive_furniture.client.model.MaterialSource;
 import net.conczin.immersive_furniture.data.FurnitureData;
 import net.conczin.immersive_furniture.data.FurnitureDataManager;
-import net.conczin.immersive_furniture.data.MaterialRegistry;
+import net.conczin.immersive_furniture.client.model.MaterialRegistry;
 import net.conczin.immersive_furniture.utils.Utils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;

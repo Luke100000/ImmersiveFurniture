@@ -83,7 +83,7 @@
 
   "gui.immersive_furniture.login": "Login",
   "gui.immersive_furniture.logout": "Logout",
-  "gui.immersive_furniture.login.tooltip": "Log in to favorite and share creations!",
+  "gui.immersive_furniture.login.tooltip": "Log in to favorite and share creations! (Opens the browser)",
   "gui.immersive_furniture.create": "Create",
   "gui.immersive_furniture.create.hint": "Create a new furniture from scratch.",
   "gui.immersive_furniture.craft": "Craft",

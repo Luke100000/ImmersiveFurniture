@@ -2,7 +2,6 @@ package net.conczin.immersive_furniture.client.model;
 
 import com.mojang.blaze3d.platform.NativeImage;
 import net.conczin.immersive_furniture.data.FurnitureData;
-import net.conczin.immersive_furniture.data.MaterialRegistry;
 import net.conczin.immersive_furniture.mixin.client.SpriteContentsAccessor;
 import net.conczin.immersive_furniture.utils.Utils;
 import net.minecraft.client.Minecraft;

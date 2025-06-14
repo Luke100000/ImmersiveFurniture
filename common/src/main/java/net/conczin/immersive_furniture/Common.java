@@ -15,6 +15,8 @@ public final class Common {
 
     public static int delayedRendersChecks = 0;
     public static int delayedRenders = 0;
+    public static int entityRendersTotal = 0;
+    public static int entityRenders = 0;
 
     public static ResourceLocation locate(String path) {
         return new ResourceLocation(MOD_ID, path);

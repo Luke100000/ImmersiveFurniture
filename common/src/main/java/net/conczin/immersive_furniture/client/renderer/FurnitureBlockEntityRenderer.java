@@ -3,6 +3,7 @@ package net.conczin.immersive_furniture.client.renderer;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
+import net.conczin.immersive_furniture.Common;
 import net.conczin.immersive_furniture.block.BaseFurnitureBlock;
 import net.conczin.immersive_furniture.block.entity.FurnitureBlockEntity;
 import net.conczin.immersive_furniture.client.DelayedFurnitureRenderer;
@@ -39,6 +40,8 @@ public class FurnitureBlockEntityRenderer<T extends FurnitureBlockEntity> implem
 
     @Override
     public void render(T blockEntity, float partialTick, PoseStack poseStack, MultiBufferSource buffer, int packedLight, int packedOverlay) {
+        Common.entityRendersTotal++;
+
         FurnitureData data = blockEntity.getData();
         if (data == null) return;
 
@@ -46,6 +49,8 @@ public class FurnitureBlockEntityRenderer<T extends FurnitureBlockEntity> implem
         if (DynamicAtlas.BAKED.knownFurniture.containsKey(data.getHash())) {
             return;
         }
+
+        Common.entityRenders++;
 
         poseStack.pushPose();
 

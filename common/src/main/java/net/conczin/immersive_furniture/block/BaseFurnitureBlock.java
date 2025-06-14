@@ -103,7 +103,7 @@ public abstract class BaseFurnitureBlock extends Block implements SimpleWaterlog
     public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
         FurnitureData data = getData(state, level, pos);
         if (data != null) {
-            data.tick(level, pos, random, level::addParticle, false);
+            data.tick(level, pos, random, level::addParticle, false, false);
         }
     }
 

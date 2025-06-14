@@ -9,7 +9,7 @@ import net.conczin.immersive_furniture.client.model.DynamicAtlas;
 import net.conczin.immersive_furniture.client.model.FurnitureModelBaker;
 import net.conczin.immersive_furniture.client.renderer.FurnitureBlockEntityRenderer;
 import net.conczin.immersive_furniture.data.FurnitureData;
-import net.conczin.immersive_furniture.data.MaterialRegistry;
+import net.conczin.immersive_furniture.client.model.MaterialRegistry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Renderable;
@@ -19,14 +19,11 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
@@ -89,9 +86,9 @@ public abstract class ArtisansWorkstationScreen extends Screen {
 
     private static BakedModel lastBakedModel = null;
 
-    static void renderModel(GuiGraphics graphics, FurnitureData data, float yaw, float pitch, boolean useLastBakedModel) {
+    static void renderModel(GuiGraphics graphics, FurnitureData data, float yaw, float pitch, boolean inEditor) {
         BakedModel bakedModel = FurnitureModelBaker.getAsyncModel(data, DynamicAtlas.SCRATCH);
-        if (useLastBakedModel) {
+        if (inEditor) {
             if (bakedModel == null) {
                 bakedModel = lastBakedModel;
             } else {
@@ -116,7 +113,7 @@ public abstract class ArtisansWorkstationScreen extends Screen {
             // We use the animation tick, which is a triangle distribution based on distance to the player,
             // 0.2f is roughly 4 blocks away
             if (level.getRandom().nextFloat() < 0.2f) {
-                data.tick(level, player.getOnPos(), level.getRandom(), getParticleEngine(data)::addParticle, true);
+                data.tick(level, player.getOnPos(), level.getRandom(), getParticleEngine(data)::addParticle, true, inEditor);
             }
 
             getParticleEngine(data).tick();

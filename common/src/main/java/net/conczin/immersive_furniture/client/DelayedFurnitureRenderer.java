@@ -68,6 +68,9 @@ public class DelayedFurnitureRenderer {
                 }
             }
         }
+
+        Common.entityRenders = 0;
+        Common.entityRendersTotal = 0;
     }
 
     public void clear() {
