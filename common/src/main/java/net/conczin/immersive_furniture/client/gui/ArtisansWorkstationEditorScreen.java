@@ -345,6 +345,8 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
         private final Vector3f originalFrom;
         private final Vector3f originalTo;
 
+        private final boolean isFlat;
+
         DraggingContext(FurnitureData.Element element, Direction direction, double x, double y, boolean resize) {
             this.element = element;
             this.direction = direction;
@@ -354,6 +356,10 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
 
             this.originalFrom = new Vector3f(element.from);
             this.originalTo = new Vector3f(element.to);
+
+            this.isFlat = element.from.x == element.to.x ||
+                          element.from.y == element.to.y ||
+                          element.from.z == element.to.z;
         }
 
         public float getOffset(double mouseX, double mouseY) {
@@ -367,9 +373,6 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
             float proj = drag.dot(screenNormal);
 
             // Use the move axis rather than face for flat elements
-            boolean isFlat = element.from.x == element.to.x ||
-                             element.from.y == element.to.y ||
-                             element.from.z == element.to.z;
             if ((isFlat || hasAltDown()) && drag.lengthSquared() > 1.0f) {
                 Direction bestDirection = Direction.UP;
                 float bestDot = Float.MIN_VALUE;
@@ -399,7 +402,7 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
 
     protected void drawModel(GuiGraphics graphics, FurnitureData data, int x, int y, float size, float yaw, float pitch, int mouseX, int mouseY) {
         graphics.pose().pushPose();
-        graphics.pose().translate(x, y, 100.0);
+        graphics.pose().translate(x, y, 1024.0);
         graphics.pose().translate(0.5, 1.0, 0.5);
         graphics.pose().mulPoseMatrix(new Matrix4f().scaling(size));
         graphics.pose().mulPose(new Quaternionf().rotateX(pitch).rotateY(yaw));

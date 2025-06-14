@@ -18,6 +18,7 @@ import java.util.Base64;
 public class Auth {
     static final SecureRandom random = new SecureRandom();
 
+    static final String FILE_NAME = "./immersiveLibraryTokenFurniture";
     static String currentToken;
 
     private static String newToken() {
@@ -27,7 +28,7 @@ public class Auth {
     }
 
     private static Path getTokenPath() {
-        return Paths.get("./immersiveLibraryTokenFurniture");
+        return Paths.get(FILE_NAME);
     }
 
     public static String loadToken() {
@@ -51,7 +52,7 @@ public class Auth {
 
     public static void saveToken() {
         try {
-            Files.writeString(Paths.get("./immersiveLibraryToken_v2"), currentToken);
+            Files.writeString(Paths.get(FILE_NAME), currentToken);
         } catch (IOException e) {
             Common.logger.error("Failed to save token!", e);
         }

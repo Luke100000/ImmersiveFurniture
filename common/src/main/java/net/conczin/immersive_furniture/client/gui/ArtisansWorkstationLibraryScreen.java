@@ -1,6 +1,7 @@
 package net.conczin.immersive_furniture.client.gui;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.conczin.immersive_furniture.Common;
 import net.conczin.immersive_furniture.client.gui.widgets.StateImageButton;
 import net.conczin.immersive_furniture.data.FurnitureData;
@@ -378,6 +379,9 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
             }
         }
 
+        graphics.pose().pushPose();
+        graphics.pose().translate(0, 0, 100);
+
         if (authenticating) {
             tickAuthentication();
 
@@ -403,6 +407,8 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
         if (tooltip != null) {
             graphics.renderTooltip(font, tooltip, Optional.empty(), lastMouseX, lastMouseY);
         }
+
+        graphics.pose().popPose();
     }
 
     private boolean isTileHovered(int x, int y) {
