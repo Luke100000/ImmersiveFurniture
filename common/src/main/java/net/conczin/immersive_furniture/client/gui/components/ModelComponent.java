@@ -156,7 +156,7 @@ public class ModelComponent extends ScreenComponent {
             ry.setEnabled(false);
             rz.setEnabled(true);
         });
-        rz.setEnabled(screen.selectedElement.axis == Direction.Axis.Z);
+        rz.setEnabled(screen.selectedElement.axis != Direction.Axis.Z);
 
         addButton(leftPos + 62, y + 1, 14, 26, 228, null, () ->
                 screen.selectedElement.rotation = (screen.selectedElement.rotation + 22.5f) % 360);
@@ -250,9 +250,9 @@ public class ModelComponent extends ScreenComponent {
             // Rotation
             for (int i = 0; i < 360; i += 90) {
                 final int rotation = i;
-                addToggleButton(leftPos + 6 + i * 18, topPos + 114, 16, 160 + (i / 90) * 16, 224, "gui.immersive_furniture.rotation." + i, () -> {
+                addToggleButton(leftPos + 6 + i / 90 * 18, topPos + 114, 16, 160 + (i / 90) * 16, 224, "gui.immersive_furniture.rotation." + i, () -> {
                     if (screen.selectedElement == null) return;
-                    screen.selectedElement.sprite.rotation = rotation * 90;
+                    screen.selectedElement.sprite.rotation = rotation;
                     screen.init();
                 }).setEnabled(screen.selectedElement.sprite.rotation != rotation);
             }

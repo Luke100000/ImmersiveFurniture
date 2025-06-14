@@ -136,7 +136,7 @@ public class SettingsComponent extends ScreenComponent {
         data.sources.clear();
         for (FurnitureData.Element element : data.elements) {
             if (element.type != FurnitureData.ElementType.ELEMENT) continue;
-            ResourceLocation source = MaterialRegistry.INSTANCE.materials.getOrDefault(element.material.source, MaterialSource.DEFAULT).north().texture();
+            ResourceLocation source = MaterialRegistry.INSTANCE.materials.getOrDefault(element.material.source, MaterialSource.DEFAULT).location();
             ResourceLocation resourceLocation = new ResourceLocation(source.getNamespace(), "textures/" + source.getPath() + ".png");
             Minecraft.getInstance().getResourceManager().getResource(resourceLocation)
                     .ifPresent(resource -> {

@@ -5,7 +5,6 @@ Initial release
 # TODO
 
 * Test sleeping and multiplayer
-* Direction offset (in the texture source to allow rotations)
 
 # Roadmap 1.0.0
 

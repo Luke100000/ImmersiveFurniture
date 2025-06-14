@@ -414,7 +414,7 @@ public class FurnitureData {
     public static class Element {
         public Vector3f from;
         public Vector3f to;
-        public Direction.Axis axis = Direction.Axis.X;
+        public Direction.Axis axis = Direction.Axis.Y;
         public float rotation = 0.0f;
         public ElementType type = ElementType.ELEMENT;
         public int color = -1;
@@ -628,12 +628,17 @@ public class FurnitureData {
         REPEAT,
     }
 
+    public enum MaterialAxis {
+        X,
+        Y,
+        Z
+    }
+
     public static class Material {
         public ResourceLocation source = new ResourceLocation("minecraft:oak_log");
         public int margin = 4;
         public WrapMode wrap = WrapMode.EXPAND;
-        public boolean rotate = false;
-        public boolean flip = false;
+        public MaterialAxis axis = MaterialAxis.X;
 
         public LightMaterialEffect lightEffect = new LightMaterialEffect();
 
@@ -645,8 +650,7 @@ public class FurnitureData {
             source = NBTHelper.getResourceLocation(tag, "Source", source);
             margin = NBTHelper.getInt(tag, "Margin", margin);
             wrap = NBTHelper.getEnum(tag, WrapMode.class, "Wrap", wrap);
-            rotate = NBTHelper.getBoolean(tag, "Rotate", rotate);
-            flip = NBTHelper.getBoolean(tag, "Flip", flip);
+            axis = NBTHelper.getEnum(tag, MaterialAxis.class, "Axis", axis);
             lightEffect.load(tag.getCompound("LightEffect"));
         }
 
@@ -654,8 +658,7 @@ public class FurnitureData {
             source = material.source;
             margin = material.margin;
             wrap = material.wrap;
-            rotate = material.rotate;
-            flip = material.flip;
+            axis = material.axis;
             lightEffect = new LightMaterialEffect(material.lightEffect);
         }
 
@@ -664,8 +667,7 @@ public class FurnitureData {
             tag.putString("Source", source.toString());
             tag.putInt("Margin", margin);
             tag.putString("Wrap", wrap.name());
-            tag.putBoolean("Rotate", rotate);
-            tag.putBoolean("Flip", flip);
+            tag.putString("Axis", axis.name());
             tag.put("LightEffect", lightEffect.save());
             return tag;
         }

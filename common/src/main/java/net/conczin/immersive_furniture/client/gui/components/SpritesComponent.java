@@ -29,9 +29,9 @@ public class SpritesComponent extends ListComponent {
     private boolean vanillaOnly = true;
 
     public enum FilterType {
-        ANIMATIONS,
-        SPRITES,
         ITEMS,
+        SPRITES,
+        ANIMATIONS,
         ALL
     }
 

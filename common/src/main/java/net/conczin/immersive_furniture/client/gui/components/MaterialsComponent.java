@@ -3,10 +3,10 @@ package net.conczin.immersive_furniture.client.gui.components;
 import net.conczin.immersive_furniture.client.gui.ArtisansWorkstationEditorScreen;
 import net.conczin.immersive_furniture.client.gui.widgets.MaterialButton;
 import net.conczin.immersive_furniture.client.gui.widgets.StateImageButton;
+import net.conczin.immersive_furniture.client.model.MaterialRegistry;
 import net.conczin.immersive_furniture.client.model.MaterialSource;
 import net.conczin.immersive_furniture.config.Config;
 import net.conczin.immersive_furniture.data.FurnitureData;
-import net.conczin.immersive_furniture.client.model.MaterialRegistry;
 import net.conczin.immersive_furniture.utils.Utils;
 import net.minecraft.resources.ResourceLocation;
 
@@ -17,8 +17,6 @@ public class MaterialsComponent extends ListComponent {
 
     final List<MaterialButton> materialButtons = new ArrayList<>();
 
-    StateImageButton rotateButton;
-    StateImageButton flipButton;
     StateImageButton repeatButton;
     StateImageButton favoriteButton;
 
@@ -30,22 +28,18 @@ public class MaterialsComponent extends ListComponent {
     public void init(int leftPos, int topPos, int width, int height) {
         // Material settings
         if (screen.selectedElement != null) {
-            // Toggle 90° rotation
-            rotateButton = addToggleButton(leftPos + 6, topPos + 22, 16, 96, 96, "gui.immersive_furniture.rotate", () -> {
-                screen.selectedElement.material.rotate = !screen.selectedElement.material.rotate;
-                rotateButton.setEnabled(screen.selectedElement.material.rotate);
-            });
-            rotateButton.setEnabled(screen.selectedElement.material.rotate);
-
-            // Toggle flip
-            flipButton = addToggleButton(leftPos + 6 + 18, topPos + 22, 16, 112, 96, "gui.immersive_furniture.flip", () -> {
-                screen.selectedElement.material.flip = !screen.selectedElement.material.flip;
-                flipButton.setEnabled(screen.selectedElement.material.flip);
-            });
-            flipButton.setEnabled(screen.selectedElement.material.flip);
+            // Texture axis
+            int i = 0;
+            for (FurnitureData.MaterialAxis axis : FurnitureData.MaterialAxis.values()) {
+                addToggleButton(leftPos + 6 + i * 18, topPos + 22, 16, 16 + i * 16, 96, "", () -> {
+                    screen.selectedElement.material.axis = axis;
+                    screen.init();
+                }).setEnabled(screen.selectedElement.material.axis != axis);
+                i++;
+            }
 
             // Toggle repeat
-            repeatButton = addToggleButton(leftPos + 6 + 36, topPos + 22, 16, 144, 96, "gui.immersive_furniture.repeat", () -> {
+            repeatButton = addToggleButton(leftPos + 6 + 54, topPos + 22, 16, 144, 96, "gui.immersive_furniture.repeat", () -> {
                 if (screen.selectedElement.material.wrap == FurnitureData.WrapMode.EXPAND) {
                     screen.selectedElement.material.wrap = FurnitureData.WrapMode.REPEAT;
                     repeatButton.setEnabled(false);
@@ -106,7 +100,7 @@ public class MaterialsComponent extends ListComponent {
         filteredMaterials.clear();
         MaterialRegistry.INSTANCE.materials.entrySet().stream()
                 .filter(entry -> Utils.search(searchBox.getValue(), entry.getKey().toString()))
-                .sorted(Comparator.comparingInt(a -> (Config.getInstance().favorites.contains(a.getKey().toString()) ? 1 : 0)))
+                .sorted(Comparator.comparingInt(a -> (Config.getInstance().favorites.contains(a.getKey().toString()) ? 0 : 1)))
                 .forEach(filteredMaterials::add);
 
         page = Math.max(0, Math.min(page, (filteredMaterials.size() - 1) / 16));

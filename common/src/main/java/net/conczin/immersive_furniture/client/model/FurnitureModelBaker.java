@@ -97,7 +97,8 @@ public class FurnitureModelBaker {
 
     public static BakedModel getModel(FurnitureData data, DynamicAtlas atlas, int yRot, boolean force) {
         String hash = data.getHash();
-        boolean exist = atlas.knownFurniture.containsKey(hash);
+        CachedBakedModelSet cachedBakedModelSet = atlas.knownFurniture.get(hash);
+        boolean exist = cachedBakedModelSet != null;
 
         // The atlas is full, cannot continue
         if (!force && !exist && atlas.isFull()) {
@@ -106,7 +107,7 @@ public class FurnitureModelBaker {
 
         if (exist) {
             atlas.uploadIfDirty();
-            return atlas.knownFurniture.get(hash).get(yRot);
+            return cachedBakedModelSet.get(yRot);
         } else {
             float previousUsage = atlas.getUsage();
             BlockModel model = FurnitureModelFactory.getModel(data, atlas);
