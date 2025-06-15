@@ -561,11 +561,11 @@ public class FurnitureData {
             } else if (type == ElementType.SPRITE) {
                 // Sprites are forced to be 16x16x0
                 Vector3f center = getCenter();
-                from.x = center.x - 8.0f;
-                from.y = center.y - 8.0f;
+                from.x = center.x - 8.0f * sprite.size;
+                from.y = center.y - 8.0f * sprite.size;
                 from.z = center.z;
-                to.x = center.x + 8.0f;
-                to.y = center.y + 8.0f;
+                to.x = center.x + 8.0f * sprite.size;
+                to.y = center.y + 8.0f * sprite.size;
                 to.z = center.z;
             }
         }
@@ -781,6 +781,7 @@ public class FurnitureData {
     public static class Sprite {
         public ResourceLocation sprite = new ResourceLocation("minecraft:block/soul_fire_1");
         public int rotation = 0;
+        public float size = 1.0f;
 
         public Sprite() {
         }
@@ -788,17 +789,20 @@ public class FurnitureData {
         public Sprite(CompoundTag tag) {
             this.sprite = NBTHelper.getResourceLocation(tag, "Sprite", sprite);
             this.rotation = NBTHelper.getInt(tag, "Rotation", rotation);
+            this.size = NBTHelper.getFloat(tag, "Size", size);
         }
 
         public Sprite(Sprite sprite) {
             this.sprite = sprite.sprite;
             this.rotation = sprite.rotation;
+            this.size = sprite.size;
         }
 
         public CompoundTag toTag() {
             CompoundTag tag = new CompoundTag();
             tag.putString("Sprite", sprite.toString());
             tag.putInt("Rotation", rotation);
+            tag.putFloat("Size", size);
             return tag;
         }
     }

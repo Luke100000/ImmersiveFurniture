@@ -60,7 +60,7 @@ public abstract class ListComponent extends ScreenComponent {
 
     abstract void updateSearch();
 
-    public void render(GuiGraphics context) {
-        context.drawCenteredString(minecraft.font, String.format("%s / %S", page + 1, getPages()), leftPos + width / 2, topPos + height - 17, 0xFFFFFF);
+    public void render(GuiGraphics graphics) {
+        graphics.drawCenteredString(minecraft.font, String.format("%s / %S", page + 1, getPages()), leftPos + width / 2, topPos + height - 17, 0xFFFFFF);
     }
 }

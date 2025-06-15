@@ -104,9 +104,9 @@ public class SettingsComponent extends ScreenComponent {
         }, leftPos + 6, topPos + 154, width - 12);
     }
 
-    public void render(GuiGraphics context) {
+    public void render(GuiGraphics graphics) {
         if (localFileExists) {
-            context.drawCenteredString(
+            graphics.drawCenteredString(
                     minecraft.font,
                     Component.translatable("gui.immersive_furniture.overwrite_file"),
                     leftPos + width + (280 - width) / 2, topPos + height - 16, 0xFFFFFF

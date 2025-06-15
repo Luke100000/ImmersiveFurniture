@@ -84,6 +84,9 @@
   "gui.immersive_furniture.rotation.180": "180°",
   "gui.immersive_furniture.rotation.270": "270°",
 
+  "gui.immersive_furniture.decrease_size": "Decrease Size",
+  "gui.immersive_furniture.increase_size": "Increase Size",
+
   "gui.immersive_furniture.login": "Login",
   "gui.immersive_furniture.logout": "Logout",
   "gui.immersive_furniture.login.tooltip": "Log in to favorite and share creations! (Opens the browser)",

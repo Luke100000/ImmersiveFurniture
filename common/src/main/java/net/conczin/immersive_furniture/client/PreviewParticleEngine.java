@@ -91,7 +91,7 @@ public class PreviewParticleEngine {
         lightTexture.turnOffLightLayer();
     }
 
-    public void renderParticles(GuiGraphics context, float yaw, float pitch, float partialTicks) {
+    public void renderParticles(GuiGraphics graphics, float yaw, float pitch, float partialTicks) {
         Minecraft minecraft = Minecraft.getInstance();
         if (minecraft.player == null || minecraft.level == null) {
             return;
@@ -100,6 +100,6 @@ public class PreviewParticleEngine {
         FakeCamera camera = new FakeCamera();
         camera.setup(minecraft.level, minecraft.player, false, false, partialTicks, yaw, pitch);
 
-        render(context.pose(), minecraft.gameRenderer.lightTexture(), camera, partialTicks);
+        render(graphics.pose(), minecraft.gameRenderer.lightTexture(), camera, partialTicks);
     }
 }

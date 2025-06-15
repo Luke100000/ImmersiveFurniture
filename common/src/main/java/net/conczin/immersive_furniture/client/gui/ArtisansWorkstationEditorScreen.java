@@ -136,35 +136,35 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
     }
 
     @Override
-    public void renderBackground(GuiGraphics context) {
-        super.renderBackground(context);
+    public void renderBackground(GuiGraphics graphics) {
+        super.renderBackground(graphics);
 
         // Background
-        drawRectangle(context, leftPos, topPos, TOOLS_WIDTH, windowHeight);
-        drawRectangle(context, leftPos + TOOLS_WIDTH, topPos, windowWidth - TOOLS_WIDTH, windowHeight);
+        drawRectangle(graphics, leftPos, topPos, TOOLS_WIDTH, windowHeight);
+        drawRectangle(graphics, leftPos + TOOLS_WIDTH, topPos, windowWidth - TOOLS_WIDTH, windowHeight);
     }
 
     @Override
-    public void render(GuiGraphics context, int mouseX, int mouseY, float delta) {
-        super.render(context, mouseX, mouseY, delta);
+    public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+        super.render(graphics, mouseX, mouseY, delta);
 
         // Recompute hash
         data.dirty();
 
         // Model
-        context.enableScissor(leftPos + TOOLS_WIDTH + 3, topPos + 3, leftPos + windowWidth - 3, topPos + windowHeight - 3);
-        drawModel(context, data, leftPos + TOOLS_WIDTH + (windowWidth - TOOLS_WIDTH) / 2, topPos + windowHeight / 2, camZoom, camYaw, camPitch, mouseX, mouseY);
-        context.disableScissor();
+        graphics.enableScissor(leftPos + TOOLS_WIDTH + 3, topPos + 3, leftPos + windowWidth - 3, topPos + windowHeight - 3);
+        drawModel(graphics, data, leftPos + TOOLS_WIDTH + (windowWidth - TOOLS_WIDTH) / 2, topPos + windowHeight / 2, camZoom, camYaw, camPitch, mouseX, mouseY);
+        graphics.disableScissor();
 
-        context.pose().translate(0, 0, 2048.0f);
+        graphics.pose().translate(0, 0, 2048.0f);
 
         switch (currentPage) {
-            case MODEL -> modelComponent.render(context);
-            case MATERIALS -> materialsComponent.render(context);
-            case PARTICLES -> particlesComponent.render(context);
-            case SOUNDS -> poundsComponent.render(context);
-            case SETTINGS -> settingsComponent.render(context);
-            case SPRITES -> spritesComponent.render(context);
+            case MODEL -> modelComponent.render(graphics);
+            case MATERIALS -> materialsComponent.render(graphics);
+            case PARTICLES -> particlesComponent.render(graphics);
+            case SOUNDS -> poundsComponent.render(graphics);
+            case SETTINGS -> settingsComponent.render(graphics);
+            case SPRITES -> spritesComponent.render(graphics);
         }
     }
 

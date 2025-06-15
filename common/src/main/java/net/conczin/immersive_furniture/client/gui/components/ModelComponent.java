@@ -256,6 +256,20 @@ public class ModelComponent extends ScreenComponent {
                     screen.init();
                 }).setEnabled(screen.selectedElement.sprite.rotation != rotation);
             }
+
+            // Size
+            addButton(leftPos + 6, topPos + 132, 16, 112, 96, "gui.immersive_furniture.decrease_size", () -> {
+                if (screen.selectedElement == null) return;
+                screen.selectedElement.sprite.size = Math.max(0.25f, screen.selectedElement.sprite.size / 2.0f);
+                screen.selectedElement.sanityCheck();
+                screen.init();
+            });
+            addButton(leftPos + 24, topPos + 132, 16, 96, 96, "gui.immersive_furniture.increase_size", () -> {
+                if (screen.selectedElement == null) return;
+                screen.selectedElement.sprite.size = Math.min(1.0f, screen.selectedElement.sprite.size * 2.0f);
+                screen.selectedElement.sanityCheck();
+                screen.init();
+            });
         }
     }
 
@@ -299,13 +313,26 @@ public class ModelComponent extends ScreenComponent {
         }
     }
 
-    public void render(GuiGraphics context) {
+    public void render(GuiGraphics graphics) {
         if (screen.selectedElement == null) {
-            context.drawString(minecraft.font, SELECT_TITLE, leftPos + 6, topPos + 6, 0xFFFFFF);
+            graphics.drawString(minecraft.font, SELECT_TITLE, leftPos + 6, topPos + 6, 0xFFFFFF);
         } else {
-            context.drawString(minecraft.font, POSITION_TITLE, leftPos + 6, topPos + 6, 0xFFFFFF);
-            context.drawString(minecraft.font, SIZE_TITLE, leftPos + 6, topPos + 34, 0xFFFFFF);
-            context.drawString(minecraft.font, ROTATION_TITLE, leftPos + 6, topPos + 62, 0xFFFFFF);
+            graphics.drawString(minecraft.font, POSITION_TITLE, leftPos + 6, topPos + 6, 0xFFFFFF);
+            graphics.drawString(minecraft.font, SIZE_TITLE, leftPos + 6, topPos + 34, 0xFFFFFF);
+            graphics.drawString(minecraft.font, ROTATION_TITLE, leftPos + 6, topPos + 62, 0xFFFFFF);
         }
+
+        if (screen.selectedElement != null) {
+            renderSmoothOutline(graphics, leftPos + 4, topPos + 4, width - 8, 87, 0x44000000);
+            renderSmoothOutline(graphics, leftPos + 4, topPos + 92, width - 8, height - 117, 0x44000000);
+            renderSmoothOutline(graphics, leftPos + 4, topPos + 156, width - 8, 20, 0x44000000);
+        }
+    }
+
+    public void renderSmoothOutline(GuiGraphics graphics, int x, int y, int width, int height, int color) {
+        graphics.fill(x + 1, y, x + width - 1, y + 1, color);
+        graphics.fill(x + 1, y + height - 1, x + width - 1, y + height, color);
+        graphics.fill(x, y + 1, x + 1, y + height - 1, color);
+        graphics.fill(x + width - 1, y + 1, x + width, y + height - 1, color);
     }
 }

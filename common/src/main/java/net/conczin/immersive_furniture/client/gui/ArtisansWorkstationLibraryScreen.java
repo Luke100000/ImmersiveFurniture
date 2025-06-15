@@ -356,6 +356,7 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
             FurnitureData data = FurnitureDataManager.getData(selected);
 
             if (data != null) {
+                graphics.pose().translate(0, 0, 1024);
                 renderModel(graphics, data, leftPos + windowWidth / 2.0, topPos + windowHeight / 2.0 - 14, windowHeight - 28, previewYaw, previewPitch);
 
                 // Title and author
