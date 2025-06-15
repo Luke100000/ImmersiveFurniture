@@ -130,5 +130,6 @@
   "gui.immersive_furniture.tab.particles": "Particles",
   "gui.immersive_furniture.tab.sounds": "Sounds",
   "gui.immersive_furniture.tab.settings": "Settings",
-  "gui.immersive_furniture.tab.sprites": "Sprites"
+  "gui.immersive_furniture.tab.sprites": "Sprites",
+  "gui.immersive_furniture.tab.help": "Open Help in Browser"
 }

@@ -2,11 +2,13 @@ package net.conczin.immersive_furniture.client.gui;
 
 import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.conczin.immersive_furniture.Common;
 import net.conczin.immersive_furniture.client.Utils;
 import net.conczin.immersive_furniture.client.gui.components.*;
 import net.conczin.immersive_furniture.client.gui.widgets.StateImageButton;
 import net.conczin.immersive_furniture.client.model.ClientModelUtils;
 import net.conczin.immersive_furniture.data.FurnitureData;
+import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Tooltip;
@@ -118,6 +120,18 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
         }
         addRenderableWidget(pagePageButton(Page.SETTINGS, x, 3 * 26));
 
+        // Help button
+        MutableComponent helpText = Component.translatable("gui.immersive_furniture.tab.help");
+        StateImageButton helpButton = new StateImageButton(
+                leftPos + 240, topPos - 24, 26, 28,
+                8 * 26, 160, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE,
+                b -> openHelp(),
+                helpText
+        );
+        helpButton.setEnabled(false);
+        helpButton.setTooltip(Tooltip.create(helpText));
+        addRenderableWidget(helpButton);
+
         addHistory();
     }
 
@@ -133,6 +147,14 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
         button.setTooltip(Tooltip.create(text));
         button.setEnabled(currentPage == page);
         return button;
+    }
+
+    private void openHelp() {
+        try {
+            Util.getPlatform().openUri("https://github.com/Luke100000/immersiveFurniture/wiki/Help");
+        } catch (Exception e) {
+            Common.logger.error(e);
+        }
     }
 
     @Override
