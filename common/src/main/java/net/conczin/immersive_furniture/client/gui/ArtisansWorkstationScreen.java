@@ -7,9 +7,9 @@ import net.conczin.immersive_furniture.Common;
 import net.conczin.immersive_furniture.client.PreviewParticleEngine;
 import net.conczin.immersive_furniture.client.model.DynamicAtlas;
 import net.conczin.immersive_furniture.client.model.FurnitureModelBaker;
+import net.conczin.immersive_furniture.client.model.MaterialRegistry;
 import net.conczin.immersive_furniture.client.renderer.FurnitureBlockEntityRenderer;
 import net.conczin.immersive_furniture.data.FurnitureData;
-import net.conczin.immersive_furniture.client.model.MaterialRegistry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Renderable;
@@ -74,11 +74,11 @@ public abstract class ArtisansWorkstationScreen extends Screen {
 
     static void renderModel(GuiGraphics graphics, FurnitureData data, double x, double y, double size, float yaw, float pitch) {
         graphics.pose().pushPose();
-        graphics.pose().translate(x, y, 16.0);
+        graphics.pose().translate(x, y, 100.0);
         graphics.pose().mulPoseMatrix(new Matrix4f().scaling((float) (size / Math.max(1.0, data.getSize() / 16.0) * 0.4)));
         graphics.pose().mulPose(new Quaternionf().rotateX(pitch).rotateY(yaw));
         Vec3 center = data.boundingBox().getCenter();
-        graphics.pose().translate(-0.5, center.y / 16.0f, -0.5);
+        graphics.pose().translate(data.size.x / 2.0f - 1.0f, data.size.y / 2.0f - 0.5f + center.y / 16.0f, data.size.z / 2.0f - 1.0f);
         graphics.pose().mulPoseMatrix(new Matrix4f().scaling(1, -1, 1));
         renderModel(graphics, data, yaw, pitch, false);
         graphics.pose().popPose();
@@ -108,7 +108,7 @@ public abstract class ArtisansWorkstationScreen extends Screen {
 
             ClientLevel level = Minecraft.getInstance().level;
             LocalPlayer player = Minecraft.getInstance().player;
-            if (level == null  || player == null) return;
+            if (level == null || player == null) return;
 
             // We use the animation tick, which is a triangle distribution based on distance to the player,
             // 0.2f is roughly 4 blocks away
@@ -138,26 +138,6 @@ public abstract class ArtisansWorkstationScreen extends Screen {
         vertexConsumer.vertex(matrix4f, x1 + nx + 0.5f, y1 + ny + 0.5f, z1 + z).color(r, g, b, a).endVertex();
         vertexConsumer.vertex(matrix4f, x0 + nx + 0.5f, y0 + ny + 0.5f, z0 + z).color(r, g, b, a).endVertex();
         vertexConsumer.vertex(matrix4f, x0 - nx + 0.5f, y0 - ny + 0.5f, z0 + z).color(r, g, b, a).endVertex();
-    }
-
-    void checkerPlane(GuiGraphics graphics) {
-        float margin = 0.0f;
-
-        RenderSystem.setShaderTexture(0, TEXTURE);
-        RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
-        RenderSystem.depthMask(false);
-        RenderSystem.disableCull();
-        RenderSystem.enableBlend();
-        RenderSystem.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-        Matrix4f matrix4f = graphics.pose().last().pose();
-        BufferBuilder builder = Tesselator.getInstance().getBuilder();
-        builder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
-        builder.vertex(matrix4f, -0.25f, 0.0f, -0.25f).uv(244.0f / 256.0f, 0.0f).color(1.0f, 1.0f, 1.0f, 0.5f).endVertex();
-        builder.vertex(matrix4f, -0.25f, 0.0f, 1.0f + margin).uv(244.0f / 256.0f, (10.0f + margin * 8.0f) / 256.0f).color(1.0f, 1.0f, 1.0f, 0.5f).endVertex();
-        builder.vertex(matrix4f, 1.25f, 0.0f, 1.0f + margin).uv(1.0f, (10.0f + margin * 8.0f) / 256.0f).color(1.0f, 1.0f, 1.0f, 0.5f).endVertex();
-        builder.vertex(matrix4f, 1.25f, 0.0f, -0.25f).uv(1.0f, 0.0f).color(1.0f, 1.0f, 1.0f, 0.5f).endVertex();
-        BufferUploader.drawWithShader(builder.end());
-        RenderSystem.enableCull();
     }
 
     @Override

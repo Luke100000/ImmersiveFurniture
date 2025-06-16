@@ -23,7 +23,8 @@ public class ModelComponent extends ScreenComponent {
     static final Component POSITION_TITLE = Component.translatable("gui.immersive_furniture.position");
     static final Component SIZE_TITLE = Component.translatable("gui.immersive_furniture.size");
     static final Component ROTATION_TITLE = Component.translatable("gui.immersive_furniture.rotation");
-    static final Component MOVE_SCENE_TITLE = Component.translatable("gui.immersive_furniture.move_scene");
+    static final Component MOVE_FURNITURE_TITLE = Component.translatable("gui.immersive_furniture.move_furniture");
+    static final Component FURNITURE_DIMENSION_TITLE = Component.translatable("gui.immersive_furniture.furniture_dimension");
 
     static final Component FIELD_TITLE = Component.literal("");
 
@@ -54,23 +55,38 @@ public class ModelComponent extends ScreenComponent {
             screen.init();
         });
 
-        // Scene movement buttons - only shown when no element is selected
+        // Furniture movement buttons - only shown when no element is selected
         if (screen.selectedElement == null) {
             int x = leftPos + 6 + 12;
             int y = topPos + 108;
             int spacing = 24;
 
             // X offset
-            addButton(x, y, 16, 160, 224, "gui.immersive_furniture.move_scene_east", () -> moveScene(1.0f, 0, 0));
-            addButton(x, y + 29, 16, 192, 224, "gui.immersive_furniture.move_scene_west", () -> moveScene(-1.0f, 0, 0));
+            addButton(x, y, 16, 160, 224, "gui.immersive_furniture.move_furniture_west", () -> moveFurniture(-1.0f, 0, 0));
+            addButton(x, y + 29, 16, 192, 224, "gui.immersive_furniture.move_furniture_east", () -> moveFurniture(1.0f, 0, 0));
 
             // Y offset
-            addButton(x + spacing, y, 16, 160, 224, "gui.immersive_furniture.move_scene_up", () -> moveScene(0, 1.0f, 0));
-            addButton(x + spacing, y + 29, 16, 192, 224, "gui.immersive_furniture.move_scene_down", () -> moveScene(0, -1.0f, 0));
+            addButton(x + spacing, y, 16, 160, 224, "gui.immersive_furniture.move_furniture_down", () -> moveFurniture(0, -1.0f, 0));
+            addButton(x + spacing, y + 29, 16, 192, 224, "gui.immersive_furniture.move_furniture_up", () -> moveFurniture(0, 1.0f, 0));
 
             // Z offset
-            addButton(x + spacing * 2, y, 16, 160, 224, "gui.immersive_furniture.move_scene_south", () -> moveScene(0, 0, 1.0f));
-            addButton(x + spacing * 2, y + 29, 16, 192, 224, "gui.immersive_furniture.move_scene_north", () -> moveScene(0, 0, -1.0f));
+            addButton(x + spacing * 2, y, 16, 160, 224, "gui.immersive_furniture.move_furniture_north", () -> moveFurniture(0, 0, -1.0f));
+            addButton(x + spacing * 2, y + 29, 16, 192, 224, "gui.immersive_furniture.move_furniture_south", () -> moveFurniture(0, 0, 1.0f));
+
+            int dimY = topPos + 45;
+            int maxDimension = 4;
+
+            // X dimension
+            addButton(x, dimY, 16, 160, 224, "", () -> screen.data.size.x = Math.min(maxDimension, screen.data.size.x + 1));
+            addButton(x, dimY + 29, 16, 192, 224, "", () -> screen.data.size.x = Math.max(1, screen.data.size.x - 1));
+
+            // Y dimension
+            addButton(x + spacing, dimY, 16, 160, 224, "", () -> screen.data.size.y = Math.min(maxDimension, screen.data.size.y + 1));
+            addButton(x + spacing, dimY + 29, 16, 192, 224, "", () -> screen.data.size.y = Math.max(1, screen.data.size.y - 1));
+
+            // Z dimension
+            addButton(x + spacing * 2, dimY, 16, 160, 224, "", () -> screen.data.size.z = Math.min(maxDimension, screen.data.size.z + 1));
+            addButton(x + spacing * 2, dimY + 29, 16, 192, 224, "", () -> screen.data.size.z = Math.max(1, screen.data.size.z - 1));
         }
 
         if (screen.selectedElement == null) return;
@@ -295,7 +311,7 @@ public class ModelComponent extends ScreenComponent {
         }
     }
 
-    private void moveScene(float xOffset, float yOffset, float zOffset) {
+    private void moveFurniture(float xOffset, float yOffset, float zOffset) {
         for (FurnitureData.Element element : screen.data.elements) {
             element.from.x += xOffset;
             element.to.x += xOffset;
@@ -354,20 +370,27 @@ public class ModelComponent extends ScreenComponent {
         if (screen.selectedElement == null) {
             // Titles
             graphics.drawString(minecraft.font, SELECT_TITLE, leftPos + 6, topPos + 6, 0xFFFFFF);
-            graphics.drawCenteredString(minecraft.font, MOVE_SCENE_TITLE, leftPos + TOOLS_WIDTH / 2, topPos + 96, 0xFFFFFF);
 
-            // Draw axis labels for the scene movement buttons
-            int x = leftPos + 6 + 17;
-            int y = topPos + 108 + 1;
+            int x = leftPos + 6 + 12;
+            int y = topPos + 108;
             int spacing = 24;
 
+            // furniture dimension
+            int dimY = topPos + 45;
+            graphics.drawCenteredString(minecraft.font, FURNITURE_DIMENSION_TITLE, leftPos + TOOLS_WIDTH / 2, dimY - 12, 0xFFFFFF);
+            graphics.drawCenteredString(minecraft.font, "X: " + screen.data.size.x, x + 8, dimY + 19, 0xFFFFFF);
+            graphics.drawCenteredString(minecraft.font, "Y: " + screen.data.size.y, x + 8 + spacing, dimY + 19, 0xFFFFFF);
+            graphics.drawCenteredString(minecraft.font, "Z: " + screen.data.size.z, x + 8 + spacing * 2, dimY + 19, 0xFFFFFF);
+
             // Offset labels
-            graphics.drawString(minecraft.font, "X", x, y + 18, 0xFFFFFF);
-            graphics.drawString(minecraft.font, "Y", x + spacing, y + 18, 0xFFFFFF);
-            graphics.drawString(minecraft.font, "Z", x + spacing * 2, y + 18, 0xFFFFFF);
+            graphics.drawCenteredString(minecraft.font, MOVE_FURNITURE_TITLE, leftPos + TOOLS_WIDTH / 2, y - 12, 0xFFFFFF);
+            graphics.drawString(minecraft.font, "X", x + 5, y + 19, 0xFFFFFF);
+            graphics.drawString(minecraft.font, "Y", x + 5 + spacing, y + 19, 0xFFFFFF);
+            graphics.drawString(minecraft.font, "Z", x + 5 + spacing * 2, y + 19, 0xFFFFFF);
 
             // Outlines
-            renderSmoothOutline(graphics, leftPos + 4, y - 3 - 13, width - 8, 62, 0x44000000);
+            renderSmoothOutline(graphics, leftPos + 4, dimY - 15, width - 8, 62, 0x44000000);
+            renderSmoothOutline(graphics, leftPos + 4, y - 15, width - 8, 62, 0x44000000);
         } else {
             // Titles
             graphics.drawString(minecraft.font, POSITION_TITLE, leftPos + 6, topPos + 6, 0xFFFFFF);

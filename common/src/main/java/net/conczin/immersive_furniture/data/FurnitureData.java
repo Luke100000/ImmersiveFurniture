@@ -48,6 +48,8 @@ public class FurnitureData {
 
     public final List<Element> elements = new LinkedList<>();
 
+    public Vector3i size = new Vector3i(1, 1, 1);
+
     private String hash;
     private Map<Direction, VoxelShape> cachedShapes = new ConcurrentHashMap<>();
     public long lastTick = 0;
@@ -67,6 +69,12 @@ public class FurnitureData {
         this.sources = NBTHelper.getStringSet(tag.getList("Sources", 8));
         this.dependencies = NBTHelper.getStringSet(tag.getList("Dependencies", 8));
         this.transparency = NBTHelper.getEnum(tag, TransparencyType.class, "Transparency", TransparencyType.SOLID);
+
+        this.size = new Vector3i(
+                NBTHelper.getInt(tag, "SizeX", 1),
+                NBTHelper.getInt(tag, "SizeY", 1),
+                NBTHelper.getInt(tag, "SizeZ", 1)
+        );
 
         ListTag elementsTag = tag.getList("Elements", 10);
         for (int i = 0; i < elementsTag.size(); i++) {
@@ -93,6 +101,8 @@ public class FurnitureData {
         for (Element element : data.elements) {
             this.elements.add(new Element(element));
         }
+
+        this.size = new Vector3i(data.size.x, data.size.y, data.size.z);
     }
 
     public CompoundTag toTag() {
@@ -107,6 +117,10 @@ public class FurnitureData {
         tag.put("Sources", NBTHelper.getStringList(sources));
         tag.put("Dependencies", NBTHelper.getStringList(dependencies));
         tag.putString("Transparency", this.transparency.name());
+
+        tag.putInt("SizeX", size.x);
+        tag.putInt("SizeY", size.y);
+        tag.putInt("SizeZ", size.z);
 
         ListTag elementsTag = new ListTag();
         for (Element element : elements) {
@@ -227,7 +241,7 @@ public class FurnitureData {
         if (!originalAuthor.isEmpty() && !originalAuthor.equals(author)) {
             tooltip.add(Component.translatable("gui.immersive_furniture.original_author", originalAuthor).withStyle(ChatFormatting.ITALIC).withStyle(ChatFormatting.GRAY));
         }
-        tooltip.add(Component.translatable("gui.immersive_furniture.tag." + tag.toLowerCase(Locale.ROOT)).withStyle(ChatFormatting.GOLD));
+        tooltip.add(Component.translatable("gui.immersive_furniture.tag." + tag.toLowerCase(Locale.ROOT)).withStyle(ChatFormatting.GOLD).append(getPrefixedSizeTooltip()));
         if (lightLevel > 0) {
             tooltip.add(Component.translatable("gui.immersive_furniture.light_level", lightLevel).withStyle(ChatFormatting.YELLOW));
         }
@@ -269,6 +283,28 @@ public class FurnitureData {
             tooltip.add(Component.translatable("gui.immersive_furniture.tooltip").withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC));
         }
         return tooltip;
+    }
+
+    private Component getPrefixedSizeTooltip() {
+        Component sizeTooltip = getSizeTooltip();
+        if (sizeTooltip == null) {
+            return Component.literal("");
+        } else {
+            return Component.literal(" - ").append(sizeTooltip).withStyle(ChatFormatting.GRAY);
+        }
+    }
+
+    private Component getSizeTooltip() {
+        if (size.x == 1 && size.y == 1 && size.z == 1) {
+            return null; // No size tooltip for single block elements
+        } else if (size.x == 1 && size.y == 1) {
+            return Component.translatable("gui.immersive_furniture.n_deep", size.z);
+        } else if (size.x == 1 && size.z == 1) {
+            return Component.translatable("gui.immersive_furniture.n_wide", size.y);
+        } else if (size.y == 1 && size.z == 1) {
+            return Component.translatable("gui.immersive_furniture.n_tall", size.x);
+        }
+        return Component.literal(String.format("%sx%sx%s", size.x, size.y, size.z));
     }
 
     public record PoseOffset(Vector3f offset, Pose pose, float rotation) {
@@ -391,17 +427,17 @@ public class FurnitureData {
         if (element.axis != Direction.Axis.X) {
             float mid = 0.5f * (from.x + to.x);
             from.x = from.x * fraction + mid * (1.0f - fraction);
-            to.x   = to.x   * fraction + mid * (1.0f - fraction);
+            to.x = to.x * fraction + mid * (1.0f - fraction);
         }
         if (element.axis != Direction.Axis.Y) {
             float mid = 0.5f * (from.y + to.y);
             from.y = from.y * fraction + mid * (1.0f - fraction);
-            to.y   = to.y   * fraction + mid * (1.0f - fraction);
+            to.y = to.y * fraction + mid * (1.0f - fraction);
         }
         if (element.axis != Direction.Axis.Z) {
             float mid = 0.5f * (from.z + to.z);
             from.z = from.z * fraction + mid * (1.0f - fraction);
-            to.z   = to.z   * fraction + mid * (1.0f - fraction);
+            to.z = to.z * fraction + mid * (1.0f - fraction);
         }
 
         Vector3f rotatedFrom = rotate(from, rotation);
@@ -563,15 +599,6 @@ public class FurnitureData {
         }
 
         public void sanityCheck() {
-            // TODO: Math is wrong for rotated elements
-            float maxSize = 64.0f;
-            to.x = Math.max(-maxSize, Math.min(16.0f + maxSize, to.x));
-            to.y = Math.max(-maxSize, Math.min(16.0f + maxSize, to.y));
-            to.z = Math.max(-maxSize, Math.min(16.0f + maxSize, to.z));
-            from.x = Math.max(-maxSize, Math.min(16.0f + maxSize, from.x));
-            from.y = Math.max(-maxSize, Math.min(16.0f + maxSize, from.y));
-            from.z = Math.max(-maxSize, Math.min(16.0f + maxSize, from.z));
-
             // Pose anchors are the shape of the players' butt
             if (type == ElementType.PLAYER_POSE) {
                 Vector3f center = getCenter();
