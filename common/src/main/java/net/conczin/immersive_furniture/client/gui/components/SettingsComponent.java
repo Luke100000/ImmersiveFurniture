@@ -122,8 +122,6 @@ public class SettingsComponent extends ScreenComponent {
         );
     }
 
-
-
     public void finish(FurnitureData data) {
         // Bake
         DynamicAtlas.SCRATCH.clear();

@@ -285,10 +285,10 @@ public class FurnitureData {
                     if (element.playerPose.pose == Pose.SLEEPING) {
                         center.add(forward.mul(0.5f));
                     } else {
-                        center.add(forward.mul(0.125f));
+                        center.add(forward.mul(0.25f));
 
                         Vector3f up = rotate(element.getRotationAxes().up(), direction).mul(1.0f / 16.0f);
-                        center.sub(up.mul(0.0625f));
+                        center.sub(up.mul(0.125f));
                     }
                     found = new PoseOffset(center, element.playerPose.pose, element.rotation + direction.toYRot() % 360.0f);
                 }
@@ -328,7 +328,7 @@ public class FurnitureData {
                     );
                 }
             } else if (element.type == ElementType.SOUND_EMITTER) {
-                if (!inEditor && element.soundEmitter.frequency > 0 && random.nextFloat() < element.soundEmitter.frequency) {
+                if (inEditor && element.soundEmitter.frequency > 0 && random.nextFloat() < element.soundEmitter.frequency) {
                     playSound(level, pos, random, element);
                 }
             }
@@ -373,7 +373,7 @@ public class FurnitureData {
 
     private static VoxelShape getBox(Element element, Direction rotation) {
         Vector3f from = new Vector3f(Float.MAX_VALUE, Float.MAX_VALUE, Float.MAX_VALUE);
-        Vector3f to = new Vector3f(Float.MIN_VALUE, Float.MIN_VALUE, Float.MIN_VALUE);
+        Vector3f to = new Vector3f(-Float.MAX_VALUE, -Float.MAX_VALUE, -Float.MAX_VALUE);
         Vector3f[] corners = ModelUtils.getCorners(element);
         for (Vector3f corner : corners) {
             from.x = Math.min(from.x, corner.x);
@@ -382,6 +382,26 @@ public class FurnitureData {
             to.x = Math.max(to.x, corner.x);
             to.y = Math.max(to.y, corner.y);
             to.z = Math.max(to.z, corner.z);
+        }
+
+        // Adjust volume
+        double volume = element.getVolume();
+        double newVolume = (to.x - from.x) * (to.y - from.y) * (to.z - from.z);
+        float fraction = (float) Math.sqrt(volume / newVolume);
+        if (element.axis != Direction.Axis.X) {
+            float mid = 0.5f * (from.x + to.x);
+            from.x = from.x * fraction + mid * (1.0f - fraction);
+            to.x   = to.x   * fraction + mid * (1.0f - fraction);
+        }
+        if (element.axis != Direction.Axis.Y) {
+            float mid = 0.5f * (from.y + to.y);
+            from.y = from.y * fraction + mid * (1.0f - fraction);
+            to.y   = to.y   * fraction + mid * (1.0f - fraction);
+        }
+        if (element.axis != Direction.Axis.Z) {
+            float mid = 0.5f * (from.z + to.z);
+            from.z = from.z * fraction + mid * (1.0f - fraction);
+            to.z   = to.z   * fraction + mid * (1.0f - fraction);
         }
 
         Vector3f rotatedFrom = rotate(from, rotation);
@@ -512,6 +532,11 @@ public class FurnitureData {
             );
         }
 
+        public float getVolume() {
+            Vector3i size = getSize();
+            return size.x * size.y * size.z;
+        }
+
         public Vector3f getCenter() {
             return new Vector3f(
                     (from.x + to.x) / 2.0f,
@@ -639,6 +664,7 @@ public class FurnitureData {
         public int margin = 4;
         public WrapMode wrap = WrapMode.EXPAND;
         public MaterialAxis axis = MaterialAxis.X;
+        public TransparencyType transparency = TransparencyType.SOLID;
 
         public LightMaterialEffect lightEffect = new LightMaterialEffect();
 
@@ -651,6 +677,7 @@ public class FurnitureData {
             margin = NBTHelper.getInt(tag, "Margin", margin);
             wrap = NBTHelper.getEnum(tag, WrapMode.class, "Wrap", wrap);
             axis = NBTHelper.getEnum(tag, MaterialAxis.class, "Axis", axis);
+            transparency = NBTHelper.getEnum(tag, TransparencyType.class, "Transparency", transparency);
             lightEffect.load(tag.getCompound("LightEffect"));
         }
 
@@ -659,6 +686,7 @@ public class FurnitureData {
             margin = material.margin;
             wrap = material.wrap;
             axis = material.axis;
+            transparency = material.transparency;
             lightEffect = new LightMaterialEffect(material.lightEffect);
         }
 
@@ -668,6 +696,7 @@ public class FurnitureData {
             tag.putInt("Margin", margin);
             tag.putString("Wrap", wrap.name());
             tag.putString("Axis", axis.name());
+            tag.putString("Transparency", transparency.name());
             tag.put("LightEffect", lightEffect.save());
             return tag;
         }

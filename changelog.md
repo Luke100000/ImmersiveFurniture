@@ -5,6 +5,8 @@ Initial release
 # TODO
 
 * Test sleeping and multiplayer
+* Move all elements function
+* Add "expected furniture size" which basically only controls the origin and editor grid
 
 # Roadmap 1.0.0
 

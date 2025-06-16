@@ -55,6 +55,7 @@ public class FurnitureModelFactory {
             if (otherElement == element) continue;
             if (otherElement.type != FurnitureData.ElementType.ELEMENT) continue;
             if (theSame(element, otherElement) && otherElement.hashCode() < element.hashCode()) continue;
+            if (element.material.transparency != otherElement.material.transparency) continue;
             if (fullyContained(otherElement, vertices)) return null;
         }
 
@@ -306,6 +307,7 @@ public class FurnitureModelFactory {
                 BlockState state = BuiltInRegistries.BLOCK.get(element.material.source).defaultBlockState();
                 RenderType renderType = ItemBlockRenderTypes.getChunkRenderType(state);
                 elementTransparencyType = fromRenderType(renderType);
+                element.material.transparency = elementTransparencyType;
             }
             if (elementTransparencyType != null && elementTransparencyType.isHigherPriorityThan(transparencyType)) {
                 transparencyType = elementTransparencyType;

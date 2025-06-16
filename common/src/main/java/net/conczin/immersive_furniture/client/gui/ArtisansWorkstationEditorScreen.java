@@ -523,7 +523,7 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
         if (!lastHistoryHash.equals(hash)) {
             lastHistoryHash = hash;
             if (history.size() >= MAX_HISTORY_SIZE) {
-                history.removeFirst();
+                history.removeLast();
             }
             history.addFirst(data.toTag());
         }
