@@ -16,11 +16,14 @@ import org.joml.Vector3i;
 
 import java.util.List;
 
+import static net.conczin.immersive_furniture.client.gui.ArtisansWorkstationEditorScreen.TOOLS_WIDTH;
+
 public class ModelComponent extends ScreenComponent {
     static final Component SELECT_TITLE = Component.translatable("gui.immersive_furniture.select");
     static final Component POSITION_TITLE = Component.translatable("gui.immersive_furniture.position");
     static final Component SIZE_TITLE = Component.translatable("gui.immersive_furniture.size");
     static final Component ROTATION_TITLE = Component.translatable("gui.immersive_furniture.rotation");
+    static final Component MOVE_SCENE_TITLE = Component.translatable("gui.immersive_furniture.move_scene");
 
     static final Component FIELD_TITLE = Component.literal("");
 
@@ -50,6 +53,25 @@ public class ModelComponent extends ScreenComponent {
             screen.data.elements.add(screen.selectedElement);
             screen.init();
         });
+
+        // Scene movement buttons - only shown when no element is selected
+        if (screen.selectedElement == null) {
+            int x = leftPos + 6 + 12;
+            int y = topPos + 108;
+            int spacing = 24;
+
+            // X offset
+            addButton(x, y, 16, 160, 224, "gui.immersive_furniture.move_scene_east", () -> moveScene(1.0f, 0, 0));
+            addButton(x, y + 29, 16, 192, 224, "gui.immersive_furniture.move_scene_west", () -> moveScene(-1.0f, 0, 0));
+
+            // Y offset
+            addButton(x + spacing, y, 16, 160, 224, "gui.immersive_furniture.move_scene_up", () -> moveScene(0, 1.0f, 0));
+            addButton(x + spacing, y + 29, 16, 192, 224, "gui.immersive_furniture.move_scene_down", () -> moveScene(0, -1.0f, 0));
+
+            // Z offset
+            addButton(x + spacing * 2, y, 16, 160, 224, "gui.immersive_furniture.move_scene_south", () -> moveScene(0, 0, 1.0f));
+            addButton(x + spacing * 2, y + 29, 16, 192, 224, "gui.immersive_furniture.move_scene_north", () -> moveScene(0, 0, -1.0f));
+        }
 
         if (screen.selectedElement == null) return;
 
@@ -136,25 +158,25 @@ public class ModelComponent extends ScreenComponent {
         rx = addToggleButton(leftPos + 6, y, 16, 16, 96, null, () -> {
             if (screen.selectedElement == null) return;
             screen.selectedElement.axis = Direction.Axis.X;
-            rx.setEnabled(true);
-            ry.setEnabled(false);
-            rz.setEnabled(false);
+            rx.setEnabled(false);
+            ry.setEnabled(true);
+            rz.setEnabled(true);
         });
-        rx.setEnabled(screen.selectedElement.axis == Direction.Axis.X);
+        rx.setEnabled(screen.selectedElement.axis != Direction.Axis.X);
         ry = addToggleButton(leftPos + 24, y, 16, 32, 96, null, () -> {
             if (screen.selectedElement == null) return;
             screen.selectedElement.axis = Direction.Axis.Y;
-            rx.setEnabled(false);
-            ry.setEnabled(true);
-            rz.setEnabled(false);
+            rx.setEnabled(true);
+            ry.setEnabled(false);
+            rz.setEnabled(true);
         });
-        ry.setEnabled(screen.selectedElement.axis == Direction.Axis.Y);
+        ry.setEnabled(screen.selectedElement.axis != Direction.Axis.Y);
         rz = addToggleButton(leftPos + 42, y, 16, 48, 96, null, () -> {
             if (screen.selectedElement == null) return;
             screen.selectedElement.axis = Direction.Axis.Z;
-            rx.setEnabled(false);
-            ry.setEnabled(false);
-            rz.setEnabled(true);
+            rx.setEnabled(true);
+            ry.setEnabled(true);
+            rz.setEnabled(false);
         });
         rz.setEnabled(screen.selectedElement.axis != Direction.Axis.Z);
 
@@ -273,6 +295,21 @@ public class ModelComponent extends ScreenComponent {
         }
     }
 
+    private void moveScene(float xOffset, float yOffset, float zOffset) {
+        for (FurnitureData.Element element : screen.data.elements) {
+            element.from.x += xOffset;
+            element.to.x += xOffset;
+
+            element.from.y += yOffset;
+            element.to.y += yOffset;
+
+            element.from.z += zOffset;
+            element.to.z += zOffset;
+
+            element.sanityCheck();
+        }
+    }
+
     public void update() {
         if (screen.selectedElement == null) return;
 
@@ -315,18 +352,34 @@ public class ModelComponent extends ScreenComponent {
 
     public void render(GuiGraphics graphics) {
         if (screen.selectedElement == null) {
+            // Titles
             graphics.drawString(minecraft.font, SELECT_TITLE, leftPos + 6, topPos + 6, 0xFFFFFF);
+            graphics.drawCenteredString(minecraft.font, MOVE_SCENE_TITLE, leftPos + TOOLS_WIDTH / 2, topPos + 96, 0xFFFFFF);
+
+            // Draw axis labels for the scene movement buttons
+            int x = leftPos + 6 + 17;
+            int y = topPos + 108 + 1;
+            int spacing = 24;
+
+            // Offset labels
+            graphics.drawString(minecraft.font, "X", x, y + 18, 0xFFFFFF);
+            graphics.drawString(minecraft.font, "Y", x + spacing, y + 18, 0xFFFFFF);
+            graphics.drawString(minecraft.font, "Z", x + spacing * 2, y + 18, 0xFFFFFF);
+
+            // Outlines
+            renderSmoothOutline(graphics, leftPos + 4, y - 3 - 13, width - 8, 62, 0x44000000);
         } else {
+            // Titles
             graphics.drawString(minecraft.font, POSITION_TITLE, leftPos + 6, topPos + 6, 0xFFFFFF);
             graphics.drawString(minecraft.font, SIZE_TITLE, leftPos + 6, topPos + 34, 0xFFFFFF);
             graphics.drawString(minecraft.font, ROTATION_TITLE, leftPos + 6, topPos + 62, 0xFFFFFF);
-        }
 
-        if (screen.selectedElement != null) {
+            // Outlines
             renderSmoothOutline(graphics, leftPos + 4, topPos + 4, width - 8, 87, 0x44000000);
             renderSmoothOutline(graphics, leftPos + 4, topPos + 92, width - 8, height - 117, 0x44000000);
-            renderSmoothOutline(graphics, leftPos + 4, topPos + 156, width - 8, 20, 0x44000000);
         }
+
+        renderSmoothOutline(graphics, leftPos + 4, topPos + 156, width - 8, 20, 0x44000000);
     }
 
     public void renderSmoothOutline(GuiGraphics graphics, int x, int y, int width, int height, int color) {

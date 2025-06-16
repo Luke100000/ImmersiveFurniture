@@ -65,6 +65,14 @@
   "gui.immersive_furniture.colorize": "Colorize",
   "gui.immersive_furniture.vanilla": "Only vanilla textures",
 
+  "gui.immersive_furniture.move_scene": "Move Scene",
+  "gui.immersive_furniture.move_scene_up": "Move Scene Up",
+  "gui.immersive_furniture.move_scene_down": "Move Scene Down",
+  "gui.immersive_furniture.move_scene_north": "Move Scene North",
+  "gui.immersive_furniture.move_scene_south": "Move Scene South",
+  "gui.immersive_furniture.move_scene_east": "Move Scene East",
+  "gui.immersive_furniture.move_scene_west": "Move Scene West",
+
   "gui.immersive_furniture.sprite_filter.animations": "Animations",
   "gui.immersive_furniture.sprite_filter.sprites": "Sprites",
   "gui.immersive_furniture.sprite_filter.items": "Items",
@@ -133,3 +141,4 @@
   "gui.immersive_furniture.tab.sprites": "Sprites",
   "gui.immersive_furniture.tab.help": "Open Help in Browser"
 }
+
