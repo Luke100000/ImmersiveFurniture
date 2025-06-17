@@ -245,6 +245,7 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
                     } else {
                         FurnitureDataManager.deleteLocalFile(selected);
                         localFiles = FurnitureDataManager.getLocalFiles();
+                        shouldSearch = true;
                     }
                     selected = null;
                     init();
@@ -357,7 +358,10 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
 
             if (data != null) {
                 graphics.pose().translate(0, 0, 1024);
-                renderModel(graphics, data, leftPos + windowWidth / 2.0, topPos + windowHeight / 2.0 - 14, windowHeight - 28, previewYaw, previewPitch);
+                graphics.enableScissor(leftPos + 6, topPos + 6, leftPos + windowWidth - 6, topPos + windowHeight - 28 - 6);
+                renderModel(graphics, data, leftPos + windowWidth / 2.0, topPos + windowHeight / 2.0, windowHeight - 28, previewYaw, previewPitch);
+                graphics.flush();
+                graphics.disableScissor();
 
                 // Title and author
                 graphics.drawString(font, data.name, leftPos + 8, topPos + 8, 0xFFFFFF);

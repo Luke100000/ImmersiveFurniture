@@ -21,7 +21,6 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
@@ -50,32 +49,30 @@ public abstract class BaseFurnitureBlock extends Block implements SimpleWaterlog
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
         FurnitureData data = getData(state, level, pos);
         if (data != null) {
-            if (level.isClientSide) {
-                data.playInteractSound(level, pos, player);
-                return InteractionResult.CONSUME;
-            } else {
-                // Find closest pose element
-                Vec3 click = new Vec3(hit.getLocation().x - pos.getX(), hit.getLocation().y - pos.getY(), hit.getLocation().z - pos.getZ());
-                FurnitureData.PoseOffset offset = data.getClosestPose(click, state.getValue(FACING));
+            // Find closest pose element
+            Vec3 click = new Vec3(hit.getLocation().x - pos.getX(), hit.getLocation().y - pos.getY(), hit.getLocation().z - pos.getZ());
+            FurnitureData.PoseOffset offset = data.getClosestPose(click, state.getValue(FACING));
 
-                if (offset != null) {
-                    // Remember interaction for the player for some injection purposes
-                    InteractionManager.INSTANCE.addInteraction(player, pos, offset);
+            if (offset != null) {
+                // Remember interaction for the player for some injection purposes
+                InteractionManager.INSTANCE.addInteraction(player, pos, offset);
 
-                    if (offset.pose() == Pose.SLEEPING) {
-                        startSleeping(pos, player);
-                    } else if (offset.pose() == Pose.SITTING) {
-                        startSitting(level, pos, player, offset);
-                    }
-
-                    return InteractionResult.CONSUME;
+                if (offset.pose() == Pose.SLEEPING) {
+                    startSleeping(pos, player);
+                } else if (offset.pose() == Pose.SITTING) {
+                    startSitting(level, pos, player, offset);
                 }
+
+                return InteractionResult.CONSUME;
             }
+
+            return level.isClientSide && data.playInteractSound(level, pos, player) ? InteractionResult.CONSUME : InteractionResult.PASS;
         }
         return InteractionResult.PASS;
     }
 
     private static void startSleeping(BlockPos pos, Player player) {
+        if (player.level().isClientSide) return;
         player.startSleepInBed(pos).ifLeft(problem -> {
             if (problem.getMessage() != null) {
                 player.displayClientMessage(problem.getMessage(), true);
@@ -85,15 +82,17 @@ public abstract class BaseFurnitureBlock extends Block implements SimpleWaterlog
 
     private static void startSitting(Level level, BlockPos pos, Player player, FurnitureData.PoseOffset offset) {
         // Create an entity to fake sitting
-        SittingEntity sittingEntity = new SittingEntity(level, new Vec3(
-                pos.getX() + offset.offset().x,
-                pos.getY() + offset.offset().y,
-                pos.getZ() + offset.offset().z
-        ), new Vec3(player.getX(), player.getY(), player.getZ()));
-        level.addFreshEntity(sittingEntity);
-        sittingEntity.setYRot(offset.rotation());
-        player.startRiding(sittingEntity);
-        sittingEntity.clampRotation(player);
+        if (!level.isClientSide) {
+            SittingEntity sittingEntity = new SittingEntity(level, new Vec3(
+                    pos.getX() + offset.offset().x,
+                    pos.getY() + offset.offset().y,
+                    pos.getZ() + offset.offset().z
+            ), new Vec3(player.getX(), player.getY(), player.getZ()));
+            sittingEntity.setYRot(offset.rotation());
+            player.startRiding(sittingEntity);
+            sittingEntity.clampRotation(player);
+            level.addFreshEntity(sittingEntity);
+        }
         player.hasImpulse = true;
     }
 
@@ -184,13 +183,64 @@ public abstract class BaseFurnitureBlock extends Block implements SimpleWaterlog
 
     @Override
     public void playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
-        if (!level.isClientSide && !player.isCreative()) {
-            // Drop the furniture item with data
-            ItemStack itemStack = getCloneItemStack(level, pos, state);
-            Block.popResource(level, pos, itemStack);
+        if (!level.isClientSide) {
+            // Remove all proxy blocks when the base block is destroyed
+            FurnitureData data = getData(state, level, pos);
+            if (data != null) {
+                Direction facing = state.getValue(FACING);
+
+                // Check and destroy all possible proxy blocks
+                for (int x = 0; x < data.size.x; x++) {
+                    for (int y = 0; y < data.size.y; y++) {
+                        for (int z = 0; z < data.size.z; z++) {
+                            if (x == 0 && y == 0 && z == 0) continue;
+                            BlockPos proxyPos = getProxyPosition(pos, facing, x, y, z);
+                            BlockState proxyState = level.getBlockState(proxyPos);
+                            if (proxyState.getBlock() instanceof FurnitureProxyBlock) {
+                                level.removeBlock(proxyPos, false);
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (!player.isCreative()) {
+                // Drop the furniture item with data
+                ItemStack itemStack = getCloneItemStack(level, pos, state);
+                Block.popResource(level, pos, itemStack);
+            }
         }
 
         super.playerWillDestroy(level, pos, state, player);
     }
-}
 
+    /**
+     * Get the position of a proxy block based on facing and offset
+     */
+    public static BlockPos getProxyPosition(BlockPos basePos, Direction facing, int offsetX, int offsetY, int offsetZ) {
+        int dx = 0, dz = 0;
+
+        switch (facing) {
+            case NORTH:
+                dz = offsetZ;
+                dx = offsetX;
+                break;
+            case SOUTH:
+                dz = -offsetZ;
+                dx = -offsetX;
+                break;
+            case EAST:
+                dx = -offsetZ;
+                dz = offsetX;
+                break;
+            case WEST:
+                dx = offsetZ;
+                dz = -offsetX;
+                break;
+            default:
+                break;
+        }
+
+        return basePos.offset(dx, offsetY, dz);
+    }
+}

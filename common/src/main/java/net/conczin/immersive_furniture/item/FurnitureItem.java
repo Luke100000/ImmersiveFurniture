@@ -1,12 +1,10 @@
 package net.conczin.immersive_furniture.item;
 
-import net.conczin.immersive_furniture.block.Blocks;
-import net.conczin.immersive_furniture.block.EntityFurnitureBlock;
-import net.conczin.immersive_furniture.block.FurnitureBlock;
-import net.conczin.immersive_furniture.block.LightFurnitureBlock;
+import net.conczin.immersive_furniture.block.*;
 import net.conczin.immersive_furniture.data.FurnitureData;
 import net.conczin.immersive_furniture.data.ServerFurnitureRegistry;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -18,6 +16,8 @@ import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.material.Fluids;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -78,13 +78,71 @@ public class FurnitureItem extends BlockItem {
     }
 
     @Override
-    protected boolean placeBlock(BlockPlaceContext context, BlockState state) {
-        // Keep track of placed furniture to estimate usage
-        if (context.getLevel() instanceof ServerLevel level) {
-            ServerFurnitureRegistry.increase(level, getData(context.getItemInHand()));
+    protected boolean canPlace(BlockPlaceContext context, BlockState state) {
+        if (!super.canPlace(context, state)) {
+            return false;
         }
 
-        return super.placeBlock(context, state);
+        // Check if there's enough space for the furniture
+        FurnitureData data = getData(context.getItemInHand());
+        Level level = context.getLevel();
+        BlockPos basePos = context.getClickedPos();
+        var facing = state.getValue(FurnitureBlock.FACING);
+        for (int x = 0; x < data.size.x; x++) {
+            for (int y = 0; y < data.size.y; y++) {
+                for (int z = 0; z < data.size.z; z++) {
+                    if (x == 0 && y == 0 && z == 0) continue;
+                    BlockPos proxyPos = BaseFurnitureBlock.getProxyPosition(basePos, facing, x, y, z);
+                    if (!level.getBlockState(proxyPos).canBeReplaced(context)) {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return true;
+    }
+
+    @Override
+    protected boolean placeBlock(BlockPlaceContext context, BlockState state) {
+        // First place the main block
+        if (!super.placeBlock(context, state)) {
+            return false;
+        }
+
+        // Place proxy blocks for multi-block furniture
+        FurnitureData data = getData(context.getItemInHand());
+        Level level = context.getLevel();
+        BlockPos basePos = context.getClickedPos();
+        var facing = state.getValue(FurnitureBlock.FACING);
+
+        // Create proxy blocks for each additional position
+        for (int x = 0; x < data.size.x; x++) {
+            for (int y = 0; y < data.size.y; y++) {
+                for (int z = 0; z < data.size.z; z++) {
+                    if (x == 0 && y == 0 && z == 0) continue;
+
+                    BlockPos proxyPos = BaseFurnitureBlock.getProxyPosition(basePos, facing, x, y, z);
+                    FluidState fluidstate = context.getLevel().getFluidState(proxyPos);
+                    boolean waterlogged = fluidstate.getType() == Fluids.WATER;
+
+                    BlockState proxyState = Blocks.FURNITURE_PROXY.defaultBlockState()
+                            .setValue(FurnitureProxyBlock.OFFSET_X, x)
+                            .setValue(FurnitureProxyBlock.OFFSET_Y, y)
+                            .setValue(FurnitureProxyBlock.OFFSET_Z, z)
+                            .setValue(FurnitureProxyBlock.FACING, facing)
+                            .setValue(FurnitureProxyBlock.WATERLOGGED, waterlogged);
+                    level.setBlock(proxyPos, proxyState, 3);
+                }
+            }
+        }
+
+        // Keep track of placed furniture to estimate usage
+        if (level instanceof ServerLevel serverLevel) {
+            ServerFurnitureRegistry.increase(serverLevel, getData(context.getItemInHand()));
+        }
+
+        return true;
     }
 
     @Override

@@ -25,6 +25,10 @@ public interface Blocks {
             .lightLevel((blockState) -> blockState.getValue(LightFurnitureBlock.LIGHT) * 3)
     );
 
+    Block FURNITURE_PROXY = new FurnitureProxyBlock(baseFurnitureProps()
+            .noOcclusion()
+    );
+
     static BlockBehaviour.Properties baseProps() {
         return BlockBehaviour.Properties.of();
     }
@@ -44,5 +48,6 @@ public interface Blocks {
         helper.register(Common.locate("furniture"), FURNITURE);
         helper.register(Common.locate("furniture_entity"), FURNITURE_ENTITY);
         helper.register(Common.locate("furniture_light"), FURNITURE_LIGHT);
+        helper.register(Common.locate("furniture_proxy"), FURNITURE_PROXY);
     }
 }

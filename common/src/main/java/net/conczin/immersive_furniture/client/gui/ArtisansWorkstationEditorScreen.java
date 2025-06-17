@@ -432,7 +432,7 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
         graphics.pose().translate(x, y, 1024.0);
         graphics.pose().mulPoseMatrix(new Matrix4f().scaling(size));
         graphics.pose().mulPose(new Quaternionf().rotateX(pitch).rotateY(yaw));
-        graphics.pose().translate(data.size.x / 2.0f - 1.0f, data.size.y / 2.0f - 1.0f + 1.0f, data.size.z / 2.0f - 1.0f);
+        graphics.pose().translate(-data.size.x / 2.0f, data.size.y / 2.0f, -data.size.z / 2.0f);
         graphics.pose().mulPoseMatrix(new Matrix4f().scaling(1, -1, 1));
 
         RenderSystem.assertOnRenderThread();
@@ -447,7 +447,7 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
         graphics.pose().pushPose();
         checkerPlane(graphics, data.size.x, data.size.z);
         graphics.pose().mulPose(new Quaternionf().rotateX((float) Math.PI / 2));
-        graphics.pose().translate(0, 1, 1 - data.size.y);
+        graphics.pose().translate(0, data.size.z, 0);
         graphics.pose().scale(1, 1, -1);
         checkerPlane(graphics, data.size.x, data.size.y);
         graphics.pose().popPose();
@@ -515,10 +515,10 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
         Matrix4f matrix4f = graphics.pose().last().pose();
         BufferBuilder builder = Tesselator.getInstance().getBuilder();
         builder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
-        builder.vertex(matrix4f, 1.0f - w, 0.001f, 1.0f - h).uv(0.0f, 0.0f).color(1.0f, 1.0f, 1.0f, 0.5f).endVertex();
-        builder.vertex(matrix4f, 1.0f - w, 0.001f, 1.0f).uv(0.0f, h / 8.0f).color(1.0f, 1.0f, 1.0f, 0.5f).endVertex();
-        builder.vertex(matrix4f, 1.0f, 0.001f, 1.0f).uv(w / 8.0f, h / 8.0f).color(1.0f, 1.0f, 1.0f, 0.5f).endVertex();
-        builder.vertex(matrix4f, 1.0f, 0.001f, 1.0f - h).uv(w / 8.0f, 0.0f).color(1.0f, 1.0f, 1.0f, 0.5f).endVertex();
+        builder.vertex(matrix4f, 0.0f, 0.001f, 0.0f).uv(0.0f, 0.0f).color(1.0f, 1.0f, 1.0f, 0.5f).endVertex();
+        builder.vertex(matrix4f, 0.0f, 0.001f, h).uv(0.0f, h / 8.0f).color(1.0f, 1.0f, 1.0f, 0.5f).endVertex();
+        builder.vertex(matrix4f, w, 0.001f, h).uv(w / 8.0f, h / 8.0f).color(1.0f, 1.0f, 1.0f, 0.5f).endVertex();
+        builder.vertex(matrix4f, w, 0.001f, 0.0f).uv(w / 8.0f, 0.0f).color(1.0f, 1.0f, 1.0f, 0.5f).endVertex();
         BufferUploader.drawWithShader(builder.end());
         RenderSystem.enableCull();
     }

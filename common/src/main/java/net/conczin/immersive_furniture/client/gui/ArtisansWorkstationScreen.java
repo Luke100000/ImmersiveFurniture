@@ -1,8 +1,6 @@
 package net.conczin.immersive_furniture.client.gui;
 
-import com.mojang.blaze3d.platform.GlStateManager;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.*;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.conczin.immersive_furniture.Common;
 import net.conczin.immersive_furniture.client.PreviewParticleEngine;
 import net.conczin.immersive_furniture.client.model.DynamicAtlas;
@@ -18,7 +16,6 @@ import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.model.BakedModel;
@@ -78,7 +75,7 @@ public abstract class ArtisansWorkstationScreen extends Screen {
         graphics.pose().mulPoseMatrix(new Matrix4f().scaling((float) (size / Math.max(1.0, data.getSize() / 16.0) * 0.4)));
         graphics.pose().mulPose(new Quaternionf().rotateX(pitch).rotateY(yaw));
         Vec3 center = data.boundingBox().getCenter();
-        graphics.pose().translate(data.size.x / 2.0f - 1.0f, data.size.y / 2.0f - 0.5f + center.y / 16.0f, data.size.z / 2.0f - 1.0f);
+        graphics.pose().translate(-data.size.x / 2.0f, data.size.y / 2.0f - 0.5f + center.y / 16.0f, -data.size.z / 2.0f);
         graphics.pose().mulPoseMatrix(new Matrix4f().scaling(1, -1, 1));
         renderModel(graphics, data, yaw, pitch, false);
         graphics.pose().popPose();

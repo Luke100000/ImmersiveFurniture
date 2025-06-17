@@ -19,6 +19,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.level.block.state.BlockState;
+import org.joml.Quaternionf;
 import org.joml.Vector2i;
 import org.joml.Vector3f;
 
@@ -44,7 +45,7 @@ public class FurnitureModelFactory {
     }
 
     float mod(float a, float b) {
-        return ((a % b) + b) % b;
+        return (a % b + b) % b;
     }
 
     private BlockElementFace getFace(FurnitureData.Element element, Direction direction) {
@@ -81,10 +82,10 @@ public class FurnitureModelFactory {
                     int color;
                     if (!useBaked) {
                         color = MaterialSource.fromCube(element.material, direction, element.getCenter(), x, y, dimensions.x, dimensions.y);
-                        int r = ((color >> 16) & 0xFF);
-                        int g = ((color >> 8) & 0xFF);
-                        int b = (color & 0xFF);
-                        int a = ((color >> 24) & 0xFF);
+                        int r = color >> 16 & 0xFF;
+                        int g = color >> 8 & 0xFF;
+                        int b = color & 0xFF;
+                        int a = color >> 24 & 0xFF;
 
                         ElementRotation rotation = element.getRotation();
                         Vector3f pos = new Vector3f(ClientModelUtils.to3D(element, direction, x, y));
@@ -126,7 +127,7 @@ public class FurnitureModelFactory {
                         g = (int) Math.max(0.0, Math.min(255.0, ((g - 128) * (1.0f + contrast) + 128) * light));
                         b = (int) Math.max(0.0, Math.min(255.0, ((b - 128) * (1.0f + contrast) + 128) * light));
 
-                        color = (a << 24) | (r << 16) | (g << 8) | b;
+                        color = a << 24 | r << 16 | g << 8 | b;
                         baked[x + y * dimensions.x] = color;
                     } else {
                         color = baked[x + y * dimensions.x];
@@ -211,11 +212,11 @@ public class FurnitureModelFactory {
     private static float quantize(int x, int y, float light) {
         int levels = 8;
         int hash = x * 0x27d4eb2d ^ y * 0x85ebca6b;
-        hash ^= (hash >>> 16);
+        hash ^= hash >>> 16;
         hash *= 0x85ebca6b;
-        hash ^= (hash >>> 13);
+        hash ^= hash >>> 13;
         hash *= 0xc2b2ae35;
-        hash ^= (hash >>> 16);
+        hash ^= hash >>> 16;
         float n = (hash & 0xFFFFFFFFL) / (float) (1L << 32);
         light = (float) Math.round(light * levels + n) / levels;
         return light;
@@ -278,15 +279,33 @@ public class FurnitureModelFactory {
 
     private ItemTransforms getTransforms() {
         float scale = (float) (1.0 / (Math.max(16.0, data.getSize()) / 16.0));
+        float sqrtScale = (float) Math.sqrt(scale);
+        Vector3f o = new Vector3f(0.5f - data.size.x / 2.0f, 0.5f - data.size.y / 2.0f, 0.5f - data.size.z / 2.0f);
         return new ItemTransforms(
-                new ItemTransform(new Vector3f(75, 225, 0), new Vector3f(0, 2.5f / 16.0f, 0), new Vector3f(0.375f * scale)),
-                new ItemTransform(new Vector3f(75, 45, 0), new Vector3f(0, 2.5f / 16.0f, 0), new Vector3f(0.375f * scale)),
-                new ItemTransform(new Vector3f(0, 225, 0), new Vector3f(), new Vector3f(0.4f * scale)),
-                new ItemTransform(new Vector3f(0, 45, 0), new Vector3f(), new Vector3f(0.4f * scale)),
-                new ItemTransform(new Vector3f(), new Vector3f(), new Vector3f(1.0f)),
-                new ItemTransform(new Vector3f(30, 225, 0), new Vector3f(), new Vector3f(0.625f * scale)),
-                new ItemTransform(new Vector3f(), new Vector3f(0, 3.0f / 16.0f, 0), new Vector3f(0.25f * scale)),
-                new ItemTransform(new Vector3f(), new Vector3f(), new Vector3f(0.5f * scale))
+                getItemTransform(o, 75, 225, 0, 0, 2.5f, 0, 0.375f * sqrtScale),
+                getItemTransform(o, 75, 45, 0, 0, 2.5f, 0, 0.375f * sqrtScale),
+                getItemTransform(o, 0, 225, 0, 0, 0, 0, 0.4f * sqrtScale),
+                getItemTransform(o, 0, 45, 0, 0, 0, 0, 0.4f * sqrtScale),
+                getItemTransform(o, 0, 0, 0, 0, 0, 0, 1.0f),
+                getItemTransform(o, 30, 225, 0, 0, 0, 0, 0.625f * scale),
+                getItemTransform(o, 0, 0, 0, 0, 3.0f, 0, 0.25f * sqrtScale),
+                getItemTransform(o, 0, 0, 0, 0, 0, 0, 0.5f * scale)
+        );
+    }
+
+    private ItemTransform getItemTransform(Vector3f offset, float rotX, float rotY, float rotZ, float x, float y, float z, float scale) {
+        Vector3f offsetScaled = new Vector3f(offset).mul(scale);
+        Quaternionf rotation = new Quaternionf()
+                .rotateXYZ(
+                        (float) Math.toRadians(rotX),
+                        (float) Math.toRadians(rotY),
+                        (float) Math.toRadians(rotZ)
+                );
+        offsetScaled.rotate(rotation);
+        return new ItemTransform(
+                new Vector3f(rotX, rotY, rotZ),
+                offsetScaled.add(x / 16.0f, y / 16.0f, z / 16.0f),
+                new Vector3f(scale)
         );
     }
 

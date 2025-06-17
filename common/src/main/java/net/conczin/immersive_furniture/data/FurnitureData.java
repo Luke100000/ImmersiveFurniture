@@ -211,12 +211,15 @@ public class FurnitureData {
         }
     }
 
-    public void playInteractSound(Level level, BlockPos pos, Player player) {
+    public boolean playInteractSound(Level level, BlockPos pos, Player player) {
+        boolean consumed = false;
         for (Element element : elements) {
             if (element.type == ElementType.SOUND_EMITTER && element.soundEmitter.onInteract) {
                 playSound(level, pos, player.getRandom(), element);
+                consumed = true;
             }
         }
+        return consumed;
     }
 
     public boolean hasParticles() {
