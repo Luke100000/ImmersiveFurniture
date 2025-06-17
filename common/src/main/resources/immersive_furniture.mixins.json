@@ -10,7 +10,7 @@
   "mixins": ["LivingEntityMixin"],
   "client": [
     "client.CameraMixin", "client.DebugScreenOverlayMixin", "client.ItemBlockRenderTypesMixin",
-    "client.ItemModelShaperMixin", "client.ItemRendererMixin", "client.MinecraftMixin", "client.SpriteContentsAccessor",
-    "client.SpriteContentsMixin", "client.TextureAtlasAccessor"
+    "client.ItemModelShaperMixin", "client.ItemRendererMixin", "client.LevelRendererMixin", "client.MinecraftMixin",
+    "client.SpriteContentsAccessor", "client.SpriteContentsMixin", "client.TextureAtlasAccessor"
   ]
 }
