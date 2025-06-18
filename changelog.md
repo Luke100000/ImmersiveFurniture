@@ -5,9 +5,9 @@ Initial release
 # TODO
 
 * Test sleeping and multiplayer
+* Confirm deletion
 
 # Roadmap 1.0.0
 
 * Blockbench/JSON block and item model import
-* Custom material packs
 * Datapack support

@@ -5,7 +5,6 @@ import net.minecraft.nbt.NbtIo;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
 import java.security.MessageDigest;
@@ -73,7 +72,7 @@ public class Utils {
         return StringUtils.capitalize(replaceUglyChars(location));
     }
 
-    private static @NotNull String replaceUglyChars(String location) {
+    private static String replaceUglyChars(String location) {
         return location.replace(".", " ").replace("/", " ").replace("_", " ");
     }
 

@@ -22,6 +22,7 @@
   "gui.immersive_furniture.delete_element": "Delete element",
   "gui.immersive_furniture.duplicate_element": "Duplicate element",
   "gui.immersive_furniture.select": "Select an element",
+  "gui.immersive_furniture.furniture_dimension": "Furniture size",
   "gui.immersive_furniture.position": "Position",
   "gui.immersive_furniture.size": "Size",
   "gui.immersive_furniture.rotation": "Rotation",
@@ -61,12 +62,12 @@
   "gui.immersive_furniture.on_interact": "On Interact",
   "gui.immersive_furniture.save": "Save",
   "gui.immersive_furniture.play_sound": "Play Sound",
-  "gui.immersive_furniture.tint": "Tint",
-  "gui.immersive_furniture.colorize": "Colorize",
   "gui.immersive_furniture.vanilla": "Only vanilla textures",
   "gui.immersive_furniture.n_wide": "%s wide",
   "gui.immersive_furniture.n_tall": "%s tall",
   "gui.immersive_furniture.n_deep": "%s deep",
+  "gui.immersive_furniture.author": "By %s",
+  "gui.immersive_furniture.original_author": "Originally by %s",
 
   "gui.immersive_furniture.move_furniture": "Move furniture",
   "gui.immersive_furniture.move_furniture_up": "Move up",
@@ -75,8 +76,6 @@
   "gui.immersive_furniture.move_furniture_south": "Move south",
   "gui.immersive_furniture.move_furniture_east": "Move east",
   "gui.immersive_furniture.move_furniture_west": "Move west",
-
-  "gui.immersive_furniture.furniture_dimension": "Furniture size",
 
   "gui.immersive_furniture.sprite_filter.animations": "Animations",
   "gui.immersive_furniture.sprite_filter.sprites": "Sprites",
@@ -119,9 +118,6 @@
   "gui.immersive_furniture.upload_failed": "Upload failed. Woops.",
   "gui.immersive_furniture.login_required": "Login required!",
   "gui.immersive_furniture.back": "Back",
-
-  "gui.immersive_furniture.author": "By %s",
-  "gui.immersive_furniture.original_author": "Originally by %s",
 
   "gui.immersive_furniture.sort.date": "Sort by date",
   "gui.immersive_furniture.sort.favorites": "Sort by favorites",
