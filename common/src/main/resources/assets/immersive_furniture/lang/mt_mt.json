@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "Stazzjon tal-Ħolqa",
   "item.immersive_furniture.crafting_material": "Materjal tal-Ħolqien",
   "immersive_furniture.not_enough_material": "Mhux biżżejjed materjal għall-ħolqien!",
+  "immersive_furniture.indium_missing": "Il-Merġin ta’ Immersive jeħtieġ Indium biex jaħdem sew ma’ Sodium!",
   "gui.immersive_furniture.furniture": "Mobbli",
   "gui.immersive_furniture.tag.living_room": "Kamra tal-Ħajja",
   "gui.immersive_furniture.tag.bed_room": "Kamra tas-Sodda",
