@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "Работна станица на занаетчија",
   "item.immersive_furniture.crafting_material": "Материјал за изработка",
   "immersive_furniture.not_enough_material": "Нема доволно материјал за изработка!",
+  "immersive_furniture.indium_missing": "Иммерзивните мебел треба да има индий за правилно функционирање со натриум!",
   "gui.immersive_furniture.furniture": "Мебел",
   "gui.immersive_furniture.tag.living_room": "Дневна соба",
   "gui.immersive_furniture.tag.bed_room": "Спална соба",
