@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "Obair na h-Ealaíne",
   "item.immersive_furniture.crafting_material": "Stuth obrach",
   "immersive_furniture.not_enough_material": "Cha bhith stuth obrach gu leòr!",
+  "immersive_furniture.indium_missing": "Tha feum air Indium ann an Làimhseachadh Còmhdach airson a bhith ag obair gu mionaideach le Sodium!",
   "gui.immersive_furniture.furniture": "Fòrdach",
   "gui.immersive_furniture.tag.living_room": "Seòmar-còmhnaidh",
   "gui.immersive_furniture.tag.bed_room": "Seòmar-cadail",
