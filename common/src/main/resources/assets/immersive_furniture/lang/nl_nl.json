@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "Artisans werkstation",
   "item.immersive_furniture.crafting_material": "Handwerk Materiaal",
   "immersive_furniture.not_enough_material": "Niet genoeg vervaardigingsmateriaal!",
+  "immersive_furniture.indium_missing": "Immersieve meubilair vereist dat India correct werkt met Sodium!",
   "gui.immersive_furniture.furniture": "Meubels",
   "gui.immersive_furniture.tag.living_room": "Woonkamer",
   "gui.immersive_furniture.tag.bed_room": "Slaapkamer",
