@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "工匠工作站",
   "item.immersive_furniture.crafting_material": "工藝材料",
   "immersive_furniture.not_enough_material": "沒有足夠的工藝材料！",
+  "immersive_furniture.indium_missing": "Immersive Furniture 需要 「铟 」與 「鈉 」一起正常運行！",
   "gui.immersive_furniture.furniture": "傢俱",
   "gui.immersive_furniture.tag.living_room": "客廳",
   "gui.immersive_furniture.tag.bed_room": "臥室",
