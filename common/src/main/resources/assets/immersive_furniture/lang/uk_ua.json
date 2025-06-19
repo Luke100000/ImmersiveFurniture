@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "Майстерна робоча станція",
   "item.immersive_furniture.crafting_material": "Створення матеріалу",
   "immersive_furniture.not_enough_material": "Не достатньо матеріалу для створення!",
+  "immersive_furniture.indium_missing": "Захоплюючий меблі вимагає щоб Індій працював належним чином з Содюмом!",
   "gui.immersive_furniture.furniture": "Меблі",
   "gui.immersive_furniture.tag.living_room": "Вітальня",
   "gui.immersive_furniture.tag.bed_room": "Спальня",
