@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "Արտիստի Աշխատանքային Հարթակ",
   "item.immersive_furniture.crafting_material": "Արտադրության Պաշտոն",
   "immersive_furniture.not_enough_material": "Չափը բավարար չէ!",
+  "immersive_furniture.indium_missing": "Իմերսիվ կահույքը պահանջում է Ինդիում՝ Աղիայի հետ ճիշտ աշխատելու համար!",
   "gui.immersive_furniture.furniture": "Կահույք",
   "gui.immersive_furniture.tag.living_room": "Բնակարանային սենյակ",
   "gui.immersive_furniture.tag.bed_room": "Շարժասենյակ",
