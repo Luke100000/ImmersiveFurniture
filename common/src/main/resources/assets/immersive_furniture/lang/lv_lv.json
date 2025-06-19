@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "Amatnieka darbstacija",
   "item.immersive_furniture.crafting_material": "Amatniecības materiāls",
   "immersive_furniture.not_enough_material": "Nav pietiekami daudz materiālu amatniecībai!",
+  "immersive_furniture.indium_missing": "Lai Immersive Furniture darbotos pareizi, ir nepieciešams Indium un Sodium!",
   "gui.immersive_furniture.furniture": "Mēbeles",
   "gui.immersive_furniture.tag.living_room": "Dzīvojamā istaba",
   "gui.immersive_furniture.tag.bed_room": "Guļamistaba",
