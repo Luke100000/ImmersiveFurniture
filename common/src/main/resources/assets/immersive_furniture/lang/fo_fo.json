@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "Handverks arbeiðspláss",
   "item.immersive_furniture.crafting_material": "Handverks evni",
   "immersive_furniture.not_enough_material": "Ikki nóg mikið handverks evni!",
+  "immersive_furniture.indium_missing": "Immersive Furniture krevur Indium at virka ordiligt við Sodium!",
   "gui.immersive_furniture.furniture": "Innanhýsis",
   "gui.immersive_furniture.tag.living_room": "Stova",
   "gui.immersive_furniture.tag.bed_room": "Sovstova",
