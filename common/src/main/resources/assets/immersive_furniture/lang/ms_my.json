@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "Stesen Kerja Artisan",
   "item.immersive_furniture.crafting_material": "Bahan Crafting",
   "immersive_furniture.not_enough_material": "Tidak cukup bahan crafting!",
+  "immersive_furniture.indium_missing": "Perabot Immersive memerlukan Indium untuk berfungsi dengan baik dengan Natrium!",
   "gui.immersive_furniture.furniture": "Perabot",
   "gui.immersive_furniture.tag.living_room": "Ruang Tamu",
   "gui.immersive_furniture.tag.bed_room": "Bilik Tidur",
