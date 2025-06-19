@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "Zanaatkarın İş İstasyonu",
   "item.immersive_furniture.crafting_material": "Üretim Malzemesi",
   "immersive_furniture.not_enough_material": "Yeterli üretim malzemesi yok!",
+  "immersive_furniture.indium_missing": "Sürükleyici Mobilya, Sodyum ile düzgün çalışması için İndiyum gerektirir!",
   "gui.immersive_furniture.furniture": "Mobilya",
   "gui.immersive_furniture.tag.living_room": "Oturma Odası",
   "gui.immersive_furniture.tag.bed_room": "Yatak Odası",
