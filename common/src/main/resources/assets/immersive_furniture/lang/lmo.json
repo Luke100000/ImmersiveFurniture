@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "Postaziù del Artisiàn",
   "item.immersive_furniture.crafting_material": "Material de Crafting",
   "immersive_furniture.not_enough_material": "Minga basta material de crafting!",
+  "immersive_furniture.indium_missing": "L'arredament immersiv el ghe vole Indium per funzionà ben con Sodium!",
   "gui.immersive_furniture.furniture": "Mobili",
   "gui.immersive_furniture.tag.living_room": "Soggiorno",
   "gui.immersive_furniture.tag.bed_room": "Camera",
