@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "Σταθμός Εργασίας Του Artisan",
   "item.immersive_furniture.crafting_material": "Υλικό Κατασκευής",
   "immersive_furniture.not_enough_material": "Δεν υπάρχει αρκετό υλικό κατασκευής!",
+  "immersive_furniture.indium_missing": "Immersive έπιπλα απαιτεί Indium για να τρέξει σωστά με νάτριο!",
   "gui.immersive_furniture.furniture": "Έπιπλα",
   "gui.immersive_furniture.tag.living_room": "Σαλόνι",
   "gui.immersive_furniture.tag.bed_room": "Υπνοδωμάτιο",
