@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "Kézműves munkaállomás",
   "item.immersive_furniture.crafting_material": "Kézműves anyag",
   "immersive_furniture.not_enough_material": "Nincs elég kézműves anyag!",
+  "immersive_furniture.indium_missing": "Az Immersive Furniture-nek Indiumra van szüksége a megfelelő működéshez a Sodiummal együtt!",
   "gui.immersive_furniture.furniture": "Bútor",
   "gui.immersive_furniture.tag.living_room": "Nappali",
   "gui.immersive_furniture.tag.bed_room": "Hálószoba",
