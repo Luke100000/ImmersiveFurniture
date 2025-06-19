@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "Estació de treball artesanal",
   "item.immersive_furniture.crafting_material": "Material d'artesania",
   "immersive_furniture.not_enough_material": "No hi ha prou material d'artesania!",
+  "immersive_furniture.indium_missing": "Els mobles immersius necessiten Indium per funcionar correctament amb Sodium!",
   "gui.immersive_furniture.furniture": "Mobles",
   "gui.immersive_furniture.tag.living_room": "Saló",
   "gui.immersive_furniture.tag.bed_room": "Dormitori",
