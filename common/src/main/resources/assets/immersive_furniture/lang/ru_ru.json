@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "Станция художника",
   "item.immersive_furniture.crafting_material": "Материал для создания",
   "immersive_furniture.not_enough_material": "Недостаточно материалов для крафта!",
+  "immersive_furniture.indium_missing": "Погружающая мебель требует, чтобы Indium правильно работала с Sodium!",
   "gui.immersive_furniture.furniture": "Мебель",
   "gui.immersive_furniture.tag.living_room": "Гостиная",
   "gui.immersive_furniture.tag.bed_room": "Спальня",
