@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "kijetesantakalu",
   "item.immersive_furniture.crafting_material": "kijetesantakalu",
   "immersive_furniture.not_enough_material": "ala lawa tan kijetesantakalu!",
+  "immersive_furniture.indium_missing": "kijetesantakalu li wile indium tawa pona kepeken sodium!",
   "gui.immersive_furniture.furniture": "kijetesantakalu",
   "gui.immersive_furniture.tag.living_room": "tala tomo",
   "gui.immersive_furniture.tag.bed_room": "tala palisa",
