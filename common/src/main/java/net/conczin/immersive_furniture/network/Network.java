@@ -4,6 +4,7 @@ import net.conczin.immersive_furniture.network.c2s.FurnitureDataRequest;
 import net.conczin.immersive_furniture.network.s2c.CraftRequest;
 import net.conczin.immersive_furniture.network.s2c.FurnitureDataResponse;
 import net.conczin.immersive_furniture.network.s2c.FurnitureRegistryMessage;
+import net.conczin.immersive_furniture.network.s2c.PoseOffsetMessage;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -40,6 +41,7 @@ public class Network {
         c.register(CraftRequest.class, CraftRequest::new);
         c.register(FurnitureDataResponse.class, FurnitureDataResponse::new);
         c.register(FurnitureRegistryMessage.class, FurnitureRegistryMessage::new);
+        c.register(PoseOffsetMessage.class, PoseOffsetMessage::new);
     }
 
     public interface Registrar {

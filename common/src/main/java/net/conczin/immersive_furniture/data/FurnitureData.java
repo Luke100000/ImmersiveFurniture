@@ -331,14 +331,15 @@ public class FurnitureData {
             if (element.type == ElementType.PLAYER_POSE) {
                 Vector3f center = rotate(element.getRotationAxes().center(), direction).mul(1.0f / 16.0f);
                 if (found == null || location.distanceToSqr(center.x, center.y, center.z) < location.distanceToSqr(found.offset.x, found.offset.y, found.offset.z)) {
-                    Vector3f forward = rotate(element.getRotationAxes().forward(), direction).mul(1.0f / 16.0f);
-                    if (element.playerPose.pose == Pose.SLEEPING) {
-                        center.add(forward.mul(0.5f));
-                    } else {
-                        center.add(forward.mul(0.25f));
+                    Vector3f forward = rotateVector(element.getRotationAxes().forward(), direction).normalize();
+                    Vector3f up = rotateVector(element.getRotationAxes().up(), direction).normalize();
 
-                        Vector3f up = rotate(element.getRotationAxes().up(), direction).mul(1.0f / 16.0f);
-                        center.sub(up.mul(0.125f));
+                    if (element.playerPose.pose == Pose.SLEEPING) {
+                        center.add(forward.mul(-0.93475f));
+                        center.sub(up.mul(-0.0625f));
+                    } else {
+                        center.add(forward.mul(0.125f));
+                        center.sub(up.mul(0.03125f));
                     }
                     found = new PoseOffset(center, element.playerPose.pose, element.rotation + direction.toYRot() % 360.0f);
                 }
@@ -419,6 +420,15 @@ public class FurnitureData {
             case SOUTH -> new Vector3f(16 - vec.x, vec.y, 16 - vec.z);
             case EAST -> new Vector3f(16 - vec.z, vec.y, vec.x);
             case WEST -> new Vector3f(vec.z, vec.y, 16 - vec.x);
+            default -> new Vector3f(vec);
+        };
+    }
+
+    private static Vector3f rotateVector(Vector3f vec, Direction direction) {
+        return switch (direction) {
+            case SOUTH -> new Vector3f(-vec.x, vec.y, -vec.z);
+            case EAST -> new Vector3f(-vec.z, vec.y, vec.x);
+            case WEST -> new Vector3f(vec.z, vec.y, -vec.x);
             default -> new Vector3f(vec);
         };
     }

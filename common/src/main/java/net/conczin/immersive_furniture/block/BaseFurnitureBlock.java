@@ -6,8 +6,11 @@ import net.conczin.immersive_furniture.data.TransparencyType;
 import net.conczin.immersive_furniture.entity.SittingEntity;
 import net.conczin.immersive_furniture.item.FurnitureItem;
 import net.conczin.immersive_furniture.item.Items;
+import net.conczin.immersive_furniture.network.Network;
+import net.conczin.immersive_furniture.network.s2c.PoseOffsetMessage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -58,7 +61,7 @@ public abstract class BaseFurnitureBlock extends Block implements SimpleWaterlog
                 InteractionManager.INSTANCE.addInteraction(player, pos, offset);
 
                 if (offset.pose() == Pose.SLEEPING) {
-                    startSleeping(pos, player);
+                    startSleeping(pos, player, offset);
                 } else if (offset.pose() == Pose.SITTING) {
                     startSitting(level, pos, player, offset);
                 }
@@ -71,8 +74,14 @@ public abstract class BaseFurnitureBlock extends Block implements SimpleWaterlog
         return InteractionResult.PASS;
     }
 
-    private static void startSleeping(BlockPos pos, Player player) {
+    private static void startSleeping(BlockPos pos, Player player, FurnitureData.PoseOffset offset) {
         if (player.level().isClientSide) return;
+
+        if (player instanceof ServerPlayer serverPlayer) {
+            PoseOffsetMessage message = new PoseOffsetMessage(pos, offset, serverPlayer);
+            Network.sendToAllPlayers(serverPlayer.serverLevel().getServer(), message);
+        }
+
         player.startSleepInBed(pos).ifLeft(problem -> {
             if (problem.getMessage() != null) {
                 player.displayClientMessage(problem.getMessage(), true);

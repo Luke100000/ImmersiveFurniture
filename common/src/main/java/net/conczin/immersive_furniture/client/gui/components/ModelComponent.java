@@ -172,37 +172,39 @@ public class ModelComponent extends ScreenComponent {
             });
         }
 
-        // Rotation
-        y = topPos + 73;
-        rx = addToggleButton(leftPos + 6, y, 16, 16, 96, null, () -> {
-            if (screen.selectedElement == null) return;
-            screen.selectedElement.axis = Direction.Axis.X;
-            rx.setEnabled(false);
-            ry.setEnabled(true);
-            rz.setEnabled(true);
-        });
-        rx.setEnabled(screen.selectedElement.axis != Direction.Axis.X);
-        ry = addToggleButton(leftPos + 24, y, 16, 32, 96, null, () -> {
-            if (screen.selectedElement == null) return;
-            screen.selectedElement.axis = Direction.Axis.Y;
-            rx.setEnabled(true);
-            ry.setEnabled(false);
-            rz.setEnabled(true);
-        });
-        ry.setEnabled(screen.selectedElement.axis != Direction.Axis.Y);
-        rz = addToggleButton(leftPos + 42, y, 16, 48, 96, null, () -> {
-            if (screen.selectedElement == null) return;
-            screen.selectedElement.axis = Direction.Axis.Z;
-            rx.setEnabled(true);
-            ry.setEnabled(true);
-            rz.setEnabled(false);
-        });
-        rz.setEnabled(screen.selectedElement.axis != Direction.Axis.Z);
+        if (screen.selectedElement.type != FurnitureData.ElementType.PLAYER_POSE) {
+            // Rotation
+            y = topPos + 73;
+            rx = addToggleButton(leftPos + 6, y, 16, 16, 96, null, () -> {
+                if (screen.selectedElement == null) return;
+                screen.selectedElement.axis = Direction.Axis.X;
+                rx.setEnabled(false);
+                ry.setEnabled(true);
+                rz.setEnabled(true);
+            });
+            rx.setEnabled(screen.selectedElement.axis != Direction.Axis.X);
+            ry = addToggleButton(leftPos + 24, y, 16, 32, 96, null, () -> {
+                if (screen.selectedElement == null) return;
+                screen.selectedElement.axis = Direction.Axis.Y;
+                rx.setEnabled(true);
+                ry.setEnabled(false);
+                rz.setEnabled(true);
+            });
+            ry.setEnabled(screen.selectedElement.axis != Direction.Axis.Y);
+            rz = addToggleButton(leftPos + 42, y, 16, 48, 96, null, () -> {
+                if (screen.selectedElement == null) return;
+                screen.selectedElement.axis = Direction.Axis.Z;
+                rx.setEnabled(true);
+                ry.setEnabled(true);
+                rz.setEnabled(false);
+            });
+            rz.setEnabled(screen.selectedElement.axis != Direction.Axis.Z);
 
-        addButton(leftPos + 62, y + 1, 14, 26, 228, null, () ->
-                screen.selectedElement.rotation = (screen.selectedElement.rotation + 22.5f) % 360);
-        addButton(leftPos + 78, y + 1, 14, 42, 228, null, () ->
-                screen.selectedElement.rotation = (screen.selectedElement.rotation - 22.5f) % 360);
+            addButton(leftPos + 62, y + 1, 14, 26, 228, null, () ->
+                    screen.selectedElement.rotation = (screen.selectedElement.rotation + 22.5f) % 360);
+            addButton(leftPos + 78, y + 1, 14, 42, 228, null, () ->
+                    screen.selectedElement.rotation = (screen.selectedElement.rotation - 22.5f) % 360);
+        }
 
         // Element type
         for (FurnitureData.ElementType type : FurnitureData.ElementType.values()) {
@@ -414,7 +416,9 @@ public class ModelComponent extends ScreenComponent {
             if (screen.selectedElement.type != FurnitureData.ElementType.SPRITE && screen.selectedElement.type != FurnitureData.ElementType.PLAYER_POSE) {
                 graphics.drawString(minecraft.font, SIZE_TITLE, leftPos + 6, topPos + 34, 0xFFFFFF);
             }
-            graphics.drawString(minecraft.font, ROTATION_TITLE, leftPos + 6, topPos + 62, 0xFFFFFF);
+            if (screen.selectedElement.type != FurnitureData.ElementType.PLAYER_POSE) {
+                graphics.drawString(minecraft.font, ROTATION_TITLE, leftPos + 6, topPos + 62, 0xFFFFFF);
+            }
 
             // Outlines
             renderSmoothOutline(graphics, leftPos + 4, topPos + 4, width - 8, 87, 0x44000000);
