@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "Artisan's Workstation",
   "item.immersive_furniture.crafting_material": "Material de Crafting",
   "immersive_furniture.not_enough_material": "製作材料が足りません。",
+  "immersive_furniture.indium_missing": "浸透性家具は、インディウムがSodiumで適切に動作することを要求します!",
   "gui.immersive_furniture.furniture": "家具",
   "gui.immersive_furniture.tag.living_room": "リビングルーム",
   "gui.immersive_furniture.tag.bed_room": "ベッドルーム",
