@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "Rzemieślnicza Stacja Robocza",
   "item.immersive_furniture.crafting_material": "Materiał Rzemieślniczy",
   "immersive_furniture.not_enough_material": "Za mało materiału rzemieślniczego!",
+  "immersive_furniture.indium_missing": "Furnitura Immersywna potrzebuje Indium, żeby prawidłowo działać z Sodium!",
   "gui.immersive_furniture.furniture": "Meble",
   "gui.immersive_furniture.tag.living_room": "Salon",
   "gui.immersive_furniture.tag.bed_room": "Sypialnia",
