@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "Artizans Wurktashun",
   "item.immersive_furniture.crafting_material": "Craftin Materiahlz",
   "immersive_furniture.not_enough_material": "Not enuff craftin materiahlz!",
+  "immersive_furniture.indium_missing": "Immersive Furniture requires Indium to run properly wif Sodium!",
   "gui.immersive_furniture.furniture": "Furnichur",
   "gui.immersive_furniture.tag.living_room": "Livin' Room",
   "gui.immersive_furniture.tag.bed_room": "Bedrooom",
