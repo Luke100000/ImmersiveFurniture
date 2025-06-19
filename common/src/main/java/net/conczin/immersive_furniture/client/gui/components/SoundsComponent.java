@@ -101,6 +101,7 @@ public class SoundsComponent extends ListComponent {
                 buttons.get(i).active = true;
             } else {
                 buttons.get(i).setMessage(Component.literal(""));
+                buttons.get(i).setTooltip(Tooltip.create(Component.literal("")));
                 buttons.get(i).active = false;
             }
         }

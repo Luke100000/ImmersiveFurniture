@@ -303,9 +303,9 @@ public class FurnitureData {
         } else if (size.x == 1 && size.y == 1) {
             return Component.translatable("gui.immersive_furniture.n_deep", size.z);
         } else if (size.x == 1 && size.z == 1) {
-            return Component.translatable("gui.immersive_furniture.n_wide", size.y);
+            return Component.translatable("gui.immersive_furniture.n_tall", size.y);
         } else if (size.y == 1 && size.z == 1) {
-            return Component.translatable("gui.immersive_furniture.n_tall", size.x);
+            return Component.translatable("gui.immersive_furniture.n_wide", size.x);
         }
         return Component.literal(String.format("%sx%sx%s", size.x, size.y, size.z));
     }

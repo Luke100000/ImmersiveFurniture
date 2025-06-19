@@ -91,7 +91,7 @@ public class MaterialsComponent extends ListComponent {
 
     @Override
     int getPages() {
-        return (filteredMaterials.size() - 1) / 16 + 1;
+        return Math.max(0, (filteredMaterials.size() - 1) / 20 + 1);
     }
 
     @Override
@@ -103,7 +103,7 @@ public class MaterialsComponent extends ListComponent {
                 .sorted(Comparator.comparingInt(a -> (Config.getInstance().favorites.contains(a.getKey().toString()) ? 0 : 1)))
                 .forEach(filteredMaterials::add);
 
-        page = Math.max(0, Math.min(page, (filteredMaterials.size() - 1) / 16));
+        page = Math.min(page, getPages() - 1);
 
         for (int i = 0; i < materialButtons.size(); i++) {
             int li = i + page * materialButtons.size();

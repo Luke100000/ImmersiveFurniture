@@ -86,6 +86,7 @@ public class ParticlesComponent extends ListComponent {
                 button.active = true;
             } else {
                 button.setMessage(Component.literal(""));
+                button.setTooltip(Tooltip.create(Component.literal("")));
                 button.active = false;
             }
         }

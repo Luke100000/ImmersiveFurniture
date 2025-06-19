@@ -51,6 +51,7 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
     private boolean awaitingAuthentication = false;
     private boolean awaitingSearch = false;
     private boolean shouldSearch = true;
+    private String lastSearch = "";
 
     private boolean authenticating;
     private boolean isBrowserOpen = false;
@@ -117,10 +118,16 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
             this.searchBox = new EditBox(font, leftPos + 5, topPos + 5, windowWidth - 64 - 12, font.lineHeight + 3, SEARCH_TITLE);
             this.searchBox.setMaxLength(50);
             this.searchBox.setVisible(true);
-            this.searchBox.setValue("");
+            this.searchBox.setValue(lastSearch);
             this.searchBox.setHint(SEARCH_HINT);
-            this.searchBox.setResponder(b -> shouldSearch = true);
-            addRenderableWidget(searchBox);
+            this.searchBox.setResponder(s -> {
+                if (!s.equals(lastSearch)) {
+                    shouldSearch = true;
+                    lastSearch = s;
+                }
+            });
+            addRenderableWidget(this.searchBox);
+            setInitialFocus(searchBox);
 
             // Tags
             int i = 0;
@@ -139,12 +146,12 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
 
             // Sort by date
             addRenderableWidget(
-                    new ImageButton(leftPos + 3, y, 22, 22, sortByDate ? 66 : 88, 48, 22, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE, b -> {
+                    new ImageButton(leftPos + 3, y, 22, 22, sortByDate ? 88 : 66, 48, 22, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE, b -> {
                         sortByDate = !sortByDate;
                         shouldSearch = true;
                         init();
                     })
-            ).setTooltip(Tooltip.create(Component.translatable(sortByDate ? "gui.immersive_furniture.sort.date" : "gui.immersive_furniture.sort.favorites")));
+            ).setTooltip(Tooltip.create(Component.translatable(sortByDate ? "gui.immersive_furniture.sort.favorites" : "gui.immersive_furniture.sort.date")));
 
             // Page buttons
             addRenderableWidget(
@@ -205,7 +212,7 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
                     if (authenticated) {
                         FurnitureData model = FurnitureDataManager.getData(selected);
                         if (model != null) {
-                            if (b.isEnabled()) {
+                            if (!b.isEnabled()) {
                                 request(API.HttpMethod.DELETE, "like/furniture/" + model.contentid);
                             } else {
                                 request(API.HttpMethod.POST, "like/furniture/" + model.contentid);
@@ -215,7 +222,7 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
                     } else {
                         setError("gui.immersive_furniture.login_required");
                     }
-                }).setEnabled(tab == Tab.FAVORITES);
+                }).setEnabled(tab != Tab.FAVORITES);
             }
 
             // Publish
@@ -623,7 +630,10 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
                 data.contentid = response.contentid();
                 FurnitureDataManager.saveLocalFile(data);
                 selected = null;
-                init();
+                Minecraft.getInstance().execute(() -> {
+                    setTab(Tab.SUBMISSIONS);
+                    init();
+                });
             } else if (request instanceof ErrorResponse response) {
                 if (response.code() == 428) {
                     setError("gui.immersive_furniture.upload_duplicate");

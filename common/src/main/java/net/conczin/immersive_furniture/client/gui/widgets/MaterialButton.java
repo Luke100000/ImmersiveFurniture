@@ -34,6 +34,9 @@ public class MaterialButton extends StateImageButton {
 
             Component namespaceTooltip = Component.literal(Utils.capitalize(material.location().getNamespace())).withStyle(ChatFormatting.GRAY);
             setTooltip(Tooltip.create(name.copy().append("\n").append(namespaceTooltip)));
+        } else {
+            setMessage(Component.literal(""));
+            setTooltip(Tooltip.create(Component.literal("")));
         }
     }
 
