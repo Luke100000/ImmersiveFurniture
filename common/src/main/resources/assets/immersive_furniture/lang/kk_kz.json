@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "Шебердің Жұмыс Отырысы",
   "item.immersive_furniture.crafting_material": "Жасаушы Материал",
   "immersive_furniture.not_enough_material": "Жасаушы материал жеткіліксіз!",
+  "immersive_furniture.indium_missing": "Индий натриймен дұрыс жұмыс істеу үшін Immersive Furniture қажет!",
   "gui.immersive_furniture.furniture": " meubles ",
   "gui.immersive_furniture.tag.living_room": "Кен бөлме",
   "gui.immersive_furniture.tag.bed_room": "Ұйықтайтын бөлме",
