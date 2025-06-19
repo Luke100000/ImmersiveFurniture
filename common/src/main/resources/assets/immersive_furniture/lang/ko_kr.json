@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "장인의 워크스테이션",
   "item.immersive_furniture.crafting_material": "제작 재료",
   "immersive_furniture.not_enough_material": "제작 재료가 부족합니다!",
+  "immersive_furniture.indium_missing": "몰입형 가구는 나트륨과 함께 제대로 작동하려면 인듐이 필요합니다!",
   "gui.immersive_furniture.furniture": "가구",
   "gui.immersive_furniture.tag.living_room": "거실",
   "gui.immersive_furniture.tag.bed_room": "침실",
