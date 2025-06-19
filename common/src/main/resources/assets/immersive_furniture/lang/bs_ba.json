@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "Majstorska Radionica",
   "item.immersive_furniture.crafting_material": "Materijal za Izradu",
   "immersive_furniture.not_enough_material": "Nema dovoljno materijala za izradu!",
+  "immersive_furniture.indium_missing": "Za pravilno funkcionisanje Immersive Furniture potrebna je Indijum uz Natrijum!",
   "gui.immersive_furniture.furniture": "Namještaj",
   "gui.immersive_furniture.tag.living_room": "Dnevna soba",
   "gui.immersive_furniture.tag.bed_room": "Spavaća soba",
