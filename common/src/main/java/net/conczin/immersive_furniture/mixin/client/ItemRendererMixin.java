@@ -19,6 +19,7 @@ public class ItemRendererMixin {
     @Inject(method = "render(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/ItemDisplayContext;ZLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;IILnet/minecraft/client/resources/model/BakedModel;)V", at = @At("HEAD"), cancellable = true)
     private void immersiveFuture$renderItemStack(ItemStack itemStack, ItemDisplayContext displayContext, boolean leftHand, PoseStack poseStack, MultiBufferSource buffer, int combinedLight, int combinedOverlay, BakedModel model, CallbackInfo ci) {
         if (itemStack.getItem() instanceof FurnitureItem) {
+            // A custom renderer is needed because the color int in the model is ignored for some reason by vanilla rendering.
             poseStack.pushPose();
             model.getTransforms().getTransform(displayContext).apply(leftHand, poseStack);
             poseStack.translate(-0.5f, -0.5f, -0.5f);

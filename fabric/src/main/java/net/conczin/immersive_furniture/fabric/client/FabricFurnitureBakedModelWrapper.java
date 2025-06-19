@@ -19,4 +19,9 @@ public class FabricFurnitureBakedModelWrapper extends FurnitureBakedModelWrapper
             VanillaModelEncoder.emitBlockQuads(model.model(), state, randomSupplier, context, context.getEmitter());
         }
     }
+
+    @Override
+    public boolean isVanillaAdapter() {
+        return false;
+    }
 }

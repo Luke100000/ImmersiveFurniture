@@ -13,7 +13,9 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -23,10 +25,22 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
 public final class ClientFabric implements ClientModInitializer {
+    private static boolean warned = false;
+
     @Override
     public void onInitializeClient() {
         ClientLifecycleEvents.CLIENT_STARTED.register(event -> CommonClient.postLoad());
         ClientTickEvents.START_CLIENT_TICK.register(event -> CommonClient.tick());
+
+        // Immersive Furniture uses the FabricBakedModel and thus required Indium to be installed when Sodium is present.
+        ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            if (client.level != null && client.player != null && !warned) {
+                warned = true;
+                if (FabricLoader.getInstance().isModLoaded("sodium") && !FabricLoader.getInstance().isModLoaded("indium")) {
+                    client.player.sendSystemMessage(Component.translatable("immersive_furniture.indium_missing"));
+                }
+            }
+        });
 
         ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new IdentifiableResourceReloadListener() {
             @Override

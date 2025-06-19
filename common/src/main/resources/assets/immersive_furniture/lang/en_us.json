@@ -4,6 +4,7 @@
   "item.immersive_furniture.crafting_material": "Crafting Material",
 
   "immersive_furniture.not_enough_material": "Not enough crafting material!",
+  "immersive_furniture.indium_missing": "Immersive Furniture requires Indium to run properly with Sodium!",
 
   "gui.immersive_furniture.furniture": "Furniture",
 
