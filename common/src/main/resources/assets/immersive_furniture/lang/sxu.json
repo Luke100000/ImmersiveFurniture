@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "Handwerker-Arbeitsplatz",
   "item.immersive_furniture.crafting_material": "Handwerksmaterial",
   "immersive_furniture.not_enough_material": "Nich genuch Handwerksmaterial!",
+  "immersive_furniture.indium_missing": "Immersiv Möbel brucht Indium, um mit Sodium richtig z'laafen!",
   "gui.immersive_furniture.furniture": "Möbel",
   "gui.immersive_furniture.tag.living_room": "Wohnzimmer",
   "gui.immersive_furniture.tag.bed_room": "Schlafzimmer",
