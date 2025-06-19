@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "Goobta Shaqada Farsamayaasha",
   "item.immersive_furniture.crafting_material": "Qalabka Gacanta",
   "immersive_furniture.not_enough_material": "Qalab ku filan ma jiraan!",
+  "immersive_furniture.indium_missing": "Qalabka Isku-darka ah waxa uu u baahan yahay Indium si uu u shaqeeyo si sax ah oo la Sodium!",
   "gui.immersive_furniture.furniture": "Meheradaha",
   "gui.immersive_furniture.tag.living_room": "qolka fadhiga",
   "gui.immersive_furniture.tag.bed_room": "qolka jiifka",
