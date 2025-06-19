@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "Artisans arbeidsstasjon",
   "item.immersive_furniture.crafting_material": "Lage materiale",
   "immersive_furniture.not_enough_material": "Ikke nok lager materiale!",
+  "immersive_furniture.indium_missing": "Immersive møbler krever indium for å kjøre ordentlig med Sodium!",
   "gui.immersive_furniture.furniture": "Møbler",
   "gui.immersive_furniture.tag.living_room": "Stuende rom",
   "gui.immersive_furniture.tag.bed_room": "Soverom",
