@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "Stasiun Kerja Pengrajin",
   "item.immersive_furniture.crafting_material": "Bahan Kerajinan",
   "immersive_furniture.not_enough_material": "Tidak cukup bahan kerajinan!",
+  "immersive_furniture.indium_missing": "Furnitur Immersive membutuhkan Indium agar dapat berjalan dengan baik dengan Sodium!",
   "gui.immersive_furniture.furniture": "Furnitur",
   "gui.immersive_furniture.tag.living_room": "Ruang Tamu",
   "gui.immersive_furniture.tag.bed_room": "Kamar Tidur",
