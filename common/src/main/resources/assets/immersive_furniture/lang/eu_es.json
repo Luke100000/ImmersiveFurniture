@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "Artisauen Lanpostua",
   "item.immersive_furniture.crafting_material": "Eskulangintza Materiala",
   "immersive_furniture.not_enough_material": "Ez dago nahikoa eskulangintza material!",
+  "immersive_furniture.indium_missing": "Inmersibo altzariek Indio beharko dute ondo funtzionatzeko Sodioarekin!",
   "gui.immersive_furniture.furniture": "Altzariak",
   "gui.immersive_furniture.tag.living_room": "Egongela",
   "gui.immersive_furniture.tag.bed_room": "Ohe-gela",
