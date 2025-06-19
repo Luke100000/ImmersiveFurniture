@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "Kunsthandwerker's Werkstation",
   "item.immersive_furniture.crafting_material": "Bastelmaterial",
   "immersive_furniture.not_enough_material": "Nicht genug Bastelmaterial!",
+  "immersive_furniture.indium_missing": "Immersiv Möbel bräucht Indium, um richtig mit Natrium zu funktionsfähige!",
   "gui.immersive_furniture.furniture": "Möbel",
   "gui.immersive_furniture.tag.living_room": "Wohzimmer",
   "gui.immersive_furniture.tag.bed_room": "Schlafzimmer",
