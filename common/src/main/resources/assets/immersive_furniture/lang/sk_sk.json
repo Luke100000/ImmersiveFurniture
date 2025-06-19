@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "Pracovisko remeselníka",
   "item.immersive_furniture.crafting_material": "Remeselný materiál",
   "immersive_furniture.not_enough_material": "Nedostatok materiálu na výrobu!",
+  "immersive_furniture.indium_missing": "Immersive Furniture vyžaduje Indium, aby správne fungovalo so Sodíkom!",
   "gui.immersive_furniture.furniture": "Nábytok",
   "gui.immersive_furniture.tag.living_room": "Obývacia izba",
   "gui.immersive_furniture.tag.bed_room": "Spálňa",
