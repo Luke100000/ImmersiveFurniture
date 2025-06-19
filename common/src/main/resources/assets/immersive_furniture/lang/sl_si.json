@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "Obrtnikovo delovno mesto",
   "item.immersive_furniture.crafting_material": "Material za izdelavo",
   "immersive_furniture.not_enough_material": "Premalo materiala za izdelavo!",
+  "immersive_furniture.indium_missing": "Immersive Furniture zahteva Indij za pravilno delovanje z natrijem!",
   "gui.immersive_furniture.furniture": "Pohištvo",
   "gui.immersive_furniture.tag.living_room": "Dnevna soba",
   "gui.immersive_furniture.tag.bed_room": "Spalnica",
