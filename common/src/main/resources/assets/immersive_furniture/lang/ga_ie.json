@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "Sraith Oibre na nUslóireacht",
   "item.immersive_furniture.crafting_material": "Ábhair Ceardaíochta",
   "immersive_furniture.not_enough_material": "Níl go leor ábhar ceardaíochta!",
+  "immersive_furniture.indium_missing": "Teastaíonn Indium ó Furniture Immersive chun a reáchtáil i gceart le Sodium!",
   "gui.immersive_furniture.furniture": "Troscán",
   "gui.immersive_furniture.tag.living_room": "Seomra suí",
   "gui.immersive_furniture.tag.bed_room": "Seomra codlata",
