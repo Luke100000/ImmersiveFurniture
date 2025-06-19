@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "Gorsaf Grefftwr",
   "item.immersive_furniture.crafting_material": "Deunydd Grefft",
   "immersive_furniture.not_enough_material": "Nid yw digon o ddeunydd grefft!",
+  "immersive_furniture.indium_missing": "Mae angen Indium ar Fefan Foddhaus i weithio'n iawn gyda Sodium!",
   "gui.immersive_furniture.furniture": "Dodrefn",
   "gui.immersive_furniture.tag.living_room": "Ystafell fyw",
   "gui.immersive_furniture.tag.bed_room": "Ystafell wely",
