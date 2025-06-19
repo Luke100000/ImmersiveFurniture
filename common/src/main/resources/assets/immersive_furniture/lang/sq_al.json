@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "Stacioni i Artisanëve",
   "item.immersive_furniture.crafting_material": "Materiale Artizanal",
   "immersive_furniture.not_enough_material": "Nuk ka mjaftueshëm materiale artizanal!",
+  "immersive_furniture.indium_missing": "Mobiljet immersive kërkojnë Indium për të funksionuar siç duhet me Sodium!",
   "gui.immersive_furniture.furniture": "Mëmoblje",
   "gui.immersive_furniture.tag.living_room": "Dhoma e Ndenjies",
   "gui.immersive_furniture.tag.bed_room": "Dhoma e Fjetjes",
