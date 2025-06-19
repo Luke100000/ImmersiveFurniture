@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "Umjetnikova radna stanica",
   "item.immersive_furniture.crafting_material": "Materijal za izradu",
   "immersive_furniture.not_enough_material": "Nema dovoljno materijala za izradu!",
+  "immersive_furniture.indium_missing": "Zaronk koji immersivni namještaj zahtijeva Indij za pravilno funkcioniranje s Natrijem!",
   "gui.immersive_furniture.furniture": "Namještaj",
   "gui.immersive_furniture.tag.living_room": "Dnevna soba",
   "gui.immersive_furniture.tag.bed_room": "Spavaća soba",
