@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "Станцыя майстра",
   "item.immersive_furniture.crafting_material": "Матэрыял для рамяства",
   "immersive_furniture.not_enough_material": "Недастаткова матэрыялаў для рамяства!",
+  "immersive_furniture.indium_missing": "Для належнай работы Immersive Furniture патрабуецца індый.",
   "gui.immersive_furniture.furniture": "Мэбля",
   "gui.immersive_furniture.tag.living_room": "Гасціная",
   "gui.immersive_furniture.tag.bed_room": "Спальня",
