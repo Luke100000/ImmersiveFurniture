@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "Stația de lucru a Artizanului",
   "item.immersive_furniture.crafting_material": "Materiale de Fabricare",
   "immersive_furniture.not_enough_material": "Nu este suficient material de meșteșugit!",
+  "immersive_furniture.indium_missing": "Mobilă imersivă necesită Indium să funcționeze corect cu Sodium!",
   "gui.immersive_furniture.furniture": "Mobilă",
   "gui.immersive_furniture.tag.living_room": "Camera de viață",
   "gui.immersive_furniture.tag.bed_room": "Cameră",
