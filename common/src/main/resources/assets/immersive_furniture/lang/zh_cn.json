@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "工匠的工作站",
   "item.immersive_furniture.crafting_material": "制作材料",
   "immersive_furniture.not_enough_material": "没有足够的制作材料！",
+  "immersive_furniture.indium_missing": "沉浸式家具需要印第安人使用Sodium正常运转！",
   "gui.immersive_furniture.furniture": "家具：",
   "gui.immersive_furniture.tag.living_room": "生活室",
   "gui.immersive_furniture.tag.bed_room": "卧室",
