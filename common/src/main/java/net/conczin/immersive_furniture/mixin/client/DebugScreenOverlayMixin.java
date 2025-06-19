@@ -14,6 +14,11 @@ import java.util.List;
 public class DebugScreenOverlayMixin {
     @Inject(at = @At("RETURN"), method = "getGameInformation")
     protected void immersiveFurniture$getLeftText(CallbackInfoReturnable<List<String>> info) {
+        Common.entityRendersLast = Common.entityRenders;
+        Common.entityRendersTotalLast = Common.entityRendersTotal;
+        Common.entityRenders = 0;
+        Common.entityRendersTotal = 0;
+
         info.getReturnValue().add("[IF] Atlas utilization: B: %s%% (%s), E: %s%% (%s), S: %s%% (%s)".formatted(
                 (int) (DynamicAtlas.BAKED.getUsage() * 100),
                 DynamicAtlas.BAKED.knownFurniture.size(),

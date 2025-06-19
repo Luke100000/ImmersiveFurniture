@@ -6,29 +6,24 @@ import com.mojang.math.Axis;
 import net.conczin.immersive_furniture.Common;
 import net.conczin.immersive_furniture.block.BaseFurnitureBlock;
 import net.conczin.immersive_furniture.block.entity.FurnitureBlockEntity;
-import net.conczin.immersive_furniture.client.DelayedFurnitureRenderer;
 import net.conczin.immersive_furniture.client.model.DynamicAtlas;
 import net.conczin.immersive_furniture.client.model.FurnitureModelBaker;
 import net.conczin.immersive_furniture.data.FurnitureData;
 import net.conczin.immersive_furniture.item.FurnitureItem;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.block.ModelBlockRenderer;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 
-import javax.annotation.Nullable;
 import java.util.List;
 
 import static net.minecraft.world.level.SignalGetter.DIRECTIONS;
@@ -68,11 +63,6 @@ public class FurnitureBlockEntityRenderer<T extends FurnitureBlockEntity> implem
         poseStack.popPose();
     }
 
-    public static void renderItem(ItemStack itemStack, PoseStack poseStack, MultiBufferSource buffer, int packedLight, int packedOverlay) {
-        FurnitureData data = FurnitureItem.getData(itemStack);
-        renderFurniture(null, poseStack, buffer, packedLight, packedOverlay, data);
-    }
-
     public static void renderFurniture(BlockState state, PoseStack poseStack, MultiBufferSource buffer, int packedLight, int packedOverlay, FurnitureData data) {
         renderFurniture(state, poseStack, buffer, packedLight, packedOverlay, data, FurnitureModelBaker.getModel(data, DynamicAtlas.ENTITY), DynamicAtlas.ENTITY);
     }
@@ -95,7 +85,7 @@ public class FurnitureBlockEntityRenderer<T extends FurnitureBlockEntity> implem
 
     private static final RandomSource randomsource = RandomSource.create();
 
-    private static void renderModel(PoseStack.Pose pose, VertexConsumer consumer, @Nullable BlockState state, BakedModel model, int packedLight, int packedOverlay, boolean blocksAtlas) {
+    private static void renderModel(PoseStack.Pose pose, VertexConsumer consumer, BlockState state, BakedModel model, int packedLight, int packedOverlay, boolean blocksAtlas) {
         for (Direction direction : DIRECTIONS) {
             renderQuadList(pose, consumer, model.getQuads(state, direction, randomsource), packedLight, packedOverlay, blocksAtlas);
         }
@@ -107,23 +97,6 @@ public class FurnitureBlockEntityRenderer<T extends FurnitureBlockEntity> implem
             ResourceLocation resourceLocation = quad.getSprite().atlasLocation();
             if (resourceLocation.getNamespace().equals("minecraft") != blocksAtlas) continue;
             consumer.putBulkData(pose, quad, new float[]{1.0F, 1.0F, 1.0F, 1.0F}, 1.0f, 1.0f, 1.0f, new int[]{packedLight, packedLight, packedLight, packedLight}, packedOverlay, true);
-        }
-    }
-
-    public static void renderBatched(ModelBlockRenderer modelRenderer, BlockState state, BlockPos pos, BlockAndTintGetter level, PoseStack poseStack, VertexConsumer consumer, boolean checkSides, RandomSource random) {
-        // Check if data is available already
-        DelayedFurnitureRenderer.Status status = DelayedFurnitureRenderer.INSTANCE.getLoadedStatus(pos);
-
-        // Render it
-        if (status.data() != null) {
-            int yRot = (int) state.getValue(BaseFurnitureBlock.FACING).getOpposite().toYRot();
-            BakedModel model = FurnitureModelBaker.getModel(status.data(), DynamicAtlas.BAKED, yRot, false);
-            if (model != null) {
-                modelRenderer.tesselateBlock(level, model, state, pos, poseStack, consumer, checkSides, random, state.getSeed(pos), OverlayTexture.NO_OVERLAY);
-            }
-        } else if (!status.done()) {
-            // Schedule a re-render
-            DelayedFurnitureRenderer.INSTANCE.delayRendering(pos);
         }
     }
 }

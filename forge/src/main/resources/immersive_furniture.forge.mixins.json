@@ -8,7 +8,5 @@
     "defaultRequire": 1
   },
   "mixins": [],
-  "client": [
-    "client.BlockRenderDispatcherMixin"
-  ]
+  "client": []
 }

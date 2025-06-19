@@ -2,9 +2,11 @@ package net.conczin.immersive_furniture.fabric;
 
 import net.conczin.immersive_furniture.CommonClient;
 import net.conczin.immersive_furniture.block.entity.BlockEntityTypes;
+import net.conczin.immersive_furniture.client.FurnitureBakedModelWrapper;
 import net.conczin.immersive_furniture.client.renderer.FurnitureBlockEntityRenderer;
 import net.conczin.immersive_furniture.client.renderer.SittingEntityRenderer;
 import net.conczin.immersive_furniture.entity.Entities;
+import net.conczin.immersive_furniture.fabric.client.FabricFurnitureBakedModelWrapper;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -42,5 +44,9 @@ public final class ClientFabric implements ClientModInitializer {
 
         BlockEntityRenderers.register(BlockEntityTypes.FURNITURE, FurnitureBlockEntityRenderer::new);
         EntityRendererRegistry.register(Entities.SITTING, SittingEntityRenderer::new);
+    }
+
+    static {
+        FurnitureBakedModelWrapper.model = new FabricFurnitureBakedModelWrapper();
     }
 }

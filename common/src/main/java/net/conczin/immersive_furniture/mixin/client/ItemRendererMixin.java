@@ -2,6 +2,7 @@ package net.conczin.immersive_furniture.mixin.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.conczin.immersive_furniture.client.renderer.FurnitureBlockEntityRenderer;
+import net.conczin.immersive_furniture.data.FurnitureData;
 import net.conczin.immersive_furniture.item.FurnitureItem;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.ItemRenderer;
@@ -21,7 +22,8 @@ public class ItemRendererMixin {
             poseStack.pushPose();
             model.getTransforms().getTransform(displayContext).apply(leftHand, poseStack);
             poseStack.translate(-0.5f, -0.5f, -0.5f);
-            FurnitureBlockEntityRenderer.renderItem(itemStack, poseStack, buffer, combinedLight, combinedOverlay);
+            FurnitureData data = FurnitureItem.getData(itemStack);
+            FurnitureBlockEntityRenderer.renderFurniture(null, poseStack, buffer, combinedLight, combinedOverlay, data);
             poseStack.popPose();
             ci.cancel();
         }

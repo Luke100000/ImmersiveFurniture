@@ -1,6 +1,7 @@
 package net.conczin.immersive_furniture.mixin.client;
 
 import net.conczin.immersive_furniture.block.BaseFurnitureBlock;
+import net.conczin.immersive_furniture.client.FurnitureBakedModelWrapper;
 import net.conczin.immersive_furniture.data.TransparencyType;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
@@ -21,13 +22,7 @@ public class ItemBlockRenderTypesMixin {
     private static void immersiveFurniture$onGetChunkRenderType(BlockState state, CallbackInfoReturnable<RenderType> cir) {
         if (state.getBlock() instanceof BaseFurnitureBlock) {
             TransparencyType transparencyType = state.getValue(BaseFurnitureBlock.TRANSPARENCY);
-
-            switch (transparencyType) {
-                case SOLID -> cir.setReturnValue(RenderType.solid());
-                case CUTOUT_MIPPED -> cir.setReturnValue(RenderType.cutoutMipped());
-                case CUTOUT -> cir.setReturnValue(RenderType.cutout());
-                case TRANSLUCENT -> cir.setReturnValue(RenderType.translucent());
-            }
+            cir.setReturnValue(FurnitureBakedModelWrapper.getRenderType(transparencyType));
         }
     }
 }

@@ -1,6 +1,7 @@
 package net.conczin.immersive_furniture.client.model;
 
 import net.conczin.immersive_furniture.Common;
+import net.conczin.immersive_furniture.CommonClient;
 import net.conczin.immersive_furniture.data.FurnitureData;
 import net.conczin.immersive_furniture.utils.CachedSupplier;
 import net.minecraft.client.renderer.block.model.BakedQuad;
