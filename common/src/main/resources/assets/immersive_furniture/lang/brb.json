@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "Artisan's Werkstation",
   "item.immersive_furniture.crafting_material": "Ambachtsmateriaal",
   "immersive_furniture.not_enough_material": "Niet genoeg ambachtsmateriaal!",
+  "immersive_furniture.indium_missing": "Immersive Meubels heb Indium nodig om goed te functioneren met Sodium!",
   "gui.immersive_furniture.furniture": "Meubilair",
   "gui.immersive_furniture.tag.living_room": "Woonkamer",
   "gui.immersive_furniture.tag.bed_room": "Slaapkamer",
