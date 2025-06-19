@@ -97,7 +97,7 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
         StateImageButton button = new StateImageButton(
                 leftPos + 4, topPos - 24, 26, 28,
                 130, 160, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE,
-                b -> Minecraft.getInstance().setScreen(new ArtisansWorkstationLibraryScreen()), text);
+                b -> cancel(), text);
         button.setTooltip(Tooltip.create(text));
         button.setEnabled(false);
         addRenderableWidget(button);
@@ -138,6 +138,16 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
         addRenderableWidget(helpButton);
 
         addHistory();
+    }
+
+    private void cancel() {
+        if (lastCriticalActionAttempt + 5000 > System.currentTimeMillis()) {
+            Minecraft.getInstance().setScreen(new ArtisansWorkstationLibraryScreen());
+        } else {
+            // Ask for confirmation
+            lastCriticalActionAttempt = System.currentTimeMillis();
+            setError("gui.immersive_furniture.cancel_confirm");
+        }
     }
 
     private StateImageButton pagePageButton(Page page, int x, int u) {
@@ -193,6 +203,8 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
             case SETTINGS -> settingsComponent.render(graphics);
             case SPRITES -> spritesComponent.render(graphics);
         }
+
+        renderError(graphics, height / 2);
     }
 
     public Vector3f quantVector(Vector3f normal, float offset, boolean quantize) {

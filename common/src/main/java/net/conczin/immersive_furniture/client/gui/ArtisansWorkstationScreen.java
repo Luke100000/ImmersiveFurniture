@@ -34,6 +34,9 @@ public abstract class ArtisansWorkstationScreen extends Screen {
     public static final Component TITLE = Component.translatable("item.immersive_furniture.artisans_workstation");
     public static final ResourceLocation TEXTURE = Common.locate("textures/gui/gui.png");
     public static final int TEXTURE_SIZE = 256;
+    protected Component error;
+    protected long lastErrorTime = 0;
+    protected long lastCriticalActionAttempt = 0;
 
     int windowWidth = 280;
     int windowHeight = 180;
@@ -169,5 +172,25 @@ public abstract class ArtisansWorkstationScreen extends Screen {
 
     public static PreviewParticleEngine getParticleEngine(FurnitureData data) {
         return objectToParticleEngine.computeIfAbsent(data, d -> new PreviewParticleEngine());
+    }
+
+    public void clearError() {
+        this.error = null;
+    }
+
+    public void setError(String text) {
+        this.error = Component.translatable(text);
+        this.lastErrorTime = System.currentTimeMillis();
+    }
+
+    protected void renderError(GuiGraphics graphics, int y) {
+        if (error == null) return;
+
+        graphics.fill(width / 2 - 80, y - 3, width / 2 + 80, y + 10, 0x80000000);
+        graphics.drawCenteredString(font, error, width / 2, y, 0xFFFF0000);
+
+        if (System.currentTimeMillis() - lastErrorTime > 5000) {
+            clearError();
+        }
     }
 }

@@ -61,9 +61,6 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
     private boolean sortByDate = false;
     private String tagFilter = "miscellaneous";
 
-    private Component error;
-    private long lastErrorTime = 0;
-
     Tab tab = Tab.GLOBAL;
     int page = 0;
 
@@ -241,22 +238,7 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
 
             // Delete
             if (tab == Tab.SUBMISSIONS || tab == Tab.LOCAL) {
-                addButton(x - 11, y, 22, 22 * 2, 48, "gui.immersive_furniture.delete", () -> {
-                    if (tab == Tab.SUBMISSIONS) {
-                        FurnitureData model = FurnitureDataManager.getData(selected);
-                        if (model != null) {
-                            request(API.HttpMethod.DELETE, "content/furniture/" + model.contentid);
-                        } else {
-                            setError("gui.immersive_furniture.delete_failed");
-                        }
-                    } else {
-                        FurnitureDataManager.deleteLocalFile(selected);
-                        localFiles = FurnitureDataManager.getLocalFiles();
-                        shouldSearch = true;
-                    }
-                    selected = null;
-                    init();
-                });
+                addButton(x - 11, y, 22, 22 * 2, 48, "gui.immersive_furniture.delete", this::delete);
             }
 
             // Modify
@@ -305,6 +287,28 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
                             .bounds(leftPos + windowWidth - 68, topPos + windowHeight - 24, 64, 20)
                             .build()
             );
+        }
+    }
+
+    private void delete() {
+        if (lastCriticalActionAttempt + 5000 > System.currentTimeMillis()) {
+            if (tab == Tab.SUBMISSIONS) {
+                FurnitureData model = FurnitureDataManager.getData(selected);
+                if (model != null) {
+                    request(API.HttpMethod.DELETE, "content/furniture/" + model.contentid);
+                } else {
+                    setError("gui.immersive_furniture.delete_failed");
+                }
+            } else {
+                FurnitureDataManager.deleteLocalFile(selected);
+                localFiles = FurnitureDataManager.getLocalFiles();
+                shouldSearch = true;
+            }
+            selected = null;
+            init();
+        } else {
+            lastCriticalActionAttempt = System.currentTimeMillis();
+            setError("gui.immersive_furniture.delete_confirm");
         }
     }
 
@@ -404,22 +408,13 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
             }
         }
 
-        // Error
-        if (error != null) {
-            int y = selected == null ? height / 2 : topPos + 9;
-            graphics.fill(width / 2 - 80, y - 3, width / 2 + 80, y + 10, 0x80000000);
-            graphics.drawCenteredString(font, error, width / 2, y, 0xFFFF0000);
-
-            if (System.currentTimeMillis() - lastErrorTime > 5000) {
-                error = null;
-            }
-        }
-
         if (tooltip != null) {
             graphics.renderTooltip(font, tooltip, Optional.empty(), lastMouseX, lastMouseY);
         }
 
         graphics.pose().popPose();
+
+        renderError(graphics, selected == null ? height / 2 : topPos + 9);
     }
 
     private boolean isTileHovered(int x, int y) {
@@ -518,15 +513,6 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
         }
 
         return super.mouseClicked(mouseX, mouseY, button);
-    }
-
-    public void clearError() {
-        this.error = null;
-    }
-
-    public void setError(String text) {
-        this.error = Component.translatable(text);
-        this.lastErrorTime = System.currentTimeMillis();
     }
 
     public void setSelected(ResourceLocation location) {
