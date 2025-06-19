@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "Håndværkers Arbejdsstation",
   "item.immersive_furniture.crafting_material": "Fremstil Materiale",
   "immersive_furniture.not_enough_material": "Ikke nok fremstillingsmateriale!",
+  "immersive_furniture.indium_missing": "Immersive Møbler kræver Indium til at køre ordentligt med Sodium!",
   "gui.immersive_furniture.furniture": "Møbler",
   "gui.immersive_furniture.tag.living_room": "Stue",
   "gui.immersive_furniture.tag.bed_room": "Soveværelse",
