@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "Pracovní stanice řemeslníka",
   "item.immersive_furniture.crafting_material": "Výrobní materiál",
   "immersive_furniture.not_enough_material": "Nedostatek výrobních materiálů!",
+  "immersive_furniture.indium_missing": "Pohlcující nábytek vyžaduje, aby Indie správně pracovala se Sodi!",
   "gui.immersive_furniture.furniture": "Nábytek",
   "gui.immersive_furniture.tag.living_room": "Obydlený pokoj",
   "gui.immersive_furniture.tag.bed_room": "Lůžková místnost",
