@@ -222,6 +222,17 @@ public class FurnitureData {
         return consumed;
     }
 
+    public boolean emitInteractParticles(BlockPos pos, Player player, ParticleConsumer particleConsumer, boolean inScreen) {
+        boolean consumed = false;
+        for (Element element : elements) {
+            if (element.type == ElementType.PARTICLE_EMITTER && element.particleEmitter.onInteract) {
+                emitParticles(pos, player.getRandom(), element, particleConsumer, inScreen, 10.0f);
+                consumed = true;
+            }
+        }
+        return consumed;
+    }
+
     public boolean hasParticles() {
         return elements.stream().anyMatch(e -> e.type == ElementType.PARTICLE_EMITTER);
     }
@@ -340,36 +351,38 @@ public class FurnitureData {
         void addParticle(SimpleParticleType particle, float x, float y, float z, float vx, float vy, float vz);
     }
 
+    private void emitParticles(BlockPos pos, RandomSource random, Element element, ParticleConsumer particleConsumer, boolean inScreen, float amountMultiplier) {
+        SimpleParticleType particle = element.particleEmitter.getParticle();
+        if (particle == null) return;
+
+        float c = element.particleEmitter.amount * amountMultiplier - random.nextFloat();
+        while (c > 0.0f) {
+            c--;
+
+            Vector3f sampledPos = element.sampleRandomPosition(random).mul(1.0f / 16.0f);
+            Vector3f up = new Vector3f(element.getRotationAxes().up()).div(Math.abs(element.to.y - element.from.y) + 0.001f);
+
+            float vr = element.particleEmitter.velocityRandom / 16.0f;
+            float vd = element.particleEmitter.velocityDirectional / 16.0f;
+
+            particleConsumer.addParticle(
+                    particle,
+                    sampledPos.x() + (inScreen ? 0.0f : pos.getX()),
+                    sampledPos.y() + (inScreen ? 1024.0f : pos.getY()),
+                    sampledPos.z() + (inScreen ? 0.0f : pos.getZ()),
+                    (random.nextFloat() - 0.5f) * vr + up.x() * vd,
+                    (random.nextFloat() - 0.5f) * vr + up.y() * vd,
+                    (random.nextFloat() - 0.5f) * vr + up.z() * vd
+            );
+        }
+    }
+
     public void tick(Level level, BlockPos pos, RandomSource random, ParticleConsumer particleConsumer, boolean inScreen, boolean inEditor) {
         for (Element element : elements) {
-            if (element.type == ElementType.PARTICLE_EMITTER) {
-                SimpleParticleType particle = element.particleEmitter.getParticle();
-                if (particle == null) continue;
-
-                float c = element.particleEmitter.amount - random.nextFloat();
-                while (c > 0.0f) {
-                    c--;
-
-                    Vector3f sampledPos = element.sampleRandomPosition(random).mul(1.0f / 16.0f);
-                    Vector3f up = element.getRotationAxes().up().div(Math.abs(element.to.y - element.from.y) + 0.001f);
-
-                    float vr = element.particleEmitter.velocityRandom / 16.0f;
-                    float vd = element.particleEmitter.velocityDirectional / 16.0f;
-
-                    particleConsumer.addParticle(
-                            particle,
-                            sampledPos.x() + (inScreen ? 0.0f : pos.getX()),
-                            sampledPos.y() + (inScreen ? 1024.0f : pos.getY()),
-                            sampledPos.z() + (inScreen ? 0.0f : pos.getZ()),
-                            (random.nextFloat() - 0.5f) * vr + up.x() * vd,
-                            (random.nextFloat() - 0.5f) * vr + up.y() * vd,
-                            (random.nextFloat() - 0.5f) * vr + up.z() * vd
-                    );
-                }
-            } else if (element.type == ElementType.SOUND_EMITTER) {
-                if (inEditor && element.soundEmitter.frequency > 0 && random.nextFloat() < element.soundEmitter.frequency) {
-                    playSound(level, pos, random, element);
-                }
+            if (element.type == ElementType.PARTICLE_EMITTER && !element.particleEmitter.onInteract) {
+                emitParticles(pos, random, element, particleConsumer, inScreen, 1.0f);
+            } else if (element.type == ElementType.SOUND_EMITTER && inEditor && element.soundEmitter.frequency > 0 && random.nextFloat() < element.soundEmitter.frequency) {
+                playSound(level, pos, random, element);
             }
         }
     }
@@ -737,6 +750,7 @@ public class FurnitureData {
         public float velocityDirectional = 0.0f;
         public float velocityRandom = 0.1f;
         public float amount = 0.5f;
+        public boolean onInteract = false;
 
         public ParticleEmitter() {
 
@@ -747,6 +761,7 @@ public class FurnitureData {
             this.velocityDirectional = NBTHelper.getFloat(tag, "VelocityDirectional", velocityDirectional);
             this.velocityRandom = NBTHelper.getFloat(tag, "VelocityRandom", velocityRandom);
             this.amount = NBTHelper.getFloat(tag, "Amount", amount);
+            this.onInteract = NBTHelper.getBoolean(tag, "OnInteract", onInteract);
         }
 
         public ParticleEmitter(ParticleEmitter particleEmitter) {
@@ -754,6 +769,7 @@ public class FurnitureData {
             this.velocityDirectional = particleEmitter.velocityDirectional;
             this.velocityRandom = particleEmitter.velocityRandom;
             this.amount = particleEmitter.amount;
+            this.onInteract = particleEmitter.onInteract;
         }
 
         public CompoundTag toTag() {
@@ -761,8 +777,8 @@ public class FurnitureData {
             tag.putString("Particle", particle.toString());
             tag.putFloat("VelocityDirectional", velocityDirectional);
             tag.putFloat("VelocityRandom", velocityRandom);
-            tag.putFloat("VelocityRandom", velocityRandom);
             tag.putFloat("Amount", amount);
+            tag.putBoolean("OnInteract", onInteract);
             return tag;
         }
 

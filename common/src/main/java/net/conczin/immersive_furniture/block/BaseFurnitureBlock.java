@@ -66,7 +66,7 @@ public abstract class BaseFurnitureBlock extends Block implements SimpleWaterlog
                 return InteractionResult.CONSUME;
             }
 
-            return level.isClientSide && data.playInteractSound(level, pos, player) ? InteractionResult.CONSUME : InteractionResult.PASS;
+            return level.isClientSide && (data.playInteractSound(level, pos, player) | data.emitInteractParticles(pos, player, level::addParticle, false)) ? InteractionResult.CONSUME : InteractionResult.PASS;
         }
         return InteractionResult.PASS;
     }

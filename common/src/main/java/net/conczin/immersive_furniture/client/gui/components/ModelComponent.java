@@ -17,6 +17,7 @@ import org.joml.Vector3i;
 import java.util.List;
 
 import static net.conczin.immersive_furniture.client.gui.ArtisansWorkstationEditorScreen.TOOLS_WIDTH;
+import static net.conczin.immersive_furniture.client.gui.ArtisansWorkstationScreen.getParticleEngine;
 
 public class ModelComponent extends ScreenComponent {
     static final Component SELECT_TITLE = Component.translatable("gui.immersive_furniture.select");
@@ -227,11 +228,25 @@ public class ModelComponent extends ScreenComponent {
             screen.addRenderableWidget(velocityRandomSlider);
 
             // Particle amount
-            BoundedDoubleSlider amountSlider = new BoundedDoubleSlider(leftPos + 6, topPos + 134, width - 12, 20,
+            BoundedDoubleSlider amountSlider = new BoundedDoubleSlider(leftPos + 6, topPos + 134, width - 32, 20,
                     "gui.immersive_furniture.particle_amount",
                     screen.selectedElement.particleEmitter.amount, 0, 4.0);
             amountSlider.setCallback(v -> screen.selectedElement.particleEmitter.amount = v.floatValue());
             screen.addRenderableWidget(amountSlider);
+
+            // Particle settings
+            addToggleButton(leftPos + width - 23, topPos + 136, 16, 32, 128, "gui.immersive_furniture.on_interact", () -> {
+                if (screen.selectedElement == null) return;
+                screen.selectedElement.particleEmitter.onInteract = !screen.selectedElement.particleEmitter.onInteract;
+                screen.init();
+
+                // Show particles on interacting
+                ClientLevel level = Minecraft.getInstance().level;
+                LocalPlayer player = Minecraft.getInstance().player;
+                if (level != null && player != null && screen.selectedElement.particleEmitter.onInteract) {
+                    screen.data.emitInteractParticles(player.getOnPos(), player, getParticleEngine(screen.data)::addParticle, true);
+                }
+            }).setEnabled(!screen.selectedElement.particleEmitter.onInteract);
         } else if (screen.selectedElement.type == FurnitureData.ElementType.SOUND_EMITTER) {
             // Volume
             BoundedDoubleSlider volumeSlider = new BoundedDoubleSlider(leftPos + 6, topPos + 112, (width - 14) / 2, 20,
