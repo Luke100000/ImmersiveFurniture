@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "ხელოსნის სამუშაო ადგილი",
   "item.immersive_furniture.crafting_material": "მომზადების მასალა",
   "immersive_furniture.not_enough_material": "არ genug მომზადების მასალა!",
+  "immersive_furniture.indium_missing": "ბუნებრივი ავეჯი საჭიროებს ინდიუმს უზრუნველყოს სწორი მუშაობა ნატრიუმთან!",
   "gui.immersive_furniture.furniture": "რასაც ვუწვევთ",
   "gui.immersive_furniture.tag.living_room": "ცხოვრების ოთახი",
   "gui.immersive_furniture.tag.bed_room": "ძინების ოთახი",
