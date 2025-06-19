@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "Estación de trabajo del artesano",
   "item.immersive_furniture.crafting_material": "Material de artesanía",
   "immersive_furniture.not_enough_material": "¡No hay suficiente material de artesanía!",
+  "immersive_furniture.indium_missing": "¡Los muebles inmersivos requieren indio para funcionar correctamente con sodio!",
   "gui.immersive_furniture.furniture": "Mobiliario",
   "gui.immersive_furniture.tag.living_room": "Sala de estar",
   "gui.immersive_furniture.tag.bed_room": "Dormitorio",
