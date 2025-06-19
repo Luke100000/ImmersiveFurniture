@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "Kunstniku töökoht",
   "item.immersive_furniture.crafting_material": "Crafting materjal",
   "immersive_furniture.not_enough_material": "Pole piisavalt käsitöömaterjali!",
+  "immersive_furniture.indium_missing": "Immersive Furniture nõuab Indiumit, et see töötaks korralikult koos Sodiumiga!",
   "gui.immersive_furniture.furniture": "Mööbel",
   "gui.immersive_furniture.tag.living_room": "Elutuba",
   "gui.immersive_furniture.tag.bed_room": "Magamistuba",
