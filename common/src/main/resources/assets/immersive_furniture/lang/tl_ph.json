@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "Pagsasangkapan ng Artisan",
   "item.immersive_furniture.crafting_material": "Materyal na Gawa",
   "immersive_furniture.not_enough_material": "Hindi sapat ang materyal na gawa!",
+  "immersive_furniture.indium_missing": "Kailangan ng Immersive Furniture ang Indium upang gumana nang tama gamit ang Sodium!",
   "gui.immersive_furniture.furniture": "Muwebles",
   "gui.immersive_furniture.tag.living_room": "Sala",
   "gui.immersive_furniture.tag.bed_room": "Silid-tulugan",
