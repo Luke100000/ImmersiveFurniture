@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "कारिगर का कार्यस्थल",
   "item.immersive_furniture.crafting_material": "क्राफ्टिंग सामग्री",
   "immersive_furniture.not_enough_material": "पर्याप्त क्राफ्टिंग सामग्री नहीं है!",
+  "immersive_furniture.indium_missing": "इमर्सिव फर्नीचर को सही ढंग से चलाने के लिए इंडियम की आवश्यकता है!",
   "gui.immersive_furniture.furniture": "फर्नीचर",
   "gui.immersive_furniture.tag.living_room": "लिविंग रूम",
   "gui.immersive_furniture.tag.bed_room": "बेडरूम",
