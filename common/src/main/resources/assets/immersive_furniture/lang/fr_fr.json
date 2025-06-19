@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "Poste de travail de l'Artisan",
   "item.immersive_furniture.crafting_material": "Matériel d'artisanat",
   "immersive_furniture.not_enough_material": "Pas assez de matériel de fabrication!",
+  "immersive_furniture.indium_missing": "Les meubles immersifs ont besoin de l'Indium pour fonctionner correctement avec Sodium !",
   "gui.immersive_furniture.furniture": "Meubles",
   "gui.immersive_furniture.tag.living_room": "Salon",
   "gui.immersive_furniture.tag.bed_room": "Chambre à coucher",
