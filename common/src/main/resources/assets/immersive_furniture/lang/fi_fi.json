@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "Taiteilijan Työasema",
   "item.immersive_furniture.crafting_material": "Rakennusmateriaali",
   "immersive_furniture.not_enough_material": "Materiaalia ei ole tarpeeksi!",
+  "immersive_furniture.indium_missing": "Immersive Furniture edellyttää, että Indium toimii kunnolla Sodium!",
   "gui.immersive_furniture.furniture": "Huonekalut",
   "gui.immersive_furniture.tag.living_room": "Olohuone",
   "gui.immersive_furniture.tag.bed_room": "Makuuhuone",
