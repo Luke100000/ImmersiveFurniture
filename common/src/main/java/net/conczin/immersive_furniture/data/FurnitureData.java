@@ -631,10 +631,9 @@ public class FurnitureData {
                 Vector3f center = getCenter();
                 from.x = center.x - 8.0f * sprite.size;
                 from.y = center.y - 8.0f * sprite.size;
-                from.z = center.z;
                 to.x = center.x + 8.0f * sprite.size;
                 to.y = center.y + 8.0f * sprite.size;
-                to.z = center.z;
+                to.z = from.z;
             }
         }
 

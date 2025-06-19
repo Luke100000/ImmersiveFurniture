@@ -137,38 +137,40 @@ public class ModelComponent extends ScreenComponent {
         });
 
         // Size
-        y = topPos + 45;
-        Vector3i size = screen.selectedElement.getSize();
-        sx = addNewFloatBox(leftPos + 6, y, 28);
-        sx.setValue(String.valueOf(size.x));
-        sx.setResponder(b -> {
-            if (screen.selectedElement == null) return;
-            int oldSize = screen.selectedElement.getSize().x;
-            int newSize = Math.max(0, parse(sx.getValue(), oldSize));
-            screen.selectedElement.from.x -= (newSize - oldSize) / 2.0f;
-            screen.selectedElement.to.x += (newSize - oldSize) / 2.0f;
-            screen.selectedElement.sanityCheck();
-        });
-        sy = addNewFloatBox(leftPos + 6 + 30, y, 28);
-        sy.setValue(String.valueOf(size.y));
-        sy.setResponder(b -> {
-            if (screen.selectedElement == null) return;
-            int oldSize = screen.selectedElement.getSize().y;
-            int newSize = Math.max(0, parse(sy.getValue(), oldSize));
-            screen.selectedElement.from.y -= (newSize - oldSize) / 2.0f;
-            screen.selectedElement.to.y += (newSize - oldSize) / 2.0f;
-            screen.selectedElement.sanityCheck();
-        });
-        sz = addNewFloatBox(leftPos + 6 + 30 * 2, y, 28);
-        sz.setValue(String.valueOf(size.z));
-        sz.setResponder(b -> {
-            if (screen.selectedElement == null) return;
-            int oldSize = screen.selectedElement.getSize().z;
-            int newSize = Math.max(0, parse(sz.getValue(), oldSize));
-            screen.selectedElement.from.z -= (newSize - oldSize) / 2.0f;
-            screen.selectedElement.to.z += (newSize - oldSize) / 2.0f;
-            screen.selectedElement.sanityCheck();
-        });
+        if (screen.selectedElement.type != FurnitureData.ElementType.SPRITE && screen.selectedElement.type != FurnitureData.ElementType.PLAYER_POSE) {
+            y = topPos + 45;
+            Vector3i size = screen.selectedElement.getSize();
+            sx = addNewFloatBox(leftPos + 6, y, 28);
+            sx.setValue(String.valueOf(size.x));
+            sx.setResponder(b -> {
+                if (screen.selectedElement == null) return;
+                int oldSize = screen.selectedElement.getSize().x;
+                int newSize = Math.max(0, parse(sx.getValue(), oldSize));
+                screen.selectedElement.from.x -= (newSize - oldSize) / 2.0f;
+                screen.selectedElement.to.x += (newSize - oldSize) / 2.0f;
+                screen.selectedElement.sanityCheck();
+            });
+            sy = addNewFloatBox(leftPos + 6 + 30, y, 28);
+            sy.setValue(String.valueOf(size.y));
+            sy.setResponder(b -> {
+                if (screen.selectedElement == null) return;
+                int oldSize = screen.selectedElement.getSize().y;
+                int newSize = Math.max(0, parse(sy.getValue(), oldSize));
+                screen.selectedElement.from.y -= (newSize - oldSize) / 2.0f;
+                screen.selectedElement.to.y += (newSize - oldSize) / 2.0f;
+                screen.selectedElement.sanityCheck();
+            });
+            sz = addNewFloatBox(leftPos + 6 + 30 * 2, y, 28);
+            sz.setValue(String.valueOf(size.z));
+            sz.setResponder(b -> {
+                if (screen.selectedElement == null) return;
+                int oldSize = screen.selectedElement.getSize().z;
+                int newSize = Math.max(0, parse(sz.getValue(), oldSize));
+                screen.selectedElement.from.z -= (newSize - oldSize) / 2.0f;
+                screen.selectedElement.to.z += (newSize - oldSize) / 2.0f;
+                screen.selectedElement.sanityCheck();
+            });
+        }
 
         // Rotation
         y = topPos + 73;
@@ -409,7 +411,9 @@ public class ModelComponent extends ScreenComponent {
         } else {
             // Titles
             graphics.drawString(minecraft.font, POSITION_TITLE, leftPos + 6, topPos + 6, 0xFFFFFF);
-            graphics.drawString(minecraft.font, SIZE_TITLE, leftPos + 6, topPos + 34, 0xFFFFFF);
+            if (screen.selectedElement.type != FurnitureData.ElementType.SPRITE && screen.selectedElement.type != FurnitureData.ElementType.PLAYER_POSE) {
+                graphics.drawString(minecraft.font, SIZE_TITLE, leftPos + 6, topPos + 34, 0xFFFFFF);
+            }
             graphics.drawString(minecraft.font, ROTATION_TITLE, leftPos + 6, topPos + 62, 0xFFFFFF);
 
             // Outlines
