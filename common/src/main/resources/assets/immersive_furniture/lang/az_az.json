@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "Sənətkarın İş Stansiyası",
   "item.immersive_furniture.crafting_material": "İstehsal Materialı",
   "immersive_furniture.not_enough_material": "Yeterli istehsal materialı yoxdur!",
+  "immersive_furniture.indium_missing": "İmmersiv Mebel düzgün işləmək üçün İndium tələb edir!",
   "gui.immersive_furniture.furniture": "Mebel",
   "gui.immersive_furniture.tag.living_room": "Oturma otağı",
   "gui.immersive_furniture.tag.bed_room": "Yataq otağı",
