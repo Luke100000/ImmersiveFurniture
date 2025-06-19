@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "Artisan's Workstation",
   "item.immersive_furniture.crafting_material": "Crafting Material",
   "immersive_furniture.not_enough_material": "Not enough crafting material!",
+  "immersive_furniture.indium_missing": "Immersive Furniture requires Indium to run properly with Sodium!",
   "gui.immersive_furniture.furniture": "Furniture",
   "gui.immersive_furniture.tag.living_room": "Living Room",
   "gui.immersive_furniture.tag.bed_room": "Bedroom",
