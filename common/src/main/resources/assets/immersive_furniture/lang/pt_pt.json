@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "Estação do Artesão",
   "item.immersive_furniture.crafting_material": "Material de Criação",
   "immersive_furniture.not_enough_material": "Sem materiais de criação suficientes!",
+  "immersive_furniture.indium_missing": "Móveis imersivas requerem que o Índio funcione corretamente com o Sodium!",
   "gui.immersive_furniture.furniture": "Móveis",
   "gui.immersive_furniture.tag.living_room": "Sala de estar",
   "gui.immersive_furniture.tag.bed_room": "Quarto",
