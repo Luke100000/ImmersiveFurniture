@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "Hernyëa Hlarëa",
   "item.immersive_furniture.crafting_material": "Caranë",
   "immersive_furniture.not_enough_material": "Uva etë caranë!",
+  "immersive_furniture.indium_missing": "\"Immersive Furniture\" requerita Indium na auta i nárë ve Sodium!",
   "gui.immersive_furniture.furniture": "Hlarë",
   "gui.immersive_furniture.tag.living_room": "fenda hlar",
   "gui.immersive_furniture.tag.bed_room": "fenda",
