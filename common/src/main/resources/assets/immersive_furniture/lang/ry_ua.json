@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "Кустарське Рабоче Місце",
   "item.immersive_furniture.crafting_material": "Матеріал для Виготовлення",
   "immersive_furniture.not_enough_material": "Недосить матеріалу для виготовлення!",
+  "immersive_furniture.indium_missing": "Занурювальне меблі потребує Індію для правильного функціонування з Натрієм!",
   "gui.immersive_furniture.furniture": "Меблі",
   "gui.immersive_furniture.tag.living_room": "Žyvyj dіvаn",
   "gui.immersive_furniture.tag.bed_room": "SpalЬnя",
