@@ -101,6 +101,7 @@
   "gui.immersive_furniture.is_auth_failed": "na claxu lo nu se jenda!",
   "gui.immersive_furniture.list_fetch_failed": "na claxu lo nu se furgi!",
   "gui.immersive_furniture.delete_confirm": "claxu fa roco o logji",
+  "gui.immersive_furniture.cancel_confirm": "clicku lo nu bajra gi'e renvi lo nu facki",
   "gui.immersive_furniture.delete_failed": "na claxu lo nu banli.",
   "gui.immersive_furniture.name": "namer",
   "gui.immersive_furniture.name.hint": "nomen jence",
