@@ -101,6 +101,7 @@
   "gui.immersive_furniture.is_auth_failed": "Defecit ad examinandum identificationem!",
   "gui.immersive_furniture.list_fetch_failed": "Defecit ad data perferenda!",
   "gui.immersive_furniture.delete_confirm": "Premere iterum ut deletionem confirmare.",
+  "gui.immersive_furniture.cancel_confirm": "Clicca rursus ut annules.",
   "gui.immersive_furniture.delete_failed": "Defecit ad creandum.",
   "gui.immersive_furniture.name": "Nomen",
   "gui.immersive_furniture.name.hint": "Nomen supellectilis",
