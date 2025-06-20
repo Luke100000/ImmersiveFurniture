@@ -101,6 +101,7 @@
   "gui.immersive_furniture.is_auth_failed": "Təsdiqi yoxlamaqda xətaya uğradı!",
   "gui.immersive_furniture.list_fetch_failed": "Məlumat əldə etmədi!",
   "gui.immersive_furniture.delete_confirm": "Silinməni təsdiqləmək üçün yenidən basın.",
+  "gui.immersive_furniture.cancel_confirm": "İptal etmək üçün yenidən klikləyin.",
   "gui.immersive_furniture.delete_failed": "Yaradılış silinmədi.",
   "gui.immersive_furniture.name": "Ad",
   "gui.immersive_furniture.name.hint": "Mebel adı",
