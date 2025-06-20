@@ -101,6 +101,7 @@
   "gui.immersive_furniture.is_auth_failed": "تأیید هویت انجام نشد!",
   "gui.immersive_furniture.list_fetch_failed": "دریافت داده‌ها انجام نشد!",
   "gui.immersive_furniture.delete_confirm": "برای تأیید حذف مجدداً کلیک کنید.",
+  "gui.immersive_furniture.cancel_confirm": "برای لغو، دوباره کلیک کنید.",
   "gui.immersive_furniture.delete_failed": "حذف ایجاد انجام نشد.",
   "gui.immersive_furniture.name": "نام",
   "gui.immersive_furniture.name.hint": "نام مبل",
