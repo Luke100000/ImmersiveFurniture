@@ -101,6 +101,7 @@
   "gui.immersive_furniture.is_auth_failed": "Dh’fhaoidte gun d’fhuair na dearbhaidhean!",
   "gui.immersive_furniture.list_fetch_failed": "Dh’fhaoidte gun d’fhosgladh an dàta!",
   "gui.immersive_furniture.delete_confirm": "Brùth a-rithist gus dearbhadh a thoirt air an sgriob.",
+  "gui.immersive_furniture.cancel_confirm": "Cuir a-null ris an ath-neartachadh.",
   "gui.immersive_furniture.delete_failed": "Dh’fhaoidte gun d’fhuaras an cruthachaidh.",
   "gui.immersive_furniture.name": "Ainm",
   "gui.immersive_furniture.name.hint": "Ainm furniture",
