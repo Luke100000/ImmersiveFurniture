@@ -101,6 +101,7 @@
   "gui.immersive_furniture.is_auth_failed": "Iwepụghị njikọ!",
   "gui.immersive_furniture.list_fetch_failed": "Iwepụghị data!",
   "gui.immersive_furniture.delete_confirm": "Pịa ọzọ iji kwado iwepụ.",
+  "gui.immersive_furniture.cancel_confirm": "Pịa ọzọ iji kwụsị.",
   "gui.immersive_furniture.delete_failed": "Iwepụ ngwọta adịghị.",
   "gui.immersive_furniture.name": "Aha",
   "gui.immersive_furniture.name.hint": "Aha ngwongwo",
