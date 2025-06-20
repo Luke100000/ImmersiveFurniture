@@ -101,6 +101,7 @@
   "gui.immersive_furniture.is_auth_failed": "Überprüfung der Authentifizierung fehlgeschlagen!",
   "gui.immersive_furniture.list_fetch_failed": "Datenabruf fehlgeschlagen!",
   "gui.immersive_furniture.delete_confirm": "Klicke erneut, um das Löschen zu bestätigen.",
+  "gui.immersive_furniture.cancel_confirm": "Klick de nochmal zum Abbrechen.",
   "gui.immersive_furniture.delete_failed": "Löschen der Kreation fehlgeschlagen.",
   "gui.immersive_furniture.name": "Name",
   "gui.immersive_furniture.name.hint": "Möbelname",
