@@ -101,6 +101,7 @@
   "gui.immersive_furniture.is_auth_failed": "Аутентификация тикшерүдә хаталык!",
   "gui.immersive_furniture.list_fetch_failed": "Мәгълүматны табарга хата!",
   "gui.immersive_furniture.delete_confirm": "Бетерүне раслыйсыгыз өчен тагын бер кат басыгыз.",
+  "gui.immersive_furniture.cancel_confirm": "Туктату өчен яңадан басыгыз.",
   "gui.immersive_furniture.delete_failed": "Иҗатны бетерүдә хаталык.",
   "gui.immersive_furniture.name": "Исем",
   "gui.immersive_furniture.name.hint": "Мебель исеме",
