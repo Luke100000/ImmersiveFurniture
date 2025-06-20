@@ -101,6 +101,7 @@
   "gui.immersive_furniture.is_auth_failed": "כישלון בבדיקת האימות!",
   "gui.immersive_furniture.list_fetch_failed": "כישלון בהבאת נתונים!",
   "gui.immersive_furniture.delete_confirm": "לחץ שוב כדי לאשר מחיקה.",
+  "gui.immersive_furniture.cancel_confirm": "לחץ שוב כדי לבטל.",
   "gui.immersive_furniture.delete_failed": "כישלון במחיקת יצירה.",
   "gui.immersive_furniture.name": "שם",
   "gui.immersive_furniture.name.hint": "שם רהיט",
