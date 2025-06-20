@@ -101,6 +101,7 @@
   "gui.immersive_furniture.is_auth_failed": "Nepavyko patikrinti autentiškumo!",
   "gui.immersive_furniture.list_fetch_failed": "Nepavyko gauti duomenų!",
   "gui.immersive_furniture.delete_confirm": "Spustelėkite dar kartą, kad patvirtintumėte ištrynimą.",
+  "gui.immersive_furniture.cancel_confirm": "Spustelėkite dar kartą, jei norite atšaukti.",
   "gui.immersive_furniture.delete_failed": "Nepavyko ištrinti kūrinio.",
   "gui.immersive_furniture.name": "Pavadinimas",
   "gui.immersive_furniture.name.hint": "Baldų pavadinimas",
