@@ -101,6 +101,7 @@
   "gui.immersive_furniture.is_auth_failed": "Error al verificar l'autenticació!",
   "gui.immersive_furniture.list_fetch_failed": "Error al recuperar les dades!",
   "gui.immersive_furniture.delete_confirm": "Fes clic de nou per confirmar l'eliminació.",
+  "gui.immersive_furniture.cancel_confirm": "Fes clic de nou per cancel·lar.",
   "gui.immersive_furniture.delete_failed": "Error en eliminar la creació.",
   "gui.immersive_furniture.name": "Nom",
   "gui.immersive_furniture.name.hint": "Nom del moble",
