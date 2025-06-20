@@ -101,6 +101,7 @@
   "gui.immersive_furniture.is_auth_failed": "Verificarea autentificării a eșuat!",
   "gui.immersive_furniture.list_fetch_failed": "Obținerea datelor a eșuat!",
   "gui.immersive_furniture.delete_confirm": "Faceți clic din nou pentru a confirma ștergerea.",
+  "gui.immersive_furniture.cancel_confirm": "Click din nou pentru a anula.",
   "gui.immersive_furniture.delete_failed": "Imposibil de șters creația.",
   "gui.immersive_furniture.name": "Nume",
   "gui.immersive_furniture.name.hint": "Denumire mobilier",
