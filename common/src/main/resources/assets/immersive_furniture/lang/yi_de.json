@@ -101,6 +101,7 @@
   "gui.immersive_furniture.is_auth_failed": "פֿאַרפלאנגט צו קאָנטראָלירן אֿאוטענטיקאַטיאָן!",
   "gui.immersive_furniture.list_fetch_failed": "פֿאַרפלאנגט צו געפֿינען דאַטן!",
   "gui.immersive_furniture.delete_confirm": "קלעפּן ווידער צו באַשטעטיקן מאָאַטש.",
+  "gui.immersive_furniture.cancel_confirm": "קליק נאָך einmal צו סטאָפּן.",
   "gui.immersive_furniture.delete_failed": "פֿאַרפלאנגט צו מחיקעס.",
   "gui.immersive_furniture.name": "נאמע",
   "gui.immersive_furniture.name.hint": "פֿנענג נאָמען",
