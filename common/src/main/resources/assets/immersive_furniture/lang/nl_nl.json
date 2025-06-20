@@ -101,6 +101,7 @@
   "gui.immersive_furniture.is_auth_failed": "Verificatie controleren mislukt!",
   "gui.immersive_furniture.list_fetch_failed": "Gegevens ophalen mislukt!",
   "gui.immersive_furniture.delete_confirm": "Klik nogmaals om de verwijdering te bevestigen.",
+  "gui.immersive_furniture.cancel_confirm": "Klik nogmaals om te annuleren.",
   "gui.immersive_furniture.delete_failed": "Aanmaak verwijderen mislukt.",
   "gui.immersive_furniture.name": "Naam",
   "gui.immersive_furniture.name.hint": "Meubels naam",
