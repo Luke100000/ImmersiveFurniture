@@ -101,6 +101,7 @@
   "gui.immersive_furniture.is_auth_failed": "ავთენტიფიკაციის შემოწმება ვერ მოხერხდა!",
   "gui.immersive_furniture.list_fetch_failed": "ბრძანების_fetch_failed",
   "gui.immersive_furniture.delete_confirm": "დადასტურება კიდევ ერთხელ დააწვით.",
+  "gui.immersive_furniture.cancel_confirm": "ხელახალი დაწკაპუნება გაუქმებისათვის.",
   "gui.immersive_furniture.delete_failed": "შექმნის წაშლა ვერ მოხდა.",
   "gui.immersive_furniture.name": "სახელი",
   "gui.immersive_furniture.name.hint": "ავეჯის სახელი",
