@@ -101,6 +101,7 @@
   "gui.immersive_furniture.is_auth_failed": "Godkendelse kunne ikke kontrolleres!",
   "gui.immersive_furniture.list_fetch_failed": "Kunne ikke hente data!",
   "gui.immersive_furniture.delete_confirm": "Klik igen for at bekræfte sletning.",
+  "gui.immersive_furniture.cancel_confirm": "Klik igen for at annullere.",
   "gui.immersive_furniture.delete_failed": "Kunne ikke slette oprettelsen.",
   "gui.immersive_furniture.name": "Navn",
   "gui.immersive_furniture.name.hint": "Møbler navn",
