@@ -101,6 +101,7 @@
   "gui.immersive_furniture.is_auth_failed": "Ma aanan xaqiijin ansixinta!",
   "gui.immersive_furniture.list_fetch_failed": "Ma aanan helin xog!",
   "gui.immersive_furniture.delete_confirm": "Riix mar kale si aad u xaqiijiso tirtiridda.",
+  "gui.immersive_furniture.cancel_confirm": "Marka hore guji mar kale si aad uitaga dhigto.",
   "gui.immersive_furniture.delete_failed": "Ma aanan tirtirin abuurista.",
   "gui.immersive_furniture.name": "Magaca",
   "gui.immersive_furniture.name.hint": "Magaca furniture",
