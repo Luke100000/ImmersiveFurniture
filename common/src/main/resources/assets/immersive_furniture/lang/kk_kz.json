@@ -101,6 +101,7 @@
   "gui.immersive_furniture.is_auth_failed": "Тексеруді тексеру сәтсіз болды!",
   "gui.immersive_furniture.list_fetch_failed": "Мәліметтерді алуда сәтсіз болды!",
   "gui.immersive_furniture.delete_confirm": "Жою үшін қайта басыңыз.",
+  "gui.immersive_furniture.cancel_confirm": "Құпиялылықты жоюды растау үшін қайтадан басыңыз.",
   "gui.immersive_furniture.delete_failed": "Творенияны жою сәтсіз болды.",
   "gui.immersive_furniture.name": "Атауы",
   "gui.immersive_furniture.name.hint": "Мебельдің аты",
