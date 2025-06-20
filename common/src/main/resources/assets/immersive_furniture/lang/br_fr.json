@@ -101,6 +101,7 @@
   "gui.immersive_furniture.is_auth_failed": "Skarzhet da adiag !",
   "gui.immersive_furniture.list_fetch_failed": "Skurzh hag a dalv da gefrî da!",
   "gui.immersive_furniture.delete_confirm": "Kclick c'hwitan da dear ezter.",
+  "gui.immersive_furniture.cancel_confirm": "Klikit un nebeud evit distreiñ.",
   "gui.immersive_furniture.delete_failed": "Prouv e ra dezhin implijoù.",
   "gui.immersive_furniture.name": "Anv",
   "gui.immersive_furniture.name.hint": "Anv ar merzh",
