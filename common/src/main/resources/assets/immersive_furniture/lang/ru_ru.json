@@ -101,6 +101,7 @@
   "gui.immersive_furniture.is_auth_failed": "Не удалось авторизоваться!",
   "gui.immersive_furniture.list_fetch_failed": "Не удалось получить данные!",
   "gui.immersive_furniture.delete_confirm": "Нажмите еще раз, чтобы подтвердить удаление.",
+  "gui.immersive_furniture.cancel_confirm": "Нажмите снова, чтобы отменить.",
   "gui.immersive_furniture.delete_failed": "Не удалось удалить создание.",
   "gui.immersive_furniture.name": "Название",
   "gui.immersive_furniture.name.hint": "Название мебели",
