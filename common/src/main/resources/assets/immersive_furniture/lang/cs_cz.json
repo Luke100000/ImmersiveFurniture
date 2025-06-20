@@ -101,6 +101,7 @@
   "gui.immersive_furniture.is_auth_failed": "Ověření se nezdařilo!",
   "gui.immersive_furniture.list_fetch_failed": "Nepodařilo se načíst data!",
   "gui.immersive_furniture.delete_confirm": "Klikněte znovu pro potvrzení odstranění.",
+  "gui.immersive_furniture.cancel_confirm": "Klikněte znovu pro zrušení.",
   "gui.immersive_furniture.delete_failed": "Vytvoření se nepodařilo odstranit.",
   "gui.immersive_furniture.name": "Název",
   "gui.immersive_furniture.name.hint": "Název nábytku",
