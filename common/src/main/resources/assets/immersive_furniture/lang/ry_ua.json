@@ -101,6 +101,7 @@
   "gui.immersive_furniture.is_auth_failed": "Не вдалося перевірити аутентифікацію!",
   "gui.immersive_furniture.list_fetch_failed": "Не вдалося отримати дані!",
   "gui.immersive_furniture.delete_confirm": "Натисніть знову, щоб підтвердити видалення.",
+  "gui.immersive_furniture.cancel_confirm": "Натисніть ще раз, щоб скасувати.",
   "gui.immersive_furniture.delete_failed": "Не вдалося видалити творіння.",
   "gui.immersive_furniture.name": "Ім'я",
   "gui.immersive_furniture.name.hint": "Назва меблів",
