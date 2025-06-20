@@ -101,6 +101,7 @@
   "gui.immersive_furniture.is_auth_failed": "Nabigong suriin ang pagpapatunay!",
   "gui.immersive_furniture.list_fetch_failed": "Nabigong kunin ang data!",
   "gui.immersive_furniture.delete_confirm": "Pindutin muli upang kumpirmahin ang pagtanggal.",
+  "gui.immersive_furniture.cancel_confirm": "Mag-click muli upang kanselahin.",
   "gui.immersive_furniture.delete_failed": "Nabigong tanggalin ang nilikha.",
   "gui.immersive_furniture.name": "Pangalan",
   "gui.immersive_furniture.name.hint": "Pangalan ng muwebles",
