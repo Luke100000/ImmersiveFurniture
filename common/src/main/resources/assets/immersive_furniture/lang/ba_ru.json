@@ -101,6 +101,7 @@
   "gui.immersive_furniture.is_auth_failed": "Аутентификацияны тикшерә алмадым!",
   "gui.immersive_furniture.list_fetch_failed": "Данные алырға оҡшаманы!",
   "gui.immersive_furniture.delete_confirm": "Южын юйыу инандырырға йоҡла.",
+  "gui.immersive_furniture.cancel_confirm": "Яҙыуҙы туҡтатыу өсөн йәнә баҫығыҙ.",
   "gui.immersive_furniture.delete_failed": "Элементы юйылмағандыр.",
   "gui.immersive_furniture.name": "Исеме",
   "gui.immersive_furniture.name.hint": "Мебель исеме",
