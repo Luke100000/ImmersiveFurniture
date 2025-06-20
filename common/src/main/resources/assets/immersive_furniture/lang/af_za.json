@@ -101,6 +101,7 @@
   "gui.immersive_furniture.is_auth_failed": "Gevaarlik om verifikasi te kontroleer!",
   "gui.immersive_furniture.list_fetch_failed": "Kon nie data verkry nie!",
   "gui.immersive_furniture.delete_confirm": "Klik weer om verwydering te bevestig.",
+  "gui.immersive_furniture.cancel_confirm": "Klik weer om te kanselleer.",
   "gui.immersive_furniture.delete_failed": "Kon nie skepping verwyder nie.",
   "gui.immersive_furniture.name": "Naam",
   "gui.immersive_furniture.name.hint": "Meubelnaam",
