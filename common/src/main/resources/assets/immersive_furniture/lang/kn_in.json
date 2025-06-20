@@ -101,6 +101,7 @@
   "gui.immersive_furniture.is_auth_failed": "ದೃಢೀಕರಣವನ್ನು ಪರೀಕ್ಷಿಸಲು ವಿಫಲ.",
   "gui.immersive_furniture.list_fetch_failed": "ಡೇಟಾವನ್ನು ಪಡೆಯಲು ವಿಫಲ.",
   "gui.immersive_furniture.delete_confirm": "ಅಳಿಸಲು ಮತ್ತೆ ಒತ್ತಿ.",
+  "gui.immersive_furniture.cancel_confirm": "ಮರುಕಲಿಯೋದು ರದ್ದುಪಡಿಸಲು ಕ್ಲಿಕ್ ಮಾಡಿ.",
   "gui.immersive_furniture.delete_failed": "ಮಾರಾಟ ಮಾಡಲು ವಿಫಲವಾಗಿದೆ.",
   "gui.immersive_furniture.name": "ಹೆಸರು",
   "gui.immersive_furniture.name.hint": "ಗೃಹಾಭಿವೃದ್ಧಿ ಹೆಸರಿನಹಾಗಿದೆ",
