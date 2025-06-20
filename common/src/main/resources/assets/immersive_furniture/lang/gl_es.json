@@ -101,6 +101,7 @@
   "gui.immersive_furniture.is_auth_failed": "Fallou ao comprobar a autenticación!",
   "gui.immersive_furniture.list_fetch_failed": "Fallou ao recuperar datos!",
   "gui.immersive_furniture.delete_confirm": "Preme de novo para confirmar a eliminación.",
+  "gui.immersive_furniture.cancel_confirm": "Faga clic de novo para cancelar.",
   "gui.immersive_furniture.delete_failed": "Fallou ao eliminar a creación.",
   "gui.immersive_furniture.name": "Nome",
   "gui.immersive_furniture.name.hint": "Nome da moblaxe",
