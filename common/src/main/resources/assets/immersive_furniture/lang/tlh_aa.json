@@ -101,6 +101,7 @@
   "gui.immersive_furniture.is_auth_failed": "pab mIgh regh!",
   "gui.immersive_furniture.list_fetch_failed": "nI' SuyHa'!",
   "gui.immersive_furniture.delete_confirm": "qaS 'engH",
+  "gui.immersive_furniture.cancel_confirm": "tlhoy' je 'ej qechmey.",
   "gui.immersive_furniture.delete_failed": "nI'chenmeH ghoS. ",
   "gui.immersive_furniture.name": "Name",
   "gui.immersive_furniture.name.hint": "mIgh wagh mekh",
