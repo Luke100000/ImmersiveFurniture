@@ -101,6 +101,7 @@
   "gui.immersive_furniture.is_auth_failed": "Failed to check yer authentication!",
   "gui.immersive_furniture.list_fetch_failed": "Failed to fetch data!",
   "gui.immersive_furniture.delete_confirm": "Click again to confirm deletionz.",
+  "gui.immersive_furniture.cancel_confirm": "Cwick againz to cancel.",
   "gui.immersive_furniture.delete_failed": "Failed to delete creationz.",
   "gui.immersive_furniture.name": "Name",
   "gui.immersive_furniture.name.hint": "Furniture namez",
