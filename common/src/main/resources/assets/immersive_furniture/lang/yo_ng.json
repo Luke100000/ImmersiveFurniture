@@ -101,6 +101,7 @@
   "gui.immersive_furniture.is_auth_failed": "Kò sẹ́yìn láti ṣàdánwò!",
   "gui.immersive_furniture.list_fetch_failed": "Kò sẹ́yìn láti gba àwọn data!",
   "gui.immersive_furniture.delete_confirm": "Tẹ́tẹ sí i láti jẹ́risi àpamọ́.",
+  "gui.immersive_furniture.cancel_confirm": "Tẹ lẹẹkan si lati fagile.",
   "gui.immersive_furniture.delete_failed": "Kò sẹ́yìn láti pa ẹ̀kó.",
   "gui.immersive_furniture.name": "Oruko",
   "gui.immersive_furniture.name.hint": "Orúkọ ẹ̀rẹ́kùsù",
