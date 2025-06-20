@@ -101,6 +101,7 @@
   "gui.immersive_furniture.is_auth_failed": "Falida a viodi l'autentificazion!",
   "gui.immersive_furniture.list_fetch_failed": "Falida a ciapâ i dats!",
   "gui.immersive_furniture.delete_confirm": "Clic clic in plui par confermâ la deletzion.",
+  "gui.immersive_furniture.cancel_confirm": "Clicca ancjemò par anulâ.",
   "gui.immersive_furniture.delete_failed": "Falida a deletâ la creazion.",
   "gui.immersive_furniture.name": "Nume",
   "gui.immersive_furniture.name.hint": "Nume dal mobil",
