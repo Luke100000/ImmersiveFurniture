@@ -101,6 +101,7 @@
   "gui.immersive_furniture.is_auth_failed": "Et ass gescheitert d'Authentifikatioun ze iwwerpréifen!",
   "gui.immersive_furniture.list_fetch_failed": "Et ass gescheitert Daten ze kréien!",
   "gui.immersive_furniture.delete_confirm": "Klickt nach eng Kéier fir d'Läscht ze bestätegen.",
+  "gui.immersive_furniture.cancel_confirm": "Klickt erëm fir ze annuléieren.",
   "gui.immersive_furniture.delete_failed": "Et ass gescheitert d'Kreation ze läschen.",
   "gui.immersive_furniture.name": "Numm",
   "gui.immersive_furniture.name.hint": "Furniturnumm",
