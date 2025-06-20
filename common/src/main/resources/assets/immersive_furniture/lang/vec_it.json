@@ -101,6 +101,7 @@
   "gui.immersive_furniture.is_auth_failed": "Autenticazione fallita!",
   "gui.immersive_furniture.list_fetch_failed": "Impossibile recuperare i dati!",
   "gui.immersive_furniture.delete_confirm": "Clicca di nuovo per confermare la cancellazione.",
+  "gui.immersive_furniture.cancel_confirm": "Clicca ancora per cancellar.",
   "gui.immersive_furniture.delete_failed": "Impossibile cancellare la creazione.",
   "gui.immersive_furniture.name": "Nome",
   "gui.immersive_furniture.name.hint": "Nome del mobile",
