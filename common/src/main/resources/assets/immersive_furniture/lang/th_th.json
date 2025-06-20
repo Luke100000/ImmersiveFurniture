@@ -101,6 +101,7 @@
   "gui.immersive_furniture.is_auth_failed": "ไม่สามารถตรวจสอบการยืนยันตัวตนได้",
   "gui.immersive_furniture.list_fetch_failed": "ไม่สามารถดึงข้อมูลได้",
   "gui.immersive_furniture.delete_confirm": "คลิกอีกครั้งเพื่อยืนยันการลบ.",
+  "gui.immersive_furniture.cancel_confirm": "คลิกอีกครั้งเพื่อยกเลิกการดำเนินการนี้.",
   "gui.immersive_furniture.delete_failed": "ไม่สามารถลบสิ่งที่สร้างขึ้นได้.",
   "gui.immersive_furniture.name": "ชื่อ",
   "gui.immersive_furniture.name.hint": "ชื่อเฟอร์นิเจอร์",
