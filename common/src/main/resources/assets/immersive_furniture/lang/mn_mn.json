@@ -101,6 +101,7 @@
   "gui.immersive_furniture.is_auth_failed": "Нэвтрэх үнэнч буруу байна!",
   "gui.immersive_furniture.list_fetch_failed": "Мэдээллийг авахад алдаа гарлаа!",
   "gui.immersive_furniture.delete_confirm": "Устгахыг баталгаажуулахын тулд дахин дарна уу.",
+  "gui.immersive_furniture.cancel_confirm": "Дахиж дарж зогсоох.",
   "gui.immersive_furniture.delete_failed": "Бүтээл устгах алдаа гарлаа.",
   "gui.immersive_furniture.name": "Нэр",
   "gui.immersive_furniture.name.hint": "Тавилгын нэр",
