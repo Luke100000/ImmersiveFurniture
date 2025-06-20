@@ -101,6 +101,7 @@
   "gui.immersive_furniture.is_auth_failed": "प्रमाणीकरण की जांच करने में विफल!",
   "gui.immersive_furniture.list_fetch_failed": "डेटा लाने में विफल!",
   "gui.immersive_furniture.delete_confirm": "हटाने की पुष्टि करने के लिए फिर से क्लिक करें।",
+  "gui.immersive_furniture.cancel_confirm": "रद्द करने के लिए फिर से क्लिक करें।",
   "gui.immersive_furniture.delete_failed": "निर्माण को हटाने में विफल!",
   "gui.immersive_furniture.name": "नाम",
   "gui.immersive_furniture.name.hint": "फर्नीचर का नाम",
