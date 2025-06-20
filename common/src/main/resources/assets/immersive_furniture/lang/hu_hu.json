@@ -101,6 +101,7 @@
   "gui.immersive_furniture.is_auth_failed": "Nem sikerült ellenőrizni a hitelesítést!",
   "gui.immersive_furniture.list_fetch_failed": "Nem sikerült adatokat lekérni!",
   "gui.immersive_furniture.delete_confirm": "Kattintson újra a törlés megerősítéséhez.",
+  "gui.immersive_furniture.cancel_confirm": "Kattintson újra a törléshez.",
   "gui.immersive_furniture.delete_failed": "A létrehozás törlése sikertelen.",
   "gui.immersive_furniture.name": "Név",
   "gui.immersive_furniture.name.hint": "Bútor neve",
