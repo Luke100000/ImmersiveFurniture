@@ -101,6 +101,7 @@
   "gui.immersive_furniture.is_auth_failed": "認証の確認に失敗しました!",
   "gui.immersive_furniture.list_fetch_failed": "データの取得に失敗しました！",
   "gui.immersive_furniture.delete_confirm": "削除を確認するには、もう一度クリックします。",
+  "gui.immersive_furniture.cancel_confirm": "もう一度クリックするとキャンセルします。",
   "gui.immersive_furniture.delete_failed": "作成を削除できませんでした。",
   "gui.immersive_furniture.name": "名称",
   "gui.immersive_furniture.name.hint": "家具名",
