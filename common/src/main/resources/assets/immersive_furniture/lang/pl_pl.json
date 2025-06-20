@@ -101,6 +101,7 @@
   "gui.immersive_furniture.is_auth_failed": "Nie udało się sprawdzić uwierzytelnienia!",
   "gui.immersive_furniture.list_fetch_failed": "Nie udało się pobrać danych!",
   "gui.immersive_furniture.delete_confirm": "Kliknij ponownie, aby potwierdzić usunięcie.",
+  "gui.immersive_furniture.cancel_confirm": "Kliknij ponownie, aby anulować.",
   "gui.immersive_furniture.delete_failed": "Nie udało się usunąć utworzenia.",
   "gui.immersive_furniture.name": "Nazwa",
   "gui.immersive_furniture.name.hint": "Nazwa mebli",
