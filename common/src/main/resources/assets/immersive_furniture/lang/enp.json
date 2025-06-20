@@ -101,6 +101,7 @@
   "gui.immersive_furniture.is_auth_failed": "Failed to check authing!",
   "gui.immersive_furniture.list_fetch_failed": "Failed to fetch data!",
   "gui.immersive_furniture.delete_confirm": "Click again to confirm cutting.",
+  "gui.immersive_furniture.cancel_confirm": "Click again to cancel.",
   "gui.immersive_furniture.delete_failed": "Failed to cut craft.",
   "gui.immersive_furniture.name": "Name",
   "gui.immersive_furniture.name.hint": "Furniture Name",
