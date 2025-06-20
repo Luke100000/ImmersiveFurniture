@@ -101,6 +101,7 @@
   "gui.immersive_furniture.is_auth_failed": "Varmennuksen tarkistus epäonnistui!",
   "gui.immersive_furniture.list_fetch_failed": "Tietojen haku epäonnistui!",
   "gui.immersive_furniture.delete_confirm": "Napsauta uudelleen vahvistaaksesi poiston.",
+  "gui.immersive_furniture.cancel_confirm": "Klikketa muitalit go cancel.",
   "gui.immersive_furniture.delete_failed": "Luomuksen poisto epäonnistui.",
   "gui.immersive_furniture.name": "Návnn",
   "gui.immersive_furniture.name.hint": "Huonekalun nimi",
