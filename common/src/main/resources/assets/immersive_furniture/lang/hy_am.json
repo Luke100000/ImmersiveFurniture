@@ -101,6 +101,7 @@
   "gui.immersive_furniture.is_auth_failed": "Հաստատումը ստուգելը չսխալվեց!",
   "gui.immersive_furniture.list_fetch_failed": "Տվյալները ստանալը չհաջողվեց!",
   "gui.immersive_furniture.delete_confirm": "Նորից սեղմեք հաստատելու համար ջնջումը.",
+  "gui.immersive_furniture.cancel_confirm": "Թողեք նորից սեղմել, որպեսզի չեղարկեք։",
   "gui.immersive_furniture.delete_failed": "Սրանից դուրս գալու համար չհաջողվեց ջնջել ստեղծագործությունը.",
   "gui.immersive_furniture.name": "Անվանում",
   "gui.immersive_furniture.name.hint": "Անվանում կահույքի",
