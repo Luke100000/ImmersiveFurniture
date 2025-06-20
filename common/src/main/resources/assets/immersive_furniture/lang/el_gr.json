@@ -101,6 +101,7 @@
   "gui.immersive_furniture.is_auth_failed": "Αποτυχία ελέγχου ταυτοποίησης!",
   "gui.immersive_furniture.list_fetch_failed": "Αποτυχία λήψης δεδομένων!",
   "gui.immersive_furniture.delete_confirm": "Κάντε κλικ ξανά για επιβεβαίωση διαγραφής.",
+  "gui.immersive_furniture.cancel_confirm": "Κάντε κλικ ξανά για ακύρωση.",
   "gui.immersive_furniture.delete_failed": "Αποτυχία διαγραφής δημιουργίας.",
   "gui.immersive_furniture.name": "Όνομα",
   "gui.immersive_furniture.name.hint": "Όνομα επίπλων",
