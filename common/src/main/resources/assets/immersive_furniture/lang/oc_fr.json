@@ -101,6 +101,7 @@
   "gui.immersive_furniture.is_auth_failed": "Falha al verificar l'autenticacion!",
   "gui.immersive_furniture.list_fetch_failed": "Falha al recuperar las donadas!",
   "gui.immersive_furniture.delete_confirm": "Clicatz un torn per confirmar la supression.",
+  "gui.immersive_furniture.cancel_confirm": "Clicatz novament per anular.",
   "gui.immersive_furniture.delete_failed": "Falha al supprimir la creacion.",
   "gui.immersive_furniture.name": "Nom",
   "gui.immersive_furniture.name.hint": "Nom del mobil",
