@@ -101,6 +101,7 @@
   "gui.immersive_furniture.is_auth_failed": "Gagal untuk menyemak pengesahan!",
   "gui.immersive_furniture.list_fetch_failed": "Gagal untuk mengambil data!",
   "gui.immersive_furniture.delete_confirm": "Klik lagi untuk mengesahkan penghapusan.",
+  "gui.immersive_furniture.cancel_confirm": "Klik sekali lagi untuk membatalkan.",
   "gui.immersive_furniture.delete_failed": "Gagal untuk menghapus ciptaan.",
   "gui.immersive_furniture.name": "Nama",
   "gui.immersive_furniture.name.hint": "Nama perabot",
