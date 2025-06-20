@@ -101,6 +101,7 @@
   "gui.immersive_furniture.is_auth_failed": "Ikki eydnast at kanna sambandi!",
   "gui.immersive_furniture.list_fetch_failed": "Ikki eydnast at fáa data!",
   "gui.immersive_furniture.delete_confirm": "Trýst aftur at staðfesta burtur.",
+  "gui.immersive_furniture.cancel_confirm": "Klicka aftur fyri at avlýsa.",
   "gui.immersive_furniture.delete_failed": "Ikki eydnast at burturflytja skapning.",
   "gui.immersive_furniture.name": "Navn",
   "gui.immersive_furniture.name.hint": "Møblar navn",
