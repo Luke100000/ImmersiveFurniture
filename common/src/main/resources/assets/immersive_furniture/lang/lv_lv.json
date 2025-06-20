@@ -101,6 +101,7 @@
   "gui.immersive_furniture.is_auth_failed": "Neizdevās pārbaudīt autentifikāciju!",
   "gui.immersive_furniture.list_fetch_failed": "Neizdevās iegūt datus!",
   "gui.immersive_furniture.delete_confirm": "Noklikšķiniet vēlreiz, lai apstiprinātu dzēšanu.",
+  "gui.immersive_furniture.cancel_confirm": "Lai atceltu, noklikšķiniet vēlreiz.",
   "gui.immersive_furniture.delete_failed": "Neizdevās izdzēst izveidošanu.",
   "gui.immersive_furniture.name": "Nosaukums",
   "gui.immersive_furniture.name.hint": "Mēbeles nosaukums",
