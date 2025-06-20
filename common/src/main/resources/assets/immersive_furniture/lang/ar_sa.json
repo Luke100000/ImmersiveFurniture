@@ -101,6 +101,7 @@
   "gui.immersive_furniture.is_auth_failed": "فشل التحقق من المصادقة!",
   "gui.immersive_furniture.list_fetch_failed": "فشل في جلب البيانات!",
   "gui.immersive_furniture.delete_confirm": "اضغط مرة أخرى لتأكيد الحذف.",
+  "gui.immersive_furniture.cancel_confirm": "انقر مرة أخرى للإلغاء.",
   "gui.immersive_furniture.delete_failed": "فشل في حذف الإبداع.",
   "gui.immersive_furniture.name": "اسم",
   "gui.immersive_furniture.name.hint": "اسم الأثاث",
