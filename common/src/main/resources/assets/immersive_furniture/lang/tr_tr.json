@@ -101,6 +101,7 @@
   "gui.immersive_furniture.is_auth_failed": "Kimlik doğrulaması kontrol edilemedi!",
   "gui.immersive_furniture.list_fetch_failed": "Veri alınamadı!",
   "gui.immersive_furniture.delete_confirm": "Silme işlemini onaylamak için tekrar tıklayın.",
+  "gui.immersive_furniture.cancel_confirm": "İptal etmek için tekrar tıklayın.",
   "gui.immersive_furniture.delete_failed": "Oluşturma silinemedi.",
   "gui.immersive_furniture.name": "İsim",
   "gui.immersive_furniture.name.hint": "Mobilya adı",
