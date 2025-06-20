@@ -101,6 +101,7 @@
   "gui.immersive_furniture.is_auth_failed": "Naqa' biex tiċċekkja l-awtentikazzjoni!",
   "gui.immersive_furniture.list_fetch_failed": "Naqa' biex tfetch data!",
   "gui.immersive_furniture.delete_confirm": "Agħfas mill-ġdid biex tikkonferma l-wegħda.",
+  "gui.immersive_furniture.cancel_confirm": "Ikklikkja darb'oħra biex tissospendi.",
   "gui.immersive_furniture.delete_failed": "Naqa' biex tilef il-kreazzjoni.",
   "gui.immersive_furniture.name": "Isem",
   "gui.immersive_furniture.name.hint": "Isem tal-furnituri",
