@@ -101,6 +101,7 @@
   "gui.immersive_furniture.is_auth_failed": "Malfeliĉo por kontroli aŭtentikigon!",
   "gui.immersive_furniture.list_fetch_failed": "Malfeliĉo por akiri datumojn!",
   "gui.immersive_furniture.delete_confirm": "Klaku denove por konfirmi forigon.",
+  "gui.immersive_furniture.cancel_confirm": "Klicka denova por canceli.",
   "gui.immersive_furniture.delete_failed": "Malfeliĉo por forigi kreon.",
   "gui.immersive_furniture.name": "Nomo",
   "gui.immersive_furniture.name.hint": "Nomo de meblo",
