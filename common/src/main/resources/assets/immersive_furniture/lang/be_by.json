@@ -101,6 +101,7 @@
   "gui.immersive_furniture.is_auth_failed": "Не ўдалося праверыць аўтэнтыфікацыю!",
   "gui.immersive_furniture.list_fetch_failed": "Не ўдалося атрымліваць дадзеныя!",
   "gui.immersive_furniture.delete_confirm": "Націсніце яшчэ раз, каб пацвердзіць выдаленне.",
+  "gui.immersive_furniture.cancel_confirm": "Націсніце яшчэ раз, каб адмяніць.",
   "gui.immersive_furniture.delete_failed": "Не ўдалося выдаліць твор.",
   "gui.immersive_furniture.name": "Назва",
   "gui.immersive_furniture.name.hint": "Назва мэблі",
