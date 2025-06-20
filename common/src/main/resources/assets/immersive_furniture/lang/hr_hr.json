@@ -101,6 +101,7 @@
   "gui.immersive_furniture.is_auth_failed": "Neuspješna provjera autentifikacije!",
   "gui.immersive_furniture.list_fetch_failed": "Neuspješno dohvaćanje podataka!",
   "gui.immersive_furniture.delete_confirm": "Kliknite ponovo da potvrdite brisanje.",
+  "gui.immersive_furniture.cancel_confirm": "Kliknite ponovno za otkazivanje.",
   "gui.immersive_furniture.delete_failed": "Neuspješno brisanje kreacije.",
   "gui.immersive_furniture.name": "Ime",
   "gui.immersive_furniture.name.hint": "Naziv namještaja",
