@@ -101,6 +101,7 @@
   "gui.immersive_furniture.is_auth_failed": "Thit sé chun seiceáil a dhéanamh ar an aithint!",
   "gui.immersive_furniture.list_fetch_failed": "Thit sé chun sonraí a fháil!",
   "gui.immersive_furniture.delete_confirm": "Brúigh arís chun scrios a dhaingniú.",
+  "gui.immersive_furniture.cancel_confirm": "Cliceáil arís chun ceal a dhéanamh.",
   "gui.immersive_furniture.delete_failed": "Thit sé le cruth a scriosadh.",
   "gui.immersive_furniture.name": "Ainm",
   "gui.immersive_furniture.name.hint": "Ainm troscáin",
