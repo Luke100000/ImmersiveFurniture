@@ -101,6 +101,7 @@
   "gui.immersive_furniture.is_auth_failed": "Ferkeard om autentifikaasje te kontrolearjen!",
   "gui.immersive_furniture.list_fetch_failed": "Ferkeard om gegevens op te heljen!",
   "gui.immersive_furniture.delete_confirm": "Klik opnij om ferwidering te befêstigjen.",
+  "gui.immersive_furniture.cancel_confirm": "Klik nochris om te annulearjen.",
   "gui.immersive_furniture.delete_failed": "Ferkeard om kreäasje te ferwiderjen.",
   "gui.immersive_furniture.name": "Namme",
   "gui.immersive_furniture.name.hint": "Meubelnamme",
