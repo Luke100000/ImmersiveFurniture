@@ -101,6 +101,7 @@
   "gui.immersive_furniture.is_auth_failed": "檢查認證失敗！",
   "gui.immersive_furniture.list_fetch_failed": "擷取資料失敗！",
   "gui.immersive_furniture.delete_confirm": "再次按一下以確認刪除。",
+  "gui.immersive_furniture.cancel_confirm": "再次按一下以取消。",
   "gui.immersive_furniture.delete_failed": "刪除創建失敗。",
   "gui.immersive_furniture.name": "名稱",
   "gui.immersive_furniture.name.hint": "家具名稱",
