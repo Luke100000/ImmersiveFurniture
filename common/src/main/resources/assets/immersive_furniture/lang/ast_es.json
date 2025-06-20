@@ -101,6 +101,7 @@
   "gui.immersive_furniture.is_auth_failed": "Falló la verificación de la autenticación!",
   "gui.immersive_furniture.list_fetch_failed": "Falló la obtención de datos!",
   "gui.immersive_furniture.delete_confirm": "Preme de nuevo pa confirmar la eliminación.",
+  "gui.immersive_furniture.cancel_confirm": "Clica de nou pa cancelar.",
   "gui.immersive_furniture.delete_failed": "Falló la eliminación de la creación.",
   "gui.immersive_furniture.name": "Nome",
   "gui.immersive_furniture.name.hint": "Nome del mobiliariu",
