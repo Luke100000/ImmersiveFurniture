@@ -101,6 +101,7 @@
   "gui.immersive_furniture.is_auth_failed": "kama ala tan!",
   "gui.immersive_furniture.list_fetch_failed": "kama ala e data!",
   "gui.immersive_furniture.delete_confirm": "tawa mute tan e ni.",
+  "gui.immersive_furniture.cancel_confirm": "tawa la mi wile tawa e ni.",
   "gui.immersive_furniture.delete_failed": "kama ala tawa e kumo.",
   "gui.immersive_furniture.name": "noman",
   "gui.immersive_furniture.name.hint": "nime palisa",
