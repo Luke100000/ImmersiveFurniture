@@ -101,6 +101,7 @@
   "gui.immersive_furniture.is_auth_failed": "Fell gans owth delivers an authentykya!",
   "gui.immersive_furniture.list_fetch_failed": "Fell gans owth dhegyas data!",
   "gui.immersive_furniture.delete_confirm": "Clicgh dhyworth dylyn an didhledh.",
+  "gui.immersive_furniture.cancel_confirm": "Clicgh gans an gath dhe gans.",
   "gui.immersive_furniture.delete_failed": "Fell gans benen an Kreans.",
   "gui.immersive_furniture.name": "An Han",
   "gui.immersive_furniture.name.hint": "An hanow furveth",
