@@ -101,6 +101,7 @@
   "gui.immersive_furniture.is_auth_failed": "Todentamisen tarkistus epäonnistui!",
   "gui.immersive_furniture.list_fetch_failed": "Tietojen noutaminen epäonnistui!",
   "gui.immersive_furniture.delete_confirm": "Klikkaa uudelleen vahvistaaksesi poisto.",
+  "gui.immersive_furniture.cancel_confirm": "Klikkaa uudelleen peruuttaaksesi.",
   "gui.immersive_furniture.delete_failed": "Luontia ei voitu poistaa.",
   "gui.immersive_furniture.name": "Nimi",
   "gui.immersive_furniture.name.hint": "Huonekalujen nimi",
