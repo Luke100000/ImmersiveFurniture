@@ -101,6 +101,7 @@
   "gui.immersive_furniture.is_auth_failed": "Dështoi kontrolli i autentifikimit!",
   "gui.immersive_furniture.list_fetch_failed": "Dështoi marrja e të dhënave!",
   "gui.immersive_furniture.delete_confirm": "Klikoni përsëri për të konfirmuar fshirjen.",
+  "gui.immersive_furniture.cancel_confirm": "Klikoni përsëri për të anuluar.",
   "gui.immersive_furniture.delete_failed": "Dështoi të fshijë krijimin.",
   "gui.immersive_furniture.name": "Emri",
   "gui.immersive_furniture.name.hint": "Emri i mobiljeve",
