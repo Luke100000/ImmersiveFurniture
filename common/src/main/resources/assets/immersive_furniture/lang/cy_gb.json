@@ -101,6 +101,7 @@
   "gui.immersive_furniture.is_auth_failed": "Methiant i wirio awdurdodiad!",
   "gui.immersive_furniture.list_fetch_failed": "Methiant i ddynnu data!",
   "gui.immersive_furniture.delete_confirm": "Cliciwch eto i gadarnhau dileu.",
+  "gui.immersive_furniture.cancel_confirm": "Cliciw eto i ganslo.",
   "gui.immersive_furniture.delete_failed": "Methiant i ddileu creadigaeth.",
   "gui.immersive_furniture.name": "Enw",
   "gui.immersive_furniture.name.hint": "Enw dodrefn",
