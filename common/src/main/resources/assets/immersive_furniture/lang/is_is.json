@@ -101,6 +101,7 @@
   "gui.immersive_furniture.is_auth_failed": "Mistókst að athuga staðfestingu!",
   "gui.immersive_furniture.list_fetch_failed": "Mistókst að sækja gögn!",
   "gui.immersive_furniture.delete_confirm": "Smelltu aftur til að staðfesta eyðingu.",
+  "gui.immersive_furniture.cancel_confirm": "Smelltu aftur á til að hætta við.",
   "gui.immersive_furniture.delete_failed": "Mistókst að eyða sköpun.",
   "gui.immersive_furniture.name": "Nafn",
   "gui.immersive_furniture.name.hint": "Nafn húsgagna",
