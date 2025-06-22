@@ -77,9 +77,9 @@ public abstract class ArtisansWorkstationScreen extends Screen {
         graphics.pose().translate(x, y, 100.0);
         graphics.pose().mulPoseMatrix(new Matrix4f().scaling((float) (size / Math.max(1.0, data.getSize() / 16.0) * 0.4)));
         graphics.pose().mulPose(new Quaternionf().rotateX(pitch).rotateY(yaw));
-        Vec3 center = data.boundingBox().getCenter();
-        graphics.pose().translate(-data.size.x / 2.0f, data.size.y / 2.0f - 0.5f + center.y / 16.0f, -data.size.z / 2.0f);
         graphics.pose().mulPoseMatrix(new Matrix4f().scaling(1, -1, 1));
+        Vec3 center = data.boundingBox().getCenter();
+        graphics.pose().translate(-center.x / 16.0f, -center.y / 16.0f, -center.z / 16.0f);
         renderModel(graphics, data, yaw, pitch, false);
         graphics.pose().popPose();
     }

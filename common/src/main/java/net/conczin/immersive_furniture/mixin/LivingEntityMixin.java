@@ -2,12 +2,13 @@ package net.conczin.immersive_furniture.mixin;
 
 import net.conczin.immersive_furniture.InteractionManager;
 import net.conczin.immersive_furniture.block.BaseFurnitureBlock;
+import net.conczin.immersive_furniture.block.FurnitureProxyBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
-import org.jetbrains.annotations.NotNull;
+import net.minecraft.world.level.block.Block;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -31,8 +32,11 @@ public abstract class LivingEntityMixin extends Entity {
     public abstract boolean isSleeping();
 
     @Unique
-    private @NotNull boolean immersiveFurniture$IsFurnitureBed() {
-        return this.getSleepingPos().map(blockPos -> this.level().getBlockState(blockPos).getBlock() instanceof BaseFurnitureBlock).orElse(false);
+    private boolean immersiveFurniture$IsFurnitureBed() {
+        return this.getSleepingPos().map(blockPos -> {
+            Block block = this.level().getBlockState(blockPos).getBlock();
+            return block instanceof BaseFurnitureBlock || block instanceof FurnitureProxyBlock;
+        }).orElse(false);
     }
 
     @Inject(method = "checkBedExists()Z", at = @At("HEAD"), cancellable = true)

@@ -352,14 +352,18 @@ public class ModelComponent extends ScreenComponent {
         py.setValue(Float.toString(screen.selectedElement.from.y));
         pz.setValue(Float.toString(screen.selectedElement.from.z));
 
-        Vector3i size = screen.selectedElement.getSize();
-        sx.setValue(String.valueOf(size.x));
-        sy.setValue(String.valueOf(size.y));
-        sz.setValue(String.valueOf(size.z));
+        if (sx != null) {
+            Vector3i size = screen.selectedElement.getSize();
+            sx.setValue(String.valueOf(size.x));
+            sy.setValue(String.valueOf(size.y));
+            sz.setValue(String.valueOf(size.z));
+        }
 
-        rx.setEnabled(screen.selectedElement.axis == Direction.Axis.X);
-        ry.setEnabled(screen.selectedElement.axis == Direction.Axis.Y);
-        rz.setEnabled(screen.selectedElement.axis == Direction.Axis.Z);
+        if (rx != null) {
+            rx.setEnabled(screen.selectedElement.axis == Direction.Axis.X);
+            ry.setEnabled(screen.selectedElement.axis == Direction.Axis.Y);
+            rz.setEnabled(screen.selectedElement.axis == Direction.Axis.Z);
+        }
     }
 
     private EditBox addNewFloatBox(int x, int y, int width) {

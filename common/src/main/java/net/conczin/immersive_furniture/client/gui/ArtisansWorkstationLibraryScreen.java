@@ -57,7 +57,6 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
     private boolean isBrowserOpen = false;
     private boolean authenticated = false;
 
-    private EditBox searchBox;
     private boolean sortByDate = false;
     private String tagFilter = "miscellaneous";
 
@@ -98,12 +97,7 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
             for (Tab tab : Tab.values()) {
                 String text = "gui.immersive_furniture.tab." + tab.name().toLowerCase(Locale.ROOT);
                 addRenderableWidget(
-                        Button.builder(Component.translatable(text), b -> {
-                                    this.tab = tab;
-                                    this.page = 0;
-                                    this.shouldSearch = true;
-                                    init();
-                                })
+                        Button.builder(Component.translatable(text), b -> this.setTab(tab))
                                 .bounds(x + 2, topPos - 19, w, 20)
                                 .tooltip(Tooltip.create(Component.translatable(text + ".hint")))
                                 .build()
@@ -112,18 +106,18 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
             }
 
             // Search box
-            this.searchBox = new EditBox(font, leftPos + 5, topPos + 5, windowWidth - 64 - 12, font.lineHeight + 3, SEARCH_TITLE);
-            this.searchBox.setMaxLength(50);
-            this.searchBox.setVisible(true);
-            this.searchBox.setValue(lastSearch);
-            this.searchBox.setHint(SEARCH_HINT);
-            this.searchBox.setResponder(s -> {
+            EditBox searchBox = new EditBox(font, leftPos + 5, topPos + 5, windowWidth - 64 - 12, font.lineHeight + 3, SEARCH_TITLE);
+            searchBox.setMaxLength(50);
+            searchBox.setVisible(true);
+            searchBox.setValue(lastSearch);
+            searchBox.setHint(SEARCH_HINT);
+            searchBox.setResponder(s -> {
                 if (!s.equals(lastSearch)) {
-                    shouldSearch = true;
                     lastSearch = s;
+                    shouldSearch = true;
                 }
             });
-            addRenderableWidget(this.searchBox);
+            addRenderableWidget(searchBox);
             setInitialFocus(searchBox);
 
             // Tags
@@ -523,6 +517,9 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
 
     public void setTab(Tab tab) {
         this.tab = tab;
+        this.page = 0;
+        this.shouldSearch = true;
+        init();
     }
 
     private void drawTextBox(GuiGraphics graphics, Component text) {
@@ -543,7 +540,7 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
         if (tab == Tab.LOCAL) {
             // Fetch from local files
             furniture = localFiles.stream()
-                    .filter(l -> Utils.search(searchBox.getValue(), l.toString()))
+                    .filter(l -> Utils.search(lastSearch, l.toString()))
                     .filter(l -> tagFilter.equals("miscellaneous") || getData(l) == null || getData(l).tag.equals(tagFilter))
                     .skip((long) page * ENTRIES_PER_PAGE)
                     .limit(ENTRIES_PER_PAGE)
@@ -553,7 +550,7 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
             awaitingSearch = true;
             CompletableFuture.runAsync(() -> {
                 Response response = request(API.HttpMethod.GET, ContentListResponse::new, "v2/content/furniture", Map.of(
-                        "whitelist", searchBox.getValue() + (tagFilter.equals("miscellaneous") ? "" : "," + tagFilter),
+                        "whitelist", lastSearch + (tagFilter.equals("miscellaneous") ? "" : "," + tagFilter),
                         "blacklist", "",
                         "order", sortByDate ? "date" : "likes",
                         "track", tab == Tab.FAVORITES ? "likes" : tab == Tab.SUBMISSIONS ? "submissions" : "all",
@@ -616,10 +613,10 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
                 data.contentid = response.contentid();
                 FurnitureDataManager.saveLocalFile(data);
                 selected = null;
-                Minecraft.getInstance().execute(() -> {
-                    setTab(Tab.SUBMISSIONS);
-                    init();
-                });
+                Minecraft.getInstance().execute(() -> setTab(Tab.SUBMISSIONS));
+            } else if (request instanceof SuccessResponse) {
+                selected = null;
+                init();
             } else if (request instanceof ErrorResponse response) {
                 if (response.code() == 428) {
                     setError("gui.immersive_furniture.upload_duplicate");

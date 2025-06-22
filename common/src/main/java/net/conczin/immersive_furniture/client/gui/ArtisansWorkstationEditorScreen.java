@@ -350,6 +350,11 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
                 data.elements.add(new FurnitureData.Element(copiedElement));
                 init();
             }
+        } else if (keyCode == 77 && hasControlDown() && !hasShiftDown() && !hasAltDown()) {
+            if (selectedElement != null && copiedElement != null) {
+                selectedElement.material = new FurnitureData.Material(new FurnitureData.Element(copiedElement).material);
+                init();
+            }
         } else if (isUndo(keyCode)) {
             if (!history.isEmpty() && lastHistoryHash.equals(data.getHash())) {
                 history.removeFirst();

@@ -60,14 +60,14 @@ public class AmbientOcclusion {
         Vector3f ny = rotation.transform(new Vector3f(0, size.y(), 0));
         Vector3f nz = rotation.transform(new Vector3f(0, 0, size.z()));
 
-        int width = (int) Math.ceil(size.x() * SAMPLE_RESOLUTION * RESOLUTION);
-        int height = (int) Math.ceil(size.y() * SAMPLE_RESOLUTION * RESOLUTION);
-        int depth = (int) Math.ceil(size.z() * SAMPLE_RESOLUTION * RESOLUTION);
+        float buffer = (float) (2.0f * SAMPLE_RESOLUTION * RESOLUTION);
+        int width = (int) Math.ceil(size.x() * SAMPLE_RESOLUTION * RESOLUTION + buffer);
+        int height = (int) Math.ceil(size.y() * SAMPLE_RESOLUTION * RESOLUTION + buffer);
+        int depth = (int) Math.ceil(size.z() * SAMPLE_RESOLUTION * RESOLUTION + buffer);
 
         for (int ix = 0; ix <= width; ix++) {
             for (int iy = 0; iy <= height; iy++) {
                 for (int iz = 0; iz <= depth; iz++) {
-                    float buffer = (float) (2.0f * SAMPLE_RESOLUTION * RESOLUTION);
                     float sx = (ix - width / 2.0f) / (width - buffer);
                     float sy = (iy - height / 2.0f) / (height - buffer);
                     float sz = (iz - depth / 2.0f) / (depth - buffer);
