@@ -222,11 +222,11 @@ public class FurnitureData {
         return consumed;
     }
 
-    public boolean emitInteractParticles(BlockPos pos, Player player, ParticleConsumer particleConsumer, boolean inScreen) {
+    public boolean emitInteractParticles(BlockPos pos, Direction direction, Player player, ParticleConsumer particleConsumer, boolean inScreen) {
         boolean consumed = false;
         for (Element element : elements) {
             if (element.type == ElementType.PARTICLE_EMITTER && element.particleEmitter.onInteract) {
-                emitParticles(pos, player.getRandom(), element, particleConsumer, inScreen, 10.0f);
+                emitParticles(pos, direction, player.getRandom(), element, particleConsumer, inScreen, 10.0f);
                 consumed = true;
             }
         }
@@ -326,11 +326,15 @@ public class FurnitureData {
     }
 
     public PoseOffset getClosestPose(Vec3 location, Direction direction) {
+        float bestDistance = Float.MAX_VALUE;
         PoseOffset found = null;
         for (Element element : elements) {
             if (element.type == ElementType.PLAYER_POSE) {
                 Vector3f center = rotate(element.getRotationAxes().center(), direction).mul(1.0f / 16.0f);
-                if (found == null || location.distanceToSqr(center.x, center.y, center.z) < location.distanceToSqr(found.offset.x, found.offset.y, found.offset.z)) {
+                double distance = location.distanceToSqr(center.x, center.y, center.z);
+                if (found == null || distance < bestDistance) {
+                    bestDistance = (float) distance;
+
                     Vector3f forward = rotateVector(element.getRotationAxes().forward(), direction).normalize();
                     Vector3f up = rotateVector(element.getRotationAxes().up(), direction).normalize();
 
@@ -352,7 +356,7 @@ public class FurnitureData {
         void addParticle(SimpleParticleType particle, float x, float y, float z, float vx, float vy, float vz);
     }
 
-    private void emitParticles(BlockPos pos, RandomSource random, Element element, ParticleConsumer particleConsumer, boolean inScreen, float amountMultiplier) {
+    private void emitParticles(BlockPos pos, Direction direction, RandomSource random, Element element, ParticleConsumer particleConsumer, boolean inScreen, float amountMultiplier) {
         SimpleParticleType particle = element.particleEmitter.getParticle();
         if (particle == null) return;
 
@@ -360,7 +364,7 @@ public class FurnitureData {
         while (c > 0.0f) {
             c--;
 
-            Vector3f sampledPos = element.sampleRandomPosition(random).mul(1.0f / 16.0f);
+            Vector3f sampledPos = element.sampleRandomPosition(random, direction).mul(1.0f / 16.0f);
             Vector3f up = new Vector3f(element.getRotationAxes().up()).div(Math.abs(element.to.y - element.from.y) + 0.001f);
 
             float vr = element.particleEmitter.velocityRandom / 16.0f;
@@ -378,10 +382,10 @@ public class FurnitureData {
         }
     }
 
-    public void tick(Level level, BlockPos pos, RandomSource random, ParticleConsumer particleConsumer, boolean inScreen, boolean inEditor) {
+    public void tick(Level level, BlockPos pos, Direction direction, RandomSource random, ParticleConsumer particleConsumer, boolean inScreen, boolean inEditor) {
         for (Element element : elements) {
             if (element.type == ElementType.PARTICLE_EMITTER && !element.particleEmitter.onInteract) {
-                emitParticles(pos, random, element, particleConsumer, inScreen, 1.0f);
+                emitParticles(pos, direction, random, element, particleConsumer, inScreen, 1.0f);
             } else if (element.type == ElementType.SOUND_EMITTER && inEditor && element.soundEmitter.frequency > 0 && random.nextFloat() < element.soundEmitter.frequency) {
                 playSound(level, pos, random, element);
             }
@@ -672,16 +676,20 @@ public class FurnitureData {
             return rotationAxes;
         }
 
-        public Vector3f sampleRandomPosition(RandomSource random) {
+        public Vector3f sampleRandomPosition(RandomSource random, Direction direction) {
             ElementRotationAxes axes = getRotationAxes();
             float x = random.nextFloat() - 0.5f;
             float y = random.nextFloat() - 0.5f;
             float z = random.nextFloat() - 0.5f;
-            return new Vector3f(
+            Vector3f pos = new Vector3f(
                     axes.center.x + x * axes.right.x + y * axes.up.x + z * axes.forward.x,
                     axes.center.y + x * axes.right.y + y * axes.up.y + z * axes.forward.y,
                     axes.center.z + x * axes.right.z + y * axes.up.z + z * axes.forward.z
             );
+            if (direction != null) {
+                return rotate(pos, direction);
+            }
+            return pos;
         }
 
         public Vector3f getGlobalDirectionNormal(Direction direction) {

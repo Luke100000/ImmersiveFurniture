@@ -113,7 +113,7 @@ public abstract class ArtisansWorkstationScreen extends Screen {
             // We use the animation tick, which is a triangle distribution based on distance to the player,
             // 0.2f is roughly 4 blocks away
             if (level.getRandom().nextFloat() < 0.2f) {
-                data.tick(level, player.getOnPos(), level.getRandom(), getParticleEngine(data)::addParticle, true, inEditor);
+                data.tick(level, player.getOnPos(), null, level.getRandom(), getParticleEngine(data)::addParticle, true, inEditor);
             }
 
             getParticleEngine(data).tick();

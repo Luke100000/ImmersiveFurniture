@@ -248,7 +248,7 @@ public class ModelComponent extends ScreenComponent {
                 ClientLevel level = Minecraft.getInstance().level;
                 LocalPlayer player = Minecraft.getInstance().player;
                 if (level != null && player != null && screen.selectedElement.particleEmitter.onInteract) {
-                    screen.data.emitInteractParticles(player.getOnPos(), player, getParticleEngine(screen.data)::addParticle, true);
+                    screen.data.emitInteractParticles(player.getOnPos(), null, player, getParticleEngine(screen.data)::addParticle, true);
                 }
             }).setEnabled(!screen.selectedElement.particleEmitter.onInteract);
         } else if (screen.selectedElement.type == FurnitureData.ElementType.SOUND_EMITTER) {

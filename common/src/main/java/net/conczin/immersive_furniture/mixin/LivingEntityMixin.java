@@ -32,23 +32,23 @@ public abstract class LivingEntityMixin extends Entity {
     public abstract boolean isSleeping();
 
     @Unique
-    private boolean immersiveFurniture$IsFurnitureBed() {
-        return this.getSleepingPos().map(blockPos -> {
-            Block block = this.level().getBlockState(blockPos).getBlock();
-            return block instanceof BaseFurnitureBlock || block instanceof FurnitureProxyBlock;
-        }).orElse(false);
+    private boolean immersiveFurniture$IsFurnitureBed(BlockPos pos) {
+        Block block = this.level().getBlockState(pos).getBlock();
+        return block instanceof BaseFurnitureBlock || block instanceof FurnitureProxyBlock;
     }
 
     @Inject(method = "checkBedExists()Z", at = @At("HEAD"), cancellable = true)
     private void immersiveFurniture$checkBedExists(CallbackInfoReturnable<Boolean> cir) {
-        if (immersiveFurniture$IsFurnitureBed()) {
+        Optional<BlockPos> sleepingPos = this.getSleepingPos();
+        if (sleepingPos.isPresent() && immersiveFurniture$IsFurnitureBed(sleepingPos.get())) {
             cir.setReturnValue(true);
         }
     }
 
     @Inject(method = "setPosToBed(Lnet/minecraft/core/BlockPos;)V", at = @At("HEAD"), cancellable = true)
     private void immersiveFurniture$setPosToBed(BlockPos pos, CallbackInfo ci) {
-        if (immersiveFurniture$IsFurnitureBed()) {
+        if (immersiveFurniture$IsFurnitureBed(pos)) {
+            immersiveFurniture$MoveToBed();
             ci.cancel();
         }
     }
@@ -56,19 +56,24 @@ public abstract class LivingEntityMixin extends Entity {
     @Inject(method = "tick", at = @At("TAIL"))
     private void immersiveFurniture$tick(CallbackInfo ci) {
         if (isSleeping()) {
-            InteractionManager.Interaction interaction = InteractionManager.INSTANCE.getInteraction((LivingEntity) (Object) this);
-            if (interaction != null && immersiveFurniture$IsFurnitureBed()) {
-                float rotation = interaction.offset().rotation();
-                setYRot(-rotation - 90f);
-                setYBodyRot(-rotation - 90f);
-                setYHeadRot(-rotation - 90f);
+            immersiveFurniture$MoveToBed();
+        }
+    }
 
-                setPos(
-                        interaction.pos().getX() + interaction.offset().offset().x(),
-                        interaction.pos().getY() + interaction.offset().offset().y(),
-                        interaction.pos().getZ() + interaction.offset().offset().z()
-                );
-            }
+    @Unique
+    private void immersiveFurniture$MoveToBed() {
+        InteractionManager.Interaction interaction = InteractionManager.INSTANCE.getInteraction((LivingEntity) (Object) this);
+        if (interaction != null && immersiveFurniture$IsFurnitureBed(interaction.pos())) {
+            float rotation = interaction.offset().rotation();
+            setYRot(-rotation - 90f);
+            setYBodyRot(-rotation - 90f);
+            setYHeadRot(-rotation - 90f);
+
+            setPos(
+                    interaction.pos().getX() + interaction.offset().offset().x(),
+                    interaction.pos().getY() + interaction.offset().offset().y(),
+                    interaction.pos().getZ() + interaction.offset().offset().z()
+            );
         }
     }
 }

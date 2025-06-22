@@ -389,7 +389,7 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
         }
 
         graphics.pose().pushPose();
-        graphics.pose().translate(0, 0, 100);
+        graphics.pose().translate(0, 0, 1024);
 
         if (authenticating) {
             tickAuthentication();
