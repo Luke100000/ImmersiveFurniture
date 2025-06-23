@@ -9,15 +9,9 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 
-public class FurnitureDataRequest implements ImmersivePayload {
-    public String hash;
-
-    public FurnitureDataRequest(String hash) {
-        this.hash = hash;
-    }
-
+public record FurnitureDataRequest(String hash) implements ImmersivePayload {
     public FurnitureDataRequest(FriendlyByteBuf b) {
-        this.hash = b.readUtf();
+        this(b.readUtf());
     }
 
     @Override

@@ -1,4 +1,4 @@
-package net.conczin.immersive_furniture.network.s2c;
+package net.conczin.immersive_furniture.network.c2s;
 
 import net.conczin.immersive_furniture.Sounds;
 import net.conczin.immersive_furniture.data.FurnitureData;
@@ -16,18 +16,9 @@ import net.minecraft.world.item.ItemStack;
 import static net.conczin.immersive_furniture.item.Items.CRAFTING_MATERIAL;
 import static net.conczin.immersive_furniture.item.Items.FURNITURE;
 
-public class CraftRequest implements ImmersivePayload {
-    FurnitureData data;
-    boolean shift;
-
-    public CraftRequest(FurnitureData data, boolean shift) {
-        this.data = data;
-        this.shift = shift;
-    }
-
+public record CraftRequest(FurnitureData data, boolean shift) implements ImmersivePayload {
     public CraftRequest(FriendlyByteBuf b) {
-        data = new FurnitureData(Utils.fromBytes(b.readByteArray()));
-        shift = b.readBoolean();
+        this(new FurnitureData(Utils.fromBytes(b.readByteArray())), b.readBoolean());
     }
 
     @Override

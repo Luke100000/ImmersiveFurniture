@@ -8,18 +8,9 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 
-public class FurnitureDataResponse implements ImmersivePayload {
-    public String hash;
-    public FurnitureData data;
-
-    public FurnitureDataResponse(String hash, FurnitureData data) {
-        this.hash = hash;
-        this.data = data;
-    }
-
+public record FurnitureDataResponse(String hash, FurnitureData data) implements ImmersivePayload {
     public FurnitureDataResponse(FriendlyByteBuf b) {
-        this.hash = b.readUtf();
-        this.data = new FurnitureData(Utils.fromBytes(b.readByteArray()));
+        this(b.readUtf(), new FurnitureData(Utils.fromBytes(b.readByteArray())));
     }
 
     @Override

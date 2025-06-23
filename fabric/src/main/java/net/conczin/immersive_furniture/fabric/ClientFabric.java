@@ -1,5 +1,6 @@
 package net.conczin.immersive_furniture.fabric;
 
+import net.conczin.immersive_furniture.Common;
 import net.conczin.immersive_furniture.CommonClient;
 import net.conczin.immersive_furniture.block.entity.BlockEntityTypes;
 import net.conczin.immersive_furniture.client.FurnitureBakedModelWrapper;
@@ -52,7 +53,7 @@ public final class ClientFabric implements ClientModInitializer {
 
             @Override
             public ResourceLocation getFabricId() {
-                return new ResourceLocation("immersive_furniture", "on_level_load");
+                return Common.locate("on_level_load");
             }
         });
 

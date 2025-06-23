@@ -9,15 +9,9 @@ import net.minecraft.world.entity.player.Player;
 
 import java.util.Map;
 
-public class FurnitureRegistryMessage implements ImmersivePayload {
-    Map<Integer, String> registry;
-
-    public FurnitureRegistryMessage(Map<Integer, String> registry) {
-        this.registry = registry;
-    }
-
+public record FurnitureRegistryMessage(Map<Integer, String> registry) implements ImmersivePayload {
     public FurnitureRegistryMessage(FriendlyByteBuf b) {
-        this.registry = b.readMap(FriendlyByteBuf::readVarInt, FriendlyByteBuf::readUtf);
+        this(b.readMap(FriendlyByteBuf::readVarInt, FriendlyByteBuf::readUtf));
     }
 
     @Override

@@ -10,7 +10,7 @@ import net.conczin.immersive_furniture.data.api.Auth;
 import net.conczin.immersive_furniture.data.api.responses.*;
 import net.conczin.immersive_furniture.item.Items;
 import net.conczin.immersive_furniture.network.Network;
-import net.conczin.immersive_furniture.network.s2c.CraftRequest;
+import net.conczin.immersive_furniture.network.c2s.CraftRequest;
 import net.conczin.immersive_furniture.utils.Utils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;

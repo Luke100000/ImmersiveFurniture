@@ -10,27 +10,25 @@ import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.player.Player;
 import org.joml.Vector3f;
 
-public class PoseOffsetMessage implements ImmersivePayload {
-    private final BlockPos blockPos;
-    private final Vector3f offset;
-    private final Pose pose;
-    private final float rotation;
-    private final int entityId;
-
+public record PoseOffsetMessage(
+        BlockPos blockPos,
+        Vector3f offset,
+        Pose pose,
+        float rotation,
+        int entityId
+) implements ImmersivePayload {
     public PoseOffsetMessage(BlockPos blockPos, FurnitureData.PoseOffset poseOffset, Entity entity) {
-        this.blockPos = blockPos;
-        this.offset = poseOffset.offset();
-        this.pose = poseOffset.pose();
-        this.rotation = poseOffset.rotation();
-        this.entityId = entity.getId();
+        this(blockPos, poseOffset.offset(), poseOffset.pose(), poseOffset.rotation(), entity.getId());
     }
 
     public PoseOffsetMessage(FriendlyByteBuf buf) {
-        this.blockPos = buf.readBlockPos();
-        this.offset = new Vector3f(buf.readFloat(), buf.readFloat(), buf.readFloat());
-        this.pose = buf.readEnum(Pose.class);
-        this.rotation = buf.readFloat();
-        this.entityId = buf.readInt();
+        this(
+                buf.readBlockPos(),
+                new Vector3f(buf.readFloat(), buf.readFloat(), buf.readFloat()),
+                buf.readEnum(Pose.class),
+                buf.readFloat(),
+                buf.readInt()
+        );
     }
 
     @Override
