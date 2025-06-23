@@ -1,13 +1,15 @@
 package net.conczin.immersive_furniture.network.c2s;
 
+import net.conczin.immersive_furniture.Common;
 import net.conczin.immersive_furniture.Sounds;
 import net.conczin.immersive_furniture.data.FurnitureData;
 import net.conczin.immersive_furniture.item.FurnitureItem;
 import net.conczin.immersive_furniture.network.ImmersivePayload;
-import net.conczin.immersive_furniture.utils.Utils;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -17,17 +19,12 @@ import static net.conczin.immersive_furniture.item.Items.CRAFTING_MATERIAL;
 import static net.conczin.immersive_furniture.item.Items.FURNITURE;
 
 public record CraftRequest(FurnitureData data, boolean shift) implements ImmersivePayload {
-    public CraftRequest(FriendlyByteBuf b) {
-        this(new FurnitureData(Utils.fromBytes(b.readByteArray())), b.readBoolean());
-    }
-
-    @Override
-    public void encode(FriendlyByteBuf b) {
-        CompoundTag tag = data.toTag();
-
-        b.writeByteArray(Utils.toBytes(tag));
-        b.writeBoolean(shift);
-    }
+    public static final CustomPacketPayload.Type<CraftRequest> TYPE = new CustomPacketPayload.Type<>(Common.locate("craft_request"));
+    public static final StreamCodec<FriendlyByteBuf, CraftRequest> STREAM_CODEC = StreamCodec.composite(
+            FurnitureData.STREAM_CODEC, CraftRequest::data,
+            ByteBufCodecs.BOOL, CraftRequest::shift,
+            CraftRequest::new
+    );
 
     @Override
     public void handle(Player e) {
@@ -95,5 +92,10 @@ public record CraftRequest(FurnitureData data, boolean shift) implements Immersi
         if (!e.getInventory().add(stack)) {
             e.drop(stack, false);
         }
+    }
+
+    @Override
+    public Type<CraftRequest> type() {
+        return TYPE;
     }
 }

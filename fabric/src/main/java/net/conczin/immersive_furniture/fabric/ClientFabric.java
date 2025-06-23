@@ -8,9 +8,11 @@ import net.conczin.immersive_furniture.client.renderer.FurnitureBlockEntityRende
 import net.conczin.immersive_furniture.client.renderer.SittingEntityRenderer;
 import net.conczin.immersive_furniture.entity.Entities;
 import net.conczin.immersive_furniture.fabric.client.FabricFurnitureBakedModelWrapper;
+import net.conczin.immersive_furniture.network.Network;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
@@ -30,6 +32,8 @@ public final class ClientFabric implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
+        Network.registerClientSender(ClientPlayNetworking::send);
+
         ClientLifecycleEvents.CLIENT_STARTED.register(event -> CommonClient.postLoad());
         ClientTickEvents.START_CLIENT_TICK.register(event -> CommonClient.tick());
 

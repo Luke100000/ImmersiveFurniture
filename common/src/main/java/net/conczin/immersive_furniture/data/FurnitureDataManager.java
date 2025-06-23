@@ -7,6 +7,7 @@ import net.conczin.immersive_furniture.data.api.responses.Response;
 import net.conczin.immersive_furniture.network.Network;
 import net.conczin.immersive_furniture.network.c2s.FurnitureDataRequest;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtAccounter;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.resources.ResourceLocation;
 
@@ -65,12 +66,12 @@ public class FurnitureDataManager {
         return Arrays.stream(files)
                 .filter(p -> p.getPath().endsWith(".nbt"))
                 .sorted((a, b) -> Long.compare(b.lastModified(), a.lastModified()))
-                .map(p -> new ResourceLocation("local", p.getName().replace(".nbt", "")))
+                .map(p -> ResourceLocation.fromNamespaceAndPath("local", p.getName().replace(".nbt", "")))
                 .toList();
     }
 
     public static ResourceLocation getSafeLocalLocation(FurnitureData data) {
-        return new ResourceLocation("local", toSafeName(data.name.toLowerCase(Locale.ROOT)));
+        return ResourceLocation.fromNamespaceAndPath("local", toSafeName(data.name.toLowerCase(Locale.ROOT)));
     }
 
     public static boolean localFileExists(FurnitureData data) {
@@ -88,7 +89,7 @@ public class FurnitureDataManager {
     public static void save(FurnitureData data, ResourceLocation id) {
         File cache = getFile(id);
         try {
-            NbtIo.writeCompressed(data.toTag(), cache);
+            NbtIo.writeCompressed(data.toTag(), cache.toPath());
             DATA.put(id, data);
         } catch (IOException e) {
             Common.logger.error("Failed to save local file: {}", cache.getPath(), e);
@@ -96,7 +97,7 @@ public class FurnitureDataManager {
     }
 
     public static FurnitureData getData(String hash) {
-        return getData(new ResourceLocation("hash", hash), false);
+        return getData(ResourceLocation.fromNamespaceAndPath("hash", hash), false);
     }
 
     public static FurnitureData getData(ResourceLocation id) {
@@ -111,7 +112,7 @@ public class FurnitureDataManager {
             File cache = getFile(id);
             if (cache.exists()) {
                 try {
-                    CompoundTag tag = NbtIo.readCompressed(cache);
+                    CompoundTag tag = NbtIo.readCompressed(cache.toPath(), NbtAccounter.unlimitedHeap());
                     FurnitureData data = new FurnitureData(tag);
                     DATA.put(id, data);
                 } catch (IOException e) {
@@ -138,10 +139,10 @@ public class FurnitureDataManager {
                     if (response instanceof ContentResponse contentResponse) {
                         ByteArrayInputStream in = new ByteArrayInputStream(Base64.getDecoder().decode(contentResponse.content().data()));
                         try {
-                            FurnitureData data = new FurnitureData(NbtIo.readCompressed(in));
+                            FurnitureData data = new FurnitureData(NbtIo.readCompressed(in, NbtAccounter.unlimitedHeap()));
                             data.contentid = contentid;
                             data.author = contentResponse.content().username();
-                            NbtIo.writeCompressed(data.toTag(), getFile(id));
+                            NbtIo.writeCompressed(data.toTag(), getFile(id).toPath());
                             DATA.put(id, data);
                         } catch (Exception e) {
                             Common.logger.error("Failed to read content response: {}", contentResponse, e);

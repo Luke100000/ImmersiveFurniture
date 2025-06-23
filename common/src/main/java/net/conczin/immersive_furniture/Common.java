@@ -21,7 +21,7 @@ public final class Common {
     public static int entityRendersLast = 0;
 
     public static ResourceLocation locate(String path) {
-        return new ResourceLocation(MOD_ID, path);
+        return ResourceLocation.fromNamespaceAndPath(MOD_ID, path);
     }
 
     public interface RegisterHelper<T> {

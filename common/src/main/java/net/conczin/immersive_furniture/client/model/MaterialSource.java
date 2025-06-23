@@ -31,7 +31,7 @@ public record MaterialSource(
         RotatedMaterial east
 ) {
     public static final MaterialSource DEFAULT = new MaterialSource(
-            new ResourceLocation("minecraft:oak_log"),
+            ResourceLocation.withDefaultNamespace("oak_log"),
             new RotatedMaterial("minecraft:block/oak_log_top"),
             new RotatedMaterial("minecraft:block/oak_log_top"),
             new RotatedMaterial("minecraft:block/oak_log"),

@@ -11,7 +11,7 @@ public class RotatedMaterial {
     private final int rotation;
 
     public RotatedMaterial(String location) {
-        this(InventoryMenu.BLOCK_ATLAS, new ResourceLocation(location), 0);
+        this(InventoryMenu.BLOCK_ATLAS, ResourceLocation.parse(location), 0);
     }
 
     public RotatedMaterial(ResourceLocation atlasLocation, ResourceLocation texture, int rotation) {

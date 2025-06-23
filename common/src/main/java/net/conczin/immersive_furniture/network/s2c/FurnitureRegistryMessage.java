@@ -1,23 +1,25 @@
 package net.conczin.immersive_furniture.network.s2c;
 
+import net.conczin.immersive_furniture.Common;
 import net.conczin.immersive_furniture.data.FurnitureDataManager;
 import net.conczin.immersive_furniture.data.FurnitureRegistry;
 import net.conczin.immersive_furniture.network.ImmersivePayload;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public record FurnitureRegistryMessage(Map<Integer, String> registry) implements ImmersivePayload {
-    public FurnitureRegistryMessage(FriendlyByteBuf b) {
-        this(b.readMap(FriendlyByteBuf::readVarInt, FriendlyByteBuf::readUtf));
-    }
-
-    @Override
-    public void encode(FriendlyByteBuf b) {
-        b.writeMap(registry, FriendlyByteBuf::writeVarInt, FriendlyByteBuf::writeUtf);
-    }
+    public static final CustomPacketPayload.Type<FurnitureRegistryMessage> TYPE = new CustomPacketPayload.Type<>(Common.locate("furniture_registry_message"));
+    public static final StreamCodec<FriendlyByteBuf, FurnitureRegistryMessage> STREAM_CODEC = StreamCodec.composite(
+            ByteBufCodecs.map(HashMap::new, ByteBufCodecs.INT, ByteBufCodecs.STRING_UTF8), FurnitureRegistryMessage::registry,
+            FurnitureRegistryMessage::new
+    );
 
     @Override
     public void handle(Player e) {
@@ -26,7 +28,12 @@ public record FurnitureRegistryMessage(Map<Integer, String> registry) implements
             FurnitureRegistry.INSTANCE.hashToIdentifier.put(entry.getValue(), entry.getKey());
 
             // Download all data now, since it's harder to differentiate between server and client later on
-            FurnitureDataManager.getData(new ResourceLocation("hash", entry.getValue()), true);
+            FurnitureDataManager.getData(ResourceLocation.fromNamespaceAndPath("hash", entry.getValue()), true);
         }
+    }
+
+    @Override
+    public Type<FurnitureRegistryMessage> type() {
+        return TYPE;
     }
 }

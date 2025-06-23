@@ -5,10 +5,10 @@ import net.conczin.immersive_furniture.client.gui.ArtisansWorkstationLibraryScre
 import net.conczin.immersive_furniture.client.gui.widgets.BoundedIntSliderButton;
 import net.conczin.immersive_furniture.client.model.DynamicAtlas;
 import net.conczin.immersive_furniture.client.model.FurnitureModelFactory;
+import net.conczin.immersive_furniture.client.model.MaterialRegistry;
 import net.conczin.immersive_furniture.client.model.MaterialSource;
 import net.conczin.immersive_furniture.data.FurnitureData;
 import net.conczin.immersive_furniture.data.FurnitureDataManager;
-import net.conczin.immersive_furniture.client.model.MaterialRegistry;
 import net.conczin.immersive_furniture.utils.Utils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -135,10 +135,10 @@ public class SettingsComponent extends ScreenComponent {
         for (FurnitureData.Element element : data.elements) {
             if (element.type != FurnitureData.ElementType.ELEMENT) continue;
             ResourceLocation source = MaterialRegistry.INSTANCE.materials.getOrDefault(element.material.source, MaterialSource.DEFAULT).location();
-            ResourceLocation resourceLocation = new ResourceLocation(source.getNamespace(), "textures/" + source.getPath() + ".png");
+            ResourceLocation resourceLocation = ResourceLocation.fromNamespaceAndPath(source.getNamespace(), "textures/" + source.getPath() + ".png");
             Minecraft.getInstance().getResourceManager().getResource(resourceLocation)
                     .ifPresent(resource -> {
-                        if (resource.isBuiltin() || resource.sourcePackId().equals("mod_resources")) {
+                        if (resource.sourcePackId().equals("mod_resources")) {
                             data.sources.add(resourceLocation.getNamespace());
                         } else {
                             data.sources.add(Utils.beatifyPackID(resource.sourcePackId()));

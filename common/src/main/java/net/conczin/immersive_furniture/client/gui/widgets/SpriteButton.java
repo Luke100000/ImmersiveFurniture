@@ -60,12 +60,11 @@ public class SpriteButton extends StateImageButton {
         RenderSystem.setShaderTexture(0, sprite.atlasLocation());
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         Matrix4f matrix4f = graphics.pose().last().pose();
-        BufferBuilder bufferbuilder = Tesselator.getInstance().getBuilder();
-        bufferbuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
-        bufferbuilder.vertex(matrix4f, x, y, (float) blitOffset).uv(sprite.getU0(), sprite.getV0()).endVertex();
-        bufferbuilder.vertex(matrix4f, x, y + size, (float) blitOffset).uv(sprite.getU0(), sprite.getV1()).endVertex();
-        bufferbuilder.vertex(matrix4f, x + size, y + size, (float) blitOffset).uv(sprite.getU1(), sprite.getV1()).endVertex();
-        bufferbuilder.vertex(matrix4f, x + size, y, (float) blitOffset).uv(sprite.getU1(), sprite.getV0()).endVertex();
-        BufferUploader.drawWithShader(bufferbuilder.end());
+        BufferBuilder bufferbuilder = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
+        bufferbuilder.addVertex(matrix4f, x, y, (float) blitOffset).setUv(sprite.getU0(), sprite.getV0());
+        bufferbuilder.addVertex(matrix4f, x, y + size, (float) blitOffset).setUv(sprite.getU0(), sprite.getV1());
+        bufferbuilder.addVertex(matrix4f, x + size, y + size, (float) blitOffset).setUv(sprite.getU1(), sprite.getV1());
+        bufferbuilder.addVertex(matrix4f, x + size, y, (float) blitOffset).setUv(sprite.getU1(), sprite.getV0());
+        BufferUploader.drawWithShader(bufferbuilder.buildOrThrow());
     }
 }

@@ -1,4 +1,4 @@
-package net.conczin.immersive_furniture.forge.client;
+package net.conczin.immersive_furniture.neoforge.client;
 
 import net.conczin.immersive_furniture.client.FurnitureBakedModelWrapper;
 import net.minecraft.client.renderer.RenderType;
@@ -9,14 +9,14 @@ import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.client.ChunkRenderTypeSet;
-import net.minecraftforge.client.extensions.IForgeBakedModel;
-import net.minecraftforge.client.model.data.ModelData;
-import net.minecraftforge.client.model.data.ModelProperty;
+import net.neoforged.neoforge.client.ChunkRenderTypeSet;
+import net.neoforged.neoforge.client.extensions.IBakedModelExtension;
+import net.neoforged.neoforge.client.model.data.ModelData;
+import net.neoforged.neoforge.client.model.data.ModelProperty;
 
 import java.util.List;
 
-public class ForgeFurnitureBakedModelWrapper extends FurnitureBakedModelWrapper implements IForgeBakedModel {
+public class NeoForgeFurnitureBakedModelWrapper extends FurnitureBakedModelWrapper implements IBakedModelExtension {
     public static final ModelProperty<BakedModel> PROPERTY = new ModelProperty<>();
     public static final ModelProperty<RenderType> RENDER_TYPE = new ModelProperty<>();
 

@@ -1,6 +1,7 @@
 package net.conczin.immersive_furniture.client.gui.components;
 
 import net.conczin.immersive_furniture.client.gui.ArtisansWorkstationEditorScreen;
+import net.conczin.immersive_furniture.client.gui.widgets.LegacyImageButton;
 import net.conczin.immersive_furniture.client.gui.widgets.StateImageButton;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.ImageButton;
@@ -34,7 +35,7 @@ public class ScreenComponent {
 
     protected ImageButton addButton(int x, int y, int size, int u, int v, String tooltip, Runnable clicked) {
         ImageButton button = screen.addRenderableWidget(
-                new ImageButton(x, y, size, size, u, v, size, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE,
+                new LegacyImageButton(x, y, size, size, u, v, size, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE,
                         b -> clicked.run(),
                         tooltip == null ? Component.literal("") : Component.translatable(tooltip))
         );

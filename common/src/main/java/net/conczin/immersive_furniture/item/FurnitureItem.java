@@ -5,9 +5,13 @@ import net.conczin.immersive_furniture.data.FurnitureData;
 import net.conczin.immersive_furniture.data.ServerFurnitureRegistry;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.core.Registry;
+import net.minecraft.core.component.DataComponentType;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
@@ -19,14 +23,19 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 public class FurnitureItem extends BlockItem {
-    public static final String FURNITURE = "Furniture";
-    public static final String FURNITURE_HASH = "FurnitureHash";
+    public static final DataComponentType<FurnitureData> FURNITURE = Registry.register(BuiltInRegistries.DATA_COMPONENT_TYPE, "furniture", DataComponentType.<FurnitureData>builder()
+            .persistent(FurnitureData.CODEC)
+            .networkSynchronized(FurnitureData.STREAM_CODEC)
+            .build());
+
+    public static final DataComponentType<String> FURNITURE_HASH = Registry.register(BuiltInRegistries.DATA_COMPONENT_TYPE, "furniture_hash", DataComponentType.<String>builder()
+            .persistent(ExtraCodecs.ESCAPED_STRING)
+            .networkSynchronized(ByteBufCodecs.STRING_UTF8)
+            .build());
 
     public FurnitureItem(Properties settings) {
         super(Blocks.FURNITURE, settings);
@@ -38,33 +47,18 @@ public class FurnitureItem extends BlockItem {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, Level world, List<Component> tooltip, TooltipFlag context) {
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag tooltipFlag) {
         FurnitureData data = getData(stack);
         tooltip.addAll(data.getTooltip(Screen.hasShiftDown()));
-        super.appendHoverText(stack, world, tooltip, context);
+        super.appendHoverText(stack, context, tooltip, tooltipFlag);
     }
 
-    private final static Map<Integer, FurnitureData> cache = new LinkedHashMap<>(100, 0.75f, true) {
-        @Override
-        protected boolean removeEldestEntry(Map.Entry<Integer, FurnitureData> eldest) {
-            return size() > 100;
-        }
-    };
-
     public static FurnitureData getData(ItemStack stack) {
-        CompoundTag tag = stack.getTagElement(BLOCK_ENTITY_TAG);
-        if (tag == null) return FurnitureData.EMPTY;
-        tag = tag.getCompound(FURNITURE);
-        int hash = System.identityHashCode(tag); // Use identity hash since it's way faster
-        if (!cache.containsKey(hash)) {
-            cache.put(hash, new FurnitureData(tag));
-        }
-        return cache.get(hash);
+        return stack.get(FURNITURE);
     }
 
     public static void setData(ItemStack stack, FurnitureData data) {
-        CompoundTag tag = stack.getOrCreateTagElement(BLOCK_ENTITY_TAG);
-        tag.put(FURNITURE, data.toTag());
+        stack.set(FURNITURE, data);
     }
 
     @Override

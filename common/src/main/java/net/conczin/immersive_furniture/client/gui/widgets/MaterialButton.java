@@ -58,10 +58,9 @@ public class MaterialButton extends StateImageButton {
         float y = getY() + height / 2.0f - size / 4 * 2.5f;
 
         RenderSystem.setShaderTexture(0, up.atlasLocation());
-        RenderSystem.setShader(GameRenderer::getPositionColorTexShader);
+        RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
         Matrix4f matrix4f = graphics.pose().last().pose();
-        BufferBuilder bufferBuilder = Tesselator.getInstance().getBuilder();
-        bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR_TEX);
+        BufferBuilder bufferBuilder = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
 
         float lx = x - size;
         float rx = x + size;
@@ -71,25 +70,25 @@ public class MaterialButton extends StateImageButton {
         float ry = y + size / 4 * 7;
 
         // Up
-        bufferBuilder.vertex(matrix4f, x, py, 0).color(1.0f, 1.0f, 1.0f, 1.0f).uv(up.getU0(), up.getV1()).endVertex();
-        bufferBuilder.vertex(matrix4f, lx, y, 0).color(1.0f, 1.0f, 1.0f, 1.0f).uv(up.getU1(), up.getV1()).endVertex();
-        bufferBuilder.vertex(matrix4f, x, cy, 0).color(1.0f, 1.0f, 1.0f, 1.0f).uv(up.getU1(), up.getV0()).endVertex();
-        bufferBuilder.vertex(matrix4f, rx, y, 0).color(1.0f, 1.0f, 1.0f, 1.0f).uv(up.getU0(), up.getV0()).endVertex();
+        bufferBuilder.addVertex(matrix4f, x, py, 0).setUv(up.getU0(), up.getV1()).setColor(1.0f, 1.0f, 1.0f, 1.0f);
+        bufferBuilder.addVertex(matrix4f, lx, y, 0).setUv(up.getU1(), up.getV1()).setColor(1.0f, 1.0f, 1.0f, 1.0f);
+        bufferBuilder.addVertex(matrix4f, x, cy, 0).setUv(up.getU1(), up.getV0()).setColor(1.0f, 1.0f, 1.0f, 1.0f);
+        bufferBuilder.addVertex(matrix4f, rx, y, 0).setUv(up.getU0(), up.getV0()).setColor(1.0f, 1.0f, 1.0f, 1.0f);
 
         // North
         float ng = 0.8f;
-        bufferBuilder.vertex(matrix4f, rx, y, 0).color(ng, ng, ng, 1.0f).uv(north.getU1(), north.getV0()).endVertex();
-        bufferBuilder.vertex(matrix4f, x, cy, 0).color(ng, ng, ng, 1.0f).uv(north.getU0(), north.getV0()).endVertex();
-        bufferBuilder.vertex(matrix4f, x, ry, 0).color(ng, ng, ng, 1.0f).uv(north.getU0(), north.getV1()).endVertex();
-        bufferBuilder.vertex(matrix4f, rx, by, 0).color(ng, ng, ng, 1.0f).uv(north.getU1(), north.getV1()).endVertex();
+        bufferBuilder.addVertex(matrix4f, rx, y, 0).setUv(north.getU1(), north.getV0()).setColor(ng, ng, ng, 1.0f);
+        bufferBuilder.addVertex(matrix4f, x, cy, 0).setUv(north.getU0(), north.getV0()).setColor(ng, ng, ng, 1.0f);
+        bufferBuilder.addVertex(matrix4f, x, ry, 0).setUv(north.getU0(), north.getV1()).setColor(ng, ng, ng, 1.0f);
+        bufferBuilder.addVertex(matrix4f, rx, by, 0).setUv(north.getU1(), north.getV1()).setColor(ng, ng, ng, 1.0f);
 
         // East
         float eg = 0.6f;
-        bufferBuilder.vertex(matrix4f, x, cy, 0).color(eg, eg, eg, 1.0f).uv(east.getU1(), east.getV0()).endVertex();
-        bufferBuilder.vertex(matrix4f, lx, y, 0).color(eg, eg, eg, 1.0f).uv(east.getU0(), east.getV0()).endVertex();
-        bufferBuilder.vertex(matrix4f, lx, by, 0).color(eg, eg, eg, 1.0f).uv(east.getU0(), east.getV1()).endVertex();
-        bufferBuilder.vertex(matrix4f, x, ry, 0).color(eg, eg, eg, 1.0f).uv(east.getU1(), east.getV1()).endVertex();
+        bufferBuilder.addVertex(matrix4f, x, cy, 0).setUv(east.getU1(), east.getV0()).setColor(eg, eg, eg, 1.0f);
+        bufferBuilder.addVertex(matrix4f, lx, y, 0).setUv(east.getU0(), east.getV0()).setColor(eg, eg, eg, 1.0f);
+        bufferBuilder.addVertex(matrix4f, lx, by, 0).setUv(east.getU0(), east.getV1()).setColor(eg, eg, eg, 1.0f);
+        bufferBuilder.addVertex(matrix4f, x, ry, 0).setUv(east.getU1(), east.getV1()).setColor(eg, eg, eg, 1.0f);
 
-        BufferUploader.drawWithShader(bufferBuilder.end());
+        BufferUploader.drawWithShader(bufferBuilder.buildOrThrow());
     }
 }

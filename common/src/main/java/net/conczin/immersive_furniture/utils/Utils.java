@@ -12,14 +12,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.HexFormat;
 
 public class Utils {
-    public static CompoundTag fromBytes(byte[] bytes) {
-        try {
-            return NbtIo.readCompressed(new DataInputStream(new ByteArrayInputStream(bytes)));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     public static byte[] toBytes(CompoundTag tag) {
         ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
         DataOutputStream dataOutput = new DataOutputStream(byteStream);

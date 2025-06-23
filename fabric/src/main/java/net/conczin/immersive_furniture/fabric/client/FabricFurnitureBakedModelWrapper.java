@@ -16,7 +16,7 @@ public class FabricFurnitureBakedModelWrapper extends FurnitureBakedModelWrapper
     public void emitBlockQuads(BlockAndTintGetter blockView, BlockState state, BlockPos pos, Supplier<RandomSource> randomSupplier, RenderContext context) {
         ModelAndRenderType model = getBakedModel(pos, state);
         if (model != null) {
-            VanillaModelEncoder.emitBlockQuads(model.model(), state, randomSupplier, context, context.getEmitter());
+            VanillaModelEncoder.emitBlockQuads(model.model(), state, randomSupplier, context);
         }
     }
 

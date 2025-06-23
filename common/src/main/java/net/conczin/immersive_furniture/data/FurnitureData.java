@@ -1,6 +1,7 @@
 package net.conczin.immersive_furniture.data;
 
 import com.mojang.math.Axis;
+import com.mojang.serialization.Codec;
 import net.conczin.immersive_furniture.config.Config;
 import net.conczin.immersive_furniture.utils.NBTHelper;
 import net.conczin.immersive_furniture.utils.Utils;
@@ -11,7 +12,9 @@ import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
@@ -32,6 +35,16 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class FurnitureData {
+    public static final Codec<FurnitureData> CODEC = CompoundTag.CODEC.xmap(
+            FurnitureData::new,
+            FurnitureData::toTag
+    );
+
+    public static final StreamCodec<FriendlyByteBuf, FurnitureData> STREAM_CODEC = StreamCodec.ofMember(
+            (data, buf) -> buf.writeNbt(data.toTag()),
+            (buf) -> new FurnitureData(buf.readNbt())
+    );
+
     public static final FurnitureData EMPTY = new FurnitureData();
 
     public String name = "Empty";
@@ -720,7 +733,7 @@ public class FurnitureData {
     }
 
     public static class Material {
-        public ResourceLocation source = new ResourceLocation("minecraft:oak_log");
+        public ResourceLocation source = ResourceLocation.withDefaultNamespace("oak_log");
         public int margin = 4;
         public WrapMode wrap = WrapMode.EXPAND;
         public MaterialAxis axis = MaterialAxis.X;
@@ -763,7 +776,7 @@ public class FurnitureData {
     }
 
     public static class ParticleEmitter {
-        public ResourceLocation particle = new ResourceLocation("minecraft:smoke");
+        public ResourceLocation particle = ResourceLocation.withDefaultNamespace("smoke");
         public float velocityDirectional = 0.0f;
         public float velocityRandom = 0.1f;
         public float amount = 0.5f;
@@ -808,7 +821,7 @@ public class FurnitureData {
     }
 
     public static class SoundEmitter {
-        public ResourceLocation sound = new ResourceLocation("minecraft:entity.item.pickup");
+        public ResourceLocation sound = ResourceLocation.withDefaultNamespace("entity.item.pickup");
         public float volume = 1.0f;
         public float pitch = 1.0f;
         public float frequency = 0.1f;
@@ -871,7 +884,7 @@ public class FurnitureData {
     }
 
     public static class Sprite {
-        public ResourceLocation sprite = new ResourceLocation("minecraft:block/soul_fire_1");
+        public ResourceLocation sprite = ResourceLocation.withDefaultNamespace("block/soul_fire_1");
         public int rotation = 0;
         public float size = 1.0f;
 

@@ -1,7 +1,5 @@
 package net.conczin.immersive_furniture.client.model;
 
-import net.conczin.immersive_furniture.Common;
-import net.conczin.immersive_furniture.CommonClient;
 import net.conczin.immersive_furniture.data.FurnitureData;
 import net.conczin.immersive_furniture.utils.CachedSupplier;
 import net.minecraft.client.renderer.block.model.BakedQuad;
@@ -17,8 +15,6 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class FurnitureModelBaker {
-    public static final ResourceLocation LOCATION = Common.locate("block/furniture");
-
     static class ModelBakerImpl implements ModelBaker {
         ModelBakerImpl() {
         }
@@ -132,8 +128,7 @@ public class FurnitureModelBaker {
     private static BakedModel bakeModel(DynamicAtlas atlas, BlockModel model, int yRot) {
         BakedModel bake = model.bake(modelBaker,
                 material -> atlas == DynamicAtlas.BAKED || !material.texture().getNamespace().equals("immersive_furniture") ? material.sprite() : atlas.sprite,
-                BlockModelRotation.by(0, yRot),
-                LOCATION
+                BlockModelRotation.by(0, yRot)
         );
 
         // Copy color (stored in tint index)

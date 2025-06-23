@@ -1,8 +1,10 @@
 package net.conczin.immersive_furniture.entity;
 
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
@@ -63,12 +65,12 @@ public class SittingEntity extends Entity {
     }
 
     @Override
-    public double getPassengersRidingOffset() {
-        return -0.25f;
+    public Vec3 getPassengerRidingPosition(Entity entity) {
+        return super.getPassengerRidingPosition(entity);
     }
 
     @Override
-    protected void defineSynchedData() {
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
 
     }
 

@@ -75,9 +75,9 @@ public abstract class ArtisansWorkstationScreen extends Screen {
     static void renderModel(GuiGraphics graphics, FurnitureData data, double x, double y, double size, float yaw, float pitch) {
         graphics.pose().pushPose();
         graphics.pose().translate(x, y, 100.0);
-        graphics.pose().mulPoseMatrix(new Matrix4f().scaling((float) (size / Math.max(1.0, data.getSize() / 16.0) * 0.4)));
+        graphics.pose().mulPose(new Matrix4f().scaling((float) (size / Math.max(1.0, data.getSize() / 16.0) * 0.4)));
         graphics.pose().mulPose(new Quaternionf().rotateX(pitch).rotateY(yaw));
-        graphics.pose().mulPoseMatrix(new Matrix4f().scaling(1, -1, 1));
+        graphics.pose().mulPose(new Matrix4f().scaling(1, -1, 1));
         Vec3 center = data.boundingBox().getCenter();
         graphics.pose().translate(-center.x / 16.0f, -center.y / 16.0f, -center.z / 16.0f);
         renderModel(graphics, data, yaw, pitch, false);
@@ -134,15 +134,15 @@ public abstract class ArtisansWorkstationScreen extends Screen {
 
         float z = 2.0f;
 
-        vertexConsumer.vertex(matrix4f, x1 - nx + 0.5f, y1 - ny + 0.5f, z1 + z).color(r, g, b, a).endVertex();
-        vertexConsumer.vertex(matrix4f, x1 + nx + 0.5f, y1 + ny + 0.5f, z1 + z).color(r, g, b, a).endVertex();
-        vertexConsumer.vertex(matrix4f, x0 + nx + 0.5f, y0 + ny + 0.5f, z0 + z).color(r, g, b, a).endVertex();
-        vertexConsumer.vertex(matrix4f, x0 - nx + 0.5f, y0 - ny + 0.5f, z0 + z).color(r, g, b, a).endVertex();
+        vertexConsumer.addVertex(matrix4f, x1 - nx + 0.5f, y1 - ny + 0.5f, z1 + z).setColor(r, g, b, a);
+        vertexConsumer.addVertex(matrix4f, x1 + nx + 0.5f, y1 + ny + 0.5f, z1 + z).setColor(r, g, b, a);
+        vertexConsumer.addVertex(matrix4f, x0 + nx + 0.5f, y0 + ny + 0.5f, z0 + z).setColor(r, g, b, a);
+        vertexConsumer.addVertex(matrix4f, x0 - nx + 0.5f, y0 - ny + 0.5f, z0 + z).setColor(r, g, b, a);
     }
 
     @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
-        renderBackground(graphics);
+        renderBackground(graphics, mouseX, mouseY, delta);
 
         super.render(graphics, mouseX, mouseY, delta);
     }

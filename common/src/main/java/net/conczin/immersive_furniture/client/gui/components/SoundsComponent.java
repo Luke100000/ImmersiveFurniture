@@ -1,6 +1,7 @@
 package net.conczin.immersive_furniture.client.gui.components;
 
 import net.conczin.immersive_furniture.client.gui.ArtisansWorkstationEditorScreen;
+import net.conczin.immersive_furniture.client.gui.widgets.LegacyImageButton;
 import net.conczin.immersive_furniture.utils.Utils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.components.Button;
@@ -51,7 +52,7 @@ public class SoundsComponent extends ListComponent {
             buttons.add(button);
 
             // Sample sound button
-            screen.addRenderableWidget(new ImageButton(
+            screen.addRenderableWidget(new LegacyImageButton(
                     leftPos + width - 23, y, 18, 18, 238, 220, 18, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE,
                     b -> {
                         if (finalI >= locations.size()) return;

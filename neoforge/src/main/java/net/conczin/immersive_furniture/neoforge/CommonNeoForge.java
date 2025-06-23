@@ -1,4 +1,4 @@
-package net.conczin.immersive_furniture.forge;
+package net.conczin.immersive_furniture.neoforge;
 
 import net.conczin.immersive_furniture.Common;
 import net.conczin.immersive_furniture.Sounds;
@@ -12,28 +12,25 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
-import net.minecraftforge.network.NetworkDirection;
-import net.minecraftforge.network.NetworkRegistry;
-import net.minecraftforge.network.simple.SimpleChannel;
-import net.minecraftforge.registries.RegisterEvent;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
+import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
+import net.neoforged.neoforge.network.registration.PayloadRegistrar;
+import net.neoforged.neoforge.registries.RegisterEvent;
 
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 @Mod(Common.MOD_ID)
-@Mod.EventBusSubscriber(modid = Common.MOD_ID, bus = Bus.MOD)
-public final class CommonForge {
+@EventBusSubscriber(modid = Common.MOD_ID)
+public final class CommonNeoForge {
     private static <T> void registerHelper(RegisterEvent event, Registry<T> register, Consumer<Common.RegisterHelper<T>> consumer) {
-        event.register(
-                register.key(),
-                registry -> consumer.accept(registry::register)
-        );
+        event.register(register.key(), registry -> consumer.accept(registry::register));
     }
 
     @SubscribeEvent
@@ -54,36 +51,29 @@ public final class CommonForge {
         }
     }
 
-    private static final String PROTOCOL_VERSION = "1";
-    public static final SimpleChannel INSTANCE = NetworkRegistry.newSimpleChannel(
-            Common.locate("main"),
-            () -> PROTOCOL_VERSION,
-            PROTOCOL_VERSION::equals,
-            PROTOCOL_VERSION::equals
-    );
-    private static int id = 0;
 
+    static class NeoForgeRegistrar implements Network.Registrar {
+        PayloadRegistrar registrar;
 
-    static class ForgeRegistrar implements Network.Registrar {
+        public NeoForgeRegistrar(PayloadRegistrar registrar) {
+            this.registrar = registrar;
+        }
+
         @Override
-        public <T extends ImmersivePayload> void register(Class<T> msg, Function<FriendlyByteBuf, T> constructor) {
-            INSTANCE.registerMessage(
-                    id++,
-                    msg,
-                    ImmersivePayload::encode,
-                    constructor,
-                    (m, ctx) -> {
-                        ctx.get().enqueueWork(() -> m.handle(ctx.get().getSender()));
-                        ctx.get().setPacketHandled(true);
-                    }
-            );
+        public <T extends ImmersivePayload> void register(ImmersivePayload.Type<T> type, StreamCodec<FriendlyByteBuf, T> codec, boolean isServer) {
+            if (isServer) {
+                registrar.playToServer(type, codec, (payload, ctx) -> ctx.enqueueWork(() -> payload.handle(ctx.player())));
+            } else {
+                registrar.playToClient(type, codec, (payload, ctx) -> ctx.enqueueWork(() -> payload.handle(ctx.player())));
+            }
         }
     }
 
-    static {
-        Network.register(new ForgeRegistrar());
-        Network.registerSender((payload, player) -> INSTANCE.sendTo(payload, player.connection.connection, NetworkDirection.PLAY_TO_CLIENT));
-        Network.registerClientSender(INSTANCE::sendToServer);
+    @SubscribeEvent
+    public static void registerNetwork(final RegisterPayloadHandlersEvent event) {
+        Network.register(new NeoForgeRegistrar(event.registrar("1")));
+        Network.registerSender(PacketDistributor::sendToPlayer);
+        Network.registerClientSender(PacketDistributor::sendToServer);
     }
 
     @SubscribeEvent

@@ -7,7 +7,7 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.resources.ResourceLocation;
 
 public class SittingEntityRenderer extends EntityRenderer<SittingEntity> {
-    public static final ResourceLocation TEXTURE = new ResourceLocation("empty");
+    public static final ResourceLocation TEXTURE = ResourceLocation.withDefaultNamespace("empty");
 
     public SittingEntityRenderer(EntityRendererProvider.Context context) {
         super(context);

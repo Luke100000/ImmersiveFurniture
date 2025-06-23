@@ -9,7 +9,6 @@ import net.conczin.immersive_furniture.block.entity.FurnitureBlockEntity;
 import net.conczin.immersive_furniture.client.model.DynamicAtlas;
 import net.conczin.immersive_furniture.client.model.FurnitureModelBaker;
 import net.conczin.immersive_furniture.data.FurnitureData;
-import net.conczin.immersive_furniture.item.FurnitureItem;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.BakedQuad;
@@ -20,15 +19,15 @@ import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.inventory.InventoryMenu;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.Vec3;
 
 import java.util.List;
 
 import static net.minecraft.world.level.SignalGetter.DIRECTIONS;
 
 public class FurnitureBlockEntityRenderer<T extends FurnitureBlockEntity> implements BlockEntityRenderer<T> {
+    public static final float[] BRIGHTNESS = {1.0F, 1.0F, 1.0F, 1.0F};
+
     public FurnitureBlockEntityRenderer(BlockEntityRendererProvider.Context ignoredContext) {
         // NO-OP
     }
@@ -96,7 +95,7 @@ public class FurnitureBlockEntityRenderer<T extends FurnitureBlockEntity> implem
         for (BakedQuad quad : quads) {
             ResourceLocation resourceLocation = quad.getSprite().atlasLocation();
             if (resourceLocation.getNamespace().equals("minecraft") != blocksAtlas) continue;
-            consumer.putBulkData(pose, quad, new float[]{1.0F, 1.0F, 1.0F, 1.0F}, 1.0f, 1.0f, 1.0f, new int[]{packedLight, packedLight, packedLight, packedLight}, packedOverlay, true);
+            consumer.putBulkData(pose, quad, BRIGHTNESS, 1.0f, 1.0f, 1.0f, 1.0f, new int[]{packedLight, packedLight, packedLight, packedLight}, packedOverlay, true);
         }
     }
 }

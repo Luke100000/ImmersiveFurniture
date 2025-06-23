@@ -2,13 +2,13 @@ package net.conczin.immersive_furniture.block;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -92,7 +92,7 @@ public class FurnitureProxyBlock extends Block {
     }
 
     @Override
-    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         // Forward the interaction to the base block
         BaseFurnitureBlock baseBlock = getBaseBlock(level, state, pos);
         if (baseBlock != null) {
@@ -107,14 +107,14 @@ public class FurnitureProxyBlock extends Block {
                     hit.isInside()
             );
 
-            return baseBlock.use(baseState, level, basePos, player, hand, adjustedHit);
+            baseState.useWithoutItem(level, player, adjustedHit);
         }
 
         return InteractionResult.PASS;
     }
 
     @Override
-    public void playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
+    public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
         // When proxy is destroyed, destroy the base block too if it exists
         if (!level.isClientSide) {
             BlockPos basePos = getBasePos(state, pos);
@@ -126,6 +126,7 @@ public class FurnitureProxyBlock extends Block {
         }
 
         super.playerWillDestroy(level, pos, state, player);
+        return state;
     }
 
     @Override
@@ -139,7 +140,7 @@ public class FurnitureProxyBlock extends Block {
     }
 
     @Override
-    public ItemStack getCloneItemStack(BlockGetter level, BlockPos pos, BlockState state) {
+    public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state) {
         BlockPos basePos = getBasePos(state, pos);
         BlockState baseState = level.getBlockState(basePos);
         if (baseState.getBlock() instanceof BaseFurnitureBlock baseBlock) {

@@ -3,8 +3,8 @@ package net.conczin.immersive_furniture.block.entity;
 import net.conczin.immersive_furniture.config.Config;
 import net.conczin.immersive_furniture.data.FurnitureData;
 import net.conczin.immersive_furniture.data.FurnitureDataManager;
-import net.conczin.immersive_furniture.item.FurnitureItem;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -26,6 +26,9 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class FurnitureBlockEntity extends BlockEntity implements Container, MenuProvider {
+    public static final String FURNITURE = "Furniture";
+    public static final String FURNITURE_HASH = "FurnitureHash";
+
     private String hash;
     private FurnitureData data;
 
@@ -36,34 +39,34 @@ public class FurnitureBlockEntity extends BlockEntity implements Container, Menu
     }
 
     @Override
-    public void load(CompoundTag tag) {
-        super.load(tag);
+    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.loadAdditional(tag, registries);
 
-        ContainerHelper.loadAllItems(tag, this.items);
+        ContainerHelper.loadAllItems(tag, this.items, registries);
 
-        if (tag.contains(FurnitureItem.FURNITURE)) {
-            this.data = new FurnitureData(tag.getCompound(FurnitureItem.FURNITURE));
-        } else if (tag.contains(FurnitureItem.FURNITURE_HASH)) {
+        if (tag.contains(FURNITURE)) {
+            this.data = new FurnitureData(tag.getCompound(FURNITURE));
+        } else if (tag.contains(FURNITURE_HASH)) {
             // Delay loading
-            hash = tag.getString(FurnitureItem.FURNITURE_HASH);
+            hash = tag.getString(FURNITURE_HASH);
         }
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tag) {
-        super.saveAdditional(tag);
+    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.saveAdditional(tag, registries);
 
-        ContainerHelper.saveAllItems(tag, this.items);
+        ContainerHelper.saveAllItems(tag, this.items, registries);
 
         if (this.data != null) {
             if (Config.getInstance().saveAsHash) {
-                FurnitureDataManager.save(data, new ResourceLocation("hash", this.data.getHash()));
-                tag.putString(FurnitureItem.FURNITURE_HASH, this.data.getHash());
+                FurnitureDataManager.save(data, ResourceLocation.fromNamespaceAndPath("hash", this.data.getHash()));
+                tag.putString(FURNITURE_HASH, this.data.getHash());
             } else {
-                tag.put(FurnitureItem.FURNITURE, this.data.toTag());
+                tag.put(FURNITURE, this.data.toTag());
             }
         } else if (hash != null) {
-            tag.putString(FurnitureItem.FURNITURE_HASH, hash);
+            tag.putString(FURNITURE_HASH, hash);
         }
     }
 
@@ -72,13 +75,13 @@ public class FurnitureBlockEntity extends BlockEntity implements Container, Menu
     }
 
     @Override
-    public CompoundTag getUpdateTag() {
-        return this.saveWithoutMetadata();
+    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+        return saveWithoutMetadata(registries);
     }
 
     public FurnitureData getData() {
         if (hash != null) {
-            data = FurnitureDataManager.getData(new ResourceLocation("hash", hash), level != null && level.isClientSide);
+            data = FurnitureDataManager.getData(ResourceLocation.fromNamespaceAndPath("hash", hash), level != null && level.isClientSide);
             if (data != null) {
                 hash = null;
             }

@@ -3,6 +3,7 @@ package net.conczin.immersive_furniture.data;
 import net.conczin.immersive_furniture.config.Config;
 import net.conczin.immersive_furniture.network.Network;
 import net.conczin.immersive_furniture.network.s2c.FurnitureRegistryMessage;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -13,7 +14,10 @@ import java.util.Map;
 
 public class ServerFurnitureRegistry {
     public static FurnitureRegistrySavedData getData(ServerLevel level) {
-        return level.getServer().overworld().getDataStorage().computeIfAbsent(FurnitureRegistrySavedData::new, FurnitureRegistrySavedData::new, "immersive_furniture");
+        //noinspection DataFlowIssue
+        return level.getServer().overworld().getDataStorage().computeIfAbsent(new SavedData.Factory<>(
+                FurnitureRegistrySavedData::new, FurnitureRegistrySavedData::new, null
+        ), "immersive_furniture");
     }
 
     public static void increase(ServerLevel level, FurnitureData data) {
@@ -90,7 +94,7 @@ public class ServerFurnitureRegistry {
 
         }
 
-        public FurnitureRegistrySavedData(CompoundTag nbt) {
+        public FurnitureRegistrySavedData(CompoundTag nbt, HolderLookup.Provider provider) {
             CompoundTag usageCountTag = nbt.getCompound("usageCount");
             usageCountTag.getAllKeys().forEach(key ->
                     usageCount.put(key, usageCountTag.getInt(key)));
@@ -103,7 +107,7 @@ public class ServerFurnitureRegistry {
         }
 
         @Override
-        public CompoundTag save(CompoundTag nbt) {
+        public CompoundTag save(CompoundTag nbt, HolderLookup.Provider provider) {
             CompoundTag usageCountTag = new CompoundTag();
             usageCount.forEach(usageCountTag::putInt);
             nbt.put("usageCount", usageCountTag);

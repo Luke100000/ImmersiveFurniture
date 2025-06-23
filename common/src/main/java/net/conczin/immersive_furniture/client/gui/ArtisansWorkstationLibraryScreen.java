@@ -2,6 +2,7 @@ package net.conczin.immersive_furniture.client.gui;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import net.conczin.immersive_furniture.Common;
+import net.conczin.immersive_furniture.client.gui.widgets.LegacyImageButton;
 import net.conczin.immersive_furniture.client.gui.widgets.StateImageButton;
 import net.conczin.immersive_furniture.data.FurnitureData;
 import net.conczin.immersive_furniture.data.FurnitureDataManager;
@@ -23,7 +24,9 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.Level;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -137,7 +140,7 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
 
             // Sort by date
             addRenderableWidget(
-                    new ImageButton(leftPos + 3, y, 22, 22, sortByDate ? 88 : 66, 48, 22, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE, b -> {
+                    new LegacyImageButton(leftPos + 3, y, 22, 22, sortByDate ? 88 : 66, 48, 22, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE, b -> {
                         sortByDate = !sortByDate;
                         shouldSearch = true;
                         init();
@@ -146,14 +149,14 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
 
             // Page buttons
             addRenderableWidget(
-                    new ImageButton(leftPos + windowWidth / 2 - 24 - 6, y + 4, 12, 15, 13, 226, 15, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE, b -> {
+                    new LegacyImageButton(leftPos + windowWidth / 2 - 24 - 6, y + 4, 12, 15, 13, 226, 15, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE, b -> {
                         page = Math.max(0, page - 1);
                         shouldSearch = true;
                         init();
                     })
             );
             addRenderableWidget(
-                    new ImageButton(leftPos + windowWidth / 2 + 24 - 6, y + 4, 12, 15, 0, 226, 15, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE, b -> {
+                    new LegacyImageButton(leftPos + windowWidth / 2 + 24 - 6, y + 4, 12, 15, 0, 226, 15, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE, b -> {
                         page += 1;
                         shouldSearch = true;
                         init();
@@ -307,8 +310,8 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
     }
 
     @Override
-    public void renderBackground(GuiGraphics graphics) {
-        super.renderBackground(graphics);
+    public void renderBackground(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+        super.renderBackground(graphics, mouseX, mouseY, delta);
 
         if (selected == null) {
             drawRectangle(graphics, leftPos, topPos, windowWidth, 38);
@@ -382,8 +385,8 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
                 graphics.pose().popPose();
 
                 // Material tooltip
-                if (lastMouseX >= leftPos + windowWidth - 32 - 6 && lastMouseX < leftPos + windowWidth - 6 && lastMouseY >= topPos + windowHeight - 32 - 32 && lastMouseY < topPos + windowHeight - 32) {
-                    tooltip = Items.CRAFTING_MATERIAL.getDefaultInstance().getTooltipLines(null, TooltipFlag.Default.NORMAL);
+                if (lastMouseX >= leftPos + windowWidth - 32 - 6 && lastMouseX < leftPos + windowWidth - 6 && lastMouseY >= topPos + windowHeight - 32 - 32 && lastMouseY < topPos + windowHeight - 32 && data.getCost() > 0) {
+                    tooltip = Items.CRAFTING_MATERIAL.getDefaultInstance().getTooltipLines(Item.TooltipContext.of((Level) null), null, TooltipFlag.Default.NORMAL);
                 }
             }
         }
@@ -426,7 +429,7 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
 
     protected ImageButton addButton(int x, int y, int size, int u, int v, String tooltip, Runnable clicked) {
         ImageButton button = addRenderableWidget(
-                new ImageButton(x, y, size, size, u, v, size, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE,
+                new LegacyImageButton(x, y, size, size, u, v, size, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE,
                         b -> clicked.run(),
                         tooltip == null ? Component.literal("") : Component.translatable(tooltip))
         );
@@ -561,7 +564,7 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
 
                 if (response instanceof ContentListResponse contentListResponse) {
                     furniture = Arrays.stream(contentListResponse.contents())
-                            .map(c -> new ResourceLocation("library", c.contentid() + "." + c.version()))
+                            .map(c -> ResourceLocation.fromNamespaceAndPath("library", c.contentid() + "." + c.version()))
                             .collect(Collectors.toList());
                     Minecraft.getInstance().execute(this::init);
                 } else {

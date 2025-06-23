@@ -17,6 +17,7 @@ import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.core.particles.ParticleOptions;
+import org.joml.Matrix4fStack;
 
 import java.util.*;
 
@@ -64,9 +65,9 @@ public class PreviewParticleEngine {
     public void render(PoseStack poseStack, LightTexture lightTexture, Camera camera, float partialTicks) {
         lightTexture.turnOnLightLayer();
         RenderSystem.enableDepthTest();
-        PoseStack viewStack = RenderSystem.getModelViewStack();
-        viewStack.pushPose();
-        viewStack.mulPoseMatrix(poseStack.last().pose());
+        Matrix4fStack viewStack = RenderSystem.getModelViewStack();
+        viewStack.pushMatrix();
+        viewStack.mul(poseStack.last().pose());
 
         RenderSystem.applyModelViewMatrix();
 
@@ -77,14 +78,15 @@ public class PreviewParticleEngine {
             if (iterable == null) continue;
             RenderSystem.setShader(GameRenderer::getParticleShader);
             Tesselator tesselator = Tesselator.getInstance();
-            BufferBuilder bufferBuilder = tesselator.getBuilder();
-            particleRenderType.begin(bufferBuilder, textureManager);
-            for (Particle particle : iterable) {
-                particle.render(bufferBuilder, camera, partialTicks);
+            BufferBuilder bufferbuilder = particleRenderType.begin(tesselator, textureManager);
+            if (bufferbuilder != null) {
+                particleRenderType.begin(tesselator, textureManager);
+                for (Particle particle : iterable) {
+                    particle.render(bufferbuilder, camera, partialTicks);
+                }
             }
-            particleRenderType.end(tesselator);
         }
-        viewStack.popPose();
+        viewStack.popMatrix();
         RenderSystem.applyModelViewMatrix();
         RenderSystem.depthMask(true);
         RenderSystem.disableBlend();

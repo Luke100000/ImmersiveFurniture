@@ -8,6 +8,7 @@ import net.minecraft.client.renderer.texture.SpriteContents;
 import net.minecraft.client.resources.metadata.animation.AnimationMetadataSection;
 import net.minecraft.client.resources.metadata.animation.FrameSize;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.ResourceMetadata;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -39,7 +40,7 @@ public class DynamicAtlas extends DynamicTexture {
         location = Common.locate("immersive_furniture_atlas/" + name);
         Minecraft.getInstance().getTextureManager().register(location, this);
 
-        SpriteContents contents = new SpriteContents(location, new FrameSize(size, size), Objects.requireNonNull(getPixels()), AnimationMetadataSection.EMPTY);
+        SpriteContents contents = new SpriteContents(location, new FrameSize(size, size), Objects.requireNonNull(getPixels()), ResourceMetadata.EMPTY);
         sprite = new TextureAtlasSpriteAccessor(location, contents, size, size, 0, 0);
 
         clear();

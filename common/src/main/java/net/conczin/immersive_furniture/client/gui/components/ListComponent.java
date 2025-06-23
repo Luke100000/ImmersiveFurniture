@@ -1,6 +1,7 @@
 package net.conczin.immersive_furniture.client.gui.components;
 
 import net.conczin.immersive_furniture.client.gui.ArtisansWorkstationEditorScreen;
+import net.conczin.immersive_furniture.client.gui.widgets.LegacyImageButton;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
@@ -41,13 +42,13 @@ public abstract class ListComponent extends ScreenComponent {
 
         // Page buttons
         screen.addRenderableWidget(
-                new ImageButton(leftPos + 6, topPos + height - 21, 12, 15, 13, 226, 15, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE, b -> {
+                new LegacyImageButton(leftPos + 6, topPos + height - 21, 12, 15, 13, 226, 15, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE, b -> {
                     page = Math.max(0, page - 1);
                     updateSearch();
                 })
         );
         screen.addRenderableWidget(
-                new ImageButton(leftPos + width - 18, topPos + height - 21, 12, 15, 0, 226, 15, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE, b -> {
+                new LegacyImageButton(leftPos + width - 18, topPos + height - 21, 12, 15, 0, 226, 15, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE, b -> {
                     page += 1;
                     updateSearch();
                 })

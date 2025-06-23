@@ -1,22 +1,21 @@
-package net.conczin.immersive_furniture.forge;
+package net.conczin.immersive_furniture.neoforge;
 
 import net.conczin.immersive_furniture.Common;
 import net.conczin.immersive_furniture.CommonClient;
 import net.conczin.immersive_furniture.data.ServerFurnitureRegistry;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.entity.EntityJoinLevelEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 
 
-@Mod.EventBusSubscriber(modid = Common.MOD_ID)
-public class ForgeBusEvents {
+@EventBusSubscriber(modid = Common.MOD_ID)
+public class NeoForgeBusEvents {
     public static boolean firstLoad = true;
 
     @SubscribeEvent
-    public static void onClientStart(TickEvent.ClientTickEvent event) {
-        //forge decided to be funny and won't trigger the client load event
+    public static void onClientStart(ClientTickEvent.Post event) {
         if (firstLoad) {
             CommonClient.postLoad();
             firstLoad = false;
@@ -24,10 +23,8 @@ public class ForgeBusEvents {
     }
 
     @SubscribeEvent
-    public static void tick(TickEvent event) {
-        if (event.type == TickEvent.Type.CLIENT && event.phase == TickEvent.Phase.START) {
-            CommonClient.tick();
-        }
+    public static void tick(ClientTickEvent.Pre event) {
+        CommonClient.tick();
     }
 
     @SubscribeEvent

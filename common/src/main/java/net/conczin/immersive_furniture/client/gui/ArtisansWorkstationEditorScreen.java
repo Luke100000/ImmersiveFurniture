@@ -173,8 +173,8 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
     }
 
     @Override
-    public void renderBackground(GuiGraphics graphics) {
-        super.renderBackground(graphics);
+    public void renderBackground(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+        super.renderBackground(graphics, mouseX, mouseY, delta);
 
         // Background
         drawRectangle(graphics, leftPos, topPos, TOOLS_WIDTH, windowHeight);
@@ -375,10 +375,10 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
     }
 
     @Override
-    public boolean mouseScrolled(double mouseX, double mouseY, double delta) {
-        camZoom = Math.max(20.0f, Math.min(120.0f, camZoom + (float) delta * 0.1f * camZoom));
+    public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+        camZoom = Math.max(20.0f, Math.min(120.0f, camZoom + (float) scrollY * 0.1f * camZoom));
 
-        return super.mouseScrolled(mouseX, mouseY, delta);
+        return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
     }
 
     final class DraggingContext {
@@ -447,12 +447,12 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
     protected void drawModel(GuiGraphics graphics, FurnitureData data, int x, int y, float size, float yaw, float pitch, int mouseX, int mouseY) {
         graphics.pose().pushPose();
         graphics.pose().translate(x, y, 1024.0);
-        graphics.pose().mulPoseMatrix(new Matrix4f().scaling(size));
+        graphics.pose().mulPose(new Matrix4f().scaling(size));
         graphics.pose().mulPose(new Quaternionf().rotateX(pitch).rotateY(yaw));
         graphics.pose().translate(-data.size.x / 2.0f, data.size.y / 2.0f, -data.size.z / 2.0f);
-        graphics.pose().mulPoseMatrix(new Matrix4f().scaling(1, -1, 1));
+        graphics.pose().mulPose(new Matrix4f().scaling(1, -1, 1));
 
-        Lighting.setupLevel(new Matrix4f().rotateX(pitch).rotateY(yaw));
+        Lighting.setupLevel();
 
         // Render the model
         renderModel(graphics, data, yaw, pitch, true);
@@ -528,13 +528,12 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
         RenderSystem.enableBlend();
         RenderSystem.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
         Matrix4f matrix4f = graphics.pose().last().pose();
-        BufferBuilder builder = Tesselator.getInstance().getBuilder();
-        builder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
-        builder.vertex(matrix4f, 0.0f, 0.001f, 0.0f).uv(0.0f, 0.0f).color(1.0f, 1.0f, 1.0f, 0.5f).endVertex();
-        builder.vertex(matrix4f, 0.0f, 0.001f, h).uv(0.0f, h / 8.0f).color(1.0f, 1.0f, 1.0f, 0.5f).endVertex();
-        builder.vertex(matrix4f, w, 0.001f, h).uv(w / 8.0f, h / 8.0f).color(1.0f, 1.0f, 1.0f, 0.5f).endVertex();
-        builder.vertex(matrix4f, w, 0.001f, 0.0f).uv(w / 8.0f, 0.0f).color(1.0f, 1.0f, 1.0f, 0.5f).endVertex();
-        BufferUploader.drawWithShader(builder.end());
+        BufferBuilder builder = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
+        builder.addVertex(matrix4f, 0.0f, 0.001f, 0.0f).setUv(0.0f, 0.0f).setColor(1.0f, 1.0f, 1.0f, 0.5f);
+        builder.addVertex(matrix4f, 0.0f, 0.001f, h).setUv(0.0f, h / 8.0f).setColor(1.0f, 1.0f, 1.0f, 0.5f);
+        builder.addVertex(matrix4f, w, 0.001f, h).setUv(w / 8.0f, h / 8.0f).setColor(1.0f, 1.0f, 1.0f, 0.5f);
+        builder.addVertex(matrix4f, w, 0.001f, 0.0f).setUv(w / 8.0f, 0.0f).setColor(1.0f, 1.0f, 1.0f, 0.5f);
+        BufferUploader.drawWithShader(builder.buildOrThrow());
         RenderSystem.disableBlend();
         RenderSystem.enableCull();
     }

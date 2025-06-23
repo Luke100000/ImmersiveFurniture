@@ -18,7 +18,6 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.level.block.state.BlockState;
 
-import javax.annotation.Nullable;
 import java.util.List;
 
 public class FurnitureBakedModelWrapper implements BakedModel {
@@ -52,7 +51,7 @@ public class FurnitureBakedModelWrapper implements BakedModel {
     }
 
     @Override
-    public List<BakedQuad> getQuads(@Nullable BlockState blockState, @Nullable Direction direction, RandomSource randomSource) {
+    public List<BakedQuad> getQuads(BlockState blockState, Direction direction, RandomSource randomSource) {
         return List.of();
     }
 
@@ -78,7 +77,7 @@ public class FurnitureBakedModelWrapper implements BakedModel {
 
     @Override
     public TextureAtlasSprite getParticleIcon() {
-        return Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(new ResourceLocation("block/oak_planks"));
+        return Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(ResourceLocation.withDefaultNamespace("block/oak_planks"));
     }
 
     @Override
