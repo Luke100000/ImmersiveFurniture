@@ -17,7 +17,6 @@ Initial release
 # TODO
 
 * Hue is still broken af
-* Swap axis on move furniture, its opengl style
 * Double atlas sizes
 * Do not reset transparency flags on non-scratch models
 * Presort transparent elements

@@ -63,16 +63,16 @@ public class ModelComponent extends ScreenComponent {
             int spacing = 24;
 
             // X offset
-            addButton(x, y, 16, 160, 224, "gui.immersive_furniture.move_furniture_west", () -> moveFurniture(-1.0f, 0, 0));
-            addButton(x, y + 29, 16, 192, 224, "gui.immersive_furniture.move_furniture_east", () -> moveFurniture(1.0f, 0, 0));
+            addButton(x, y, 16, 160, 224, "gui.immersive_furniture.move_furniture_east", () -> moveFurniture(1.0f, 0, 0));
+            addButton(x, y + 29, 16, 192, 224, "gui.immersive_furniture.move_furniture_west", () -> moveFurniture(-1.0f, 0, 0));
 
             // Y offset
-            addButton(x + spacing, y, 16, 160, 224, "gui.immersive_furniture.move_furniture_down", () -> moveFurniture(0, -1.0f, 0));
-            addButton(x + spacing, y + 29, 16, 192, 224, "gui.immersive_furniture.move_furniture_up", () -> moveFurniture(0, 1.0f, 0));
+            addButton(x + spacing, y, 16, 160, 224, "gui.immersive_furniture.move_furniture_up", () -> moveFurniture(0, 1.0f, 0));
+            addButton(x + spacing, y + 29, 16, 192, 224, "gui.immersive_furniture.move_furniture_down", () -> moveFurniture(0, -1.0f, 0));
 
             // Z offset
-            addButton(x + spacing * 2, y, 16, 160, 224, "gui.immersive_furniture.move_furniture_north", () -> moveFurniture(0, 0, -1.0f));
-            addButton(x + spacing * 2, y + 29, 16, 192, 224, "gui.immersive_furniture.move_furniture_south", () -> moveFurniture(0, 0, 1.0f));
+            addButton(x + spacing * 2, y, 16, 160, 224, "gui.immersive_furniture.move_furniture_south", () -> moveFurniture(0, 0, 1.0f));
+            addButton(x + spacing * 2, y + 29, 16, 192, 224, "gui.immersive_furniture.move_furniture_north", () -> moveFurniture(0, 0, -1.0f));
 
             int dimY = topPos + 45;
             int maxDimension = 4;
