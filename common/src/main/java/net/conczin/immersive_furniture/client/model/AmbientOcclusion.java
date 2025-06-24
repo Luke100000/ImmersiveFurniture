@@ -18,7 +18,7 @@ public class AmbientOcclusion {
     private static final double SAMPLE_RESOLUTION = Math.sqrt(3);
     private static final float RESOLUTION = 0.25f;
 
-    record PrecomputedElement(FurnitureData.Element element, Quaternionf rotation, Vector3f origin) {
+    record PrecomputedElement(FurnitureData.Element element, Quaternionf rotation, Vector3f origin, float opacity) {
 
     }
 
@@ -48,13 +48,17 @@ public class AmbientOcclusion {
         return elementCache.computeIfAbsent(key, k -> new ObjectOpenHashSet<>());
     }
 
-    public void place(FurnitureData.Element element) {
+    public void place(FurnitureData.Element element, float opacity) {
         Vector3f center = element.getCenter();
         Vector3i size = element.getSize();
 
         ElementRotation elementRotation = element.getRotation();
         Quaternionf rotation = getElementRotation(elementRotation);
-        PrecomputedElement precomputed = new PrecomputedElement(element, new Quaternionf(rotation).conjugate(), element.getOrigin().mul(16.0f));
+        PrecomputedElement precomputed = new PrecomputedElement(
+                element,
+                new Quaternionf(rotation).conjugate(), element.getOrigin().mul(16.0f),
+                opacity
+        );
 
         Vector3f nx = rotation.transform(new Vector3f(size.x(), 0, 0));
         Vector3f ny = rotation.transform(new Vector3f(0, size.y(), 0));
@@ -82,7 +86,7 @@ public class AmbientOcclusion {
         }
     }
 
-    private boolean is(float x, float y, float z) {
+    private float is(float x, float y, float z) {
         float e = 0.0001f;
         Vector3f pos = new Vector3f();
         for (PrecomputedElement p : getElements(x, y, z)) {
@@ -93,10 +97,10 @@ public class AmbientOcclusion {
             if (pos.x > p.element.from.x + e && pos.x < p.element.to.x - e &&
                 pos.y > p.element.from.y + e && pos.y < p.element.to.y - e &&
                 pos.z > p.element.from.z + e && pos.z < p.element.to.z - e) {
-                return true;
+                return p.opacity;
             }
         }
-        return false;
+        return 0.0f;
     }
 
     public float sample(Vector3f pos, Vector3f normal) {
@@ -105,9 +109,7 @@ public class AmbientOcclusion {
         for (Vector3f offset : kernel) {
             float dot = normal.x * offset.x + normal.y * offset.y + normal.z * offset.z;
             if (dot <= 0) continue;
-            if (is(pos.x + offset.x, pos.y + offset.y, pos.z + offset.z)) {
-                value += 1.0f;
-            }
+            value += is(pos.x + offset.x, pos.y + offset.y, pos.z + offset.z);
             totalWeight += 1.0f;
         }
         return value / totalWeight;

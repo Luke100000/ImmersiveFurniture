@@ -1,6 +1,7 @@
 # 0.0.3
 
 * Added autosave
+* Improved ambient occlusion on transparent blocks
 
 # 0.0.2
 

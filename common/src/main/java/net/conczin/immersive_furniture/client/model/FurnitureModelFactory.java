@@ -36,7 +36,7 @@ public class FurnitureModelFactory {
         ao = new AmbientOcclusion();
         for (FurnitureData.Element element : data.elements) {
             if (element.type == FurnitureData.ElementType.ELEMENT) {
-                ao.place(element);
+                ao.place(element, element.material.transparency == TransparencyType.SOLID ? 1.0f : 0.25f);
             }
         }
 
