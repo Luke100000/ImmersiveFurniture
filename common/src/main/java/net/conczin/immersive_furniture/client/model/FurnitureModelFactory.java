@@ -30,6 +30,9 @@ public class FurnitureModelFactory {
     private final FurnitureData data;
     private final DynamicAtlas atlas;
     private final AmbientOcclusion ao;
+    private int zFightingCounter = 0;
+
+    private final Map<FurnitureData.Element, Map<Direction, BlockElementFace>> faces = new HashMap<>();
 
     private FurnitureModelFactory(FurnitureData data, DynamicAtlas atlas) {
         // Populate AO lookup
@@ -201,6 +204,62 @@ public class FurnitureModelFactory {
         return true;
     }
 
+    private boolean mightZFight(FurnitureData.Element element, Map<Direction, BlockElementFace> faces) {
+        for (Direction direction : faces.keySet()) {
+            float[] fs = ClientModelUtils.getShapeData(element);
+            Vector3f[] vertices = ClientModelUtils.getVertices(element, direction, fs, null);
+
+            for (FurnitureData.Element otherElement : data.elements) {
+                if (otherElement == element) continue;
+                if (otherElement.getVolume() < element.getVolume()) continue;
+                if (!hasFaces(otherElement)) continue;
+
+                // Convert to another element's local space
+                Vector3f[] localVerts = new Vector3f[vertices.length];
+                for (int i = 0; i < vertices.length; i++) {
+                    Vector3f v = vertices[i];
+                    Vector3f lv = new Vector3f(v);
+                    ModelUtils.applyInverseElementRotation(lv, otherElement.getRotation());
+                    lv.mul(16.0f);
+                    localVerts[i] = lv;
+                }
+
+                Map<Direction, BlockElementFace> otherFaces = this.faces.getOrDefault(otherElement, Collections.emptyMap());
+
+                float fromX = Math.min(localVerts[0].x, localVerts[2].x);
+                float toX = Math.max(localVerts[0].x, localVerts[2].x);
+                float fromY = Math.min(localVerts[0].y, localVerts[2].y);
+                float toY = Math.max(localVerts[0].y, localVerts[2].y);
+                float fromZ = Math.min(localVerts[0].z, localVerts[2].z);
+                float toZ = Math.max(localVerts[0].z, localVerts[2].z);
+
+                float m = 0.01f;
+
+                if (Math.abs(fromX - toX) < m && fromY < otherElement.to.y - m && toY > otherElement.from.y + m && fromZ < otherElement.to.z - m && toZ > otherElement.from.z + m) {
+                    if (otherFaces.containsKey(Direction.WEST) && Math.abs(fromX - otherElement.from.x) < m)
+                        return true;
+                    if (otherFaces.containsKey(Direction.EAST) && Math.abs(toX - otherElement.to.x) < m)
+                        return true;
+                }
+
+                if (Math.abs(fromY - toY) < m && fromX < otherElement.to.x - m && toX > otherElement.from.x + m && fromZ < otherElement.to.z - m && toZ > otherElement.from.z + m) {
+                    if (otherFaces.containsKey(Direction.DOWN) && Math.abs(fromY - otherElement.from.y) < m)
+                        return true;
+                    if (otherFaces.containsKey(Direction.UP) && Math.abs(toY - otherElement.to.y) < m)
+                        return true;
+                }
+
+                if (Math.abs(fromZ - toZ) < m && fromX < otherElement.to.x - m && toX > otherElement.from.x + m && fromY < otherElement.to.y - m && toY > otherElement.from.y + m) {
+                    if (otherFaces.containsKey(Direction.NORTH) && Math.abs(fromZ - otherElement.from.z) < m)
+                        return true;
+                    if (otherFaces.containsKey(Direction.SOUTH) && Math.abs(toZ - otherElement.to.z) < m)
+                        return true;
+                }
+            }
+        }
+        return false;
+    }
+
     private static float getLight(int x, int y, Vector2i dimensions) {
         float rx = x / (dimensions.x - 1.0f) * 2.0f - 1.0f;
         float ry = y / (dimensions.y - 1.0f) * 2.0f - 1.0f;
@@ -223,13 +282,21 @@ public class FurnitureModelFactory {
     }
 
     private BlockElement getElement(FurnitureData.Element element) {
-        return new BlockElement(
-                element.from,
-                element.to,
-                getFaces(element),
-                ClientModelUtils.toBlockElementRotation(element.getRotation()),
-                true
-        );
+        Vector3f from = new Vector3f(element.from);
+        Vector3f to = new Vector3f(element.to);
+
+        Map<Direction, BlockElementFace> faces = this.faces.getOrDefault(element, Collections.emptyMap());
+
+        // If that element causes Z-fighting with another element, offset it slightly
+        if (mightZFight(element, faces)) {
+            zFightingCounter++;
+            float offset = 0.01f * (zFightingCounter % 7);
+            from.sub(offset, offset, offset);
+            to.add(offset, offset, offset);
+        }
+
+        BlockElementRotation rotation = ClientModelUtils.toBlockElementRotation(element.getRotation());
+        return new BlockElement(from, to, faces, rotation, true);
     }
 
     private Map<Direction, BlockElementFace> getFaces(FurnitureData.Element element) {
@@ -266,15 +333,24 @@ public class FurnitureModelFactory {
                 .map(e -> e.sprite.sprite).distinct().forEach(source ->
                         textures.put(source.toString(), Either.left(new Material(InventoryMenu.BLOCK_ATLAS, source))));
 
+        // Fetch all faces
+        data.elements.stream().filter(FurnitureModelFactory::hasFaces).forEach(e -> faces.put(e, getFaces(e)));
+
         return new BlockModel(
                 null,
-                data.elements.stream().filter(e -> e.type == FurnitureData.ElementType.ELEMENT || e.type == FurnitureData.ElementType.SPRITE).map(this::getElement).toList(),
+                data.elements.stream()
+                        .filter(FurnitureModelFactory::hasFaces)
+                        .map(this::getElement).toList(),
                 textures,
                 false,
                 BlockModel.GuiLight.SIDE,
                 getTransforms(),
                 List.of()
         );
+    }
+
+    private static boolean hasFaces(FurnitureData.Element e) {
+        return e.type == FurnitureData.ElementType.ELEMENT || e.type == FurnitureData.ElementType.SPRITE;
     }
 
     private ItemTransforms getTransforms() {
@@ -311,7 +387,8 @@ public class FurnitureModelFactory {
 
     public static BlockModel getModel(FurnitureData data, DynamicAtlas atlas) {
         data.transparency = computeTransparency(data);
-        return new FurnitureModelFactory(data, atlas).getModel();
+        FurnitureModelFactory factory = new FurnitureModelFactory(data, atlas);
+        return factory.getModel();
     }
 
     private static TransparencyType computeTransparency(FurnitureData data) {

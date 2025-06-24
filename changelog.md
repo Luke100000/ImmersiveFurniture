@@ -4,6 +4,7 @@
 * Improved ambient occlusion on transparent elements
 * Transparent elements no longer cull other elements
 * Fixed Artisans table is not dropping itself
+* Added some anti-z-fighting (Does not replace proper modeling!)
 
 # 0.0.2
 
@@ -13,12 +14,15 @@
 
 Initial release
 
+# TODO
+
+* Hue is still broken af
+* Swap axis on move furniture, its opengl style
+* Double atlas sizes
+* Do not reset transparency flags on non-scratch models
+* Presort transparent elements
+
 # Roadmap 1.0.0
 
 * Blockbench/JSON block and item model import
 * Datapack support
-* Anti-Z-Fighting
-    * Offset sprites by 0.001 blocks
-    * Offset any elements blocks by 0.001 blocks
-* Hue is still broken af
-* Swap axis on move furniture, its opengl style
