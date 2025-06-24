@@ -1,7 +1,8 @@
 # 0.0.3
 
 * Added autosave
-* Improved ambient occlusion on transparent blocks
+* Improved ambient occlusion on transparent elements
+* Transparent elements no longer cull other elements
 
 # 0.0.2
 
@@ -18,6 +19,5 @@ Initial release
 * Anti-Z-Fighting
     * Offset sprites by 0.001 blocks
     * Offset any elements blocks by 0.001 blocks
-* Alpha still culls for some reason
 * Hue is still broken af
 * Swap axis on move furniture, its opengl style

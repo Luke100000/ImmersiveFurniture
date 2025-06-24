@@ -54,9 +54,9 @@ public class FurnitureModelFactory {
         Vector3f[] vertices = ClientModelUtils.getVertices(element, direction, fs, null);
         for (FurnitureData.Element otherElement : data.elements) {
             if (otherElement == element) continue;
+            if (otherElement.material.transparency != TransparencyType.SOLID) continue;
             if (otherElement.type != FurnitureData.ElementType.ELEMENT) continue;
             if (theSame(element, otherElement) && otherElement.hashCode() < element.hashCode()) continue;
-            if (element.material.transparency != otherElement.material.transparency) continue;
             if (fullyContained(otherElement, vertices)) return null;
         }
 
