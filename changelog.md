@@ -3,6 +3,7 @@
 * Added autosave
 * Improved ambient occlusion on transparent elements
 * Transparent elements no longer cull other elements
+* Fixed Artisans table is not dropping itself
 
 # 0.0.2
 
