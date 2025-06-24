@@ -24,6 +24,9 @@ public final class Config extends JsonConfig {
     // Cost multiplier for furniture crafting costs.
     public float costMultiplier = 1.0f;
 
+    // Interval in seconds between autosaves in the editor. Negative value disables autosave.
+    public int autosaveInterval = 60;
+
     public Config(String name) {
         super(name);
     }

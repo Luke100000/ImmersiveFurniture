@@ -9,7 +9,9 @@ import net.conczin.immersive_furniture.client.Utils;
 import net.conczin.immersive_furniture.client.gui.components.*;
 import net.conczin.immersive_furniture.client.gui.widgets.StateImageButton;
 import net.conczin.immersive_furniture.client.model.ClientModelUtils;
+import net.conczin.immersive_furniture.config.Config;
 import net.conczin.immersive_furniture.data.FurnitureData;
+import net.conczin.immersive_furniture.data.FurnitureDataManager;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -43,6 +45,8 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
     private String lastHistoryHash = "";
     private final Deque<CompoundTag> history = new ArrayDeque<>(MAX_HISTORY_SIZE);
     private CompoundTag copiedElement;
+
+    private long lastAutosaveTime = 0;
 
     DraggingContext draggingContext;
     boolean isRotatingView;
@@ -564,6 +568,16 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
                 history.removeLast();
             }
             history.addFirst(data.toTag());
+
+            // Autosave functionality
+            int autosaveInterval = Config.getInstance().autosaveInterval;
+            if (autosaveInterval >= 0) {
+                long currentTime = System.currentTimeMillis();
+                if (currentTime - lastAutosaveTime > autosaveInterval * 1000L) {
+                    FurnitureDataManager.save(data, new ResourceLocation("local", "autosave"));
+                    lastAutosaveTime = currentTime;
+                }
+            }
         }
     }
 }

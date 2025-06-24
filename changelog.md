@@ -1,3 +1,7 @@
+# 0.0.3
+
+* Added autosave
+
 # 0.0.2
 
 * Fixed a crash
@@ -10,3 +14,9 @@ Initial release
 
 * Blockbench/JSON block and item model import
 * Datapack support
+* Anti-Z-Fighting
+    * Offset sprites by 0.001 blocks
+    * Offset any elements blocks by 0.001 blocks
+* Alpha still culls for some reason
+* Hue is still broken af
+* Swap axis on move furniture, its opengl style

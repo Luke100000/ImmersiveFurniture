@@ -5,10 +5,10 @@ import net.conczin.immersive_furniture.client.gui.ArtisansWorkstationLibraryScre
 import net.conczin.immersive_furniture.client.gui.widgets.BoundedIntSliderButton;
 import net.conczin.immersive_furniture.client.model.DynamicAtlas;
 import net.conczin.immersive_furniture.client.model.FurnitureModelFactory;
+import net.conczin.immersive_furniture.client.model.MaterialRegistry;
 import net.conczin.immersive_furniture.client.model.MaterialSource;
 import net.conczin.immersive_furniture.data.FurnitureData;
 import net.conczin.immersive_furniture.data.FurnitureDataManager;
-import net.conczin.immersive_furniture.client.model.MaterialRegistry;
 import net.conczin.immersive_furniture.utils.Utils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -95,6 +95,9 @@ public class SettingsComponent extends ScreenComponent {
             // Finish and bake the model and save
             finish(screen.data);
             FurnitureDataManager.saveLocalFile(screen.data);
+
+            // Delete the autosave file if it exists
+            FurnitureDataManager.deleteLocalFile(new ResourceLocation("local", "autosave"));
 
             // Switch to the library screen
             ArtisansWorkstationLibraryScreen libraryScreen = new ArtisansWorkstationLibraryScreen();
