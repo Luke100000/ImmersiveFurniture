@@ -16,10 +16,7 @@ Initial release
 
 # TODO
 
-* Hue is still broken af
-* Double atlas sizes
 * Do not reset transparency flags on non-scratch models
-* Presort transparent elements
 
 # Roadmap 1.0.0
 

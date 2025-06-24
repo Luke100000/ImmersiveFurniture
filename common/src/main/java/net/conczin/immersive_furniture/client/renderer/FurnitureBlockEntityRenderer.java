@@ -68,7 +68,7 @@ public class FurnitureBlockEntityRenderer<T extends FurnitureBlockEntity> implem
     }
 
     public static void renderFurniture(BlockState state, PoseStack poseStack, MultiBufferSource buffer, int packedLight, int packedOverlay, FurnitureData data, BakedModel bakedModel, DynamicAtlas atlas) {
-        // Render in two passes since, unliked baked textures, the textures can be on up to two atlases
+        // Render in two passes since; unliked baked textures, the textures can be on up to two atlases
         for (int i = 0; i < 2; i++) {
             ResourceLocation location = i == 0 ? atlas.getLocation() : InventoryMenu.BLOCK_ATLAS;
 

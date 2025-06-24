@@ -14,7 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 
 public class DynamicAtlas extends DynamicTexture {
-    public static final DynamicAtlas BAKED = new DynamicAtlas(512, "baked");
+    public static final DynamicAtlas BAKED = new DynamicAtlas(1024, "baked");
     public static final DynamicAtlas ENTITY = new DynamicAtlas(512, "entity");
     public static final DynamicAtlas SCRATCH = new DynamicAtlas(512, "scratch");
 
