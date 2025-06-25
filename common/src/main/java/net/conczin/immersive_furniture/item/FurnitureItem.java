@@ -170,8 +170,6 @@ public class FurnitureItem extends BlockItem {
                     .setValue(FurnitureBlock.IDENTIFIER, identifier);
         }
 
-        state = state.setValue(FurnitureBlock.TRANSPARENCY, data.transparency);
-
         return this.canPlace(context, state) ? state : null;
     }
 }

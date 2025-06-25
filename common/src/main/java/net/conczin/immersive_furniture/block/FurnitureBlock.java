@@ -38,7 +38,7 @@ public class FurnitureBlock extends BaseFurnitureBlock {
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(IDENTIFIER, WATERLOGGED, FACING, TRANSPARENCY);
+        builder.add(IDENTIFIER, WATERLOGGED, FACING);
     }
 
     public FurnitureData getData(BlockState state, BlockGetter level, BlockPos pos) {

@@ -2,6 +2,7 @@ package net.conczin.immersive_furniture.client.gui;
 
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.conczin.immersive_furniture.Common;
+import net.conczin.immersive_furniture.client.model.MergedBakedModel;
 import net.conczin.immersive_furniture.client.PreviewParticleEngine;
 import net.conczin.immersive_furniture.client.model.DynamicAtlas;
 import net.conczin.immersive_furniture.client.model.FurnitureModelBaker;
@@ -18,7 +19,6 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.phys.Vec3;
@@ -84,10 +84,10 @@ public abstract class ArtisansWorkstationScreen extends Screen {
         graphics.pose().popPose();
     }
 
-    private static BakedModel lastBakedModel = null;
+    private static MergedBakedModel lastBakedModel = null;
 
     static void renderModel(GuiGraphics graphics, FurnitureData data, float yaw, float pitch, boolean inEditor) {
-        BakedModel bakedModel = FurnitureModelBaker.getAsyncModel(data, DynamicAtlas.SCRATCH);
+        MergedBakedModel bakedModel = FurnitureModelBaker.getAsyncModel(data, DynamicAtlas.SCRATCH);
         if (inEditor) {
             if (bakedModel == null) {
                 bakedModel = lastBakedModel;
@@ -97,7 +97,15 @@ public abstract class ArtisansWorkstationScreen extends Screen {
         }
 
         if (bakedModel != null) {
-            FurnitureBlockEntityRenderer.renderFurniture(null, graphics.pose(), graphics.bufferSource(), 0xF000F0, OverlayTexture.NO_OVERLAY, data, bakedModel, DynamicAtlas.SCRATCH);
+            FurnitureBlockEntityRenderer.renderFurniture(
+                    null,
+                    graphics.pose(),
+                    graphics.bufferSource(),
+                    0xF000F0,
+                    OverlayTexture.NO_OVERLAY,
+                    bakedModel,
+                    DynamicAtlas.SCRATCH
+            );
         }
 
         // Particles

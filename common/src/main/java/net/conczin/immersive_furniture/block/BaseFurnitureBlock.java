@@ -42,7 +42,6 @@ import java.util.List;
 public abstract class BaseFurnitureBlock extends Block implements SimpleWaterloggedBlock {
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
-    public static final EnumProperty<TransparencyType> TRANSPARENCY = EnumProperty.create("transparency", TransparencyType.class);
 
     public BaseFurnitureBlock(BlockBehaviour.Properties properties) {
         super(properties);

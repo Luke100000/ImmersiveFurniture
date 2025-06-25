@@ -200,10 +200,14 @@ public class ModelComponent extends ScreenComponent {
             });
             rz.setEnabled(screen.selectedElement.axis != Direction.Axis.Z);
 
-            addButton(leftPos + 62, y + 1, 14, 26, 228, null, () ->
-                    screen.selectedElement.rotation = (screen.selectedElement.rotation + 22.5f) % 360);
-            addButton(leftPos + 78, y + 1, 14, 42, 228, null, () ->
-                    screen.selectedElement.rotation = (screen.selectedElement.rotation - 22.5f) % 360);
+            addButton(leftPos + 62, y + 1, 14, 26, 228, null, () -> {
+                if (screen.selectedElement == null) return;
+                screen.selectedElement.rotation = (screen.selectedElement.rotation + 22.5f) % 360;
+            });
+            addButton(leftPos + 78, y + 1, 14, 42, 228, null, () -> {
+                if (screen.selectedElement == null) return;
+                screen.selectedElement.rotation = (screen.selectedElement.rotation - 22.5f) % 360;
+            });
         }
 
         // Element type

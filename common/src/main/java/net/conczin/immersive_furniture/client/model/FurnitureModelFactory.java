@@ -328,7 +328,7 @@ public class FurnitureModelFactory {
         );
     }
 
-    private BlockModel getModel() {
+    private BlockModel getModel(TransparencyType type) {
         Map<String, Either<Material, String>> textures = new HashMap<>();
         textures.put("0", Either.left(new Material(InventoryMenu.BLOCK_ATLAS, Common.locate("block/furniture"))));
         data.elements.stream().filter(e -> e.type == FurnitureData.ElementType.SPRITE)
@@ -342,6 +342,7 @@ public class FurnitureModelFactory {
                 null,
                 data.elements.stream()
                         .filter(FurnitureModelFactory::hasFaces)
+                        .filter(e -> type == null || getTransparencyType(e) == type)
                         .map(this::getElement).toList(),
                 textures,
                 false,
@@ -349,6 +350,10 @@ public class FurnitureModelFactory {
                 getTransforms(),
                 List.of()
         );
+    }
+
+    private TransparencyType getTransparencyType(FurnitureData.Element e) {
+        return e.type == FurnitureData.ElementType.SPRITE ? getTransparencyTypeFromSprite(e) : e.material.transparency;
     }
 
     private static boolean hasFaces(FurnitureData.Element e) {
@@ -387,12 +392,18 @@ public class FurnitureModelFactory {
         );
     }
 
-    public static BlockModel getModel(FurnitureData data, DynamicAtlas atlas) {
+    public static MultiRenderTypeBlockModel getModel(FurnitureData data, DynamicAtlas atlas) {
         if (atlas == DynamicAtlas.SCRATCH) {
             data.transparency = computeTransparency(data);
         }
         FurnitureModelFactory factory = new FurnitureModelFactory(data, atlas);
-        return factory.getModel();
+
+        MultiRenderTypeBlockModel composite = new MultiRenderTypeBlockModel();
+        composite.addModel(RenderType.solid(), factory.getModel(TransparencyType.SOLID));
+        composite.addModel(RenderType.cutout(), factory.getModel(TransparencyType.CUTOUT));
+        composite.addModel(RenderType.cutoutMipped(), factory.getModel(TransparencyType.CUTOUT_MIPPED));
+        composite.addModel(RenderType.translucent(), factory.getModel(TransparencyType.TRANSLUCENT));
+        return composite;
     }
 
     private static TransparencyType computeTransparency(FurnitureData data) {
@@ -400,9 +411,7 @@ public class FurnitureModelFactory {
         for (FurnitureData.Element element : data.elements) {
             TransparencyType elementTransparencyType = null;
             if (element.type == FurnitureData.ElementType.SPRITE) {
-                TextureAtlas atlas = Minecraft.getInstance().getModelManager().getAtlas(InventoryMenu.BLOCK_ATLAS);
-                TextureAtlasSprite sprite = atlas.getSprite(element.sprite.sprite);
-                elementTransparencyType = TransparencyManager.INSTANCE.getTransparencyType(sprite.contents());
+                elementTransparencyType = getTransparencyTypeFromSprite(element);
             } else if (element.type == FurnitureData.ElementType.ELEMENT) {
                 BlockState state = BuiltInRegistries.BLOCK.get(element.material.source).defaultBlockState();
                 RenderType renderType = ItemBlockRenderTypes.getChunkRenderType(state);
@@ -414,6 +423,14 @@ public class FurnitureModelFactory {
             }
         }
         return transparencyType;
+    }
+
+    private static TransparencyType getTransparencyTypeFromSprite(FurnitureData.Element element) {
+        TransparencyType elementTransparencyType;
+        TextureAtlas atlas = Minecraft.getInstance().getModelManager().getAtlas(InventoryMenu.BLOCK_ATLAS);
+        TextureAtlasSprite sprite = atlas.getSprite(element.sprite.sprite);
+        elementTransparencyType = TransparencyManager.INSTANCE.getTransparencyType(sprite.contents());
+        return elementTransparencyType;
     }
 
     public static TransparencyType fromRenderType(RenderType renderType) {

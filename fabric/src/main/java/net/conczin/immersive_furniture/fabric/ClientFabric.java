@@ -3,7 +3,7 @@ package net.conczin.immersive_furniture.fabric;
 import net.conczin.immersive_furniture.Common;
 import net.conczin.immersive_furniture.CommonClient;
 import net.conczin.immersive_furniture.block.entity.BlockEntityTypes;
-import net.conczin.immersive_furniture.client.FurnitureBakedModelWrapper;
+import net.conczin.immersive_furniture.client.model.FurnitureBakedModelWrapper;
 import net.conczin.immersive_furniture.client.renderer.FurnitureBlockEntityRenderer;
 import net.conczin.immersive_furniture.client.renderer.SittingEntityRenderer;
 import net.conczin.immersive_furniture.entity.Entities;
