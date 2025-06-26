@@ -3,10 +3,13 @@ package net.conczin.immersive_furniture.forge;
 import net.conczin.immersive_furniture.Common;
 import net.conczin.immersive_furniture.CommonClient;
 import net.conczin.immersive_furniture.data.ServerFurnitureRegistry;
+import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 
 
@@ -34,6 +37,22 @@ public class ForgeBusEvents {
     public static void onEntityJoinLevel(EntityJoinLevelEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
             ServerFurnitureRegistry.syncWithPlayer(player);
+        }
+    }
+
+    private static boolean warned = false;
+
+    @SubscribeEvent
+    public static void onClientTick(TickEvent.ClientTickEvent event) {
+        if (event.phase == TickEvent.Phase.END) {
+            Minecraft mc = Minecraft.getInstance();
+            if (mc.level != null && mc.player != null && !warned) {
+                warned = true;
+                ModList modList = ModList.get();
+                if (!modList.isLoaded("ferritecore")) {
+                    mc.player.sendSystemMessage(Component.translatable("immersive_furniture.ferritecore_missing"));
+                }
+            }
         }
     }
 }

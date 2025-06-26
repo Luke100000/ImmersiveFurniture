@@ -56,8 +56,6 @@ jobs:
             ${{steps.split.outputs._1}}
           java: |
             Java 17
-          dependencies: |
-            fabric-api | required | *
 
           fail-mode: skip
       - name: "Upload Forge"

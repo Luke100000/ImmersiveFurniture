@@ -40,6 +40,9 @@ public final class ClientFabric implements ClientModInitializer {
                 if (FabricLoader.getInstance().isModLoaded("sodium") && !FabricLoader.getInstance().isModLoaded("indium")) {
                     client.player.sendSystemMessage(Component.translatable("immersive_furniture.indium_missing"));
                 }
+                if (!FabricLoader.getInstance().isModLoaded("ferritecore")) {
+                    client.player.sendSystemMessage(Component.translatable("immersive_furniture.ferritecore_missing"));
+                }
             }
         });
 
