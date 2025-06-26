@@ -29,6 +29,7 @@ public class FurnitureModelFactory {
 
     private final Map<FurnitureData.Element, Map<Direction, BlockElementFace>> faces = new HashMap<>();
     private final List<FurnitureData.Element> elements = new LinkedList<>();
+    Map<String, Either<Material, String>> textures = new HashMap<>();
 
     private FurnitureModelFactory(FurnitureData data, DynamicAtlas atlas) {
         this.data = data;
@@ -43,6 +44,15 @@ public class FurnitureModelFactory {
                 ao.place(element, element.material.transparency == TransparencyType.SOLID ? 1.0f : 0.25f);
             }
         }
+
+        // Fetch all textures
+        textures.put("0", Either.left(new Material(InventoryMenu.BLOCK_ATLAS, Common.locate("block/furniture"))));
+        elements.stream().filter(e -> e.type == FurnitureData.ElementType.SPRITE)
+                .map(e -> e.sprite.sprite).distinct().forEach(source ->
+                        textures.put(source.toString(), Either.left(new Material(InventoryMenu.BLOCK_ATLAS, source))));
+
+        // Fetch all faces
+        elements.stream().filter(FurnitureModelFactory::hasFaces).forEach(e -> faces.put(e, getFaces(e)));
     }
 
     float mod(float a, float b) {
@@ -328,15 +338,6 @@ public class FurnitureModelFactory {
     }
 
     private BlockModel getModel(TransparencyType type) {
-        Map<String, Either<Material, String>> textures = new HashMap<>();
-        textures.put("0", Either.left(new Material(InventoryMenu.BLOCK_ATLAS, Common.locate("block/furniture"))));
-        elements.stream().filter(e -> e.type == FurnitureData.ElementType.SPRITE)
-                .map(e -> e.sprite.sprite).distinct().forEach(source ->
-                        textures.put(source.toString(), Either.left(new Material(InventoryMenu.BLOCK_ATLAS, source))));
-
-        // Fetch all faces
-        elements.stream().filter(FurnitureModelFactory::hasFaces).forEach(e -> faces.put(e, getFaces(e)));
-
         return new BlockModel(
                 null,
                 elements.stream()

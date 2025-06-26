@@ -60,8 +60,14 @@ public class DynamicAtlas extends DynamicTexture {
             // Split
             int dw = best.w - w;
             int dh = best.h - h;
-            quads.add(new Quad(best.x + w, best.y, dw, h)); // Right side
-            quads.add(new Quad(best.x, best.y + h, best.w, dh)); // Bottom side
+
+            if (dw > dh) {
+                if (dw > 0) quads.add(new Quad(best.x + w, best.y, dw, best.h));
+                if (dh > 0) quads.add(new Quad(best.x, best.y + h, w, dh));
+            } else {
+                if (dw > 0) quads.add(new Quad(best.x + w, best.y, dw, h));
+                if (dh > 0) quads.add(new Quad(best.x, best.y + h, best.w, dh));
+            }
 
             allocated += w * h;
             return new Quad(best.x, best.y, w, h);

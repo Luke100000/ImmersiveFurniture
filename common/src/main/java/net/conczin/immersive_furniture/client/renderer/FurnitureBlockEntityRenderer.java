@@ -72,10 +72,8 @@ public class FurnitureBlockEntityRenderer<T extends FurnitureBlockEntity> implem
             ResourceLocation location = i == 0 ? atlas.getLocation() : InventoryMenu.BLOCK_ATLAS;
             for (Map.Entry<RenderType, BakedModel> entry : bakedModel.getModels().entrySet()) {
                 VertexConsumer consumer;
-                if (entry.getKey() == RenderType.cutout()) {
+                if (entry.getKey() == RenderType.cutout() || entry.getKey() == RenderType.cutoutMipped()) {
                     consumer = buffer.getBuffer(RenderType.entityCutout(location));
-                } else if (entry.getKey() == RenderType.cutoutMipped()) {
-                    consumer = buffer.getBuffer(RenderType.entityCutoutNoCull(location));
                 } else if (entry.getKey() == RenderType.translucent()) {
                     consumer = buffer.getBuffer(RenderType.entityTranslucentCull(location));
                 } else {

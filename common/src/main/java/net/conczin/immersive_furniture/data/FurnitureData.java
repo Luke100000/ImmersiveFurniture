@@ -1,6 +1,7 @@
 package net.conczin.immersive_furniture.data;
 
 import com.mojang.math.Axis;
+import net.conczin.immersive_furniture.client.model.DynamicAtlas;
 import net.conczin.immersive_furniture.config.Config;
 import net.conczin.immersive_furniture.utils.NBTHelper;
 import net.conczin.immersive_furniture.utils.Utils;
@@ -142,6 +143,8 @@ public class FurnitureData {
         float maxX = Float.MIN_VALUE, maxY = Float.MIN_VALUE, maxZ = Float.MIN_VALUE;
 
         for (Element element : elements) {
+            if (element.type != ElementType.ELEMENT && element.type != ElementType.SPRITE) continue;
+
             Vector3f from = element.from;
             Vector3f to = element.to;
 
@@ -269,6 +272,16 @@ public class FurnitureData {
         }
         if (canSleep()) {
             tooltip.add(Component.translatable("gui.immersive_furniture.can_sleep").withStyle(ChatFormatting.YELLOW));
+        }
+        if (advanced) {
+            int pixels = 0;
+            for (Element element : elements) {
+                for (int[] value : element.bakedTexture.values()) {
+                    pixels += value.length;
+                }
+            }
+            long round = Math.round(pixels / Math.pow(DynamicAtlas.SCRATCH.getSize(), 2) * 1000);
+            tooltip.add(Component.literal(round + "%.").withStyle(ChatFormatting.YELLOW));
         }
         boolean hasAdvanced = false;
         if (!sources.isEmpty()) {
