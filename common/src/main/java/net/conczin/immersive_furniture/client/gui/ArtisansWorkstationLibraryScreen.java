@@ -124,7 +124,7 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
             int i = 0;
             int tx = leftPos + 4;
             for (String tag : TAGS) {
-                addToggleButton(tx, topPos + 18, 16, 48 + i * 16, 128, "gui.immersive_furniture.tag." + tag.toLowerCase(Locale.ROOT), b -> {
+                addToggleButton(tx, topPos + 18, 16, i * 16, 224, "gui.immersive_furniture.tag." + tag.toLowerCase(Locale.ROOT), b -> {
                     tagFilter = tag;
                     shouldSearch = true;
                     b.setEnabled(true);
@@ -137,7 +137,7 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
 
             // Sort by date
             addRenderableWidget(
-                    new ImageButton(leftPos + 3, y, 22, 22, sortByDate ? 88 : 66, 48, 22, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE, b -> {
+                    new ImageButton(leftPos + 3, y, 22, 22, sortByDate ? 88 : 66, 114, 22, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE, b -> {
                         sortByDate = !sortByDate;
                         shouldSearch = true;
                         init();
@@ -146,14 +146,14 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
 
             // Page buttons
             addRenderableWidget(
-                    new ImageButton(leftPos + windowWidth / 2 - 24 - 6, y + 4, 12, 15, 13, 226, 15, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE, b -> {
+                    new ImageButton(leftPos + windowWidth / 2 - 24 - 6, y + 4, 12, 15, 193, 0, 15, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE, b -> {
                         page = Math.max(0, page - 1);
                         shouldSearch = true;
                         init();
                     })
             );
             addRenderableWidget(
-                    new ImageButton(leftPos + windowWidth / 2 + 24 - 6, y + 4, 12, 15, 0, 226, 15, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE, b -> {
+                    new ImageButton(leftPos + windowWidth / 2 + 24 - 6, y + 4, 12, 15, 180, 0, 15, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE, b -> {
                         page += 1;
                         shouldSearch = true;
                         init();
@@ -199,7 +199,7 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
             int y = topPos + windowHeight - 25;
 
             if (!selected.getNamespace().equals("local")) {
-                addToggleButton(x - 50 - 11, y, 22, 0, 48, "gui.immersive_furniture.favorite", b -> {
+                addToggleButton(x - 50 - 11, y, 22, 0, 114, "gui.immersive_furniture.favorite", b -> {
                     if (authenticated) {
                         FurnitureData model = FurnitureDataManager.getData(selected);
                         if (model != null) {
@@ -218,7 +218,7 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
 
             // Publish
             if (selected.getNamespace().equals("local")) {
-                addButton(x - 25 - 11, y, 22, 22 * 6, 48, "gui.immersive_furniture.publish", () -> {
+                addButton(x - 25 - 11, y, 22, 22 * 6, 114, "gui.immersive_furniture.publish", () -> {
                     if (authenticated) {
                         FurnitureData model = FurnitureDataManager.getData(selected);
                         if (model != null) {
@@ -232,11 +232,11 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
 
             // Delete
             if (tab == Tab.SUBMISSIONS || tab == Tab.LOCAL) {
-                addButton(x - 11, y, 22, 22 * 2, 48, "gui.immersive_furniture.delete", this::delete);
+                addButton(x - 11, y, 22, 22 * 2, 114, "gui.immersive_furniture.delete", this::delete);
             }
 
             // Modify
-            addButton(x + 25 - 11, y, 22, 22, 48, "gui.immersive_furniture.modify", () -> {
+            addButton(x + 25 - 11, y, 22, 22, 114, "gui.immersive_furniture.modify", () -> {
                 FurnitureData data = FurnitureDataManager.getData(selected);
                 if (minecraft != null && data != null) {
                     minecraft.setScreen(new ArtisansWorkstationEditorScreen(new FurnitureData(data)));
@@ -245,7 +245,7 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
 
             // Report
             if (tab == Tab.GLOBAL) {
-                addToggleButton(x + 50 - 11, y, 22, 22 * 5, 48, "gui.immersive_furniture.report", b -> {
+                addToggleButton(x + 50 - 11, y, 22, 22 * 5, 114, "gui.immersive_furniture.report", b -> {
                     if (authenticated) {
                         FurnitureData model = FurnitureDataManager.getData(selected);
                         if (model != null) {

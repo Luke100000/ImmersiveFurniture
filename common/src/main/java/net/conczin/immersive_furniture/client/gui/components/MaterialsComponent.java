@@ -31,7 +31,7 @@ public class MaterialsComponent extends ListComponent {
             // Texture axis
             int i = 0;
             for (FurnitureData.MaterialAxis axis : FurnitureData.MaterialAxis.values()) {
-                addToggleButton(leftPos + 6 + i * 18, topPos + 22, 16, 16 + i * 16, 96, "", () -> {
+                addToggleButton(leftPos + 6 + i * 18, topPos + 22, 16, 16 + i * 16, 192, "", () -> {
                     screen.selectedElement.material.axis = axis;
                     screen.init();
                 }).setEnabled(screen.selectedElement.material.axis != axis);
@@ -39,7 +39,7 @@ public class MaterialsComponent extends ListComponent {
             }
 
             // Toggle repeat
-            repeatButton = addToggleButton(leftPos + 6 + 54, topPos + 22, 16, 144, 96, "gui.immersive_furniture.repeat", () -> {
+            repeatButton = addToggleButton(leftPos + 6 + 54, topPos + 22, 16, 144, 192, "gui.immersive_furniture.repeat", () -> {
                 if (screen.selectedElement.material.wrap == FurnitureData.WrapMode.EXPAND) {
                     screen.selectedElement.material.wrap = FurnitureData.WrapMode.REPEAT;
                     repeatButton.setEnabled(false);
@@ -51,7 +51,7 @@ public class MaterialsComponent extends ListComponent {
             repeatButton.setEnabled(screen.selectedElement.material.wrap == FurnitureData.WrapMode.EXPAND);
 
             // Mark as favorite
-            favoriteButton = addToggleButton(leftPos + 100 - 6 - 16, topPos + 22, 16, 128, 96, "gui.immersive_furniture.favorite", () -> {
+            favoriteButton = addToggleButton(leftPos + 100 - 6 - 16, topPos + 22, 16, 128, 192, "gui.immersive_furniture.favorite", () -> {
                 String location = screen.selectedElement.material.source.toString();
                 if (Config.getInstance().favorites.contains(location)) {
                     Config.getInstance().favorites.remove(location);
@@ -61,6 +61,7 @@ public class MaterialsComponent extends ListComponent {
                     favoriteButton.setEnabled(false);
                 }
                 Config.getInstance().save();
+                screen.init();
             });
             favoriteButton.setEnabled(!Config.getInstance().favorites.contains(screen.selectedElement.material.source.toString()));
         }
@@ -71,7 +72,7 @@ public class MaterialsComponent extends ListComponent {
             for (int x = 0; x < 4; x++) {
                 MaterialButton button = new MaterialButton(
                         leftPos + 6 + x * 22, topPos + 44 + y * 22,
-                        22, 22, 234, 162,
+                        22, 22, 146, 0,
                         b -> {
                             MaterialSource material = ((MaterialButton) b).getMaterial();
                             if (screen.selectedElement != null && material != null) {

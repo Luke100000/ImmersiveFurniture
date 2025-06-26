@@ -50,7 +50,7 @@ public class ModelComponent extends ScreenComponent {
         super.init(leftPos, topPos, width, height);
 
         // New
-        addButton(leftPos + 6, topPos + height - 22, 16, 64, 96, "gui.immersive_furniture.new_element", () -> {
+        addButton(leftPos + 6, topPos + height - 22, 16, 64, 192, "gui.immersive_furniture.new_element", () -> {
             screen.selectedElement = new FurnitureData.Element();
             screen.data.elements.add(screen.selectedElement);
             screen.init();
@@ -63,44 +63,44 @@ public class ModelComponent extends ScreenComponent {
             int spacing = 24;
 
             // X offset
-            addButton(x, y, 16, 160, 224, "gui.immersive_furniture.move_furniture_east", () -> moveFurniture(1.0f, 0, 0));
-            addButton(x, y + 29, 16, 192, 224, "gui.immersive_furniture.move_furniture_west", () -> moveFurniture(-1.0f, 0, 0));
+            addButton(x, y, 16, 96, 160, "gui.immersive_furniture.move_furniture_east", () -> moveFurniture(1.0f, 0, 0));
+            addButton(x, y + 29, 16, 128, 160, "gui.immersive_furniture.move_furniture_west", () -> moveFurniture(-1.0f, 0, 0));
 
             // Y offset
-            addButton(x + spacing, y, 16, 160, 224, "gui.immersive_furniture.move_furniture_up", () -> moveFurniture(0, 1.0f, 0));
-            addButton(x + spacing, y + 29, 16, 192, 224, "gui.immersive_furniture.move_furniture_down", () -> moveFurniture(0, -1.0f, 0));
+            addButton(x + spacing, y, 16, 96, 160, "gui.immersive_furniture.move_furniture_up", () -> moveFurniture(0, 1.0f, 0));
+            addButton(x + spacing, y + 29, 16, 128, 160, "gui.immersive_furniture.move_furniture_down", () -> moveFurniture(0, -1.0f, 0));
 
             // Z offset
-            addButton(x + spacing * 2, y, 16, 160, 224, "gui.immersive_furniture.move_furniture_south", () -> moveFurniture(0, 0, 1.0f));
-            addButton(x + spacing * 2, y + 29, 16, 192, 224, "gui.immersive_furniture.move_furniture_north", () -> moveFurniture(0, 0, -1.0f));
+            addButton(x + spacing * 2, y, 16, 96, 160, "gui.immersive_furniture.move_furniture_south", () -> moveFurniture(0, 0, 1.0f));
+            addButton(x + spacing * 2, y + 29, 16, 128, 160, "gui.immersive_furniture.move_furniture_north", () -> moveFurniture(0, 0, -1.0f));
 
             int dimY = topPos + 45;
             int maxDimension = 4;
 
             // X dimension
-            addButton(x, dimY, 16, 160, 224, "", () -> screen.data.size.x = Math.min(maxDimension, screen.data.size.x + 1));
-            addButton(x, dimY + 29, 16, 192, 224, "", () -> screen.data.size.x = Math.max(1, screen.data.size.x - 1));
+            addButton(x, dimY, 16, 96, 160, "", () -> screen.data.size.x = Math.min(maxDimension, screen.data.size.x + 1));
+            addButton(x, dimY + 29, 16, 128, 160, "", () -> screen.data.size.x = Math.max(1, screen.data.size.x - 1));
 
             // Y dimension
-            addButton(x + spacing, dimY, 16, 160, 224, "", () -> screen.data.size.y = Math.min(maxDimension, screen.data.size.y + 1));
-            addButton(x + spacing, dimY + 29, 16, 192, 224, "", () -> screen.data.size.y = Math.max(1, screen.data.size.y - 1));
+            addButton(x + spacing, dimY, 16, 96, 160, "", () -> screen.data.size.y = Math.min(maxDimension, screen.data.size.y + 1));
+            addButton(x + spacing, dimY + 29, 16, 128, 160, "", () -> screen.data.size.y = Math.max(1, screen.data.size.y - 1));
 
             // Z dimension
-            addButton(x + spacing * 2, dimY, 16, 160, 224, "", () -> screen.data.size.z = Math.min(maxDimension, screen.data.size.z + 1));
-            addButton(x + spacing * 2, dimY + 29, 16, 192, 224, "", () -> screen.data.size.z = Math.max(1, screen.data.size.z - 1));
+            addButton(x + spacing * 2, dimY, 16, 96, 160, "", () -> screen.data.size.z = Math.min(maxDimension, screen.data.size.z + 1));
+            addButton(x + spacing * 2, dimY + 29, 16, 128, 160, "", () -> screen.data.size.z = Math.max(1, screen.data.size.z - 1));
         }
 
         if (screen.selectedElement == null) return;
 
         // Delete
-        addButton(leftPos + 24, topPos + height - 22, 16, 80, 96, "gui.immersive_furniture.delete_element", () -> {
+        addButton(leftPos + 24, topPos + height - 22, 16, 80, 192, "gui.immersive_furniture.delete_element", () -> {
             screen.data.elements.remove(screen.selectedElement);
             screen.selectedElement = null;
             screen.init();
         });
 
         // Duplicate
-        addButton(leftPos + 42, topPos + height - 22, 16, 160, 96, "gui.immersive_furniture.duplicate_element", () -> {
+        addButton(leftPos + 42, topPos + height - 22, 16, 160, 192, "gui.immersive_furniture.duplicate_element", () -> {
             screen.selectedElement = new FurnitureData.Element(screen.selectedElement);
             screen.data.elements.add(screen.selectedElement);
             screen.init();
@@ -175,7 +175,7 @@ public class ModelComponent extends ScreenComponent {
         if (screen.selectedElement.type != FurnitureData.ElementType.PLAYER_POSE) {
             // Rotation
             y = topPos + 73;
-            rx = addToggleButton(leftPos + 6, y, 16, 16, 96, null, () -> {
+            rx = addToggleButton(leftPos + 6, y, 16, 16, 192, null, () -> {
                 if (screen.selectedElement == null) return;
                 screen.selectedElement.axis = Direction.Axis.X;
                 rx.setEnabled(false);
@@ -183,7 +183,7 @@ public class ModelComponent extends ScreenComponent {
                 rz.setEnabled(true);
             });
             rx.setEnabled(screen.selectedElement.axis != Direction.Axis.X);
-            ry = addToggleButton(leftPos + 24, y, 16, 32, 96, null, () -> {
+            ry = addToggleButton(leftPos + 24, y, 16, 32, 192, null, () -> {
                 if (screen.selectedElement == null) return;
                 screen.selectedElement.axis = Direction.Axis.Y;
                 rx.setEnabled(true);
@@ -191,7 +191,7 @@ public class ModelComponent extends ScreenComponent {
                 rz.setEnabled(true);
             });
             ry.setEnabled(screen.selectedElement.axis != Direction.Axis.Y);
-            rz = addToggleButton(leftPos + 42, y, 16, 48, 96, null, () -> {
+            rz = addToggleButton(leftPos + 42, y, 16, 48, 192, null, () -> {
                 if (screen.selectedElement == null) return;
                 screen.selectedElement.axis = Direction.Axis.Z;
                 rx.setEnabled(true);
@@ -200,11 +200,11 @@ public class ModelComponent extends ScreenComponent {
             });
             rz.setEnabled(screen.selectedElement.axis != Direction.Axis.Z);
 
-            addButton(leftPos + 62, y + 1, 14, 26, 228, null, () -> {
+            addButton(leftPos + 62, y + 1, 14, 222, 2, null, () -> {
                 if (screen.selectedElement == null) return;
                 screen.selectedElement.rotation = (screen.selectedElement.rotation + 22.5f) % 360;
             });
-            addButton(leftPos + 78, y + 1, 14, 42, 228, null, () -> {
+            addButton(leftPos + 78, y + 1, 14, 206, 2, null, () -> {
                 if (screen.selectedElement == null) return;
                 screen.selectedElement.rotation = (screen.selectedElement.rotation - 22.5f) % 360;
             });
@@ -212,7 +212,7 @@ public class ModelComponent extends ScreenComponent {
 
         // Element type
         for (FurnitureData.ElementType type : FurnitureData.ElementType.values()) {
-            addToggleButton(leftPos + 6 + type.ordinal() * 18, topPos + 94, 16, 176 + type.ordinal() * 16, 96, "gui.immersive_furniture.element_type." + type.name().toLowerCase(), () -> {
+            addToggleButton(leftPos + 6 + type.ordinal() * 18, topPos + 94, 16, 176 + type.ordinal() * 16, 192, "gui.immersive_furniture.element_type." + type.name().toLowerCase(), () -> {
                 if (screen.selectedElement == null) return;
                 screen.selectedElement.type = type;
                 screen.selectedElement.sanityCheck();
@@ -243,7 +243,7 @@ public class ModelComponent extends ScreenComponent {
             screen.addRenderableWidget(amountSlider);
 
             // Particle settings
-            addToggleButton(leftPos + width - 23, topPos + 136, 16, 32, 128, "gui.immersive_furniture.on_interact", () -> {
+            addToggleButton(leftPos + width - 23, topPos + 136, 16, 192, 160, "gui.immersive_furniture.on_interact", () -> {
                 if (screen.selectedElement == null) return;
                 screen.selectedElement.particleEmitter.onInteract = !screen.selectedElement.particleEmitter.onInteract;
                 screen.init();
@@ -278,7 +278,7 @@ public class ModelComponent extends ScreenComponent {
             screen.addRenderableWidget(amountSlider);
 
             // Sound settings
-            addToggleButton(leftPos + width - 23, topPos + 136, 16, 32, 128, "gui.immersive_furniture.on_interact", () -> {
+            addToggleButton(leftPos + width - 23, topPos + 136, 16, 192, 160, "gui.immersive_furniture.on_interact", () -> {
                 if (screen.selectedElement == null) return;
                 screen.selectedElement.soundEmitter.onInteract = !screen.selectedElement.soundEmitter.onInteract;
                 if (screen.selectedElement.soundEmitter.onInteract) {
@@ -300,7 +300,7 @@ public class ModelComponent extends ScreenComponent {
             List<Pose> poses = List.of(Pose.SITTING, Pose.SLEEPING);
             for (int i = 0; i < poses.size(); i++) {
                 Pose pose = poses.get(i);
-                addToggleButton(leftPos + 6 + i * 18, topPos + 114, 16, i * 16, 128, "gui.immersive_furniture.player_pose." + pose.name().toLowerCase(), () -> {
+                addToggleButton(leftPos + 6 + i * 18, topPos + 114, 16, 160 + i * 16, 160, "gui.immersive_furniture.player_pose." + pose.name().toLowerCase(), () -> {
                     if (screen.selectedElement == null) return;
                     screen.selectedElement.playerPose.pose = pose;
                     screen.selectedElement.sanityCheck();
@@ -311,7 +311,7 @@ public class ModelComponent extends ScreenComponent {
             // Rotation
             for (int i = 0; i < 360; i += 90) {
                 final int rotation = i;
-                addToggleButton(leftPos + 6 + i / 90 * 18, topPos + 114, 16, 160 + (i / 90) * 16, 224, "gui.immersive_furniture.rotation." + i, () -> {
+                addToggleButton(leftPos + 6 + i / 90 * 18, topPos + 114, 16, 96 + (i / 90) * 16, 160, "gui.immersive_furniture.rotation." + i, () -> {
                     if (screen.selectedElement == null) return;
                     screen.selectedElement.sprite.rotation = rotation;
                     screen.init();
@@ -319,13 +319,13 @@ public class ModelComponent extends ScreenComponent {
             }
 
             // Size
-            addButton(leftPos + 6, topPos + 132, 16, 112, 96, "gui.immersive_furniture.decrease_size", () -> {
+            addButton(leftPos + 6, topPos + 132, 16, 112, 192, "gui.immersive_furniture.decrease_size", () -> {
                 if (screen.selectedElement == null) return;
                 screen.selectedElement.sprite.size = Math.max(0.25f, screen.selectedElement.sprite.size / 2.0f);
                 screen.selectedElement.sanityCheck();
                 screen.init();
             });
-            addButton(leftPos + 24, topPos + 132, 16, 96, 96, "gui.immersive_furniture.increase_size", () -> {
+            addButton(leftPos + 24, topPos + 132, 16, 96, 192, "gui.immersive_furniture.increase_size", () -> {
                 if (screen.selectedElement == null) return;
                 screen.selectedElement.sprite.size = Math.min(1.0f, screen.selectedElement.sprite.size * 2.0f);
                 screen.selectedElement.sanityCheck();
@@ -333,7 +333,7 @@ public class ModelComponent extends ScreenComponent {
             });
 
             // Tiled toggle
-            addToggleButton(leftPos + 78, topPos + 132, 16, 144, 96, "gui.immersive_furniture.tiled", () -> {
+            addToggleButton(leftPos + 78, topPos + 132, 16, 144, 192, "gui.immersive_furniture.tiled", () -> {
                 if (screen.selectedElement == null) return;
                 screen.selectedElement.sprite.tiled = !screen.selectedElement.sprite.tiled;
                 screen.selectedElement.sanityCheck();

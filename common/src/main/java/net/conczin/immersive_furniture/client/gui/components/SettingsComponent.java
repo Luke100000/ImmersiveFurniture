@@ -63,7 +63,7 @@ public class SettingsComponent extends ScreenComponent {
         int x = leftPos + 6;
         int y = topPos + 22;
         for (String tag : TAGS) {
-            addToggleButton(x, y, 16, 48 + i * 16, 128,
+            addToggleButton(x, y, 16, i * 16, 224,
                     "gui.immersive_furniture.tag." + tag.toLowerCase(Locale.ROOT),
                     () -> {
                         screen.data.tag = tag;

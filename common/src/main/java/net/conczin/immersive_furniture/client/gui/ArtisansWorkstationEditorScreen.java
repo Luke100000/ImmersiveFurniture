@@ -64,6 +64,8 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
 
     Page currentPage = Page.MODEL;
 
+    boolean backwardsCheckerPlane = true;
+
     public enum Page {
         MODEL,
         MATERIALS,
@@ -100,7 +102,7 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
         MutableComponent text = Component.translatable("gui.immersive_furniture.tab.cancel");
         StateImageButton button = new StateImageButton(
                 leftPos + 4, topPos - 24, 26, 28,
-                130, 160, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE,
+                130, 56, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE,
                 b -> cancel(), text);
         button.setTooltip(Tooltip.create(text));
         button.setEnabled(false);
@@ -133,13 +135,43 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
         MutableComponent helpText = Component.translatable("gui.immersive_furniture.tab.help");
         StateImageButton helpButton = new StateImageButton(
                 leftPos + 240, topPos - 24, 26, 28,
-                8 * 26, 160, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE,
+                8 * 26, 56, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE,
                 b -> openHelp(),
                 helpText
         );
         helpButton.setEnabled(false);
         helpButton.setTooltip(Tooltip.create(helpText));
         addRenderableWidget(helpButton);
+
+        // Night-mode button
+        MutableComponent nightModeText = Component.translatable("gui.immersive_furniture.nightmode");
+        StateImageButton nightModeButton = new StateImageButton(
+                leftPos + windowWidth - 20, topPos + windowHeight - 20, 16, 16,
+                256 - 48, 160, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE,
+                b -> {
+                    nightMode = !nightMode;
+                    init();
+                },
+                nightModeText
+        );
+        nightModeButton.setTooltip(Tooltip.create(nightModeText));
+        nightModeButton.setEnabled(nightMode);
+        addRenderableWidget(nightModeButton);
+
+        // Backwards checker plane button
+        MutableComponent backwardsCheckerPlaneText = Component.translatable("gui.immersive_furniture.backwards_checkerplane");
+        StateImageButton backwardsCheckerButton = new StateImageButton(
+                leftPos + windowWidth - 20, topPos + windowHeight - 37, 16, 16,
+                256 - 32, 160, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE,
+                b -> {
+                    backwardsCheckerPlane = !backwardsCheckerPlane;
+                    init();
+                },
+                backwardsCheckerPlaneText
+        );
+        backwardsCheckerButton.setTooltip(Tooltip.create(backwardsCheckerPlaneText));
+        backwardsCheckerButton.setEnabled(backwardsCheckerPlane);
+        addRenderableWidget(backwardsCheckerButton);
 
         addHistory();
     }
@@ -158,7 +190,7 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
         MutableComponent text = Component.translatable("gui.immersive_furniture.tab." + page.name().toLowerCase(Locale.ROOT));
         StateImageButton button = new StateImageButton(
                 TOOLS_WIDTH + (windowWidth - TOOLS_WIDTH - 26 * Page.values().length) / 2 + leftPos + x, topPos - 24, 26, 28,
-                u, 160, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE,
+                u, 56, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE,
                 b -> {
                     currentPage = page;
                     init();
@@ -471,7 +503,9 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
         graphics.pose().mulPose(new Quaternionf().rotateX((float) Math.PI / 2));
         graphics.pose().translate(0, data.size.z, 0);
         graphics.pose().scale(1, 1, -1);
-        checkerPlane(graphics, data.size.x, data.size.y);
+        if (backwardsCheckerPlane) {
+            checkerPlane(graphics, data.size.x, data.size.y);
+        }
         graphics.pose().popPose();
 
         Matrix4f pose = graphics.pose().last().pose();

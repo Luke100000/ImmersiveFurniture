@@ -24,6 +24,8 @@
   "gui.immersive_furniture.delete_element": "Delete element",
   "gui.immersive_furniture.duplicate_element": "Duplicate element",
   "gui.immersive_furniture.select": "Select an element",
+  "gui.immersive_furniture.nightmode": "Night Mode",
+  "gui.immersive_furniture.backwards_checkerplane": "Backwards Checkerplane",
   "gui.immersive_furniture.furniture_dimension": "Furniture size",
   "gui.immersive_furniture.position": "Position",
   "gui.immersive_furniture.size": "Size",

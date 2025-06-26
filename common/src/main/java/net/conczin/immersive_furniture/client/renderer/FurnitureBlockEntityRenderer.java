@@ -97,7 +97,25 @@ public class FurnitureBlockEntityRenderer<T extends FurnitureBlockEntity> implem
         for (BakedQuad quad : quads) {
             ResourceLocation resourceLocation = quad.getSprite().atlasLocation();
             if (resourceLocation.getNamespace().equals("minecraft") != blocksAtlas) continue;
-            consumer.putBulkData(pose, quad, new float[]{1.0F, 1.0F, 1.0F, 1.0F}, 1.0f, 1.0f, 1.0f, new int[]{packedLight, packedLight, packedLight, packedLight}, packedOverlay, true);
+            consumer.putBulkData(pose,
+                    quad,
+                    new float[]{1.0F, 1.0F, 1.0F, 1.0F},
+                    1.0f,
+                    1.0f,
+                    1.0f,
+                    new int[]{
+                            blend(packedLight, quad.getVertices()[6]),
+                            blend(packedLight, quad.getVertices()[8 + 6]),
+                            blend(packedLight, quad.getVertices()[16 + 6]),
+                            blend(packedLight, quad.getVertices()[24 + 6])
+                    },
+                    packedOverlay,
+                    true
+            );
         }
+    }
+
+    private static int blend(int worldLight, int vertexLight) {
+        return Math.max(worldLight & 0xFFFF, vertexLight & 0xFFFF) | (Math.max((worldLight >> 16) & 0xFFFF, (vertexLight >> 16) & 0xFFFF) << 16);
     }
 }

@@ -63,9 +63,9 @@ public class SpritesComponent extends ListComponent {
     @Override
     public void init(int leftPos, int topPos, int width, int height) {
         int tx = 7;
-        int u = 64;
+        int u = 0;
         for (FilterType value : FilterType.values()) {
-            StateImageButton button = addToggleButton(leftPos + tx, topPos + 22, 16, u, 224,
+            StateImageButton button = addToggleButton(leftPos + tx, topPos + 22, 16, u, 160,
                     "gui.immersive_furniture.sprite_filter." + value.name().toLowerCase(Locale.ROOT), () -> {
                         filterType = value;
                         screen.init();
@@ -76,7 +76,7 @@ public class SpritesComponent extends ListComponent {
         }
 
         // Vanilla only toggle
-        addToggleButton(leftPos + 80, topPos + 22, 16, 144, 224,
+        addToggleButton(leftPos + 80, topPos + 22, 16, 80, 160,
                 "gui.immersive_furniture.vanilla", () -> {
                     vanillaOnly = !vanillaOnly;
                     screen.init();
@@ -88,7 +88,7 @@ public class SpritesComponent extends ListComponent {
             for (int x = 0; x < 4; x++) {
                 SpriteButton button = new SpriteButton(
                         leftPos + 6 + x * 22, topPos + 44 + y * 22,
-                        22, 22, 234, 162,
+                        22, 22, 146, 0,
                         b -> {
                             ResourceLocation spriteLocation = ((SpriteButton) b).getSpriteLocation();
                             if (screen.selectedElement != null && spriteLocation != null) {

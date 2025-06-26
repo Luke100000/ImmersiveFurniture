@@ -52,7 +52,7 @@ public class SoundsComponent extends ListComponent {
 
             // Sample sound button
             screen.addRenderableWidget(new ImageButton(
-                    leftPos + width - 23, y, 18, 18, 238, 220, 18, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE,
+                    leftPos + width - 23, y, 18, 18, 238, 0, 18, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE,
                     b -> {
                         if (finalI >= locations.size()) return;
                         SoundEvent soundEvent = BuiltInRegistries.SOUND_EVENT.get(locations.get(finalI));
