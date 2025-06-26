@@ -7,6 +7,7 @@
 * Fixed Artisans table is not dropping itself
 * Added some anti-z-fighting (Does not replace proper modeling!)
 * Sprites now support tile mode (mostly interesting for liquids and co)
+* Fixed Sodium incompatibility pausing animations
 
 # 0.0.2
 

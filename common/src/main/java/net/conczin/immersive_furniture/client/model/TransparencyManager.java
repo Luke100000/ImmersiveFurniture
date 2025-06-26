@@ -3,6 +3,7 @@ package net.conczin.immersive_furniture.client.model;
 import com.mojang.blaze3d.platform.NativeImage;
 import net.conczin.immersive_furniture.data.FurnitureData;
 import net.conczin.immersive_furniture.data.TransparencyType;
+import net.conczin.immersive_furniture.item.FurnitureItem;
 import net.conczin.immersive_furniture.mixin.client.SpriteContentsAccessor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
@@ -78,5 +79,14 @@ public class TransparencyManager {
         TextureAtlas atlas = Minecraft.getInstance().getModelManager().getAtlas(InventoryMenu.BLOCK_ATLAS);
         TextureAtlasSprite sprite = atlas.getSprite(element.sprite.sprite);
         return TransparencyManager.INSTANCE.getTransparencyType(sprite.contents());
+    }
+
+    public static void heySodiumImInUse(FurnitureData data) {
+        for (FurnitureData.Element element : data.elements) {
+            if (element.type == FurnitureData.ElementType.SPRITE) {
+                TextureAtlas atlas = Minecraft.getInstance().getModelManager().getAtlas(InventoryMenu.BLOCK_ATLAS);
+                atlas.getSprite(element.sprite.sprite);
+            }
+        }
     }
 }
