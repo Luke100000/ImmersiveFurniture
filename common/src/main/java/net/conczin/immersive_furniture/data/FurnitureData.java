@@ -513,6 +513,7 @@ public class FurnitureData {
         public float rotation = 0.0f;
         public ElementType type = ElementType.ELEMENT;
         public int color = -1;
+        public int emission = 0;
         public Material material;
         public ParticleEmitter particleEmitter;
         public SoundEmitter soundEmitter;
@@ -539,6 +540,7 @@ public class FurnitureData {
             this.rotation = NBTHelper.getFloat(tag, "Rotation", rotation);
             this.type = NBTHelper.getEnum(tag, ElementType.class, "Type", type);
             this.color = NBTHelper.getInt(tag, "Color", color);
+            this.emission = NBTHelper.getInt(tag, "Emission", 0);
             this.material = new Material(tag.getCompound("Material"));
             this.particleEmitter = new ParticleEmitter(tag.getCompound("ParticleEmitter"));
             this.soundEmitter = new SoundEmitter(tag.getCompound("SoundEmitter"));
@@ -559,6 +561,7 @@ public class FurnitureData {
             this.rotation = element.rotation;
             this.type = element.type;
             this.color = element.color;
+            this.emission = element.emission;
             this.material = new Material(element.material);
             this.particleEmitter = new ParticleEmitter(element.particleEmitter);
             this.soundEmitter = new SoundEmitter(element.soundEmitter);
@@ -576,6 +579,7 @@ public class FurnitureData {
             tag.putFloat("Rotation", rotation);
             tag.putString("Type", type.name().toLowerCase());
             tag.putInt("Color", color);
+            tag.putInt("Emission", emission);
 
             if (type == ElementType.ELEMENT) {
                 tag.put("Material", material.toTag());
@@ -659,6 +663,9 @@ public class FurnitureData {
                     to.y = center.y + 8.0f * sprite.size;
                 }
                 to.z = from.z;
+            } else if (type == ElementType.ELEMENT) {
+                // While elements could be tinted, there is no gui to do so
+                color = -1;
             }
         }
 

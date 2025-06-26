@@ -1,6 +1,7 @@
 # 0.0.3
 
 * Added autosave
+* Added emission to materials and sprites
 * Improved transparent rendering
 * Improved ambient occlusion on transparent elements
 * Transparent elements no longer cull other elements
@@ -25,4 +26,3 @@ Initial release
 
 * Blockbench/JSON block and item model import
 * Datapack support
-* Emissions

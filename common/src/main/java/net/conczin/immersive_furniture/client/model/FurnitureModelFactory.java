@@ -29,7 +29,9 @@ public class FurnitureModelFactory {
 
     private final Map<FurnitureData.Element, Map<Direction, BlockElementFace>> faces = new HashMap<>();
     private final List<FurnitureData.Element> elements = new LinkedList<>();
-    Map<String, Either<Material, String>> textures = new HashMap<>();
+    private final Map<String, Either<Material, String>> textures = new HashMap<>();
+    private final Map<FurnitureData.Element, Integer> elementToIndex = new HashMap<>();
+    private final Map<Integer, FurnitureData.Element> indexToElement = new HashMap<>();
 
     private FurnitureModelFactory(FurnitureData data, DynamicAtlas atlas) {
         this.data = data;
@@ -132,7 +134,8 @@ public class FurnitureModelFactory {
 
                         // Ambient Occlusion
                         float ao = Math.min(1.0f, Math.max(0.0f, 1.0f - this.ao.sample(pos, normal) * 1.5f));
-                        light *= ao;
+                        float emission = element.emission / 15.0f;
+                        light *= (ao * (1.0f - emission) + emission);
 
                         // Contrast
                         float contrast = lightEffect.contrast / 100.0f;
@@ -159,7 +162,7 @@ public class FurnitureModelFactory {
         float uvScale = 16.0f / atlas.size;
         return new BlockElementFace(
                 getCulledDirection(vertices),
-                -1,
+                elementToIndex.get(element),
                 "0",
                 new BlockFaceUV(
                         new float[]{
@@ -324,11 +327,11 @@ public class FurnitureModelFactory {
         }
     }
 
-    private static BlockElementFace getSpriteFace(FurnitureData.Element element, boolean front) {
+    private BlockElementFace getSpriteFace(FurnitureData.Element element, boolean front) {
         Vector3i size = element.getSize();
         return new BlockElementFace(
                 null,
-                element.color,
+                elementToIndex.get(element),
                 element.sprite.sprite.toString(),
                 new BlockFaceUV(
                         new float[]{front ? 0 : size.x, 0, front ? size.x : 0, size.y},
@@ -353,6 +356,7 @@ public class FurnitureModelFactory {
     }
 
     private void splitSprites() {
+        int index = 0;
         for (FurnitureData.Element element : data.elements) {
             if (element.type == FurnitureData.ElementType.SPRITE && element.sprite.tiled) {
                 Vector3i size = element.getSize();
@@ -366,11 +370,16 @@ public class FurnitureModelFactory {
                                 element.to.z
                         );
                         elements.add(tiledElement);
+                        elementToIndex.put(tiledElement, index);
                     }
                 }
+                indexToElement.put(index, element);
             } else {
                 elements.add(element);
+                elementToIndex.put(element, index);
+                indexToElement.put(index, element);
             }
+            index++;
         }
     }
 
@@ -418,7 +427,7 @@ public class FurnitureModelFactory {
         FurnitureModelFactory factory = new FurnitureModelFactory(data, atlas);
 
         // Create a model for each transparency type
-        MultiRenderTypeBlockModel composite = new MultiRenderTypeBlockModel();
+        MultiRenderTypeBlockModel composite = new MultiRenderTypeBlockModel(factory.indexToElement);
         composite.addModel(RenderType.solid(), factory.getModel(TransparencyType.SOLID));
         composite.addModel(RenderType.cutout(), factory.getModel(TransparencyType.CUTOUT));
         composite.addModel(RenderType.cutoutMipped(), factory.getModel(TransparencyType.CUTOUT_MIPPED));

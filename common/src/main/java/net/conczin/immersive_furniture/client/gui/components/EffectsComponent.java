@@ -3,7 +3,6 @@ package net.conczin.immersive_furniture.client.gui.components;
 import net.conczin.immersive_furniture.client.gui.ArtisansWorkstationEditorScreen;
 import net.conczin.immersive_furniture.client.gui.widgets.BoundedIntSliderButton;
 import net.conczin.immersive_furniture.client.gui.widgets.HSVColorPicker;
-import net.conczin.immersive_furniture.client.gui.widgets.StateImageButton;
 import net.conczin.immersive_furniture.data.FurnitureData;
 
 public class EffectsComponent extends ScreenComponent {
@@ -24,7 +23,18 @@ public class EffectsComponent extends ScreenComponent {
             HSVColorPicker colorSelector = new HSVColorPicker(leftPos + 6, y, width - 12, 60, screen.selectedElement.color,
                     c -> screen.selectedElement.color = c);
             colorSelector.getWidgets().forEach(screen::addRenderableWidget);
+            y += 66;
         }
+
+        // Emission
+        BoundedIntSliderButton emissionSlider = new BoundedIntSliderButton(leftPos + 6, y, width - 12, 20,
+                "gui.immersive_furniture.emission",
+                screen.selectedElement.emission, 0, 15);
+        emissionSlider.setCallback(i -> {
+            if (screen.selectedElement == null) return;
+            screen.selectedElement.emission = i;
+        });
+        screen.addRenderableWidget(emissionSlider);
     }
 
     public int initLightGUI(ArtisansWorkstationEditorScreen screen, int x, int y, int width) {

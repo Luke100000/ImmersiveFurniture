@@ -40,6 +40,7 @@
   "gui.immersive_furniture.hue": "Hue %s",
   "gui.immersive_furniture.saturation": "Saturation %s",
   "gui.immersive_furniture.value": "Value %s",
+  "gui.immersive_furniture.emission": "Emission %s",
   "gui.immersive_furniture.light_level": "%s Light",
   "gui.immersive_furniture.inventory": "%s Inventory",
   "gui.immersive_furniture.has_particles": "Has particles",
