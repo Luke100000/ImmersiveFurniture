@@ -433,7 +433,9 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
                         bestDot = dot;
                     }
                 }
-                direction = bestDirection;
+
+                // TODO: That's a hack and should rather check for which side of the face was the initial grabbing point
+                direction = (hasAltDown() && isFlat) ? bestDirection.getOpposite() : bestDirection;
             }
 
             float viewDot = (float) Math.sqrt(1.0f - normal.z * normal.z);

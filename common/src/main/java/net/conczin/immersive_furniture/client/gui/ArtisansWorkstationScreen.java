@@ -2,11 +2,8 @@ package net.conczin.immersive_furniture.client.gui;
 
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.conczin.immersive_furniture.Common;
-import net.conczin.immersive_furniture.client.model.MergedBakedModel;
 import net.conczin.immersive_furniture.client.PreviewParticleEngine;
-import net.conczin.immersive_furniture.client.model.DynamicAtlas;
-import net.conczin.immersive_furniture.client.model.FurnitureModelBaker;
-import net.conczin.immersive_furniture.client.model.MaterialRegistry;
+import net.conczin.immersive_furniture.client.model.*;
 import net.conczin.immersive_furniture.client.renderer.FurnitureBlockEntityRenderer;
 import net.conczin.immersive_furniture.data.FurnitureData;
 import net.minecraft.client.Minecraft;
@@ -87,6 +84,7 @@ public abstract class ArtisansWorkstationScreen extends Screen {
     private static MergedBakedModel lastBakedModel = null;
 
     static void renderModel(GuiGraphics graphics, FurnitureData data, float yaw, float pitch, boolean inEditor) {
+        if (inEditor) TransparencyManager.prepare(data);
         MergedBakedModel bakedModel = FurnitureModelBaker.getAsyncModel(data, DynamicAtlas.SCRATCH);
         if (inEditor) {
             if (bakedModel == null) {

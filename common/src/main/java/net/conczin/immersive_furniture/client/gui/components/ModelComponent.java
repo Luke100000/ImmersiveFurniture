@@ -331,6 +331,14 @@ public class ModelComponent extends ScreenComponent {
                 screen.selectedElement.sanityCheck();
                 screen.init();
             });
+
+            // Tiled toggle
+            addToggleButton(leftPos + 78, topPos + 132, 16, 144, 96, "gui.immersive_furniture.tiled", () -> {
+                if (screen.selectedElement == null) return;
+                screen.selectedElement.sprite.tiled = !screen.selectedElement.sprite.tiled;
+                screen.selectedElement.sanityCheck();
+                screen.init();
+            }).setEnabled(!screen.selectedElement.sprite.tiled);
         }
     }
 

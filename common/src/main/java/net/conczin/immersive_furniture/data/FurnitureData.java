@@ -44,7 +44,6 @@ public class FurnitureData {
     public String originalAuthor = "";
     public Set<String> sources = new HashSet<>();
     public Set<String> dependencies = new HashSet<>();
-    public TransparencyType transparency = TransparencyType.SOLID;
 
     public final List<Element> elements = new LinkedList<>();
 
@@ -68,7 +67,6 @@ public class FurnitureData {
         this.originalAuthor = NBTHelper.getString(tag, "OriginalAuthor", originalAuthor);
         this.sources = NBTHelper.getStringSet(tag.getList("Sources", 8));
         this.dependencies = NBTHelper.getStringSet(tag.getList("Dependencies", 8));
-        this.transparency = NBTHelper.getEnum(tag, TransparencyType.class, "Transparency", TransparencyType.SOLID);
 
         this.size = new Vector3i(
                 NBTHelper.getInt(tag, "SizeX", 1),
@@ -92,7 +90,6 @@ public class FurnitureData {
         this.originalAuthor = data.originalAuthor.isEmpty() ? data.author : data.originalAuthor;
         this.sources.addAll(data.sources);
         this.dependencies.addAll(data.dependencies);
-        this.transparency = data.transparency;
 
         this.hash = null;
         this.cachedShapes = new HashMap<>();
@@ -116,7 +113,6 @@ public class FurnitureData {
         tag.putString("OriginalAuthor", originalAuthor);
         tag.put("Sources", NBTHelper.getStringList(sources));
         tag.put("Dependencies", NBTHelper.getStringList(dependencies));
-        tag.putString("Transparency", this.transparency.name());
 
         tag.putInt("SizeX", size.x);
         tag.putInt("SizeY", size.y);
@@ -643,10 +639,12 @@ public class FurnitureData {
             } else if (type == ElementType.SPRITE) {
                 // Sprites are forced to be 16x16x0
                 Vector3f center = getCenter();
-                from.x = center.x - 8.0f * sprite.size;
-                from.y = center.y - 8.0f * sprite.size;
-                to.x = center.x + 8.0f * sprite.size;
-                to.y = center.y + 8.0f * sprite.size;
+                if (!sprite.tiled) {
+                    from.x = center.x - 8.0f * sprite.size;
+                    from.y = center.y - 8.0f * sprite.size;
+                    to.x = center.x + 8.0f * sprite.size;
+                    to.y = center.y + 8.0f * sprite.size;
+                }
                 to.z = from.z;
             }
         }
@@ -874,6 +872,7 @@ public class FurnitureData {
         public ResourceLocation sprite = new ResourceLocation("minecraft:block/soul_fire_1");
         public int rotation = 0;
         public float size = 1.0f;
+        public boolean tiled = false;
 
         public Sprite() {
         }
@@ -882,12 +881,14 @@ public class FurnitureData {
             this.sprite = NBTHelper.getResourceLocation(tag, "Sprite", sprite);
             this.rotation = NBTHelper.getInt(tag, "Rotation", rotation);
             this.size = NBTHelper.getFloat(tag, "Size", size);
+            this.tiled = NBTHelper.getBoolean(tag, "Tiled", tiled);
         }
 
         public Sprite(Sprite sprite) {
             this.sprite = sprite.sprite;
             this.rotation = sprite.rotation;
             this.size = sprite.size;
+            this.tiled = sprite.tiled;
         }
 
         public CompoundTag toTag() {
@@ -895,6 +896,7 @@ public class FurnitureData {
             tag.putString("Sprite", sprite.toString());
             tag.putInt("Rotation", rotation);
             tag.putFloat("Size", size);
+            tag.putBoolean("Tiled", tiled);
             return tag;
         }
     }

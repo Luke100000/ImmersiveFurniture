@@ -6,6 +6,7 @@
 * Transparent elements no longer cull other elements
 * Fixed Artisans table is not dropping itself
 * Added some anti-z-fighting (Does not replace proper modeling!)
+* Sprites now support tile mode (mostly interesting for liquids and co)
 
 # 0.0.2
 
@@ -15,9 +16,12 @@
 
 Initial release
 
+# Bugs
+
+* On flat elements (sprites mostly) the direction is picked oddly
+
 # Roadmap 1.0.0
 
 * Blockbench/JSON block and item model import
 * Datapack support
-* Tiled sprites (primarily interesting for water)
 * Emissions
