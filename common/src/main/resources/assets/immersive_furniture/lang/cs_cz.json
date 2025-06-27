@@ -68,6 +68,7 @@
   "gui.immersive_furniture.n_tall": "%s vysoké",
   "gui.immersive_furniture.n_deep": "%s hluboká",
   "gui.immersive_furniture.author": "Podle %s",
+  "gui.immersive_furniture.atlas_usage": "Používá %s atlasu textury",
   "gui.immersive_furniture.original_author": "Původně %s",
   "gui.immersive_furniture.move_furniture": "Přesunout nábytek",
   "gui.immersive_furniture.move_furniture_up": "Posunout nahoru",
