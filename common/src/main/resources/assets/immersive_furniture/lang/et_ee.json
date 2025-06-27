@@ -68,6 +68,7 @@
   "gui.immersive_furniture.n_tall": "%s pikk",
   "gui.immersive_furniture.n_deep": "%s sügav",
   "gui.immersive_furniture.author": "Autor %s",
+  "gui.immersive_furniture.atlas_usage": "Kasutab %s tekstuuri atlastikku.",
   "gui.immersive_furniture.original_author": "Algselt %s",
   "gui.immersive_furniture.move_furniture": "Mööbli teisaldamine",
   "gui.immersive_furniture.move_furniture_up": "Liigu ülespoole",
