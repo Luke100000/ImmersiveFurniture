@@ -68,6 +68,7 @@
   "gui.immersive_furniture.n_tall": "%s visok",
   "gui.immersive_furniture.n_deep": "%s globoko",
   "gui.immersive_furniture.author": "Po %s",
+  "gui.immersive_furniture.atlas_usage": "Uporablja %s atlasa tekstur",
   "gui.immersive_furniture.original_author": "Prvotno ga je %s",
   "gui.immersive_furniture.move_furniture": "Premikanje pohištva",
   "gui.immersive_furniture.move_furniture_up": "Premaknite se navzgor",
