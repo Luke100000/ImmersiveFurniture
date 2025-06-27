@@ -68,6 +68,7 @@
   "gui.immersive_furniture.n_tall": "%s tall",
   "gui.immersive_furniture.n_deep": "%s deep",
   "gui.immersive_furniture.author": "제작: %s",
+  "gui.immersive_furniture.atlas_usage": "텍스처 아틀라스의 %s 사용",
   "gui.immersive_furniture.original_author": "원래 작성자: %s",
   "gui.immersive_furniture.move_furniture": "가구 이동",
   "gui.immersive_furniture.move_furniture_up": "위로 이동",
