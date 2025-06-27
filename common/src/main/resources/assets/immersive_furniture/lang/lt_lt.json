@@ -68,6 +68,7 @@
   "gui.immersive_furniture.n_tall": "%s aukštas",
   "gui.immersive_furniture.n_deep": "%s gilus",
   "gui.immersive_furniture.author": "Pagal %s",
+  "gui.immersive_furniture.atlas_usage": "Naudoja %s tekstūrų atlasą",
   "gui.immersive_furniture.original_author": "Iš pradžių %s",
   "gui.immersive_furniture.move_furniture": "Perkelkite baldus",
   "gui.immersive_furniture.move_furniture_up": "Pereiti į aukštesnį lygį",
