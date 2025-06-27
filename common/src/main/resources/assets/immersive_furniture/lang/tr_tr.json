@@ -68,6 +68,7 @@
   "gui.immersive_furniture.n_tall": "%s uzun boylu",
   "gui.immersive_furniture.n_deep": "%s derin",
   "gui.immersive_furniture.author": "Tarafından %s",
+  "gui.immersive_furniture.atlas_usage": "Doku atlasının %s adresini kullanır",
   "gui.immersive_furniture.original_author": "Originally tarafından %s",
   "gui.immersive_furniture.move_furniture": "Mobilyaları taşıyın",
   "gui.immersive_furniture.move_furniture_up": "İlerleyin",
