@@ -68,6 +68,7 @@
   "gui.immersive_furniture.n_tall": "%s magas",
   "gui.immersive_furniture.n_deep": "%s mély",
   "gui.immersive_furniture.author": "Készítő: %s",
+  "gui.immersive_furniture.atlas_usage": "Használja a %s a textúra atlaszt",
   "gui.immersive_furniture.original_author": "Eredetileg %sáltal",
   "gui.immersive_furniture.move_furniture": "Bútorok mozgatása",
   "gui.immersive_furniture.move_furniture_up": "Mozogj feljebb",
