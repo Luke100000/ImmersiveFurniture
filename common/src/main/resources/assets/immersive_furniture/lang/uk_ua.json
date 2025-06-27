@@ -68,6 +68,7 @@
   "gui.immersive_furniture.n_tall": "%s високий",
   "gui.immersive_furniture.n_deep": "%s глибоко",
   "gui.immersive_furniture.author": "Автор: %s",
+  "gui.immersive_furniture.atlas_usage": "Використовує атлас текстур %s",
   "gui.immersive_furniture.original_author": "Спочатку від %s",
   "gui.immersive_furniture.move_furniture": "Перемістити меблі",
   "gui.immersive_furniture.move_furniture_up": "Посунути вгору",
