@@ -334,7 +334,12 @@ public class FurnitureModelFactory {
                 elementToIndex.get(element),
                 element.sprite.sprite.toString(),
                 new BlockFaceUV(
-                        new float[]{front ? 0 : size.x, 0, front ? size.x : 0, size.y},
+                        new float[]{
+                                front ? 0 : size.x / element.sprite.size,
+                                0,
+                                front ? size.x / element.sprite.size : 0,
+                                size.y / element.sprite.size
+                        },
                         element.sprite.rotation
                 )
         );
@@ -360,13 +365,14 @@ public class FurnitureModelFactory {
         for (FurnitureData.Element element : data.elements) {
             if (element.type == FurnitureData.ElementType.SPRITE && element.sprite.tiled) {
                 Vector3i size = element.getSize();
-                for (int x = 0; x < size.x; x += 16) {
-                    for (int y = 0; y < size.y; y += 16) {
+                int px = Math.round(16 * element.sprite.size);
+                for (int x = 0; x < size.x; x += px) {
+                    for (int y = 0; y < size.y; y += px) {
                         FurnitureData.Element tiledElement = new FurnitureData.Element(element);
                         tiledElement.from.add(x, y, 0);
                         tiledElement.to = new Vector3f(
-                                Math.min(element.from.x + x + 16, element.to.x),
-                                Math.min(element.from.y + y + 16, element.to.y),
+                                Math.min(element.from.x + x + px, element.to.x),
+                                Math.min(element.from.y + y + px, element.to.y),
                                 element.to.z
                         );
                         elements.add(tiledElement);

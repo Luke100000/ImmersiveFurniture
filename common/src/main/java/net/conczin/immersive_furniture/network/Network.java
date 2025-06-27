@@ -3,6 +3,7 @@ package net.conczin.immersive_furniture.network;
 import net.conczin.immersive_furniture.network.c2s.FurnitureDataRequest;
 import net.conczin.immersive_furniture.network.c2s.CraftRequest;
 import net.conczin.immersive_furniture.network.s2c.FurnitureDataResponse;
+import net.conczin.immersive_furniture.network.s2c.FurnitureInteractMessage;
 import net.conczin.immersive_furniture.network.s2c.FurnitureRegistryMessage;
 import net.conczin.immersive_furniture.network.s2c.PoseOffsetMessage;
 import net.minecraft.network.FriendlyByteBuf;
@@ -36,10 +37,11 @@ public class Network {
     }
 
     public static void register(Registrar c) {
+        c.register(CraftRequest.class, CraftRequest::new);
         c.register(FurnitureDataRequest.class, FurnitureDataRequest::new);
 
-        c.register(CraftRequest.class, CraftRequest::new);
         c.register(FurnitureDataResponse.class, FurnitureDataResponse::new);
+        c.register(FurnitureInteractMessage.class, FurnitureInteractMessage::new);
         c.register(FurnitureRegistryMessage.class, FurnitureRegistryMessage::new);
         c.register(PoseOffsetMessage.class, PoseOffsetMessage::new);
     }

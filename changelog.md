@@ -1,3 +1,8 @@
+# 0.0.4
+
+* Fixes and improvements
+* Interact sounds and particles are now shared in multiplayer
+
 # 0.0.3
 
 * Added autosave
@@ -26,3 +31,4 @@ Initial release
 
 * Blockbench/JSON block and item model import
 * Datapack support
+* Multi-selection

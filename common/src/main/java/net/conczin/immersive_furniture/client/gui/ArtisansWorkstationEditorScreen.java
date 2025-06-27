@@ -146,7 +146,7 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
         // Night-mode button
         MutableComponent nightModeText = Component.translatable("gui.immersive_furniture.nightmode");
         StateImageButton nightModeButton = new StateImageButton(
-                leftPos + windowWidth - 20, topPos + windowHeight - 20, 16, 16,
+                leftPos + windowWidth + 1, topPos + windowHeight - 19, 16, 16,
                 256 - 48, 160, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE,
                 b -> {
                     nightMode = !nightMode;
@@ -161,7 +161,7 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
         // Backwards checker plane button
         MutableComponent backwardsCheckerPlaneText = Component.translatable("gui.immersive_furniture.backwards_checkerplane");
         StateImageButton backwardsCheckerButton = new StateImageButton(
-                leftPos + windowWidth - 20, topPos + windowHeight - 37, 16, 16,
+                leftPos + windowWidth + 1, topPos + windowHeight - 36, 16, 16,
                 256 - 32, 160, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE,
                 b -> {
                     backwardsCheckerPlane = !backwardsCheckerPlane;
@@ -370,10 +370,12 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         if (isCopy(keyCode)) {
+            // Copy
             if (selectedElement != null) {
                 copiedElement = selectedElement.toTag();
             }
         } else if (isCut(keyCode)) {
+            // Cut
             if (selectedElement != null) {
                 copiedElement = selectedElement.toTag();
                 data.elements.remove(selectedElement);
@@ -381,17 +383,31 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
                 init();
             }
         } else if (isPaste(keyCode)) {
+            // Paste
             if (copiedElement != null) {
-                selectedElement = new FurnitureData.Element(selectedElement);
-                data.elements.add(new FurnitureData.Element(copiedElement));
+                FurnitureData.Element element = new FurnitureData.Element(copiedElement);
+                data.elements.add(element);
+                selectedElement = element;
+                init();
+            }
+        } else if (keyCode == 261) {
+            // Delete
+            if (selectedElement != null) {
+                data.elements.remove(selectedElement);
+                selectedElement = null;
                 init();
             }
         } else if (keyCode == 77 && hasControlDown() && !hasShiftDown() && !hasAltDown()) {
+            // Paste material
             if (selectedElement != null && copiedElement != null) {
-                selectedElement.material = new FurnitureData.Material(new FurnitureData.Element(copiedElement).material);
+                FurnitureData.Element element = new FurnitureData.Element(copiedElement);
+                selectedElement.material = new FurnitureData.Material(element.material);
+                selectedElement.color = element.color;
+                selectedElement.emission = element.emission;
                 init();
             }
         } else if (isUndo(keyCode)) {
+            // Undo
             if (!history.isEmpty() && lastHistoryHash.equals(data.getHash())) {
                 history.removeFirst();
             }

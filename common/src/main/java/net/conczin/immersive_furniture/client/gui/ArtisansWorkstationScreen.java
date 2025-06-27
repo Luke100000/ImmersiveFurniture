@@ -101,7 +101,7 @@ public abstract class ArtisansWorkstationScreen extends Screen {
         }
 
         if (bakedModel != null) {
-            int light = nightMode ? 0 : 15;
+            int light = nightMode ? data.lightLevel : 15;
             FurnitureBlockEntityRenderer.renderFurniture(
                     null,
                     graphics.pose(),

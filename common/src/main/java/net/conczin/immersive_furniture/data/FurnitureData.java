@@ -210,26 +210,20 @@ public class FurnitureData {
         }
     }
 
-    public boolean playInteractSound(Level level, BlockPos pos, Player player) {
-        boolean consumed = false;
+    public void playInteractSound(Level level, BlockPos pos, Player player) {
         for (Element element : elements) {
             if (element.type == ElementType.SOUND_EMITTER && element.soundEmitter.onInteract) {
                 playSound(level, pos, player.getRandom(), element);
-                consumed = true;
             }
         }
-        return consumed;
     }
 
-    public boolean emitInteractParticles(BlockPos pos, Direction direction, Player player, ParticleConsumer particleConsumer, boolean inScreen) {
-        boolean consumed = false;
+    public void emitInteractParticles(BlockPos pos, Direction direction, Player player, ParticleConsumer particleConsumer, boolean inScreen) {
         for (Element element : elements) {
             if (element.type == ElementType.PARTICLE_EMITTER && element.particleEmitter.onInteract) {
                 emitParticles(pos, direction, player.getRandom(), element, particleConsumer, inScreen, 10.0f);
-                consumed = true;
             }
         }
-        return consumed;
     }
 
     public boolean hasParticles() {
@@ -273,16 +267,6 @@ public class FurnitureData {
         if (canSleep()) {
             tooltip.add(Component.translatable("gui.immersive_furniture.can_sleep").withStyle(ChatFormatting.YELLOW));
         }
-        if (advanced) {
-            int pixels = 0;
-            for (Element element : elements) {
-                for (int[] value : element.bakedTexture.values()) {
-                    pixels += value.length;
-                }
-            }
-            long round = Math.round(pixels / Math.pow(DynamicAtlas.SCRATCH.getSize(), 2) * 1000);
-            tooltip.add(Component.literal(round + "%.").withStyle(ChatFormatting.YELLOW));
-        }
         boolean hasAdvanced = false;
         if (!sources.isEmpty()) {
             hasAdvanced = true;
@@ -301,6 +285,16 @@ public class FurnitureData {
                     tooltip.add(Component.literal("- " + dependency).withStyle(ChatFormatting.GRAY));
                 }
             }
+        }
+        if (advanced) {
+            int pixels = 0;
+            for (Element element : elements) {
+                for (int[] value : element.bakedTexture.values()) {
+                    pixels += value.length;
+                }
+            }
+            double usage = pixels / Math.pow(DynamicAtlas.BAKED.getSize(), 2);
+            tooltip.add(Component.translatable("gui.immersive_furniture.atlas_usage", String.format("%.1f%%", usage * 100)).withStyle(ChatFormatting.DARK_GRAY));
         }
         if (hasAdvanced && !advanced) {
             tooltip.add(Component.translatable("gui.immersive_furniture.tooltip").withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC));
