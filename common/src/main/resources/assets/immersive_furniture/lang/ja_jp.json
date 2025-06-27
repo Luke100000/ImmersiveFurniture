@@ -68,6 +68,7 @@
   "gui.immersive_furniture.n_tall": "%s 高い",
   "gui.immersive_furniture.n_deep": "%s 深い",
   "gui.immersive_furniture.author": "by %s",
+  "gui.immersive_furniture.atlas_usage": "テクスチャアトラスの %s を使用",
   "gui.immersive_furniture.original_author": "元 %s",
   "gui.immersive_furniture.move_furniture": "家具を移動",
   "gui.immersive_furniture.move_furniture_up": "上へ移動",
