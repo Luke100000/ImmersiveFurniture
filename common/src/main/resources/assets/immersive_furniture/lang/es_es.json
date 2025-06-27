@@ -68,6 +68,7 @@
   "gui.immersive_furniture.n_tall": "Altura %s",
   "gui.immersive_furniture.n_deep": "%s en profundidad",
   "gui.immersive_furniture.author": "Por %s",
+  "gui.immersive_furniture.atlas_usage": "Usa %s del atlas de textura",
   "gui.immersive_furniture.original_author": "Originalmente por %s",
   "gui.immersive_furniture.move_furniture": "Mover muebles",
   "gui.immersive_furniture.move_furniture_up": "Subir",
