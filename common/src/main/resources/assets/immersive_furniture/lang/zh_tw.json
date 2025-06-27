@@ -68,6 +68,7 @@
   "gui.immersive_furniture.n_tall": "%s 高",
   "gui.immersive_furniture.n_deep": "%s (人)深沉的",
   "gui.immersive_furniture.author": "來自 %s",
+  "gui.immersive_furniture.atlas_usage": "使用 %s 的材質圖集",
   "gui.immersive_furniture.original_author": "原作者 %s",
   "gui.immersive_furniture.move_furniture": "移動傢俱",
   "gui.immersive_furniture.move_furniture_up": "上移",
