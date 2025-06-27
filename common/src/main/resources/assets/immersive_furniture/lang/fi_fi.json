@@ -68,6 +68,7 @@
   "gui.immersive_furniture.n_tall": "%s pitkä",
   "gui.immersive_furniture.n_deep": "%s syvä",
   "gui.immersive_furniture.author": "By %s",
+  "gui.immersive_furniture.atlas_usage": "Käyttää tekstuurikartasta %s",
   "gui.immersive_furniture.original_author": "Alun perin %s",
   "gui.immersive_furniture.move_furniture": "Siirrä huonekalut",
   "gui.immersive_furniture.move_furniture_up": "Siirrä ylös",
