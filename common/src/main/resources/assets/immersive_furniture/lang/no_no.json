@@ -68,6 +68,7 @@
   "gui.immersive_furniture.n_tall": "%s høy",
   "gui.immersive_furniture.n_deep": "%s dyp",
   "gui.immersive_furniture.author": "Av %s",
+  "gui.immersive_furniture.atlas_usage": "Bruker %s av teksturatlaset",
   "gui.immersive_furniture.original_author": "Opprinnelig av %s",
   "gui.immersive_furniture.move_furniture": "Flytt møbler",
   "gui.immersive_furniture.move_furniture_up": "Flytt opp",
