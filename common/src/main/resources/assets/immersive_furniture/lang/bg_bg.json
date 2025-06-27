@@ -68,6 +68,7 @@
   "gui.immersive_furniture.n_tall": "%s висок",
   "gui.immersive_furniture.n_deep": "%s дълбоко",
   "gui.immersive_furniture.author": "От %s",
+  "gui.immersive_furniture.atlas_usage": "Използва %s от атласа на текстурите",
   "gui.immersive_furniture.original_author": "Първоначално от %s",
   "gui.immersive_furniture.move_furniture": "Преместване на мебели",
   "gui.immersive_furniture.move_furniture_up": "Преместване нагоре",
