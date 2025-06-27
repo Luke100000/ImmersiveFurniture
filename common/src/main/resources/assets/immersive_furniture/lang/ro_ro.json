@@ -68,6 +68,7 @@
   "gui.immersive_furniture.n_tall": "Înălțime %s",
   "gui.immersive_furniture.n_deep": "%s adânc",
   "gui.immersive_furniture.author": "De către %s",
+  "gui.immersive_furniture.atlas_usage": "Folosește %s din textura atlasului",
   "gui.immersive_furniture.original_author": "Iniţial de %s",
   "gui.immersive_furniture.move_furniture": "Mută mobila",
   "gui.immersive_furniture.move_furniture_up": "Mută în sus",
