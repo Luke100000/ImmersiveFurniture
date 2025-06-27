@@ -68,6 +68,7 @@
   "gui.immersive_furniture.n_tall": "%s hoog",
   "gui.immersive_furniture.n_deep": "%s diep",
   "gui.immersive_furniture.author": "Door %s",
+  "gui.immersive_furniture.atlas_usage": "Gebruikt %s van de textureatlas",
   "gui.immersive_furniture.original_author": "Oorspronkelijk door %s",
   "gui.immersive_furniture.move_furniture": "Verplaats meubels",
   "gui.immersive_furniture.move_furniture_up": "Verplaats omhoog",
