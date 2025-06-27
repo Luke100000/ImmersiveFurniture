@@ -68,6 +68,7 @@
   "gui.immersive_furniture.n_tall": "%s lång",
   "gui.immersive_furniture.n_deep": "%s djup",
   "gui.immersive_furniture.author": "Genom %s",
+  "gui.immersive_furniture.atlas_usage": "Använder %s av texturatlasen",
   "gui.immersive_furniture.original_author": "Ursprungligen av %s",
   "gui.immersive_furniture.move_furniture": "Flytta möbler",
   "gui.immersive_furniture.move_furniture_up": "Flytta upp",
