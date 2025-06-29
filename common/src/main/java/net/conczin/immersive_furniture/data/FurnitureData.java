@@ -93,7 +93,7 @@ public class FurnitureData {
         this.dependencies.addAll(data.dependencies);
 
         this.hash = null;
-        this.cachedShapes = new HashMap<>();
+        this.cachedShapes = new ConcurrentHashMap<>();
         this.lastTick = 0;
 
         for (Element element : data.elements) {
@@ -514,7 +514,7 @@ public class FurnitureData {
         public PlayerPose playerPose;
         public Sprite sprite;
 
-        public Map<Direction, int[]> bakedTexture = new HashMap<>();
+        public Map<Direction, int[]> bakedTexture = new ConcurrentHashMap<>();
         public ElementRotationAxes rotationAxes;
 
         public Element() {
@@ -541,7 +541,6 @@ public class FurnitureData {
             this.playerPose = new PlayerPose(tag.getCompound("PlayerPose"));
             this.sprite = new Sprite(tag.getCompound("Sprite"));
 
-            this.bakedTexture = new HashMap<>();
             CompoundTag bakedTextureTag = tag.getCompound("BakedTexture");
             for (String key : bakedTextureTag.getAllKeys()) {
                 bakedTexture.put(Direction.CODEC.byName(key), bakedTextureTag.getIntArray(key));
@@ -561,7 +560,7 @@ public class FurnitureData {
             this.soundEmitter = new SoundEmitter(element.soundEmitter);
             this.playerPose = new PlayerPose(element.playerPose);
             this.sprite = new Sprite(element.sprite);
-            this.bakedTexture = new HashMap<>();
+            this.bakedTexture = new ConcurrentHashMap<>();
             this.rotationAxes = null;
         }
 
