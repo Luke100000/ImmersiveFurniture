@@ -12,6 +12,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
@@ -135,16 +136,17 @@ public class SettingsComponent extends ScreenComponent {
         data.sources.clear();
         for (FurnitureData.Element element : data.elements) {
             if (element.type != FurnitureData.ElementType.ELEMENT) continue;
-            ResourceLocation source = MaterialRegistry.INSTANCE.materials.getOrDefault(element.material.source, MaterialSource.DEFAULT).location();
-            ResourceLocation resourceLocation = new ResourceLocation(source.getNamespace(), "textures/" + source.getPath() + ".png");
-            Minecraft.getInstance().getResourceManager().getResource(resourceLocation)
-                    .ifPresent(resource -> {
-                        if (resource.isBuiltin() || resource.sourcePackId().equals("mod_resources")) {
-                            data.sources.add(resourceLocation.getNamespace());
-                        } else {
-                            data.sources.add(Utils.beatifyPackID(resource.sourcePackId()));
-                        }
-                    });
+            MaterialSource source = MaterialRegistry.INSTANCE.materials.getOrDefault(element.material.source, MaterialSource.DEFAULT);
+
+            for (Direction value : Direction.values()) {
+                ResourceLocation location = source.getMaterial(value).sprite().contents().name();
+                data.sources.add(location.getNamespace());
+
+                // Also try to detect resource packs
+                ResourceLocation textureLocation = new ResourceLocation(location.getNamespace(), "textures/" + location.getPath() + ".png");
+                Minecraft.getInstance().getResourceManager().getResource(textureLocation)
+                        .ifPresent(resource -> data.sources.add(Utils.beatifyPackID(resource.sourcePackId())));
+            }
         }
         data.sources.remove("minecraft");
 
@@ -155,6 +157,8 @@ public class SettingsComponent extends ScreenComponent {
                 data.dependencies.add(element.particleEmitter.particle.getNamespace());
             } else if (element.type == FurnitureData.ElementType.SOUND_EMITTER) {
                 data.dependencies.add(element.soundEmitter.sound.getNamespace());
+            } else if (element.type == FurnitureData.ElementType.SPRITE) {
+                data.dependencies.add(element.sprite.sprite.getNamespace());
             }
         }
         data.dependencies.remove("minecraft");

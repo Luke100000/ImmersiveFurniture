@@ -81,12 +81,12 @@ public class FurnitureData {
         }
     }
 
+    @SuppressWarnings("CopyConstructorMissesField")
     public FurnitureData(FurnitureData data) {
         this.name = data.name;
         this.tag = data.tag;
         this.lightLevel = data.lightLevel;
         this.inventorySize = data.inventorySize;
-        this.contentid = data.contentid;
         this.author = data.author;
         this.originalAuthor = data.originalAuthor.isEmpty() ? data.author : data.originalAuthor;
         this.sources.addAll(data.sources);

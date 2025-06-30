@@ -17,7 +17,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Tooltip;
-import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;

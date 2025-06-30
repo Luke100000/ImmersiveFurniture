@@ -73,12 +73,12 @@ public class Utils {
     }
 
     private static String replaceUglyChars(String location) {
-        return location.replace(".", " ").replace("/", " ").replace("_", " ");
+        return location.replace("/", " ").replace("_", " ");
     }
 
     public static String beatifyPackID(String s) {
-        String[] split = s.split("/");
-        return replaceUglyChars(split[split.length - 1]).replace(".zip", "");
+        String[] split = s.replace(".zip", "").split("/");
+        return replaceUglyChars(split[split.length - 1]);
     }
 
     public static boolean search(String search, String value) {

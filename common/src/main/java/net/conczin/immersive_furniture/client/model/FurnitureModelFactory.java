@@ -8,8 +8,12 @@ import net.conczin.immersive_furniture.data.ElementRotation;
 import net.conczin.immersive_furniture.data.FurnitureData;
 import net.conczin.immersive_furniture.data.ModelUtils;
 import net.conczin.immersive_furniture.data.TransparencyType;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.*;
+import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
+import net.minecraft.client.renderer.texture.TextureAtlas;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.Material;
 import net.minecraft.core.Direction;
 import net.minecraft.world.inventory.InventoryMenu;
@@ -314,6 +318,11 @@ public class FurnitureModelFactory {
 
     private Map<Direction, BlockElementFace> getFaces(FurnitureData.Element element) {
         if (element.type == FurnitureData.ElementType.SPRITE) {
+            TextureAtlas atlas = Minecraft.getInstance().getModelManager().getAtlas(InventoryMenu.BLOCK_ATLAS);
+            TextureAtlasSprite sprite = atlas.getSprite(element.sprite.sprite);
+            if (sprite.contents().name().equals(MissingTextureAtlasSprite.getLocation())) {
+                return Map.of();
+            }
             return Map.of(
                     Direction.NORTH, getSpriteFace(element, true),
                     Direction.SOUTH, getSpriteFace(element, false)

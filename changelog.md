@@ -1,3 +1,11 @@
+# 0.0.5
+
+* Fixed crashes and bugs
+* Fixed tiled rotated sprites
+* Users can now upload modified furniture
+* Missing sprites are no longer rendered (instead of ugly missing textures)
+* Fixed used resources and mods not tracked in tooltip
+
 # 0.0.4
 
 * Fixes and improvements
