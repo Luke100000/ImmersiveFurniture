@@ -710,7 +710,6 @@ public class FurnitureData {
                 case Y -> Axis.YP.rotationDegrees(rotation).transform(normal);
                 case Z -> Axis.ZP.rotationDegrees(rotation).transform(normal);
             }
-            normal.mul(1, -1, 1);
             return normal;
         }
 

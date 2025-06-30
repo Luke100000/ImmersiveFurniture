@@ -15,7 +15,9 @@ import net.conczin.immersive_furniture.data.FurnitureDataManager;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Tooltip;
+import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -263,7 +265,7 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
 
         if (draggingContext != null) {
             float offset = draggingContext.getOffset(mouseX, mouseY);
-            Vector3f local = quantVector(draggingContext.direction.step().mul(1, -1, 1), offset, false);
+            Vector3f local = quantVector(draggingContext.direction.step(), offset, false);
             Vector3f global = quantVector(draggingContext.getNormal(), offset, hasControlDown() && !draggingContext.resize);
 
             Vector3f normal;
@@ -287,19 +289,19 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
 
             if (draggingContext.direction == Direction.DOWN || draggingContext.direction == Direction.WEST || draggingContext.direction == Direction.NORTH) {
                 draggingContext.element.from.x = Math.min(draggingContext.element.to.x, draggingContext.originalFrom.x + normal.x);
-                draggingContext.element.from.y = Math.min(draggingContext.element.to.y, draggingContext.originalFrom.y - normal.y);
+                draggingContext.element.from.y = Math.min(draggingContext.element.to.y, draggingContext.originalFrom.y + normal.y);
                 draggingContext.element.from.z = Math.min(draggingContext.element.to.z, draggingContext.originalFrom.z + normal.z);
 
                 draggingContext.element.to.x = Math.max(draggingContext.element.from.x, draggingContext.originalTo.x + normal2.x);
-                draggingContext.element.to.y = Math.max(draggingContext.element.from.y, draggingContext.originalTo.y - normal2.y);
+                draggingContext.element.to.y = Math.max(draggingContext.element.from.y, draggingContext.originalTo.y + normal2.y);
                 draggingContext.element.to.z = Math.max(draggingContext.element.from.z, draggingContext.originalTo.z + normal2.z);
             } else {
                 draggingContext.element.to.x = Math.max(draggingContext.element.from.x, draggingContext.originalTo.x + normal.x);
-                draggingContext.element.to.y = Math.max(draggingContext.element.from.y, draggingContext.originalTo.y - normal.y);
+                draggingContext.element.to.y = Math.max(draggingContext.element.from.y, draggingContext.originalTo.y + normal.y);
                 draggingContext.element.to.z = Math.max(draggingContext.element.from.z, draggingContext.originalTo.z + normal.z);
 
                 draggingContext.element.from.x = Math.min(draggingContext.element.to.x, draggingContext.originalFrom.x + normal2.x);
-                draggingContext.element.from.y = Math.min(draggingContext.element.to.y, draggingContext.originalFrom.y - normal2.y);
+                draggingContext.element.from.y = Math.min(draggingContext.element.to.y, draggingContext.originalFrom.y + normal2.y);
                 draggingContext.element.from.z = Math.min(draggingContext.element.to.z, draggingContext.originalFrom.z + normal2.z);
             }
 
@@ -392,7 +394,7 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
             }
         } else if (keyCode == 261) {
             // Delete
-            if (selectedElement != null) {
+            if (selectedElement != null && !(getFocused() instanceof EditBox)) {
                 data.elements.remove(selectedElement);
                 selectedElement = null;
                 init();
@@ -416,6 +418,7 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
                 if (oldData != null) {
                     data = new FurnitureData(oldData);
                     selectedElement = null;
+                    init();
                 }
             }
         }
@@ -436,6 +439,7 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
     final class DraggingContext {
         private final FurnitureData.Element element;
         private Direction direction;
+        private boolean autoDirectionLock;
         private final double x;
         private final double y;
         private final boolean resize;
@@ -462,28 +466,31 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
             // View space normal
             Vector3f normal = getNormal();
             Quaternionf q = new Quaternionf().rotateX(camPitch).rotateY(camYaw);
-            q.transform(normal).normalize();
+            q.transform(normal.mul(1, -1, 1)).normalize();
 
             Vector3f screenNormal = new Vector3f(normal.x, normal.y, 0.0f).normalize();
             Vector3f drag = new Vector3f((float) (mouseX - x), (float) (mouseY - y), 0.0f);
             float proj = drag.dot(screenNormal);
 
             // Use the move axis rather than face for flat elements
-            if ((isFlat || hasAltDown()) && drag.lengthSquared() > 1.0f) {
-                Direction bestDirection = Direction.UP;
-                float bestDot = Float.MIN_VALUE;
+            if ((isFlat || hasAltDown()) && drag.lengthSquared() > 2.0f) {
+                Direction bestDirection = direction;
+                float bestDot = 0.0f;
                 for (Direction value : Direction.values()) {
-                    Vector3f globalDirectionNormal = element.getGlobalDirectionNormal(value);
-                    q.transform(globalDirectionNormal).normalize();
-                    float dot = globalDirectionNormal.dot(drag);
+                    if (autoDirectionLock && value != direction && value != direction.getOpposite()) continue;
+                    Vector3f directionNormal = element.getGlobalDirectionNormal(value);
+                    q.transform(directionNormal.mul(1, -1, 1)).normalize();
+                    Vector3f directionScreenNormal = directionNormal.normalize();
+                    float dot = directionScreenNormal.dot(drag);
                     if (dot > bestDot) {
                         bestDirection = value;
                         bestDot = dot;
                     }
                 }
 
-                // TODO: That's a hack and should rather check for which side of the face was the initial grabbing point
-                direction = (hasAltDown() && isFlat) ? bestDirection.getOpposite() : bestDirection;
+                // TODO: Check on what side of the face the mouse initially grabbed
+                direction = bestDirection;
+                autoDirectionLock = true;
             }
 
             float viewDot = (float) Math.sqrt(1.0f - normal.z * normal.z);

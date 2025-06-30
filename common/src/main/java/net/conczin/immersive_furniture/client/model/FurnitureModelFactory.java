@@ -369,22 +369,36 @@ public class FurnitureModelFactory {
                 for (int x = 0; x < size.x; x += px) {
                     for (int y = 0; y < size.y; y += px) {
                         FurnitureData.Element tiledElement = new FurnitureData.Element(element);
+
+                        // Resize to chunk
+                        float w = Math.min(size.x - x, px);
+                        float h = Math.min(size.y - y, px);
                         tiledElement.from.add(x, y, 0);
-                        tiledElement.to = new Vector3f(
-                                Math.min(element.from.x + x + px, element.to.x),
-                                Math.min(element.from.y + y + px, element.to.y),
-                                element.to.z
+                        tiledElement.to = new Vector3f(tiledElement.from).add(w, h, 0);
+
+                        // Readjust position
+                        Vector3f east = element.getGlobalDirectionNormal(Direction.EAST);
+                        Vector3f up = element.getGlobalDirectionNormal(Direction.DOWN);
+                        float hx = x + w / 2.0f - size.x / 2.0f;
+                        float hy = y + h / 2.0f - size.y / 2.0f;
+                        Vector3f offset = new Vector3f(
+                                east.x * hx + up.x * hy,
+                                east.y * hx + up.y * hy,
+                                east.z * hx + up.z * hy
                         );
+                        offset.add(element.getCenter().sub(tiledElement.getCenter()));
+                        tiledElement.from.add(offset);
+                        tiledElement.to.add(offset);
+
                         elements.add(tiledElement);
                         elementToIndex.put(tiledElement, index);
                     }
                 }
-                indexToElement.put(index, element);
             } else {
                 elements.add(element);
                 elementToIndex.put(element, index);
-                indexToElement.put(index, element);
             }
+            indexToElement.put(index, element);
             index++;
         }
     }

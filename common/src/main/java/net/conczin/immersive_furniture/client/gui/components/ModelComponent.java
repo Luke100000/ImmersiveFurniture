@@ -137,7 +137,7 @@ public class ModelComponent extends ScreenComponent {
         });
 
         // Size
-        if (screen.selectedElement.type != FurnitureData.ElementType.SPRITE && screen.selectedElement.type != FurnitureData.ElementType.PLAYER_POSE) {
+        if (isResizable()) {
             y = topPos + 45;
             Vector3i size = screen.selectedElement.getSize();
             sx = addNewFloatBox(leftPos + 6, y, 28);
@@ -342,6 +342,10 @@ public class ModelComponent extends ScreenComponent {
         }
     }
 
+    private boolean isResizable() {
+        return (screen.selectedElement.type != FurnitureData.ElementType.SPRITE || screen.selectedElement.sprite.tiled) && screen.selectedElement.type != FurnitureData.ElementType.PLAYER_POSE;
+    }
+
     private void moveFurniture(float xOffset, float yOffset, float zOffset) {
         for (FurnitureData.Element element : screen.data.elements) {
             element.from.x += xOffset;
@@ -429,7 +433,7 @@ public class ModelComponent extends ScreenComponent {
         } else {
             // Titles
             graphics.drawString(minecraft.font, POSITION_TITLE, leftPos + 6, topPos + 6, 0xFFFFFF);
-            if (screen.selectedElement.type != FurnitureData.ElementType.SPRITE && screen.selectedElement.type != FurnitureData.ElementType.PLAYER_POSE) {
+            if (isResizable()) {
                 graphics.drawString(minecraft.font, SIZE_TITLE, leftPos + 6, topPos + 34, 0xFFFFFF);
             }
             if (screen.selectedElement.type != FurnitureData.ElementType.PLAYER_POSE) {
