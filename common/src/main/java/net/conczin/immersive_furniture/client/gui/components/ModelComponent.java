@@ -14,6 +14,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Pose;
 import org.joml.Vector3i;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static net.conczin.immersive_furniture.client.gui.ArtisansWorkstationEditorScreen.TOOLS_WIDTH;
@@ -51,13 +52,14 @@ public class ModelComponent extends ScreenComponent {
 
         // New
         addButton(leftPos + 6, topPos + height - 22, 16, 64, 192, "gui.immersive_furniture.new_element", () -> {
-            screen.selectedElement = new FurnitureData.Element();
-            screen.data.elements.add(screen.selectedElement);
+            FurnitureData.Element element = new FurnitureData.Element();
+            screen.data.elements.add(element);
+            screen.selectElement(element, false);
             screen.init();
         });
 
-        // Furniture movement buttons - only shown when no element is selected
-        if (screen.selectedElement == null) {
+        // Furniture movement buttons
+        if (screen.selectedElements.isEmpty()) {
             int x = leftPos + 6 + 12;
             int y = topPos + 108;
             int spacing = 24;
@@ -90,260 +92,287 @@ public class ModelComponent extends ScreenComponent {
             addButton(x + spacing * 2, dimY + 29, 16, 128, 160, "", () -> screen.data.size.z = Math.max(1, screen.data.size.z - 1));
         }
 
-        if (screen.selectedElement == null) return;
+        FurnitureData.Element firstElement = screen.getFirstElement().orElse(null);
+        if (firstElement == null) return;
 
         // Delete
         addButton(leftPos + 24, topPos + height - 22, 16, 80, 192, "gui.immersive_furniture.delete_element", () -> {
-            screen.data.elements.remove(screen.selectedElement);
-            screen.selectedElement = null;
+            screen.data.elements.removeAll(screen.selectedElements);
+            screen.selectedElements.clear();
             screen.init();
         });
 
         // Duplicate
-        addButton(leftPos + 42, topPos + height - 22, 16, 160, 192, "gui.immersive_furniture.duplicate_element", () -> {
-            screen.selectedElement = new FurnitureData.Element(screen.selectedElement);
-            screen.data.elements.add(screen.selectedElement);
-            screen.init();
-        });
+        addButton(leftPos + 42, topPos + height - 22, 16, 160, 192, "gui.immersive_furniture.duplicate_element", this::duplicateElements);
 
         // Position
         int y = topPos + 17;
         px = addNewFloatBox(leftPos + 6, y, 28);
-        px.setValue(Float.toString(screen.selectedElement.from.x));
+        px.setValue(Float.toString(firstElement.from.x));
         px.setResponder(b -> {
-            if (screen.selectedElement == null) return;
-            float offset = parse(px.getValue(), screen.selectedElement.from.x) - screen.selectedElement.from.x;
-            screen.selectedElement.from.x += offset;
-            screen.selectedElement.to.x += offset;
-            screen.selectedElement.sanityCheck();
+            float offset = parse(px.getValue(), firstElement.from.x) - firstElement.from.x;
+            if (offset == 0) return;
+            firstElement.from.x += offset;
+            firstElement.to.x += offset;
+            for (FurnitureData.Element element : screen.selectedElements) {
+                element.from.x = firstElement.from.x;
+                element.to.x = firstElement.to.x;
+                element.sanityCheck();
+            }
         });
         py = addNewFloatBox(leftPos + 6 + 30, y, 28);
-        py.setValue(Float.toString(screen.selectedElement.from.y));
+        py.setValue(Float.toString(firstElement.from.y));
         py.setResponder(b -> {
-            if (screen.selectedElement == null) return;
-            float offset = parse(py.getValue(), screen.selectedElement.from.y) - screen.selectedElement.from.y;
-            screen.selectedElement.from.y += offset;
-            screen.selectedElement.to.y += offset;
-            screen.selectedElement.sanityCheck();
+            float offset = parse(py.getValue(), firstElement.from.y) - firstElement.from.y;
+            if (offset == 0) return;
+            firstElement.from.y += offset;
+            firstElement.to.y += offset;
+            for (FurnitureData.Element element : screen.selectedElements) {
+                element.from.y = firstElement.from.y;
+                element.to.y = firstElement.to.y;
+                element.sanityCheck();
+            }
         });
         pz = addNewFloatBox(leftPos + 6 + 30 * 2, y, 28);
-        pz.setValue(Float.toString(screen.selectedElement.from.z));
+        pz.setValue(Float.toString(firstElement.from.z));
         pz.setResponder(b -> {
-            if (screen.selectedElement == null) return;
-            float offset = parse(pz.getValue(), screen.selectedElement.from.z) - screen.selectedElement.from.z;
-            screen.selectedElement.from.z += offset;
-            screen.selectedElement.to.z += offset;
-            screen.selectedElement.sanityCheck();
+            float offset = parse(pz.getValue(), firstElement.from.z) - firstElement.from.z;
+            if (offset == 0) return;
+            firstElement.from.z += offset;
+            firstElement.to.z += offset;
+            for (FurnitureData.Element element : screen.selectedElements) {
+                element.from.z = firstElement.from.z;
+                element.to.z = firstElement.to.z;
+                element.sanityCheck();
+            }
         });
 
         // Size
-        if (isResizable()) {
+        if (isResizable(firstElement)) {
             y = topPos + 45;
-            Vector3i size = screen.selectedElement.getSize();
+            Vector3i size = firstElement.getSize();
             sx = addNewFloatBox(leftPos + 6, y, 28);
             sx.setValue(String.valueOf(size.x));
             sx.setResponder(b -> {
-                if (screen.selectedElement == null) return;
-                int oldSize = screen.selectedElement.getSize().x;
+                int oldSize = firstElement.getSize().x;
                 int newSize = Math.max(0, parse(sx.getValue(), oldSize));
-                screen.selectedElement.from.x -= (newSize - oldSize) / 2.0f;
-                screen.selectedElement.to.x += (newSize - oldSize) / 2.0f;
-                screen.selectedElement.sanityCheck();
+                if (newSize == oldSize) return;
+                firstElement.from.x -= (newSize - oldSize) / 2.0f;
+                firstElement.to.x += (newSize - oldSize) / 2.0f;
+                for (FurnitureData.Element element : screen.selectedElements) {
+                    element.from.x = firstElement.from.x;
+                    element.to.x = firstElement.to.x;
+                    element.sanityCheck();
+                }
             });
             sy = addNewFloatBox(leftPos + 6 + 30, y, 28);
             sy.setValue(String.valueOf(size.y));
             sy.setResponder(b -> {
-                if (screen.selectedElement == null) return;
-                int oldSize = screen.selectedElement.getSize().y;
+                int oldSize = firstElement.getSize().y;
                 int newSize = Math.max(0, parse(sy.getValue(), oldSize));
-                screen.selectedElement.from.y -= (newSize - oldSize) / 2.0f;
-                screen.selectedElement.to.y += (newSize - oldSize) / 2.0f;
-                screen.selectedElement.sanityCheck();
+                if (newSize == oldSize) return;
+                firstElement.from.y -= (newSize - oldSize) / 2.0f;
+                firstElement.to.y += (newSize - oldSize) / 2.0f;
+                for (FurnitureData.Element element : screen.selectedElements) {
+                    element.from.y = firstElement.from.y;
+                    element.to.y = firstElement.to.y;
+                    element.sanityCheck();
+                }
             });
             sz = addNewFloatBox(leftPos + 6 + 30 * 2, y, 28);
             sz.setValue(String.valueOf(size.z));
             sz.setResponder(b -> {
-                if (screen.selectedElement == null) return;
-                int oldSize = screen.selectedElement.getSize().z;
+                int oldSize = firstElement.getSize().z;
                 int newSize = Math.max(0, parse(sz.getValue(), oldSize));
-                screen.selectedElement.from.z -= (newSize - oldSize) / 2.0f;
-                screen.selectedElement.to.z += (newSize - oldSize) / 2.0f;
-                screen.selectedElement.sanityCheck();
+                if (newSize == oldSize) return;
+                firstElement.from.z -= (newSize - oldSize) / 2.0f;
+                firstElement.to.z += (newSize - oldSize) / 2.0f;
+                for (FurnitureData.Element element : screen.selectedElements) {
+                    element.from.z = firstElement.from.z;
+                    element.to.z = firstElement.to.z;
+                    element.sanityCheck();
+                }
             });
         }
 
-        if (screen.selectedElement.type != FurnitureData.ElementType.PLAYER_POSE) {
-            // Rotation
-            y = topPos + 73;
-            rx = addToggleButton(leftPos + 6, y, 16, 16, 192, null, () -> {
-                if (screen.selectedElement == null) return;
-                screen.selectedElement.axis = Direction.Axis.X;
-                rx.setEnabled(false);
-                ry.setEnabled(true);
-                rz.setEnabled(true);
-            });
-            rx.setEnabled(screen.selectedElement.axis != Direction.Axis.X);
-            ry = addToggleButton(leftPos + 24, y, 16, 32, 192, null, () -> {
-                if (screen.selectedElement == null) return;
-                screen.selectedElement.axis = Direction.Axis.Y;
-                rx.setEnabled(true);
-                ry.setEnabled(false);
-                rz.setEnabled(true);
-            });
-            ry.setEnabled(screen.selectedElement.axis != Direction.Axis.Y);
-            rz = addToggleButton(leftPos + 42, y, 16, 48, 192, null, () -> {
-                if (screen.selectedElement == null) return;
-                screen.selectedElement.axis = Direction.Axis.Z;
-                rx.setEnabled(true);
-                ry.setEnabled(true);
-                rz.setEnabled(false);
-            });
-            rz.setEnabled(screen.selectedElement.axis != Direction.Axis.Z);
+        // Rotation
+        y = topPos + 73;
+        rx = addToggleButton(leftPos + 6, y, 16, 16, 192, null, () -> {
+            screen.selectedElements.forEach(e -> e.axis = Direction.Axis.X);
+            rx.setEnabled(false);
+            ry.setEnabled(true);
+            rz.setEnabled(true);
+        });
+        rx.setEnabled(firstElement.axis != Direction.Axis.X);
+        ry = addToggleButton(leftPos + 24, y, 16, 32, 192, null, () -> {
+            screen.selectedElements.forEach(e -> e.axis = Direction.Axis.Y);
+            rx.setEnabled(true);
+            ry.setEnabled(false);
+            rz.setEnabled(true);
+        });
+        ry.setEnabled(firstElement.axis != Direction.Axis.Y);
+        rz = addToggleButton(leftPos + 42, y, 16, 48, 192, null, () -> {
+            screen.selectedElements.forEach(e -> e.axis = Direction.Axis.Y);
+            rx.setEnabled(true);
+            ry.setEnabled(true);
+            rz.setEnabled(false);
+        });
+        rz.setEnabled(firstElement.axis != Direction.Axis.Z);
 
-            addButton(leftPos + 62, y + 1, 14, 222, 2, null, () -> {
-                if (screen.selectedElement == null) return;
-                screen.selectedElement.rotation = (screen.selectedElement.rotation + 22.5f) % 360;
-            });
-            addButton(leftPos + 78, y + 1, 14, 206, 2, null, () -> {
-                if (screen.selectedElement == null) return;
-                screen.selectedElement.rotation = (screen.selectedElement.rotation - 22.5f) % 360;
-            });
-        }
+        addButton(leftPos + 62, y + 1, 14, 222, 2, null,
+                () -> screen.selectedElements.forEach(e -> e.rotation = (e.rotation + 22.5f) % 360));
+        addButton(leftPos + 78, y + 1, 14, 206, 2, null,
+                () -> screen.selectedElements.forEach(e -> e.rotation = (e.rotation - 22.5f) % 360));
 
         // Element type
         for (FurnitureData.ElementType type : FurnitureData.ElementType.values()) {
             addToggleButton(leftPos + 6 + type.ordinal() * 18, topPos + 94, 16, 176 + type.ordinal() * 16, 192, "gui.immersive_furniture.element_type." + type.name().toLowerCase(), () -> {
-                if (screen.selectedElement == null) return;
-                screen.selectedElement.type = type;
-                screen.selectedElement.sanityCheck();
+                screen.selectedElements.forEach(e -> {
+                    e.type = type;
+                    e.sanityCheck();
+                });
                 screen.init();
-            }).setEnabled(screen.selectedElement.type != type);
+            }).setEnabled(firstElement.type != type);
         }
 
-        if (screen.selectedElement.type == FurnitureData.ElementType.PARTICLE_EMITTER) {
+        if (firstElement.type == FurnitureData.ElementType.PARTICLE_EMITTER) {
             // Direction velocity
             BoundedDoubleSlider directionalVelocitySlider = new BoundedDoubleSlider(leftPos + 6, topPos + 112, (width - 14) / 2, 20,
                     "gui.immersive_furniture.directional_velocity",
-                    screen.selectedElement.particleEmitter.velocityDirectional, 0, 5.0);
-            directionalVelocitySlider.setCallback(v -> screen.selectedElement.particleEmitter.velocityDirectional = v.floatValue());
+                    firstElement.particleEmitter.velocityDirectional, 0, 5.0);
+            directionalVelocitySlider.setCallback(v -> screen.selectedElements.forEach(e -> e.particleEmitter.velocityDirectional = v.floatValue()));
             screen.addRenderableWidget(directionalVelocitySlider);
 
             // Random velocity
             BoundedDoubleSlider velocityRandomSlider = new BoundedDoubleSlider(leftPos + 8 + (width - 14) / 2, topPos + 112, (width - 14) / 2, 20,
                     "gui.immersive_furniture.random_velocity",
-                    screen.selectedElement.particleEmitter.velocityRandom, 0, 5.0);
-            velocityRandomSlider.setCallback(v -> screen.selectedElement.particleEmitter.velocityRandom = v.floatValue());
+                    firstElement.particleEmitter.velocityRandom, 0, 5.0);
+            velocityRandomSlider.setCallback(v -> screen.selectedElements.forEach(e -> e.particleEmitter.velocityRandom = v.floatValue()));
             screen.addRenderableWidget(velocityRandomSlider);
 
             // Particle amount
             BoundedDoubleSlider amountSlider = new BoundedDoubleSlider(leftPos + 6, topPos + 134, width - 32, 20,
                     "gui.immersive_furniture.particle_amount",
-                    screen.selectedElement.particleEmitter.amount, 0, 4.0);
-            amountSlider.setCallback(v -> screen.selectedElement.particleEmitter.amount = v.floatValue());
+                    firstElement.particleEmitter.amount, 0, 4.0);
+            amountSlider.setCallback(v -> screen.selectedElements.forEach(e -> e.particleEmitter.amount = v.floatValue()));
             screen.addRenderableWidget(amountSlider);
 
             // Particle settings
             addToggleButton(leftPos + width - 23, topPos + 136, 16, 192, 160, "gui.immersive_furniture.on_interact", () -> {
-                if (screen.selectedElement == null) return;
-                screen.selectedElement.particleEmitter.onInteract = !screen.selectedElement.particleEmitter.onInteract;
+                screen.selectedElements.forEach(e -> e.particleEmitter.onInteract = !e.particleEmitter.onInteract);
                 screen.init();
 
                 // Show particles on interacting
                 ClientLevel level = Minecraft.getInstance().level;
                 LocalPlayer player = Minecraft.getInstance().player;
-                if (level != null && player != null && screen.selectedElement.particleEmitter.onInteract) {
+                if (level != null && player != null && firstElement.particleEmitter.onInteract) {
                     screen.data.emitInteractParticles(player.getOnPos(), null, player, getParticleEngine(screen.data)::addParticle, true);
                 }
-            }).setEnabled(!screen.selectedElement.particleEmitter.onInteract);
-        } else if (screen.selectedElement.type == FurnitureData.ElementType.SOUND_EMITTER) {
+            }).setEnabled(!firstElement.particleEmitter.onInteract);
+        } else if (firstElement.type == FurnitureData.ElementType.SOUND_EMITTER) {
             // Volume
             BoundedDoubleSlider volumeSlider = new BoundedDoubleSlider(leftPos + 6, topPos + 112, (width - 14) / 2, 20,
                     "gui.immersive_furniture.volume",
-                    screen.selectedElement.soundEmitter.volume, 0, 2.0);
-            volumeSlider.setCallback(v -> screen.selectedElement.soundEmitter.volume = v.floatValue());
+                    firstElement.soundEmitter.volume, 0, 2.0);
+            volumeSlider.setCallback(v -> screen.selectedElements.forEach(e -> e.soundEmitter.volume = v.floatValue()));
             screen.addRenderableWidget(volumeSlider);
 
             // Pitch
             BoundedDoubleSlider velocityRandomSlider = new BoundedDoubleSlider(leftPos + 8 + (width - 14) / 2, topPos + 112, (width - 14) / 2, 20,
                     "gui.immersive_furniture.pitch",
-                    screen.selectedElement.soundEmitter.pitch, 0.5, 2.0);
-            velocityRandomSlider.setCallback(v -> screen.selectedElement.soundEmitter.pitch = v.floatValue());
+                    firstElement.soundEmitter.pitch, 0.5, 2.0);
+            velocityRandomSlider.setCallback(v -> screen.selectedElements.forEach(e -> e.soundEmitter.pitch = v.floatValue()));
             screen.addRenderableWidget(velocityRandomSlider);
 
             // Frequency
-            BoundedDoubleSlider amountSlider = new BoundedDoubleSlider(leftPos + 6, topPos + 134, width - 32, 20,
-                    "gui.immersive_furniture.frequency",
-                    screen.selectedElement.soundEmitter.frequency, 0.0, 1.0);
-            amountSlider.setCallback(v -> screen.selectedElement.soundEmitter.frequency = v.floatValue());
-            screen.addRenderableWidget(amountSlider);
+            if (!firstElement.soundEmitter.onInteract) {
+                BoundedDoubleSlider frequencySlider = new BoundedDoubleSlider(leftPos + 6, topPos + 134, width - 32, 20,
+                        "gui.immersive_furniture.frequency",
+                        firstElement.soundEmitter.frequency, 0.0, 1.0);
+                frequencySlider.setCallback(v -> screen.selectedElements.forEach(e -> e.soundEmitter.frequency = v.floatValue()));
+                screen.addRenderableWidget(frequencySlider);
+            }
 
             // Sound settings
             addToggleButton(leftPos + width - 23, topPos + 136, 16, 192, 160, "gui.immersive_furniture.on_interact", () -> {
-                if (screen.selectedElement == null) return;
-                screen.selectedElement.soundEmitter.onInteract = !screen.selectedElement.soundEmitter.onInteract;
-                if (screen.selectedElement.soundEmitter.onInteract) {
-                    screen.selectedElement.soundEmitter.frequency = 0.0f;
-                } else {
-                    screen.selectedElement.soundEmitter.frequency = 0.1f;
-                }
+                screen.selectedElements.forEach(e -> {
+                    e.soundEmitter.onInteract = !e.soundEmitter.onInteract;
+                    e.soundEmitter.frequency = e.soundEmitter.onInteract ? 0.0f : 0.1f;
+                });
                 screen.init();
 
                 // Play sound on interacting
                 ClientLevel level = Minecraft.getInstance().level;
                 LocalPlayer player = Minecraft.getInstance().player;
-                if (level != null && player != null && screen.selectedElement.soundEmitter.onInteract) {
+                if (level != null && player != null && firstElement.soundEmitter.onInteract) {
                     screen.data.playInteractSound(level, player.getOnPos(), player);
                 }
-            }).setEnabled(!screen.selectedElement.soundEmitter.onInteract);
-        } else if (screen.selectedElement.type == FurnitureData.ElementType.PLAYER_POSE) {
+            }).setEnabled(!firstElement.soundEmitter.onInteract);
+        } else if (firstElement.type == FurnitureData.ElementType.PLAYER_POSE) {
             // Pose settings
             List<Pose> poses = List.of(Pose.SITTING, Pose.SLEEPING);
             for (int i = 0; i < poses.size(); i++) {
                 Pose pose = poses.get(i);
                 addToggleButton(leftPos + 6 + i * 18, topPos + 114, 16, 160 + i * 16, 160, "gui.immersive_furniture.player_pose." + pose.name().toLowerCase(), () -> {
-                    if (screen.selectedElement == null) return;
-                    screen.selectedElement.playerPose.pose = pose;
-                    screen.selectedElement.sanityCheck();
+                    screen.selectedElements.forEach(e -> {
+                        e.playerPose.pose = pose;
+                        e.sanityCheck();
+                    });
                     screen.init();
-                }).setEnabled(screen.selectedElement.playerPose.pose != pose);
+                }).setEnabled(firstElement.playerPose.pose != pose);
             }
-        } else if (screen.selectedElement.type == FurnitureData.ElementType.SPRITE) {
+        } else if (firstElement.type == FurnitureData.ElementType.SPRITE) {
             // Rotation
             for (int i = 0; i < 360; i += 90) {
                 final int rotation = i;
                 addToggleButton(leftPos + 6 + i / 90 * 18, topPos + 114, 16, 96 + (i / 90) * 16, 160, "gui.immersive_furniture.rotation." + i, () -> {
-                    if (screen.selectedElement == null) return;
-                    screen.selectedElement.sprite.rotation = rotation;
+                    // TODO: Rotate around origin
+                    screen.selectedElements.forEach(e -> e.sprite.rotation = rotation);
                     screen.init();
-                }).setEnabled(screen.selectedElement.sprite.rotation != rotation);
+                }).setEnabled(firstElement.sprite.rotation != rotation);
             }
 
             // Size
             addButton(leftPos + 6, topPos + 132, 16, 112, 192, "gui.immersive_furniture.decrease_size", () -> {
-                if (screen.selectedElement == null) return;
-                screen.selectedElement.sprite.size = Math.max(0.25f, screen.selectedElement.sprite.size / 2.0f);
-                screen.selectedElement.sanityCheck();
+                screen.selectedElements.forEach(e -> {
+                    e.sprite.size = Math.max(0.25f, e.sprite.size / 2.0f);
+                    e.sanityCheck();
+                });
                 screen.init();
             });
             addButton(leftPos + 24, topPos + 132, 16, 96, 192, "gui.immersive_furniture.increase_size", () -> {
-                if (screen.selectedElement == null) return;
-                screen.selectedElement.sprite.size = Math.min(1.0f, screen.selectedElement.sprite.size * 2.0f);
-                screen.selectedElement.sanityCheck();
+                screen.selectedElements.forEach(e -> {
+                    e.sprite.size = Math.max(0.25f, e.sprite.size * 2.0f);
+                    e.sanityCheck();
+                });
                 screen.init();
             });
 
             // Tiled toggle
             addToggleButton(leftPos + 78, topPos + 132, 16, 144, 192, "gui.immersive_furniture.tiled", () -> {
-                if (screen.selectedElement == null) return;
-                screen.selectedElement.sprite.tiled = !screen.selectedElement.sprite.tiled;
-                screen.selectedElement.sanityCheck();
+                screen.selectedElements.forEach(e -> {
+                    e.sprite.tiled = !e.sprite.tiled;
+                    e.sanityCheck();
+                });
                 screen.init();
-            }).setEnabled(!screen.selectedElement.sprite.tiled);
+            }).setEnabled(!firstElement.sprite.tiled);
         }
     }
 
-    private boolean isResizable() {
-        return (screen.selectedElement.type != FurnitureData.ElementType.SPRITE || screen.selectedElement.sprite.tiled) && screen.selectedElement.type != FurnitureData.ElementType.PLAYER_POSE;
+    public void duplicateElements() {
+        ArrayList<FurnitureData.Element> duplicatedElements = new ArrayList<>(screen.selectedElements);
+        if (duplicatedElements.isEmpty()) return;
+        screen.selectedElements.clear();
+        for (FurnitureData.Element element : duplicatedElements) {
+            FurnitureData.Element newElement = new FurnitureData.Element(element);
+            screen.data.elements.add(newElement);
+            screen.selectedElements.add(newElement);
+        }
+        screen.init();
+    }
+
+    private boolean isResizable(FurnitureData.Element element) {
+        return (element.type != FurnitureData.ElementType.SPRITE || element.sprite.tiled) && element.type != FurnitureData.ElementType.PLAYER_POSE;
     }
 
     private void moveFurniture(float xOffset, float yOffset, float zOffset) {
@@ -362,23 +391,24 @@ public class ModelComponent extends ScreenComponent {
     }
 
     public void update() {
-        if (screen.selectedElement == null) return;
+        FurnitureData.Element firstElement = screen.getFirstElement().orElse(null);
+        if (firstElement == null) return;
 
-        px.setValue(Float.toString(screen.selectedElement.from.x));
-        py.setValue(Float.toString(screen.selectedElement.from.y));
-        pz.setValue(Float.toString(screen.selectedElement.from.z));
+        px.setValue(Float.toString(firstElement.from.x));
+        py.setValue(Float.toString(firstElement.from.y));
+        pz.setValue(Float.toString(firstElement.from.z));
 
         if (sx != null) {
-            Vector3i size = screen.selectedElement.getSize();
+            Vector3i size = firstElement.getSize();
             sx.setValue(String.valueOf(size.x));
             sy.setValue(String.valueOf(size.y));
             sz.setValue(String.valueOf(size.z));
         }
 
         if (rx != null) {
-            rx.setEnabled(screen.selectedElement.axis == Direction.Axis.X);
-            ry.setEnabled(screen.selectedElement.axis == Direction.Axis.Y);
-            rz.setEnabled(screen.selectedElement.axis == Direction.Axis.Z);
+            rx.setEnabled(firstElement.axis == Direction.Axis.X);
+            ry.setEnabled(firstElement.axis == Direction.Axis.Y);
+            rz.setEnabled(firstElement.axis == Direction.Axis.Z);
         }
     }
 
@@ -406,7 +436,8 @@ public class ModelComponent extends ScreenComponent {
     }
 
     public void render(GuiGraphics graphics) {
-        if (screen.selectedElement == null) {
+        FurnitureData.Element firstElement = screen.getFirstElement().orElse(null);
+        if (firstElement == null) {
             // Titles
             graphics.drawString(minecraft.font, SELECT_TITLE, leftPos + 6, topPos + 6, 0xFFFFFF);
 
@@ -433,10 +464,10 @@ public class ModelComponent extends ScreenComponent {
         } else {
             // Titles
             graphics.drawString(minecraft.font, POSITION_TITLE, leftPos + 6, topPos + 6, 0xFFFFFF);
-            if (isResizable()) {
+            if (isResizable(firstElement)) {
                 graphics.drawString(minecraft.font, SIZE_TITLE, leftPos + 6, topPos + 34, 0xFFFFFF);
             }
-            if (screen.selectedElement.type != FurnitureData.ElementType.PLAYER_POSE) {
+            if (firstElement.type != FurnitureData.ElementType.PLAYER_POSE) {
                 graphics.drawString(minecraft.font, ROTATION_TITLE, leftPos + 6, topPos + 62, 0xFFFFFF);
             }
 

@@ -73,7 +73,7 @@ public class Utils {
     }
 
     private static String replaceUglyChars(String location) {
-        return location.replace("/", " ").replace("_", " ");
+        return location.replace(".", " ").replace("/", " ").replace("_", " ");
     }
 
     public static String beatifyPackID(String s) {

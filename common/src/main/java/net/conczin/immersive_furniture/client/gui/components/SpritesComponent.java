@@ -4,6 +4,7 @@ import net.conczin.immersive_furniture.client.gui.ArtisansWorkstationEditorScree
 import net.conczin.immersive_furniture.client.gui.widgets.SpriteButton;
 import net.conczin.immersive_furniture.client.gui.widgets.StateImageButton;
 import net.conczin.immersive_furniture.client.model.TransparencyManager;
+import net.conczin.immersive_furniture.data.FurnitureData;
 import net.conczin.immersive_furniture.data.TransparencyType;
 import net.conczin.immersive_furniture.mixin.client.SpriteContentsAccessor;
 import net.conczin.immersive_furniture.mixin.client.TextureAtlasAccessor;
@@ -82,6 +83,8 @@ public class SpritesComponent extends ListComponent {
                     screen.init();
                 }).setEnabled(vanillaOnly);
 
+        FurnitureData.Element firstElement = screen.getFirstElement().orElse(null);
+
         // Sprite buttons
         spriteButtons.clear();
         for (int y = 0; y < 5; y++) {
@@ -91,15 +94,15 @@ public class SpritesComponent extends ListComponent {
                         22, 22, 146, 0,
                         b -> {
                             ResourceLocation spriteLocation = ((SpriteButton) b).getSpriteLocation();
-                            if (screen.selectedElement != null && spriteLocation != null) {
-                                screen.selectedElement.sprite.sprite = spriteLocation;
+                            if (spriteLocation != null) {
+                                screen.selectedElements.forEach(e -> e.sprite.sprite = spriteLocation);
                                 screen.init();
                             }
                         }
                 );
                 button.setEnabled(
-                        screen.selectedElement != null && button.getSpriteLocation() != null &&
-                        button.getSpriteLocation().equals(screen.selectedElement.sprite.sprite)
+                        firstElement != null && button.getSpriteLocation() != null &&
+                        button.getSpriteLocation().equals(firstElement.sprite.sprite)
                 );
                 spriteButtons.add(button);
                 screen.addRenderableWidget(button);
@@ -147,7 +150,7 @@ public class SpritesComponent extends ListComponent {
 
                 spriteButtons.get(i).setSpriteLocation(location);
                 spriteButtons.get(i).setSprite(sprite);
-                spriteButtons.get(i).setEnabled(screen.selectedElement != null);
+                spriteButtons.get(i).setEnabled(!screen.selectedElements.isEmpty());
             } else {
                 spriteButtons.get(i).setSpriteLocation(null);
                 spriteButtons.get(i).setSprite(null);

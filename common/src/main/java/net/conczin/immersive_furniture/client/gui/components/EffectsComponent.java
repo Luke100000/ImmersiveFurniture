@@ -14,14 +14,15 @@ public class EffectsComponent extends ScreenComponent {
     public void init(int leftPos, int topPos, int width, int height) {
         super.init(leftPos, topPos, width, height);
 
-        if (screen.selectedElement == null) return;
+        FurnitureData.Element firstElement = screen.getFirstElement().orElse(null);
+        if (firstElement == null) return;
 
         int y = topPos + 6;
         y = initLightGUI(screen, leftPos, y, width);
 
-        if (screen.selectedElement.type == FurnitureData.ElementType.SPRITE) {
-            HSVColorPicker colorSelector = new HSVColorPicker(leftPos + 6, y, width - 12, 60, screen.selectedElement.color,
-                    c -> screen.selectedElement.color = c);
+        if (firstElement.type == FurnitureData.ElementType.SPRITE) {
+            HSVColorPicker colorSelector = new HSVColorPicker(leftPos + 6, y, width - 12, 60, firstElement.color,
+                    c -> screen.selectedElements.forEach(e -> e.color = c));
             colorSelector.getWidgets().forEach(screen::addRenderableWidget);
             y += 66;
         }
@@ -29,81 +30,61 @@ public class EffectsComponent extends ScreenComponent {
         // Emission
         BoundedIntSliderButton emissionSlider = new BoundedIntSliderButton(leftPos + 6, y, width - 12, 20,
                 "gui.immersive_furniture.emission",
-                screen.selectedElement.emission, 0, 15);
-        emissionSlider.setCallback(i -> {
-            if (screen.selectedElement == null) return;
-            screen.selectedElement.emission = i;
-        });
+                firstElement.emission, 0, 15);
+        emissionSlider.setCallback(i -> screen.selectedElements.forEach(e -> e.emission = i));
         screen.addRenderableWidget(emissionSlider);
     }
 
     public int initLightGUI(ArtisansWorkstationEditorScreen screen, int x, int y, int width) {
-        if (screen.selectedElement == null) return y;
-        if (screen.selectedElement.type != FurnitureData.ElementType.ELEMENT) return y;
+        FurnitureData.Element firstElement = screen.getFirstElement().orElse(null);
+        if (firstElement == null) return y;
+        if (firstElement.type != FurnitureData.ElementType.ELEMENT) return y;
 
         // Roundness
         BoundedIntSliderButton lightLevelSlider = new BoundedIntSliderButton(x + 6, y, width - 12, 20,
                 "gui.immersive_furniture.roundness",
-                (int) screen.selectedElement.material.lightEffect.roundness, -100, 100);
-        lightLevelSlider.setCallback(i -> {
-            if (screen.selectedElement == null) return;
-            screen.selectedElement.material.lightEffect.roundness = i;
-        });
+                (int) firstElement.material.lightEffect.roundness, -100, 100);
+        lightLevelSlider.setCallback(i -> screen.selectedElements.forEach(e -> e.material.lightEffect.roundness = i));
         screen.addRenderableWidget(lightLevelSlider);
         y += 22;
 
         // Brightness
         BoundedIntSliderButton brightnessSlider = new BoundedIntSliderButton(x + 6, y, width - 12, 20,
                 "gui.immersive_furniture.brightness",
-                (int) screen.selectedElement.material.lightEffect.brightness, -100, 100);
-        brightnessSlider.setCallback(i -> {
-            if (screen.selectedElement == null) return;
-            screen.selectedElement.material.lightEffect.brightness = i;
-        });
+                (int) firstElement.material.lightEffect.brightness, -100, 100);
+        brightnessSlider.setCallback(i -> screen.selectedElements.forEach(e -> e.material.lightEffect.brightness = i));
         screen.addRenderableWidget(brightnessSlider);
         y += 22;
 
         // Contrast
         BoundedIntSliderButton contrastSlider = new BoundedIntSliderButton(x + 6, y, width - 12, 20,
                 "gui.immersive_furniture.contrast",
-                (int) screen.selectedElement.material.lightEffect.contrast, -100, 100);
-        contrastSlider.setCallback(i -> {
-            if (screen.selectedElement == null) return;
-            screen.selectedElement.material.lightEffect.contrast = i;
-        });
+                (int) firstElement.material.lightEffect.contrast, -100, 100);
+        contrastSlider.setCallback(i -> screen.selectedElements.forEach(e -> e.material.lightEffect.contrast = i));
         screen.addRenderableWidget(contrastSlider);
         y += 22;
 
         // Hue
         BoundedIntSliderButton hueSlider = new BoundedIntSliderButton(x + 6, y, width - 12, 20,
                 "gui.immersive_furniture.hue",
-                (int) screen.selectedElement.material.lightEffect.hue, -100, 100);
-        hueSlider.setCallback(i -> {
-            if (screen.selectedElement == null) return;
-            screen.selectedElement.material.lightEffect.hue = i;
-        });
+                (int) firstElement.material.lightEffect.hue, -100, 100);
+        hueSlider.setCallback(i -> screen.selectedElements.forEach(e -> e.material.lightEffect.hue = i));
         screen.addRenderableWidget(hueSlider);
         y += 22;
 
         // Saturation
         BoundedIntSliderButton saturationSlider = new BoundedIntSliderButton(x + 6, y, width - 12, 20,
                 "gui.immersive_furniture.saturation",
-                (int) screen.selectedElement.material.lightEffect.saturation, -100, 100);
-        saturationSlider.setCallback(i -> {
-            if (screen.selectedElement == null) return;
-            screen.selectedElement.material.lightEffect.saturation = i;
-        });
+                (int) firstElement.material.lightEffect.saturation, -100, 100);
+        saturationSlider.setCallback(i -> screen.selectedElements.forEach(e -> e.material.lightEffect.saturation = i));
         screen.addRenderableWidget(saturationSlider);
         y += 22;
 
         // Value
         BoundedIntSliderButton valueSlider = new BoundedIntSliderButton(x + 6, y, width - 12, 20,
                 "gui.immersive_furniture.value",
-                (int) screen.selectedElement.material.lightEffect.value, -100, 100);
-        valueSlider.setCallback(i -> {
-            if (screen.selectedElement == null) return;
-            screen.selectedElement.material.lightEffect.value = i;
-        });
+                (int) firstElement.material.lightEffect.value, -100, 100);
+        valueSlider.setCallback(i -> screen.selectedElements.forEach(e -> e.material.lightEffect.value = i));
         screen.addRenderableWidget(valueSlider);
         y += 22;
 

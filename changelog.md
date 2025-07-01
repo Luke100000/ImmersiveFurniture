@@ -1,3 +1,9 @@
+# 0.0.6
+
+* Added multi-selection
+* Fixed poses not being rotatable and the front is marked
+* Added ctrl-A (select all) and ctrl-D (duplicate) shortcut
+
 # 0.0.5
 
 * Fixed crashes and bugs
@@ -34,9 +40,12 @@ Initial release
 # Bugs
 
 * On flat elements (sprites mostly) the direction is picked oddly
+* Particles + sounds doesnt work
+* Totem as default non interact doesnt trigger
+* Interact sound is played twice
+* Only play closest sound + particles and those stacked?
 
-# Roadmap 1.0.0
+# TODO
 
 * Blockbench/JSON block and item model import
 * Datapack support
-* Multi-selection

@@ -644,7 +644,6 @@ public class FurnitureData {
                 to.x = center.x + 4.0f;
                 to.y = center.y + 1.0f;
                 to.z = center.z + (playerPose.pose == Pose.SLEEPING ? 14.0f : 4.0f);
-                rotation = 0.0f;
                 axis = Direction.Axis.Y;
             } else if (type == ElementType.SPRITE) {
                 // Sprites are forced to be 16x16x0

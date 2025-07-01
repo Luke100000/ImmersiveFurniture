@@ -38,14 +38,14 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
     float camZoom = 100.0f;
 
     public FurnitureData data;
-    public FurnitureData.Element selectedElement;
+    public List<FurnitureData.Element> selectedElements = new LinkedList<>();
     public HoverResult hoverResult;
     public HoverResult nextHoverResult;
 
     final static int MAX_HISTORY_SIZE = 20;
     private String lastHistoryHash = "";
     private final Deque<CompoundTag> history = new ArrayDeque<>(MAX_HISTORY_SIZE);
-    private CompoundTag copiedElement;
+    private List<CompoundTag> copiedElements = new LinkedList<>();
 
     private long lastAutosaveTime = 0;
 
@@ -113,18 +113,18 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
         int x = 16;
         addRenderableWidget(pagePageButton(Page.MODEL, x, 0));
         x += 26;
-        if (selectedElement != null && selectedElement.type == FurnitureData.ElementType.PARTICLE_EMITTER) {
+        if (isFirstElement(FurnitureData.ElementType.PARTICLE_EMITTER)) {
             addRenderableWidget(pagePageButton(Page.PARTICLES, x, 6 * 26));
             x += 26;
-        } else if (selectedElement != null && selectedElement.type == FurnitureData.ElementType.SOUND_EMITTER) {
+        } else if (isFirstElement(FurnitureData.ElementType.SOUND_EMITTER)) {
             addRenderableWidget(pagePageButton(Page.SOUNDS, x, 7 * 26));
             x += 26;
-        } else if (selectedElement != null && selectedElement.type == FurnitureData.ElementType.ELEMENT) {
+        } else if (isFirstElement(FurnitureData.ElementType.ELEMENT)) {
             addRenderableWidget(pagePageButton(Page.MATERIALS, x, 26));
             x += 26;
             addRenderableWidget(pagePageButton(Page.EFFECTS, x, 2 * 26));
             x += 26;
-        } else if (selectedElement != null && selectedElement.type == FurnitureData.ElementType.SPRITE) {
+        } else if (isFirstElement(FurnitureData.ElementType.SPRITE)) {
             addRenderableWidget(pagePageButton(Page.SPRITES, x, 4 * 26));
             x += 26;
             addRenderableWidget(pagePageButton(Page.EFFECTS, x, 2 * 26));
@@ -286,25 +286,31 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
                 normal2 = global;
             }
 
-            if (draggingContext.direction == Direction.DOWN || draggingContext.direction == Direction.WEST || draggingContext.direction == Direction.NORTH) {
-                draggingContext.element.from.x = Math.min(draggingContext.element.to.x, draggingContext.originalFrom.x + normal.x);
-                draggingContext.element.from.y = Math.min(draggingContext.element.to.y, draggingContext.originalFrom.y + normal.y);
-                draggingContext.element.from.z = Math.min(draggingContext.element.to.z, draggingContext.originalFrom.z + normal.z);
+            for (FurnitureData.Element element : selectedElements) {
+                if (!draggingContext.originalFrom.containsKey(element)) continue;
+                Vector3f originalFrom = draggingContext.originalFrom.get(element);
+                Vector3f originalTo = draggingContext.originalTo.get(element);
 
-                draggingContext.element.to.x = Math.max(draggingContext.element.from.x, draggingContext.originalTo.x + normal2.x);
-                draggingContext.element.to.y = Math.max(draggingContext.element.from.y, draggingContext.originalTo.y + normal2.y);
-                draggingContext.element.to.z = Math.max(draggingContext.element.from.z, draggingContext.originalTo.z + normal2.z);
-            } else {
-                draggingContext.element.to.x = Math.max(draggingContext.element.from.x, draggingContext.originalTo.x + normal.x);
-                draggingContext.element.to.y = Math.max(draggingContext.element.from.y, draggingContext.originalTo.y + normal.y);
-                draggingContext.element.to.z = Math.max(draggingContext.element.from.z, draggingContext.originalTo.z + normal.z);
+                if (draggingContext.direction == Direction.DOWN || draggingContext.direction == Direction.WEST || draggingContext.direction == Direction.NORTH) {
+                    element.from.x = Math.min(element.to.x, originalFrom.x + normal.x);
+                    element.from.y = Math.min(element.to.y, originalFrom.y + normal.y);
+                    element.from.z = Math.min(element.to.z, originalFrom.z + normal.z);
 
-                draggingContext.element.from.x = Math.min(draggingContext.element.to.x, draggingContext.originalFrom.x + normal2.x);
-                draggingContext.element.from.y = Math.min(draggingContext.element.to.y, draggingContext.originalFrom.y + normal2.y);
-                draggingContext.element.from.z = Math.min(draggingContext.element.to.z, draggingContext.originalFrom.z + normal2.z);
+                    element.to.x = Math.max(element.from.x, originalTo.x + normal2.x);
+                    element.to.y = Math.max(element.from.y, originalTo.y + normal2.y);
+                    element.to.z = Math.max(element.from.z, originalTo.z + normal2.z);
+                } else {
+                    element.to.x = Math.max(element.from.x, originalTo.x + normal.x);
+                    element.to.y = Math.max(element.from.y, originalTo.y + normal.y);
+                    element.to.z = Math.max(element.from.z, originalTo.z + normal.z);
+
+                    element.from.x = Math.min(element.to.x, originalFrom.x + normal2.x);
+                    element.from.y = Math.min(element.to.y, originalFrom.y + normal2.y);
+                    element.from.z = Math.min(element.to.z, originalFrom.z + normal2.z);
+                }
+
+                element.sanityCheck();
             }
-
-            draggingContext.element.sanityCheck();
 
             if (currentPage == Page.MODEL) {
                 modelComponent.update();
@@ -319,17 +325,23 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if ((button == 0 || button == 1) && hoverResult != null && nextHoverResult != null) {
-            HoverResult result = lastMouseX == (int) mouseX && lastMouseY == (int) mouseY ? nextHoverResult : hoverResult;
-            selectedElement = result.element();
+            boolean doubleClick = lastMouseX == (int) mouseX && lastMouseY == (int) mouseY;
+            HoverResult result = doubleClick ? nextHoverResult : hoverResult;
+
+            if (hasShiftDown() && selectedElements.contains(result.element)) {
+                selectedElements.remove(result.element);
+            } else {
+                selectElement(result.element(), hasShiftDown() || (selectedElements.size() > 1 && !doubleClick));
+            }
 
             if (currentPage == Page.MATERIALS || currentPage == Page.SOUNDS || currentPage == Page.PARTICLES || currentPage == Page.SPRITES) {
-                if (selectedElement.type == FurnitureData.ElementType.ELEMENT) {
+                if (isFirstElement(FurnitureData.ElementType.ELEMENT)) {
                     currentPage = Page.MATERIALS;
-                } else if (selectedElement.type == FurnitureData.ElementType.SOUND_EMITTER) {
+                } else if (isFirstElement(FurnitureData.ElementType.SOUND_EMITTER)) {
                     currentPage = Page.SOUNDS;
-                } else if (selectedElement.type == FurnitureData.ElementType.PARTICLE_EMITTER) {
+                } else if (isFirstElement(FurnitureData.ElementType.PARTICLE_EMITTER)) {
                     currentPage = Page.PARTICLES;
-                } else if (selectedElement.type == FurnitureData.ElementType.SPRITE) {
+                } else if (isFirstElement(FurnitureData.ElementType.SPRITE)) {
                     currentPage = Page.SPRITES;
                 }
             }
@@ -354,8 +366,8 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
         }
 
         // Deselect element
-        if (selectedElement != null && hoverResult == null && lastMouseX == (int) mouseX && lastMouseY == (int) mouseY && isOverRightWindow(mouseX, mouseY)) {
-            selectedElement = null;
+        if (!selectedElements.isEmpty() && hoverResult == null && lastMouseX == (int) mouseX && lastMouseY == (int) mouseY && isOverRightWindow(mouseX, mouseY)) {
+            selectedElements.clear();
             init();
         }
 
@@ -372,39 +384,49 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         if (isCopy(keyCode)) {
             // Copy
-            if (selectedElement != null) {
-                copiedElement = selectedElement.toTag();
-            }
+            copiedElements = selectedElements.stream().map(FurnitureData.Element::toTag).toList();
         } else if (isCut(keyCode)) {
             // Cut
-            if (selectedElement != null) {
-                copiedElement = selectedElement.toTag();
-                data.elements.remove(selectedElement);
-                selectedElement = null;
+            if (!selectedElements.isEmpty()) {
+                copiedElements = selectedElements.stream().map(FurnitureData.Element::toTag).toList();
+                data.elements.removeAll(selectedElements);
+                selectedElements.clear();
                 init();
             }
         } else if (isPaste(keyCode)) {
             // Paste
-            if (copiedElement != null) {
-                FurnitureData.Element element = new FurnitureData.Element(copiedElement);
-                data.elements.add(element);
-                selectedElement = element;
+            if (!copiedElements.isEmpty()) {
+                selectedElements.clear();
+                for (CompoundTag copiedElement : copiedElements) {
+                    FurnitureData.Element element = new FurnitureData.Element(copiedElement);
+                    data.elements.add(element);
+                    selectedElements.add(element);
+                }
                 init();
             }
         } else if (keyCode == 261) {
             // Delete
-            if (selectedElement != null && !(getFocused() instanceof EditBox)) {
-                data.elements.remove(selectedElement);
-                selectedElement = null;
+            if (!selectedElements.isEmpty() && !(getFocused() instanceof EditBox)) {
+                data.elements.removeAll(selectedElements);
+                selectedElements.clear();
                 init();
             }
+        } else if (keyCode == 68 && hasControlDown() && !hasShiftDown() && !hasAltDown()) {
+            // Duplicate
+            modelComponent.duplicateElements();
+        } else if (keyCode == 65 && hasControlDown() && !hasShiftDown() && !hasAltDown()) {
+            // Select all
+            selectedElements.clear();
+            selectedElements.addAll(data.elements);
         } else if (keyCode == 77 && hasControlDown() && !hasShiftDown() && !hasAltDown()) {
             // Paste material
-            if (selectedElement != null && copiedElement != null) {
-                FurnitureData.Element element = new FurnitureData.Element(copiedElement);
-                selectedElement.material = new FurnitureData.Material(element.material);
-                selectedElement.color = element.color;
-                selectedElement.emission = element.emission;
+            if (!selectedElements.isEmpty() && !copiedElements.isEmpty()) {
+                FurnitureData.Element element = new FurnitureData.Element(copiedElements.get(0));
+                for (FurnitureData.Element selectedElement : selectedElements) {
+                    selectedElement.material = new FurnitureData.Material(element.material);
+                    selectedElement.color = element.color;
+                    selectedElement.emission = element.emission;
+                }
                 init();
             }
         } else if (isUndo(keyCode)) {
@@ -416,7 +438,7 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
                 CompoundTag oldData = history.removeFirst();
                 if (oldData != null) {
                     data = new FurnitureData(oldData);
-                    selectedElement = null;
+                    selectedElements.clear();
                     init();
                 }
             }
@@ -443,8 +465,8 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
         private final double y;
         private final boolean resize;
 
-        private final Vector3f originalFrom;
-        private final Vector3f originalTo;
+        private final Map<FurnitureData.Element, Vector3f> originalFrom = new HashMap<>();
+        private final Map<FurnitureData.Element, Vector3f> originalTo = new HashMap<>();
 
         private final boolean isFlat;
 
@@ -455,8 +477,10 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
             this.y = y;
             this.resize = resize;
 
-            this.originalFrom = new Vector3f(element.from);
-            this.originalTo = new Vector3f(element.to);
+            for (FurnitureData.Element e : selectedElements) {
+                this.originalFrom.put(e, new Vector3f(e.from));
+                this.originalTo.put(e, new Vector3f(e.to));
+            }
 
             this.isFlat = element.isFlat();
         }
@@ -553,10 +577,11 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
         } else {
             results.sort((a, b) -> Float.compare(b.depth, a.depth));
 
+            // TODO: SHift + mouse-scroll for next/previous element?
             int index = -1;
-            if (selectedElement != null) {
+            if (!selectedElements.isEmpty()) {
                 for (int i = 0; i < results.size(); i++) {
-                    if (results.get(i).element() == selectedElement) {
+                    if (selectedElements.contains(results.get(i).element())) {
                         index = i;
                         break;
                     }
@@ -567,12 +592,15 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
             nextHoverResult = results.get((index + 1) % results.size());
 
             // Highlight the hovered element
-            drawSelection(graphics, hoverResult.element(), pose, 1.0f, false);
+            float selectionWidth = selectedElements.contains(hoverResult.element()) ? 1.25f : 1.0f;
+            drawSelection(graphics, hoverResult.element(), pose, selectionWidth, false);
         }
 
+        graphics.flush();
+
         // Highlight the selected element
-        if (selectedElement != null) {
-            drawSelection(graphics, selectedElement, pose, 0.5f, true);
+        for (FurnitureData.Element selectedElement : selectedElements) {
+            drawSelection(graphics, selectedElement, pose, 0.6f, true);
         }
 
         // Highlight all non-solid elements
@@ -608,7 +636,8 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
             for (int i = 0; i < 4; i++) {
                 Vector3f vertex = vertices[i];
                 Vector3f nextVertex = vertices[(i + 1) % 4];
-                line(graphics, vertex.x(), vertex.y(), vertex.z(), nextVertex.x(), nextVertex.y(), nextVertex.z(), width, overlay, 0.0f, 0.0f, 0.0f, 1.0f);
+                float adjustedWidth = element.type == FurnitureData.ElementType.PLAYER_POSE && facing == Direction.NORTH ? (1.5f + width * 0.5f) : width;
+                line(graphics, vertex.x(), vertex.y(), vertex.z(), nextVertex.x(), nextVertex.y(), nextVertex.z(), adjustedWidth, overlay, 0.0f, 0.0f, 0.0f, 1.0f);
             }
         }
     }
@@ -636,6 +665,25 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
                     lastAutosaveTime = currentTime;
                 }
             }
+        }
+    }
+
+    public Optional<FurnitureData.Element> getFirstElement() {
+        return selectedElements.isEmpty()
+                ? Optional.empty()
+                : Optional.of(selectedElements.get(0));
+    }
+
+    public boolean isFirstElement(FurnitureData.ElementType type) {
+        return getFirstElement().filter(e -> e.type == type).isPresent();
+    }
+
+    public void selectElement(FurnitureData.Element element, boolean add) {
+        if (!add) {
+            selectedElements.clear();
+        }
+        if (!selectedElements.contains(element)) {
+            selectedElements.add(element);
         }
     }
 }

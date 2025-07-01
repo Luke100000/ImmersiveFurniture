@@ -27,32 +27,33 @@ public class MaterialsComponent extends ListComponent {
     @Override
     public void init(int leftPos, int topPos, int width, int height) {
         // Material settings
-        if (screen.selectedElement != null) {
+        FurnitureData.Element element = screen.getFirstElement().orElse(null);
+        if (element != null) {
             // Texture axis
             int i = 0;
             for (FurnitureData.MaterialAxis axis : FurnitureData.MaterialAxis.values()) {
                 addToggleButton(leftPos + 6 + i * 18, topPos + 22, 16, 16 + i * 16, 192, "", () -> {
-                    screen.selectedElement.material.axis = axis;
+                    screen.selectedElements.forEach(e -> e.material.axis = axis);
                     screen.init();
-                }).setEnabled(screen.selectedElement.material.axis != axis);
+                }).setEnabled(element.material.axis != axis);
                 i++;
             }
 
             // Toggle repeat
             repeatButton = addToggleButton(leftPos + 6 + 54, topPos + 22, 16, 144, 192, "gui.immersive_furniture.repeat", () -> {
-                if (screen.selectedElement.material.wrap == FurnitureData.WrapMode.EXPAND) {
-                    screen.selectedElement.material.wrap = FurnitureData.WrapMode.REPEAT;
+                if (element.material.wrap == FurnitureData.WrapMode.EXPAND) {
+                    screen.selectedElements.forEach(e -> e.material.wrap = FurnitureData.WrapMode.REPEAT);
                     repeatButton.setEnabled(false);
                 } else {
-                    screen.selectedElement.material.wrap = FurnitureData.WrapMode.EXPAND;
+                    screen.selectedElements.forEach(e -> e.material.wrap = FurnitureData.WrapMode.EXPAND);
                     repeatButton.setEnabled(true);
                 }
             });
-            repeatButton.setEnabled(screen.selectedElement.material.wrap == FurnitureData.WrapMode.EXPAND);
+            repeatButton.setEnabled(element.material.wrap == FurnitureData.WrapMode.EXPAND);
 
             // Mark as favorite
             favoriteButton = addToggleButton(leftPos + 100 - 6 - 16, topPos + 22, 16, 128, 192, "gui.immersive_furniture.favorite", () -> {
-                String location = screen.selectedElement.material.source.toString();
+                String location = element.material.source.toString();
                 if (Config.getInstance().favorites.contains(location)) {
                     Config.getInstance().favorites.remove(location);
                     favoriteButton.setEnabled(true);
@@ -63,7 +64,7 @@ public class MaterialsComponent extends ListComponent {
                 Config.getInstance().save();
                 screen.init();
             });
-            favoriteButton.setEnabled(!Config.getInstance().favorites.contains(screen.selectedElement.material.source.toString()));
+            favoriteButton.setEnabled(!Config.getInstance().favorites.contains(element.material.source.toString()));
         }
 
         // Material buttons
@@ -75,13 +76,13 @@ public class MaterialsComponent extends ListComponent {
                         22, 22, 146, 0,
                         b -> {
                             MaterialSource material = ((MaterialButton) b).getMaterial();
-                            if (screen.selectedElement != null && material != null) {
-                                screen.selectedElement.material.source = material.location();
+                            if (material != null) {
+                                screen.selectedElements.forEach(e -> e.material.source = material.location());
                                 screen.init();
                             }
                         }
                 );
-                button.setEnabled(screen.selectedElement != null && button.getMaterial() != null && button.getMaterial().location().equals(screen.selectedElement.material.source));
+                button.setEnabled(element != null && button.getMaterial() != null && button.getMaterial().location().equals(element.material.source));
                 materialButtons.add(button);
                 screen.addRenderableWidget(button);
             }
