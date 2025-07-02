@@ -31,8 +31,6 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static net.conczin.immersive_furniture.client.gui.components.SettingsComponent.TAGS;
-import static net.conczin.immersive_furniture.data.FurnitureDataManager.REQUESTED_DATA;
-import static net.conczin.immersive_furniture.data.FurnitureDataManager.getData;
 import static net.conczin.immersive_furniture.data.api.API.request;
 
 public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen {
@@ -83,7 +81,7 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
         authenticating = Auth.loadToken() != null;
 
         // Just in case a few jobs failed
-        REQUESTED_DATA.clear();
+        FurnitureDataManager.REQUESTED_DATA.clear();
     }
 
     @Override
@@ -541,7 +539,10 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
             // Fetch from local files
             furniture = localFiles.stream()
                     .filter(l -> Utils.search(lastSearch, l.toString()))
-                    .filter(l -> tagFilter.equals("miscellaneous") || getData(l) == null || getData(l).tag.equals(tagFilter))
+                    .filter(l -> {
+                        FurnitureData data = FurnitureDataManager.getData(l);
+                        return tagFilter.equals("miscellaneous") || data == null || data.tag.equals(tagFilter);
+                    })
                     .skip((long) page * ENTRIES_PER_PAGE)
                     .limit(ENTRIES_PER_PAGE)
                     .toList();

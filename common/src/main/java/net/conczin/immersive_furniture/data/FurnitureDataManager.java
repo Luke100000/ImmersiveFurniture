@@ -95,16 +95,33 @@ public class FurnitureDataManager {
         }
     }
 
+    /**
+     * Fetches from cached or hash storage in situations where it's not fully clear whether the call comes from a server or client.
+     */
     public static FurnitureData getData(String hash) {
-        return getData(new ResourceLocation("hash", hash), false);
+        ResourceLocation cachedLocation = new ResourceLocation("cache", hash);
+        if (DATA.containsKey(cachedLocation)) {
+            return DATA.get(cachedLocation);
+        }
+        return getHashData(hash);
+    }
+
+    /**
+     * Client-sided access via cache, fetches from the server when not available.
+     */
+    public static FurnitureData getCachedData(String hash) {
+        return getData(new ResourceLocation("cache", hash));
+    }
+
+    /**
+     * Server-sided access via hash storage.
+     */
+    public static FurnitureData getHashData(String hash) {
+        return getData(new ResourceLocation("hash", hash));
     }
 
     public static FurnitureData getData(ResourceLocation id) {
-        return getData(id, true);
-    }
-
-    public static FurnitureData getData(ResourceLocation id, boolean request) {
-        if (request && !DATA.containsKey(id) && !REQUESTED_DATA.contains(id)) {
+        if (!DATA.containsKey(id) && !REQUESTED_DATA.contains(id)) {
             REQUESTED_DATA.add(id);
 
             // Load if it exists
@@ -148,7 +165,7 @@ public class FurnitureDataManager {
                         }
                     }
                 });
-            } else if (id.getNamespace().equals("hash")) {
+            } else if (id.getNamespace().equals("cache")) {
                 Network.sendToServer(new FurnitureDataRequest(id.getPath()));
             }
         }

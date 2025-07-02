@@ -4,6 +4,7 @@
 * Fixed poses not being rotatable and the front is marked
 * Added ctrl-A (select all) and ctrl-D (duplicate) shortcut
 * Fixed sounds playing twice
+* Fix cache degradation
 
 # 0.0.5
 

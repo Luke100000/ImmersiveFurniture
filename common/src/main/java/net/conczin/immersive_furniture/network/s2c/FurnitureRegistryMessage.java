@@ -4,7 +4,6 @@ import net.conczin.immersive_furniture.data.FurnitureDataManager;
 import net.conczin.immersive_furniture.data.FurnitureRegistry;
 import net.conczin.immersive_furniture.network.ImmersivePayload;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 
 import java.util.Map;
@@ -26,7 +25,7 @@ public record FurnitureRegistryMessage(Map<Integer, String> registry) implements
             FurnitureRegistry.INSTANCE.hashToIdentifier.put(entry.getValue(), entry.getKey());
 
             // Download all data now, since it's harder to differentiate between server and client later on
-            FurnitureDataManager.getData(new ResourceLocation("hash", entry.getValue()), true);
+            FurnitureDataManager.getCachedData(entry.getValue());
         }
     }
 }
