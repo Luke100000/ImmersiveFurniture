@@ -348,7 +348,7 @@ public class FurnitureData {
                         center.add(forward.mul(0.125f));
                         center.sub(up.mul(0.03125f));
                     }
-                    found = new PoseOffset(center, element.playerPose.pose, element.rotation + direction.toYRot() % 360.0f);
+                    found = new PoseOffset(center, element.playerPose.pose, -element.rotation + direction.toYRot() % 360.0f);
                 }
             }
         }
@@ -389,7 +389,7 @@ public class FurnitureData {
         for (Element element : elements) {
             if (element.type == ElementType.PARTICLE_EMITTER && !element.particleEmitter.onInteract) {
                 emitParticles(pos, direction, random, element, particleConsumer, inScreen, 1.0f);
-            } else if (element.type == ElementType.SOUND_EMITTER && inEditor && element.soundEmitter.frequency > 0 && random.nextFloat() < element.soundEmitter.frequency) {
+            } else if (element.type == ElementType.SOUND_EMITTER && (!inScreen || inEditor) && element.soundEmitter.frequency > 0 && random.nextFloat() < element.soundEmitter.frequency) {
                 playSound(level, pos, random, element);
             }
         }

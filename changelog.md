@@ -3,6 +3,7 @@
 * Added multi-selection
 * Fixed poses not being rotatable and the front is marked
 * Added ctrl-A (select all) and ctrl-D (duplicate) shortcut
+* Fixed sounds playing twice
 
 # 0.0.5
 
@@ -40,12 +41,9 @@ Initial release
 # Bugs
 
 * On flat elements (sprites mostly) the direction is picked oddly
-* Particles + sounds doesnt work
-* Totem as default non interact doesnt trigger
-* Interact sound is played twice
-* Only play closest sound + particles and those stacked?
 
 # TODO
 
 * Blockbench/JSON block and item model import
 * Datapack support
+* Only play the closest sound + particles and those stacked?

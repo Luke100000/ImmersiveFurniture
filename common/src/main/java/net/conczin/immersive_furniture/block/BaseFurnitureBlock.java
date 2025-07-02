@@ -43,37 +43,38 @@ public abstract class BaseFurnitureBlock extends Block implements SimpleWaterlog
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
 
-    public BaseFurnitureBlock(BlockBehaviour.Properties properties) {
+    public BaseFurnitureBlock(Properties properties) {
         super(properties);
     }
 
     @Override
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+        if (hand != InteractionHand.MAIN_HAND) {
+            return InteractionResult.PASS;
+        }
         FurnitureData data = getData(state, level, pos);
         if (data != null) {
             // Find closest pose element
             Vec3 click = new Vec3(hit.getLocation().x - pos.getX(), hit.getLocation().y - pos.getY(), hit.getLocation().z - pos.getZ());
             FurnitureData.PoseOffset offset = data.getClosestPose(click, state.getValue(FACING));
 
+            boolean consume = false;
             if (offset != null) {
                 // Remember interaction for the player for some injection purposes
                 InteractionManager.INSTANCE.addInteraction(player, pos, offset);
-
                 if (offset.pose() == Pose.SLEEPING) {
                     startSleeping(pos, player, offset);
                 } else if (offset.pose() == Pose.SITTING) {
                     startSitting(level, pos, player, offset);
                 }
-
-                return InteractionResult.CONSUME;
+                consume = true;
             }
 
             if (level instanceof ServerLevel serverLevel && (data.hasSounds() || data.hasParticles())) {
                 Network.sendToAllPlayers(serverLevel.getServer(), new FurnitureInteractMessage(pos));
-                return InteractionResult.CONSUME;
-            } else {
-                return InteractionResult.PASS;
+                consume = true;
             }
+            return consume ? InteractionResult.CONSUME : InteractionResult.PASS;
         }
         return InteractionResult.PASS;
     }
