@@ -1,6 +1,5 @@
 package net.conczin.immersive_furniture.data;
 
-import com.mojang.math.Axis;
 import net.conczin.immersive_furniture.client.model.DynamicAtlas;
 import net.conczin.immersive_furniture.config.Config;
 import net.conczin.immersive_furniture.utils.NBTHelper;
@@ -659,6 +658,14 @@ public class FurnitureData {
                 // While elements could be tinted, there is no gui to do so
                 color = -1;
             }
+
+            // Reduce the risk of weird rounding errors
+            from.x = Math.round(from.x * 64.0f) / 64.0f;
+            from.y = Math.round(from.y * 64.0f) / 64.0f;
+            from.z = Math.round(from.z * 64.0f) / 64.0f;
+            to.x = Math.round(to.x - from.x) + from.x;
+            to.y = Math.round(to.y - from.y) + from.y;
+            to.z = Math.round(to.z - from.z) + from.z;
         }
 
         public boolean contains(Vector3f pos) {
@@ -669,6 +676,11 @@ public class FurnitureData {
             return pos.x >= from.x - margin && pos.x <= to.x + margin &&
                    pos.y >= from.y - margin && pos.y <= to.y + margin &&
                    pos.z >= from.z - margin && pos.z <= to.z + margin;
+        }
+
+        public void move(float x, float y, float z) {
+            from.add(x, y, z);
+            to.add(x, y, z);
         }
 
         public ElementRotationAxes getRotationAxes() {
@@ -703,13 +715,7 @@ public class FurnitureData {
         }
 
         public Vector3f getGlobalDirectionNormal(Direction direction) {
-            Vector3f normal = direction.step();
-            switch (axis) {
-                case X -> Axis.XP.rotationDegrees(rotation).transform(normal);
-                case Y -> Axis.YP.rotationDegrees(rotation).transform(normal);
-                case Z -> Axis.ZP.rotationDegrees(rotation).transform(normal);
-            }
-            return normal;
+            return ModelUtils.rotate(direction.step(), axis, rotation);
         }
 
         public boolean isFlat() {

@@ -12,6 +12,7 @@ import net.conczin.immersive_furniture.client.model.ClientModelUtils;
 import net.conczin.immersive_furniture.config.Config;
 import net.conczin.immersive_furniture.data.FurnitureData;
 import net.conczin.immersive_furniture.data.FurnitureDataManager;
+import net.conczin.immersive_furniture.data.ModelUtils;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -40,7 +41,6 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
     public FurnitureData data;
     public List<FurnitureData.Element> selectedElements = new LinkedList<>();
     public HoverResult hoverResult;
-    public HoverResult nextHoverResult;
 
     final static int MAX_HISTORY_SIZE = 20;
     private String lastHistoryHash = "";
@@ -54,6 +54,8 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
 
     int lastMouseX;
     int lastMouseY;
+
+    int elementShift = 0;
 
     final MaterialsComponent materialsComponent = new MaterialsComponent(this);
     final ParticlesComponent particlesComponent = new ParticlesComponent(this);
@@ -291,22 +293,30 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
                 Vector3f originalFrom = draggingContext.originalFrom.get(element);
                 Vector3f originalTo = draggingContext.originalTo.get(element);
 
+                // Rotate by actual axis
+                Vector3f fNormal = new Vector3f(normal);
+                ModelUtils.rotate(fNormal, draggingContext.element.axis, -draggingContext.element.rotation);
+                ModelUtils.rotate(fNormal, element.axis, element.rotation);
+                Vector3f fNormal2 = new Vector3f(normal2);
+                ModelUtils.rotate(fNormal2, draggingContext.element.axis, -draggingContext.element.rotation);
+                ModelUtils.rotate(fNormal2, element.axis, element.rotation);
+
                 if (draggingContext.direction == Direction.DOWN || draggingContext.direction == Direction.WEST || draggingContext.direction == Direction.NORTH) {
-                    element.from.x = Math.min(element.to.x, originalFrom.x + normal.x);
-                    element.from.y = Math.min(element.to.y, originalFrom.y + normal.y);
-                    element.from.z = Math.min(element.to.z, originalFrom.z + normal.z);
+                    element.from.x = Math.min(element.to.x, originalFrom.x + fNormal.x);
+                    element.from.y = Math.min(element.to.y, originalFrom.y + fNormal.y);
+                    element.from.z = Math.min(element.to.z, originalFrom.z + fNormal.z);
 
-                    element.to.x = Math.max(element.from.x, originalTo.x + normal2.x);
-                    element.to.y = Math.max(element.from.y, originalTo.y + normal2.y);
-                    element.to.z = Math.max(element.from.z, originalTo.z + normal2.z);
+                    element.to.x = Math.max(element.from.x, originalTo.x + fNormal2.x);
+                    element.to.y = Math.max(element.from.y, originalTo.y + fNormal2.y);
+                    element.to.z = Math.max(element.from.z, originalTo.z + fNormal2.z);
                 } else {
-                    element.to.x = Math.max(element.from.x, originalTo.x + normal.x);
-                    element.to.y = Math.max(element.from.y, originalTo.y + normal.y);
-                    element.to.z = Math.max(element.from.z, originalTo.z + normal.z);
+                    element.to.x = Math.max(element.from.x, originalTo.x + fNormal.x);
+                    element.to.y = Math.max(element.from.y, originalTo.y + fNormal.y);
+                    element.to.z = Math.max(element.from.z, originalTo.z + fNormal.z);
 
-                    element.from.x = Math.min(element.to.x, originalFrom.x + normal2.x);
-                    element.from.y = Math.min(element.to.y, originalFrom.y + normal2.y);
-                    element.from.z = Math.min(element.to.z, originalFrom.z + normal2.z);
+                    element.from.x = Math.min(element.to.x, originalFrom.x + fNormal2.x);
+                    element.from.y = Math.min(element.to.y, originalFrom.y + fNormal2.y);
+                    element.from.z = Math.min(element.to.z, originalFrom.z + fNormal2.z);
                 }
 
                 element.sanityCheck();
@@ -324,14 +334,12 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if ((button == 0 || button == 1) && hoverResult != null && nextHoverResult != null) {
+        if ((button == 0 || button == 1) && hoverResult != null) {
             boolean doubleClick = lastMouseX == (int) mouseX && lastMouseY == (int) mouseY;
-            HoverResult result = doubleClick ? nextHoverResult : hoverResult;
-
-            if (hasShiftDown() && selectedElements.contains(result.element)) {
-                selectedElements.remove(result.element);
+            if (button == 0 && hasShiftDown() && selectedElements.contains(hoverResult.element)) {
+                selectedElements.remove(hoverResult.element);
             } else {
-                selectElement(result.element(), hasShiftDown() || (selectedElements.size() > 1 && !doubleClick));
+                selectElement(hoverResult.element(), hasShiftDown() || (selectedElements.size() > 1 && !doubleClick));
             }
 
             if (currentPage == Page.MATERIALS || currentPage == Page.SOUNDS || currentPage == Page.PARTICLES || currentPage == Page.SPRITES) {
@@ -346,7 +354,7 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
                 }
             }
 
-            draggingContext = new DraggingContext(result.element(), result.direction(), mouseX, mouseY, button == 1);
+            draggingContext = new DraggingContext(hoverResult.element(), hoverResult.direction(), mouseX, mouseY, button == 1);
             isRotatingView = false;
             init();
         } else {
@@ -406,7 +414,7 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
             }
         } else if (keyCode == 261) {
             // Delete
-            if (!selectedElements.isEmpty() && !(getFocused() instanceof EditBox)) {
+            if (!selectedElements.isEmpty() && isOverRightWindow(lastMouseX, lastMouseY)) {
                 data.elements.removeAll(selectedElements);
                 selectedElements.clear();
                 init();
@@ -418,6 +426,7 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
             // Select all
             selectedElements.clear();
             selectedElements.addAll(data.elements);
+            init();
         } else if (keyCode == 77 && hasControlDown() && !hasShiftDown() && !hasAltDown()) {
             // Paste material
             if (!selectedElements.isEmpty() && !copiedElements.isEmpty()) {
@@ -452,9 +461,20 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double delta) {
-        camZoom = Math.max(20.0f, Math.min(120.0f, camZoom + (float) delta * 0.1f * camZoom));
+        if (hasShiftDown()) {
+            elementShift += (mouseY > 0 ? 1 : -1);
+        } else {
+            camZoom = Math.max(20.0f, Math.min(120.0f, camZoom + (float) delta * 0.1f * camZoom));
+        }
 
         return super.mouseScrolled(mouseX, mouseY, delta);
+    }
+
+    @Override
+    public void mouseMoved(double mouseX, double mouseY) {
+        super.mouseMoved(mouseX, mouseY);
+
+        elementShift = 0;
     }
 
     final class DraggingContext {
@@ -573,23 +593,9 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
 
         if (results.isEmpty() || !isOverRightWindow(mouseX, mouseY)) {
             hoverResult = null;
-            nextHoverResult = null;
         } else {
             results.sort((a, b) -> Float.compare(b.depth, a.depth));
-
-            // TODO: SHift + mouse-scroll for next/previous element?
-            int index = -1;
-            if (!selectedElements.isEmpty()) {
-                for (int i = 0; i < results.size(); i++) {
-                    if (selectedElements.contains(results.get(i).element())) {
-                        index = i;
-                        break;
-                    }
-                }
-            }
-
-            hoverResult = results.get(Math.max(0, index));
-            nextHoverResult = results.get((index + 1) % results.size());
+            hoverResult = results.get(elementShift % results.size());
 
             // Highlight the hovered element
             float selectionWidth = selectedElements.contains(hoverResult.element()) ? 1.25f : 1.0f;

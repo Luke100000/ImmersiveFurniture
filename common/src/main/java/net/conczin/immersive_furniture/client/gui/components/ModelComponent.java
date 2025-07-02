@@ -4,6 +4,7 @@ import net.conczin.immersive_furniture.client.gui.ArtisansWorkstationEditorScree
 import net.conczin.immersive_furniture.client.gui.widgets.BoundedDoubleSlider;
 import net.conczin.immersive_furniture.client.gui.widgets.StateImageButton;
 import net.conczin.immersive_furniture.data.FurnitureData;
+import net.conczin.immersive_furniture.data.ModelUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
@@ -12,6 +13,7 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Pose;
+import org.joml.Vector3f;
 import org.joml.Vector3i;
 
 import java.util.ArrayList;
@@ -109,43 +111,43 @@ public class ModelComponent extends ScreenComponent {
         int y = topPos + 17;
         px = addNewFloatBox(leftPos + 6, y, 28);
         px.setValue(Float.toString(firstElement.from.x));
-        px.setResponder(b -> {
-            float offset = parse(px.getValue(), firstElement.from.x) - firstElement.from.x;
-            if (offset == 0) return;
-            firstElement.from.x += offset;
-            firstElement.to.x += offset;
+        px.setResponder(b -> screen.getFirstElement().ifPresent(currentFirstElement -> {
+            float offset = parse(px.getValue(), currentFirstElement.from.x) - currentFirstElement.from.x;
+            if (Math.abs(offset) < 0.001) return;
+            currentFirstElement.from.x += offset;
+            currentFirstElement.to.x += offset;
             for (FurnitureData.Element element : screen.selectedElements) {
-                element.from.x = firstElement.from.x;
-                element.to.x = firstElement.to.x;
+                element.from.x = currentFirstElement.from.x;
+                element.to.x = currentFirstElement.to.x;
                 element.sanityCheck();
             }
-        });
+        }));
         py = addNewFloatBox(leftPos + 6 + 30, y, 28);
         py.setValue(Float.toString(firstElement.from.y));
-        py.setResponder(b -> {
-            float offset = parse(py.getValue(), firstElement.from.y) - firstElement.from.y;
-            if (offset == 0) return;
-            firstElement.from.y += offset;
-            firstElement.to.y += offset;
+        py.setResponder(b -> screen.getFirstElement().ifPresent(currentFirstElement -> {
+            float offset = parse(py.getValue(), currentFirstElement.from.y) - currentFirstElement.from.y;
+            if (Math.abs(offset) < 0.001) return;
+            currentFirstElement.from.y += offset;
+            currentFirstElement.to.y += offset;
             for (FurnitureData.Element element : screen.selectedElements) {
-                element.from.y = firstElement.from.y;
-                element.to.y = firstElement.to.y;
+                element.from.y = currentFirstElement.from.y;
+                element.to.y = currentFirstElement.to.y;
                 element.sanityCheck();
             }
-        });
+        }));
         pz = addNewFloatBox(leftPos + 6 + 30 * 2, y, 28);
         pz.setValue(Float.toString(firstElement.from.z));
-        pz.setResponder(b -> {
-            float offset = parse(pz.getValue(), firstElement.from.z) - firstElement.from.z;
-            if (offset == 0) return;
-            firstElement.from.z += offset;
-            firstElement.to.z += offset;
+        pz.setResponder(b -> screen.getFirstElement().ifPresent(currentFirstElement -> {
+            float offset = parse(pz.getValue(), currentFirstElement.from.z) - currentFirstElement.from.z;
+            if (Math.abs(offset) < 0.001) return;
+            currentFirstElement.from.z += offset;
+            currentFirstElement.to.z += offset;
             for (FurnitureData.Element element : screen.selectedElements) {
-                element.from.z = firstElement.from.z;
-                element.to.z = firstElement.to.z;
+                element.from.z = currentFirstElement.from.z;
+                element.to.z = currentFirstElement.to.z;
                 element.sanityCheck();
             }
-        });
+        }));
 
         // Size
         if (isResizable(firstElement)) {
@@ -153,46 +155,46 @@ public class ModelComponent extends ScreenComponent {
             Vector3i size = firstElement.getSize();
             sx = addNewFloatBox(leftPos + 6, y, 28);
             sx.setValue(String.valueOf(size.x));
-            sx.setResponder(b -> {
-                int oldSize = firstElement.getSize().x;
+            sx.setResponder(b -> screen.getFirstElement().ifPresent(currentFirstElement -> {
+                int oldSize = currentFirstElement.getSize().x;
                 int newSize = Math.max(0, parse(sx.getValue(), oldSize));
-                if (newSize == oldSize) return;
-                firstElement.from.x -= (newSize - oldSize) / 2.0f;
-                firstElement.to.x += (newSize - oldSize) / 2.0f;
+                if (Math.abs(newSize - oldSize) < 0.001) return;
+                currentFirstElement.from.x -= (newSize - oldSize) / 2.0f;
+                currentFirstElement.to.x += (newSize - oldSize) / 2.0f;
                 for (FurnitureData.Element element : screen.selectedElements) {
-                    element.from.x = firstElement.from.x;
-                    element.to.x = firstElement.to.x;
+                    element.from.x = currentFirstElement.from.x;
+                    element.to.x = currentFirstElement.to.x;
                     element.sanityCheck();
                 }
-            });
+            }));
             sy = addNewFloatBox(leftPos + 6 + 30, y, 28);
             sy.setValue(String.valueOf(size.y));
-            sy.setResponder(b -> {
-                int oldSize = firstElement.getSize().y;
+            sy.setResponder(b -> screen.getFirstElement().ifPresent(currentFirstElement -> {
+                int oldSize = currentFirstElement.getSize().y;
                 int newSize = Math.max(0, parse(sy.getValue(), oldSize));
-                if (newSize == oldSize) return;
-                firstElement.from.y -= (newSize - oldSize) / 2.0f;
-                firstElement.to.y += (newSize - oldSize) / 2.0f;
+                if (Math.abs(newSize - oldSize) < 0.001) return;
+                currentFirstElement.from.y -= (newSize - oldSize) / 2.0f;
+                currentFirstElement.to.y += (newSize - oldSize) / 2.0f;
                 for (FurnitureData.Element element : screen.selectedElements) {
-                    element.from.y = firstElement.from.y;
-                    element.to.y = firstElement.to.y;
+                    element.from.y = currentFirstElement.from.y;
+                    element.to.y = currentFirstElement.to.y;
                     element.sanityCheck();
                 }
-            });
+            }));
             sz = addNewFloatBox(leftPos + 6 + 30 * 2, y, 28);
             sz.setValue(String.valueOf(size.z));
-            sz.setResponder(b -> {
-                int oldSize = firstElement.getSize().z;
+            sz.setResponder(b -> screen.getFirstElement().ifPresent(currentFirstElement -> {
+                int oldSize = currentFirstElement.getSize().z;
                 int newSize = Math.max(0, parse(sz.getValue(), oldSize));
-                if (newSize == oldSize) return;
-                firstElement.from.z -= (newSize - oldSize) / 2.0f;
-                firstElement.to.z += (newSize - oldSize) / 2.0f;
+                if (Math.abs(newSize - oldSize) < 0.001) return;
+                currentFirstElement.from.z -= (newSize - oldSize) / 2.0f;
+                currentFirstElement.to.z += (newSize - oldSize) / 2.0f;
                 for (FurnitureData.Element element : screen.selectedElements) {
-                    element.from.z = firstElement.from.z;
-                    element.to.z = firstElement.to.z;
+                    element.from.z = currentFirstElement.from.z;
+                    element.to.z = currentFirstElement.to.z;
                     element.sanityCheck();
                 }
-            });
+            }));
         }
 
         // Rotation
@@ -219,10 +221,8 @@ public class ModelComponent extends ScreenComponent {
         });
         rz.setEnabled(firstElement.axis != Direction.Axis.Z);
 
-        addButton(leftPos + 62, y + 1, 14, 222, 2, null,
-                () -> screen.selectedElements.forEach(e -> e.rotation = (e.rotation + 22.5f) % 360));
-        addButton(leftPos + 78, y + 1, 14, 206, 2, null,
-                () -> screen.selectedElements.forEach(e -> e.rotation = (e.rotation - 22.5f) % 360));
+        addButton(leftPos + 62, y + 1, 14, 222, 2, null, () -> rotate(22.5f));
+        addButton(leftPos + 78, y + 1, 14, 206, 2, null, () -> rotate(-22.5f));
 
         // Element type
         for (FurnitureData.ElementType type : FurnitureData.ElementType.values()) {
@@ -356,6 +356,31 @@ public class ModelComponent extends ScreenComponent {
                 });
                 screen.init();
             }).setEnabled(!firstElement.sprite.tiled);
+        }
+    }
+
+    private void rotate(float rotation) {
+        // Rotate around the center
+        if (screen.selectedElements.size() > 1) {
+            Vector3f center = new Vector3f();
+            screen.selectedElements.stream().map(FurnitureData.Element::getCenter).forEach(center::add);
+            center.div(screen.selectedElements.size());
+
+            for (FurnitureData.Element element : screen.selectedElements) {
+                Vector3f offset = element.getCenter().sub(center);
+                Vector3f newOffset = ModelUtils.rotate(new Vector3f(offset), element.axis, rotation);
+                newOffset.sub(offset);
+                element.move(
+                        Math.round(newOffset.x * 4) / 4f,
+                        Math.round(newOffset.y * 4) / 4f,
+                        Math.round(newOffset.z * 4) / 4f
+                );
+            }
+        }
+
+        // Rotate each selected element
+        for (FurnitureData.Element element : screen.selectedElements) {
+            element.rotation = (element.rotation + rotation) % 360;
         }
     }
 
