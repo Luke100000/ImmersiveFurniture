@@ -11,6 +11,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -131,7 +132,7 @@ public class FurnitureModelBaker {
     private final static RandomSource random = RandomSource.create();
 
     private static MergedBakedModel bakeModel(DynamicAtlas atlas, MultiRenderTypeBlockModel model, int yRot) {
-        Map<RenderType, BakedModel> bakedModels = new HashMap<>();
+        Map<RenderType, BakedModel> bakedModels = new LinkedHashMap<>();
         for (RenderType type : model.models.keySet()) {
             bakedModels.put(type, bakeModel(atlas, model, type, yRot));
         }

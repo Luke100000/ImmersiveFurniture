@@ -5,11 +5,12 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.BlockModel;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class MultiRenderTypeBlockModel {
     public final Map<Integer, FurnitureData.Element> indexToElement;
-    public final Map<RenderType, BlockModel> models = new HashMap<>();
+    public final Map<RenderType, BlockModel> models = new LinkedHashMap<>();
 
     public MultiRenderTypeBlockModel(Map<Integer, FurnitureData.Element> indexToElement) {
         this.indexToElement = indexToElement;
