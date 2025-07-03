@@ -8,6 +8,7 @@ import net.conczin.immersive_furniture.block.BaseFurnitureBlock;
 import net.conczin.immersive_furniture.block.entity.FurnitureBlockEntity;
 import net.conczin.immersive_furniture.client.model.DynamicAtlas;
 import net.conczin.immersive_furniture.client.model.FurnitureModelBaker;
+import net.conczin.immersive_furniture.client.model.MergedBakedModel;
 import net.conczin.immersive_furniture.data.FurnitureData;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
@@ -22,6 +23,7 @@ import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.List;
+import java.util.Map;
 
 import static net.minecraft.world.level.SignalGetter.DIRECTIONS;
 
@@ -63,22 +65,24 @@ public class FurnitureBlockEntityRenderer<T extends FurnitureBlockEntity> implem
     }
 
     public static void renderFurniture(BlockState state, PoseStack poseStack, MultiBufferSource buffer, int packedLight, int packedOverlay, FurnitureData data) {
-        renderFurniture(state, poseStack, buffer, packedLight, packedOverlay, data, FurnitureModelBaker.getModel(data, DynamicAtlas.ENTITY), DynamicAtlas.ENTITY);
+        renderFurniture(state, poseStack, buffer, packedLight, packedOverlay, FurnitureModelBaker.getModel(data, DynamicAtlas.ENTITY), DynamicAtlas.ENTITY);
     }
 
-    public static void renderFurniture(BlockState state, PoseStack poseStack, MultiBufferSource buffer, int packedLight, int packedOverlay, FurnitureData data, BakedModel bakedModel, DynamicAtlas atlas) {
-        // Render in two passes since, unliked baked textures, the textures can be on up to two atlases
+    public static void renderFurniture(BlockState state, PoseStack poseStack, MultiBufferSource buffer, int packedLight, int packedOverlay, MergedBakedModel bakedModel, DynamicAtlas atlas) {
+        // Render in two passes since; unliked baked textures, the textures can be on up to two atlases
         for (int i = 0; i < 2; i++) {
             ResourceLocation location = i == 0 ? atlas.getLocation() : InventoryMenu.BLOCK_ATLAS;
-
-            // Use the transparency type to determine the render type
-            VertexConsumer consumer = switch (data.transparency) {
-                case TRANSLUCENT -> buffer.getBuffer(RenderType.entityTranslucentCull(location));
-                case CUTOUT, CUTOUT_MIPPED -> buffer.getBuffer(RenderType.entityCutout(location));
-                default -> buffer.getBuffer(RenderType.entitySolid(location));
-            };
-
-            renderModel(poseStack.last(), consumer, state, bakedModel, packedLight, packedOverlay, i == 1);
+            for (Map.Entry<RenderType, BakedModel> entry : bakedModel.getModels().entrySet()) {
+                VertexConsumer consumer;
+                if (entry.getKey() == RenderType.cutout() || entry.getKey() == RenderType.cutoutMipped()) {
+                    consumer = buffer.getBuffer(RenderType.entityCutout(location));
+                } else if (entry.getKey() == RenderType.translucent()) {
+                    consumer = buffer.getBuffer(RenderType.entityTranslucentCull(location));
+                } else {
+                    consumer = buffer.getBuffer(RenderType.entitySolid(location));
+                }
+                renderModel(poseStack.last(), consumer, state, entry.getValue(), packedLight, packedOverlay, i == 1);
+            }
         }
     }
 
@@ -95,7 +99,25 @@ public class FurnitureBlockEntityRenderer<T extends FurnitureBlockEntity> implem
         for (BakedQuad quad : quads) {
             ResourceLocation resourceLocation = quad.getSprite().atlasLocation();
             if (resourceLocation.getNamespace().equals("minecraft") != blocksAtlas) continue;
-            consumer.putBulkData(pose, quad, BRIGHTNESS, 1.0f, 1.0f, 1.0f, 1.0f, new int[]{packedLight, packedLight, packedLight, packedLight}, packedOverlay, true);
+            consumer.putBulkData(pose,
+                    quad,
+                    BRIGHTNESS, 1.0f,
+                    1.0f,
+                    1.0f,
+                    1.0f,
+                    new int[]{
+                            blend(packedLight, quad.getVertices()[6]),
+                            blend(packedLight, quad.getVertices()[8 + 6]),
+                            blend(packedLight, quad.getVertices()[16 + 6]),
+                            blend(packedLight, quad.getVertices()[24 + 6])
+                    },
+                    packedOverlay,
+                    true
+            );
         }
+    }
+
+    private static int blend(int worldLight, int vertexLight) {
+        return Math.max(worldLight & 0xFFFF, vertexLight & 0xFFFF) | (Math.max((worldLight >> 16) & 0xFFFF, (vertexLight >> 16) & 0xFFFF) << 16);
     }
 }

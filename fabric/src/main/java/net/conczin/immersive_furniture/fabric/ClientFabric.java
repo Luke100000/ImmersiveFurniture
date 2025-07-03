@@ -3,7 +3,7 @@ package net.conczin.immersive_furniture.fabric;
 import net.conczin.immersive_furniture.Common;
 import net.conczin.immersive_furniture.CommonClient;
 import net.conczin.immersive_furniture.block.entity.BlockEntityTypes;
-import net.conczin.immersive_furniture.client.FurnitureBakedModelWrapper;
+import net.conczin.immersive_furniture.client.model.FurnitureBakedModelWrapper;
 import net.conczin.immersive_furniture.client.renderer.FurnitureBlockEntityRenderer;
 import net.conczin.immersive_furniture.client.renderer.SittingEntityRenderer;
 import net.conczin.immersive_furniture.entity.Entities;
@@ -43,6 +43,9 @@ public final class ClientFabric implements ClientModInitializer {
                 warned = true;
                 if (FabricLoader.getInstance().isModLoaded("sodium") && !FabricLoader.getInstance().isModLoaded("indium")) {
                     client.player.sendSystemMessage(Component.translatable("immersive_furniture.indium_missing"));
+                }
+                if (!FabricLoader.getInstance().isModLoaded("ferritecore")) {
+                    client.player.sendSystemMessage(Component.translatable("immersive_furniture.ferritecore_missing"));
                 }
             }
         });

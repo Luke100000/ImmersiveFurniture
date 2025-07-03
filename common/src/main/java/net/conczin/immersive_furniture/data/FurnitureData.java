@@ -1,6 +1,6 @@
 package net.conczin.immersive_furniture.data;
 
-import com.mojang.math.Axis;
+import net.conczin.immersive_furniture.client.model.DynamicAtlas;
 import com.mojang.serialization.Codec;
 import net.conczin.immersive_furniture.config.Config;
 import net.conczin.immersive_furniture.utils.NBTHelper;
@@ -57,7 +57,6 @@ public class FurnitureData {
     public String originalAuthor = "";
     public Set<String> sources = new HashSet<>();
     public Set<String> dependencies = new HashSet<>();
-    public TransparencyType transparency = TransparencyType.SOLID;
 
     public final List<Element> elements = new LinkedList<>();
 
@@ -81,7 +80,6 @@ public class FurnitureData {
         this.originalAuthor = NBTHelper.getString(tag, "OriginalAuthor", originalAuthor);
         this.sources = NBTHelper.getStringSet(tag.getList("Sources", 8));
         this.dependencies = NBTHelper.getStringSet(tag.getList("Dependencies", 8));
-        this.transparency = NBTHelper.getEnum(tag, TransparencyType.class, "Transparency", TransparencyType.SOLID);
 
         this.size = new Vector3i(
                 NBTHelper.getInt(tag, "SizeX", 1),
@@ -95,20 +93,19 @@ public class FurnitureData {
         }
     }
 
+    @SuppressWarnings("CopyConstructorMissesField")
     public FurnitureData(FurnitureData data) {
         this.name = data.name;
         this.tag = data.tag;
         this.lightLevel = data.lightLevel;
         this.inventorySize = data.inventorySize;
-        this.contentid = data.contentid;
         this.author = data.author;
         this.originalAuthor = data.originalAuthor.isEmpty() ? data.author : data.originalAuthor;
         this.sources.addAll(data.sources);
         this.dependencies.addAll(data.dependencies);
-        this.transparency = data.transparency;
 
         this.hash = null;
-        this.cachedShapes = new HashMap<>();
+        this.cachedShapes = new ConcurrentHashMap<>();
         this.lastTick = 0;
 
         for (Element element : data.elements) {
@@ -129,7 +126,6 @@ public class FurnitureData {
         tag.putString("OriginalAuthor", originalAuthor);
         tag.put("Sources", NBTHelper.getStringList(sources));
         tag.put("Dependencies", NBTHelper.getStringList(dependencies));
-        tag.putString("Transparency", this.transparency.name());
 
         tag.putInt("SizeX", size.x);
         tag.putInt("SizeY", size.y);
@@ -159,6 +155,8 @@ public class FurnitureData {
         float maxX = Float.MIN_VALUE, maxY = Float.MIN_VALUE, maxZ = Float.MIN_VALUE;
 
         for (Element element : elements) {
+            if (element.type != ElementType.ELEMENT && element.type != ElementType.SPRITE) continue;
+
             Vector3f from = element.from;
             Vector3f to = element.to;
 
@@ -224,26 +222,20 @@ public class FurnitureData {
         }
     }
 
-    public boolean playInteractSound(Level level, BlockPos pos, Player player) {
-        boolean consumed = false;
+    public void playInteractSound(Level level, BlockPos pos, Player player) {
         for (Element element : elements) {
             if (element.type == ElementType.SOUND_EMITTER && element.soundEmitter.onInteract) {
                 playSound(level, pos, player.getRandom(), element);
-                consumed = true;
             }
         }
-        return consumed;
     }
 
-    public boolean emitInteractParticles(BlockPos pos, Direction direction, Player player, ParticleConsumer particleConsumer, boolean inScreen) {
-        boolean consumed = false;
+    public void emitInteractParticles(BlockPos pos, Direction direction, Player player, ParticleConsumer particleConsumer, boolean inScreen) {
         for (Element element : elements) {
             if (element.type == ElementType.PARTICLE_EMITTER && element.particleEmitter.onInteract) {
                 emitParticles(pos, direction, player.getRandom(), element, particleConsumer, inScreen, 10.0f);
-                consumed = true;
             }
         }
-        return consumed;
     }
 
     public boolean hasParticles() {
@@ -306,6 +298,16 @@ public class FurnitureData {
                 }
             }
         }
+        if (advanced) {
+            int pixels = 0;
+            for (Element element : elements) {
+                for (int[] value : element.bakedTexture.values()) {
+                    pixels += value.length;
+                }
+            }
+            double usage = pixels / Math.pow(DynamicAtlas.BAKED.getSize(), 2);
+            tooltip.add(Component.translatable("gui.immersive_furniture.atlas_usage", String.format("%.1f%%", usage * 100)).withStyle(ChatFormatting.DARK_GRAY));
+        }
         if (hasAdvanced && !advanced) {
             tooltip.add(Component.translatable("gui.immersive_furniture.tooltip").withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC));
         }
@@ -358,7 +360,7 @@ public class FurnitureData {
                         center.add(forward.mul(0.125f));
                         center.sub(up.mul(0.03125f));
                     }
-                    found = new PoseOffset(center, element.playerPose.pose, element.rotation + direction.toYRot() % 360.0f);
+                    found = new PoseOffset(center, element.playerPose.pose, -element.rotation + direction.toYRot() % 360.0f);
                 }
             }
         }
@@ -399,7 +401,7 @@ public class FurnitureData {
         for (Element element : elements) {
             if (element.type == ElementType.PARTICLE_EMITTER && !element.particleEmitter.onInteract) {
                 emitParticles(pos, direction, random, element, particleConsumer, inScreen, 1.0f);
-            } else if (element.type == ElementType.SOUND_EMITTER && inEditor && element.soundEmitter.frequency > 0 && random.nextFloat() < element.soundEmitter.frequency) {
+            } else if (element.type == ElementType.SOUND_EMITTER && (!inScreen || inEditor) && element.soundEmitter.frequency > 0 && random.nextFloat() < element.soundEmitter.frequency) {
                 playSound(level, pos, random, element);
             }
         }
@@ -517,13 +519,14 @@ public class FurnitureData {
         public float rotation = 0.0f;
         public ElementType type = ElementType.ELEMENT;
         public int color = -1;
+        public int emission = 0;
         public Material material;
         public ParticleEmitter particleEmitter;
         public SoundEmitter soundEmitter;
         public PlayerPose playerPose;
         public Sprite sprite;
 
-        public Map<Direction, int[]> bakedTexture = new HashMap<>();
+        public Map<Direction, int[]> bakedTexture = new ConcurrentHashMap<>();
         public ElementRotationAxes rotationAxes;
 
         public Element() {
@@ -543,13 +546,13 @@ public class FurnitureData {
             this.rotation = NBTHelper.getFloat(tag, "Rotation", rotation);
             this.type = NBTHelper.getEnum(tag, ElementType.class, "Type", type);
             this.color = NBTHelper.getInt(tag, "Color", color);
+            this.emission = NBTHelper.getInt(tag, "Emission", 0);
             this.material = new Material(tag.getCompound("Material"));
             this.particleEmitter = new ParticleEmitter(tag.getCompound("ParticleEmitter"));
             this.soundEmitter = new SoundEmitter(tag.getCompound("SoundEmitter"));
             this.playerPose = new PlayerPose(tag.getCompound("PlayerPose"));
             this.sprite = new Sprite(tag.getCompound("Sprite"));
 
-            this.bakedTexture = new HashMap<>();
             CompoundTag bakedTextureTag = tag.getCompound("BakedTexture");
             for (String key : bakedTextureTag.getAllKeys()) {
                 bakedTexture.put(Direction.CODEC.byName(key), bakedTextureTag.getIntArray(key));
@@ -563,12 +566,13 @@ public class FurnitureData {
             this.rotation = element.rotation;
             this.type = element.type;
             this.color = element.color;
+            this.emission = element.emission;
             this.material = new Material(element.material);
             this.particleEmitter = new ParticleEmitter(element.particleEmitter);
             this.soundEmitter = new SoundEmitter(element.soundEmitter);
             this.playerPose = new PlayerPose(element.playerPose);
             this.sprite = new Sprite(element.sprite);
-            this.bakedTexture = new HashMap<>();
+            this.bakedTexture = new ConcurrentHashMap<>();
             this.rotationAxes = null;
         }
 
@@ -580,6 +584,7 @@ public class FurnitureData {
             tag.putFloat("Rotation", rotation);
             tag.putString("Type", type.name().toLowerCase());
             tag.putInt("Color", color);
+            tag.putInt("Emission", emission);
 
             if (type == ElementType.ELEMENT) {
                 tag.put("Material", material.toTag());
@@ -651,17 +656,29 @@ public class FurnitureData {
                 to.x = center.x + 4.0f;
                 to.y = center.y + 1.0f;
                 to.z = center.z + (playerPose.pose == Pose.SLEEPING ? 14.0f : 4.0f);
-                rotation = 0.0f;
                 axis = Direction.Axis.Y;
             } else if (type == ElementType.SPRITE) {
                 // Sprites are forced to be 16x16x0
                 Vector3f center = getCenter();
-                from.x = center.x - 8.0f * sprite.size;
-                from.y = center.y - 8.0f * sprite.size;
-                to.x = center.x + 8.0f * sprite.size;
-                to.y = center.y + 8.0f * sprite.size;
+                if (!sprite.tiled) {
+                    from.x = center.x - 8.0f * sprite.size;
+                    from.y = center.y - 8.0f * sprite.size;
+                    to.x = center.x + 8.0f * sprite.size;
+                    to.y = center.y + 8.0f * sprite.size;
+                }
                 to.z = from.z;
+            } else if (type == ElementType.ELEMENT) {
+                // While elements could be tinted, there is no gui to do so
+                color = -1;
             }
+
+            // Reduce the risk of weird rounding errors
+            from.x = Math.round(from.x * 64.0f) / 64.0f;
+            from.y = Math.round(from.y * 64.0f) / 64.0f;
+            from.z = Math.round(from.z * 64.0f) / 64.0f;
+            to.x = Math.round(to.x - from.x) + from.x;
+            to.y = Math.round(to.y - from.y) + from.y;
+            to.z = Math.round(to.z - from.z) + from.z;
         }
 
         public boolean contains(Vector3f pos) {
@@ -672,6 +689,11 @@ public class FurnitureData {
             return pos.x >= from.x - margin && pos.x <= to.x + margin &&
                    pos.y >= from.y - margin && pos.y <= to.y + margin &&
                    pos.z >= from.z - margin && pos.z <= to.z + margin;
+        }
+
+        public void move(float x, float y, float z) {
+            from.add(x, y, z);
+            to.add(x, y, z);
         }
 
         public ElementRotationAxes getRotationAxes() {
@@ -706,14 +728,7 @@ public class FurnitureData {
         }
 
         public Vector3f getGlobalDirectionNormal(Direction direction) {
-            Vector3f normal = direction.step();
-            switch (axis) {
-                case X -> Axis.XP.rotationDegrees(rotation).transform(normal);
-                case Y -> Axis.YP.rotationDegrees(rotation).transform(normal);
-                case Z -> Axis.ZP.rotationDegrees(rotation).transform(normal);
-            }
-            normal.mul(1, -1, 1);
-            return normal;
+            return ModelUtils.rotate(direction.step(), axis, rotation);
         }
 
         public boolean isFlat() {
@@ -887,6 +902,7 @@ public class FurnitureData {
         public ResourceLocation sprite = ResourceLocation.withDefaultNamespace("block/soul_fire_1");
         public int rotation = 0;
         public float size = 1.0f;
+        public boolean tiled = false;
 
         public Sprite() {
         }
@@ -895,12 +911,14 @@ public class FurnitureData {
             this.sprite = NBTHelper.getResourceLocation(tag, "Sprite", sprite);
             this.rotation = NBTHelper.getInt(tag, "Rotation", rotation);
             this.size = NBTHelper.getFloat(tag, "Size", size);
+            this.tiled = NBTHelper.getBoolean(tag, "Tiled", tiled);
         }
 
         public Sprite(Sprite sprite) {
             this.sprite = sprite.sprite;
             this.rotation = sprite.rotation;
             this.size = sprite.size;
+            this.tiled = sprite.tiled;
         }
 
         public CompoundTag toTag() {
@@ -908,6 +926,7 @@ public class FurnitureData {
             tag.putString("Sprite", sprite.toString());
             tag.putInt("Rotation", rotation);
             tag.putFloat("Size", size);
+            tag.putBoolean("Tiled", tiled);
             return tag;
         }
     }

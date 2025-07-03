@@ -9,10 +9,14 @@ import net.conczin.immersive_furniture.client.Utils;
 import net.conczin.immersive_furniture.client.gui.components.*;
 import net.conczin.immersive_furniture.client.gui.widgets.StateImageButton;
 import net.conczin.immersive_furniture.client.model.ClientModelUtils;
+import net.conczin.immersive_furniture.config.Config;
 import net.conczin.immersive_furniture.data.FurnitureData;
+import net.conczin.immersive_furniture.data.FurnitureDataManager;
+import net.conczin.immersive_furniture.data.ModelUtils;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.core.Direction;
@@ -35,20 +39,23 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
     float camZoom = 100.0f;
 
     public FurnitureData data;
-    public FurnitureData.Element selectedElement;
+    public List<FurnitureData.Element> selectedElements = new LinkedList<>();
     public HoverResult hoverResult;
-    public HoverResult nextHoverResult;
 
     final static int MAX_HISTORY_SIZE = 20;
     private String lastHistoryHash = "";
     private final Deque<CompoundTag> history = new ArrayDeque<>(MAX_HISTORY_SIZE);
-    private CompoundTag copiedElement;
+    private List<CompoundTag> copiedElements = new LinkedList<>();
+
+    private long lastAutosaveTime = 0;
 
     DraggingContext draggingContext;
     boolean isRotatingView;
 
     int lastMouseX;
     int lastMouseY;
+
+    int elementShift = 0;
 
     final MaterialsComponent materialsComponent = new MaterialsComponent(this);
     final ParticlesComponent particlesComponent = new ParticlesComponent(this);
@@ -59,6 +66,8 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
     final SpritesComponent spritesComponent = new SpritesComponent(this);
 
     Page currentPage = Page.MODEL;
+
+    boolean backwardsCheckerPlane = true;
 
     public enum Page {
         MODEL,
@@ -96,7 +105,7 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
         MutableComponent text = Component.translatable("gui.immersive_furniture.tab.cancel");
         StateImageButton button = new StateImageButton(
                 leftPos + 4, topPos - 24, 26, 28,
-                130, 160, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE,
+                130, 56, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE,
                 b -> cancel(), text);
         button.setTooltip(Tooltip.create(text));
         button.setEnabled(false);
@@ -106,18 +115,18 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
         int x = 16;
         addRenderableWidget(pagePageButton(Page.MODEL, x, 0));
         x += 26;
-        if (selectedElement != null && selectedElement.type == FurnitureData.ElementType.PARTICLE_EMITTER) {
+        if (isFirstElement(FurnitureData.ElementType.PARTICLE_EMITTER)) {
             addRenderableWidget(pagePageButton(Page.PARTICLES, x, 6 * 26));
             x += 26;
-        } else if (selectedElement != null && selectedElement.type == FurnitureData.ElementType.SOUND_EMITTER) {
+        } else if (isFirstElement(FurnitureData.ElementType.SOUND_EMITTER)) {
             addRenderableWidget(pagePageButton(Page.SOUNDS, x, 7 * 26));
             x += 26;
-        } else if (selectedElement != null && selectedElement.type == FurnitureData.ElementType.ELEMENT) {
+        } else if (isFirstElement(FurnitureData.ElementType.ELEMENT)) {
             addRenderableWidget(pagePageButton(Page.MATERIALS, x, 26));
             x += 26;
             addRenderableWidget(pagePageButton(Page.EFFECTS, x, 2 * 26));
             x += 26;
-        } else if (selectedElement != null && selectedElement.type == FurnitureData.ElementType.SPRITE) {
+        } else if (isFirstElement(FurnitureData.ElementType.SPRITE)) {
             addRenderableWidget(pagePageButton(Page.SPRITES, x, 4 * 26));
             x += 26;
             addRenderableWidget(pagePageButton(Page.EFFECTS, x, 2 * 26));
@@ -129,13 +138,43 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
         MutableComponent helpText = Component.translatable("gui.immersive_furniture.tab.help");
         StateImageButton helpButton = new StateImageButton(
                 leftPos + 240, topPos - 24, 26, 28,
-                8 * 26, 160, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE,
+                8 * 26, 56, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE,
                 b -> openHelp(),
                 helpText
         );
         helpButton.setEnabled(false);
         helpButton.setTooltip(Tooltip.create(helpText));
         addRenderableWidget(helpButton);
+
+        // Night-mode button
+        MutableComponent nightModeText = Component.translatable("gui.immersive_furniture.nightmode");
+        StateImageButton nightModeButton = new StateImageButton(
+                leftPos + windowWidth + 1, topPos + windowHeight - 19, 16, 16,
+                256 - 48, 160, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE,
+                b -> {
+                    nightMode = !nightMode;
+                    init();
+                },
+                nightModeText
+        );
+        nightModeButton.setTooltip(Tooltip.create(nightModeText));
+        nightModeButton.setEnabled(nightMode);
+        addRenderableWidget(nightModeButton);
+
+        // Backwards checker plane button
+        MutableComponent backwardsCheckerPlaneText = Component.translatable("gui.immersive_furniture.backwards_checkerplane");
+        StateImageButton backwardsCheckerButton = new StateImageButton(
+                leftPos + windowWidth + 1, topPos + windowHeight - 36, 16, 16,
+                256 - 32, 160, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE,
+                b -> {
+                    backwardsCheckerPlane = !backwardsCheckerPlane;
+                    init();
+                },
+                backwardsCheckerPlaneText
+        );
+        backwardsCheckerButton.setTooltip(Tooltip.create(backwardsCheckerPlaneText));
+        backwardsCheckerButton.setEnabled(backwardsCheckerPlane);
+        addRenderableWidget(backwardsCheckerButton);
 
         addHistory();
     }
@@ -154,7 +193,7 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
         MutableComponent text = Component.translatable("gui.immersive_furniture.tab." + page.name().toLowerCase(Locale.ROOT));
         StateImageButton button = new StateImageButton(
                 TOOLS_WIDTH + (windowWidth - TOOLS_WIDTH - 26 * Page.values().length) / 2 + leftPos + x, topPos - 24, 26, 28,
-                u, 160, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE,
+                u, 56, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE,
                 b -> {
                     currentPage = page;
                     init();
@@ -227,7 +266,7 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
 
         if (draggingContext != null) {
             float offset = draggingContext.getOffset(mouseX, mouseY);
-            Vector3f local = quantVector(draggingContext.direction.step().mul(1, -1, 1), offset, false);
+            Vector3f local = quantVector(draggingContext.direction.step(), offset, false);
             Vector3f global = quantVector(draggingContext.getNormal(), offset, hasControlDown() && !draggingContext.resize);
 
             Vector3f normal;
@@ -249,25 +288,39 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
                 normal2 = global;
             }
 
-            if (draggingContext.direction == Direction.DOWN || draggingContext.direction == Direction.WEST || draggingContext.direction == Direction.NORTH) {
-                draggingContext.element.from.x = Math.min(draggingContext.element.to.x, draggingContext.originalFrom.x + normal.x);
-                draggingContext.element.from.y = Math.min(draggingContext.element.to.y, draggingContext.originalFrom.y - normal.y);
-                draggingContext.element.from.z = Math.min(draggingContext.element.to.z, draggingContext.originalFrom.z + normal.z);
+            for (FurnitureData.Element element : selectedElements) {
+                if (!draggingContext.originalFrom.containsKey(element)) continue;
+                Vector3f originalFrom = draggingContext.originalFrom.get(element);
+                Vector3f originalTo = draggingContext.originalTo.get(element);
 
-                draggingContext.element.to.x = Math.max(draggingContext.element.from.x, draggingContext.originalTo.x + normal2.x);
-                draggingContext.element.to.y = Math.max(draggingContext.element.from.y, draggingContext.originalTo.y - normal2.y);
-                draggingContext.element.to.z = Math.max(draggingContext.element.from.z, draggingContext.originalTo.z + normal2.z);
-            } else {
-                draggingContext.element.to.x = Math.max(draggingContext.element.from.x, draggingContext.originalTo.x + normal.x);
-                draggingContext.element.to.y = Math.max(draggingContext.element.from.y, draggingContext.originalTo.y - normal.y);
-                draggingContext.element.to.z = Math.max(draggingContext.element.from.z, draggingContext.originalTo.z + normal.z);
+                // Rotate by actual axis
+                Vector3f fNormal = new Vector3f(normal);
+                ModelUtils.rotate(fNormal, draggingContext.element.axis, -draggingContext.element.rotation);
+                ModelUtils.rotate(fNormal, element.axis, element.rotation);
+                Vector3f fNormal2 = new Vector3f(normal2);
+                ModelUtils.rotate(fNormal2, draggingContext.element.axis, -draggingContext.element.rotation);
+                ModelUtils.rotate(fNormal2, element.axis, element.rotation);
 
-                draggingContext.element.from.x = Math.min(draggingContext.element.to.x, draggingContext.originalFrom.x + normal2.x);
-                draggingContext.element.from.y = Math.min(draggingContext.element.to.y, draggingContext.originalFrom.y - normal2.y);
-                draggingContext.element.from.z = Math.min(draggingContext.element.to.z, draggingContext.originalFrom.z + normal2.z);
+                if (draggingContext.direction == Direction.DOWN || draggingContext.direction == Direction.WEST || draggingContext.direction == Direction.NORTH) {
+                    element.from.x = Math.min(element.to.x, originalFrom.x + fNormal.x);
+                    element.from.y = Math.min(element.to.y, originalFrom.y + fNormal.y);
+                    element.from.z = Math.min(element.to.z, originalFrom.z + fNormal.z);
+
+                    element.to.x = Math.max(element.from.x, originalTo.x + fNormal2.x);
+                    element.to.y = Math.max(element.from.y, originalTo.y + fNormal2.y);
+                    element.to.z = Math.max(element.from.z, originalTo.z + fNormal2.z);
+                } else {
+                    element.to.x = Math.max(element.from.x, originalTo.x + fNormal.x);
+                    element.to.y = Math.max(element.from.y, originalTo.y + fNormal.y);
+                    element.to.z = Math.max(element.from.z, originalTo.z + fNormal.z);
+
+                    element.from.x = Math.min(element.to.x, originalFrom.x + fNormal2.x);
+                    element.from.y = Math.min(element.to.y, originalFrom.y + fNormal2.y);
+                    element.from.z = Math.min(element.to.z, originalFrom.z + fNormal2.z);
+                }
+
+                element.sanityCheck();
             }
-
-            draggingContext.element.sanityCheck();
 
             if (currentPage == Page.MODEL) {
                 modelComponent.update();
@@ -281,23 +334,27 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if ((button == 0 || button == 1) && hoverResult != null && nextHoverResult != null) {
-            HoverResult result = lastMouseX == (int) mouseX && lastMouseY == (int) mouseY ? nextHoverResult : hoverResult;
-            selectedElement = result.element();
+        if ((button == 0 || button == 1) && hoverResult != null) {
+            boolean doubleClick = lastMouseX == (int) mouseX && lastMouseY == (int) mouseY;
+            if (button == 0 && hasShiftDown() && selectedElements.contains(hoverResult.element)) {
+                selectedElements.remove(hoverResult.element);
+            } else {
+                selectElement(hoverResult.element(), hasShiftDown() || (selectedElements.size() > 1 && !doubleClick));
+            }
 
             if (currentPage == Page.MATERIALS || currentPage == Page.SOUNDS || currentPage == Page.PARTICLES || currentPage == Page.SPRITES) {
-                if (selectedElement.type == FurnitureData.ElementType.ELEMENT) {
+                if (isFirstElement(FurnitureData.ElementType.ELEMENT)) {
                     currentPage = Page.MATERIALS;
-                } else if (selectedElement.type == FurnitureData.ElementType.SOUND_EMITTER) {
+                } else if (isFirstElement(FurnitureData.ElementType.SOUND_EMITTER)) {
                     currentPage = Page.SOUNDS;
-                } else if (selectedElement.type == FurnitureData.ElementType.PARTICLE_EMITTER) {
+                } else if (isFirstElement(FurnitureData.ElementType.PARTICLE_EMITTER)) {
                     currentPage = Page.PARTICLES;
-                } else if (selectedElement.type == FurnitureData.ElementType.SPRITE) {
+                } else if (isFirstElement(FurnitureData.ElementType.SPRITE)) {
                     currentPage = Page.SPRITES;
                 }
             }
 
-            draggingContext = new DraggingContext(result.element(), result.direction(), mouseX, mouseY, button == 1);
+            draggingContext = new DraggingContext(hoverResult.element(), hoverResult.direction(), mouseX, mouseY, button == 1);
             isRotatingView = false;
             init();
         } else {
@@ -317,8 +374,8 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
         }
 
         // Deselect element
-        if (selectedElement != null && hoverResult == null && lastMouseX == (int) mouseX && lastMouseY == (int) mouseY && isOverRightWindow(mouseX, mouseY)) {
-            selectedElement = null;
+        if (!selectedElements.isEmpty() && hoverResult == null && lastMouseX == (int) mouseX && lastMouseY == (int) mouseY && isOverRightWindow(mouseX, mouseY)) {
+            selectedElements.clear();
             init();
         }
 
@@ -334,28 +391,55 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         if (isCopy(keyCode)) {
-            if (selectedElement != null) {
-                copiedElement = selectedElement.toTag();
-            }
+            // Copy
+            copiedElements = selectedElements.stream().map(FurnitureData.Element::toTag).toList();
         } else if (isCut(keyCode)) {
-            if (selectedElement != null) {
-                copiedElement = selectedElement.toTag();
-                data.elements.remove(selectedElement);
-                selectedElement = null;
+            // Cut
+            if (!selectedElements.isEmpty()) {
+                copiedElements = selectedElements.stream().map(FurnitureData.Element::toTag).toList();
+                data.elements.removeAll(selectedElements);
+                selectedElements.clear();
                 init();
             }
         } else if (isPaste(keyCode)) {
-            if (copiedElement != null) {
-                selectedElement = new FurnitureData.Element(selectedElement);
-                data.elements.add(new FurnitureData.Element(copiedElement));
+            // Paste
+            if (!copiedElements.isEmpty()) {
+                selectedElements.clear();
+                for (CompoundTag copiedElement : copiedElements) {
+                    FurnitureData.Element element = new FurnitureData.Element(copiedElement);
+                    data.elements.add(element);
+                    selectedElements.add(element);
+                }
                 init();
             }
+        } else if (keyCode == 261) {
+            // Delete
+            if (!selectedElements.isEmpty() && isOverRightWindow(lastMouseX, lastMouseY)) {
+                data.elements.removeAll(selectedElements);
+                selectedElements.clear();
+                init();
+            }
+        } else if (keyCode == 68 && hasControlDown() && !hasShiftDown() && !hasAltDown()) {
+            // Duplicate
+            modelComponent.duplicateElements();
+        } else if (keyCode == 65 && hasControlDown() && !hasShiftDown() && !hasAltDown()) {
+            // Select all
+            selectedElements.clear();
+            selectedElements.addAll(data.elements);
+            init();
         } else if (keyCode == 77 && hasControlDown() && !hasShiftDown() && !hasAltDown()) {
-            if (selectedElement != null && copiedElement != null) {
-                selectedElement.material = new FurnitureData.Material(new FurnitureData.Element(copiedElement).material);
+            // Paste material
+            if (!selectedElements.isEmpty() && !copiedElements.isEmpty()) {
+                FurnitureData.Element element = new FurnitureData.Element(copiedElements.get(0));
+                for (FurnitureData.Element selectedElement : selectedElements) {
+                    selectedElement.material = new FurnitureData.Material(element.material);
+                    selectedElement.color = element.color;
+                    selectedElement.emission = element.emission;
+                }
                 init();
             }
         } else if (isUndo(keyCode)) {
+            // Undo
             if (!history.isEmpty() && lastHistoryHash.equals(data.getHash())) {
                 history.removeFirst();
             }
@@ -363,7 +447,8 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
                 CompoundTag oldData = history.removeFirst();
                 if (oldData != null) {
                     data = new FurnitureData(oldData);
-                    selectedElement = null;
+                    selectedElements.clear();
+                    init();
                 }
             }
         }
@@ -376,20 +461,32 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
-        camZoom = Math.max(20.0f, Math.min(120.0f, camZoom + (float) scrollY * 0.1f * camZoom));
+        if (hasShiftDown()) {
+            elementShift += (mouseY > 0 ? 1 : -1);
+        } else {
+            camZoom = Math.max(20.0f, Math.min(120.0f, camZoom + (float) scrollY * 0.1f * camZoom));
+        }
 
         return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
+    }
+
+    @Override
+    public void mouseMoved(double mouseX, double mouseY) {
+        super.mouseMoved(mouseX, mouseY);
+
+        elementShift = 0;
     }
 
     final class DraggingContext {
         private final FurnitureData.Element element;
         private Direction direction;
+        private boolean autoDirectionLock;
         private final double x;
         private final double y;
         private final boolean resize;
 
-        private final Vector3f originalFrom;
-        private final Vector3f originalTo;
+        private final Map<FurnitureData.Element, Vector3f> originalFrom = new HashMap<>();
+        private final Map<FurnitureData.Element, Vector3f> originalTo = new HashMap<>();
 
         private final boolean isFlat;
 
@@ -400,8 +497,10 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
             this.y = y;
             this.resize = resize;
 
-            this.originalFrom = new Vector3f(element.from);
-            this.originalTo = new Vector3f(element.to);
+            for (FurnitureData.Element e : selectedElements) {
+                this.originalFrom.put(e, new Vector3f(e.from));
+                this.originalTo.put(e, new Vector3f(e.to));
+            }
 
             this.isFlat = element.isFlat();
         }
@@ -410,26 +509,31 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
             // View space normal
             Vector3f normal = getNormal();
             Quaternionf q = new Quaternionf().rotateX(camPitch).rotateY(camYaw);
-            q.transform(normal).normalize();
+            q.transform(normal.mul(1, -1, 1)).normalize();
 
             Vector3f screenNormal = new Vector3f(normal.x, normal.y, 0.0f).normalize();
             Vector3f drag = new Vector3f((float) (mouseX - x), (float) (mouseY - y), 0.0f);
             float proj = drag.dot(screenNormal);
 
             // Use the move axis rather than face for flat elements
-            if ((isFlat || hasAltDown()) && drag.lengthSquared() > 1.0f) {
-                Direction bestDirection = Direction.UP;
-                float bestDot = Float.MIN_VALUE;
+            if ((isFlat || hasAltDown()) && drag.lengthSquared() > 2.0f) {
+                Direction bestDirection = direction;
+                float bestDot = 0.0f;
                 for (Direction value : Direction.values()) {
-                    Vector3f globalDirectionNormal = element.getGlobalDirectionNormal(value);
-                    q.transform(globalDirectionNormal).normalize();
-                    float dot = globalDirectionNormal.dot(drag);
+                    if (autoDirectionLock && value != direction && value != direction.getOpposite()) continue;
+                    Vector3f directionNormal = element.getGlobalDirectionNormal(value);
+                    q.transform(directionNormal.mul(1, -1, 1)).normalize();
+                    Vector3f directionScreenNormal = directionNormal.normalize();
+                    float dot = directionScreenNormal.dot(drag);
                     if (dot > bestDot) {
                         bestDirection = value;
                         bestDot = dot;
                     }
                 }
+
+                // TODO: Check on what side of the face the mouse initially grabbed
                 direction = bestDirection;
+                autoDirectionLock = true;
             }
 
             float viewDot = (float) Math.sqrt(1.0f - normal.z * normal.z);
@@ -465,7 +569,9 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
         graphics.pose().mulPose(new Quaternionf().rotateX((float) Math.PI / 2));
         graphics.pose().translate(0, data.size.z, 0);
         graphics.pose().scale(1, 1, -1);
-        checkerPlane(graphics, data.size.x, data.size.y);
+        if (backwardsCheckerPlane) {
+            checkerPlane(graphics, data.size.x, data.size.y);
+        }
         graphics.pose().popPose();
 
         Matrix4f pose = graphics.pose().last().pose();
@@ -487,30 +593,20 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
 
         if (results.isEmpty() || !isOverRightWindow(mouseX, mouseY)) {
             hoverResult = null;
-            nextHoverResult = null;
         } else {
             results.sort((a, b) -> Float.compare(b.depth, a.depth));
-
-            int index = -1;
-            if (selectedElement != null) {
-                for (int i = 0; i < results.size(); i++) {
-                    if (results.get(i).element() == selectedElement) {
-                        index = i;
-                        break;
-                    }
-                }
-            }
-
-            hoverResult = results.get(Math.max(0, index));
-            nextHoverResult = results.get((index + 1) % results.size());
+            hoverResult = results.get(elementShift % results.size());
 
             // Highlight the hovered element
-            drawSelection(graphics, hoverResult.element(), pose, 1.0f, false);
+            float selectionWidth = selectedElements.contains(hoverResult.element()) ? 1.25f : 1.0f;
+            drawSelection(graphics, hoverResult.element(), pose, selectionWidth, false);
         }
 
+        graphics.flush();
+
         // Highlight the selected element
-        if (selectedElement != null) {
-            drawSelection(graphics, selectedElement, pose, 0.5f, true);
+        for (FurnitureData.Element selectedElement : selectedElements) {
+            drawSelection(graphics, selectedElement, pose, 0.6f, true);
         }
 
         // Highlight all non-solid elements
@@ -545,7 +641,8 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
             for (int i = 0; i < 4; i++) {
                 Vector3f vertex = vertices[i];
                 Vector3f nextVertex = vertices[(i + 1) % 4];
-                line(graphics, vertex.x(), vertex.y(), vertex.z(), nextVertex.x(), nextVertex.y(), nextVertex.z(), width, overlay, 0.0f, 0.0f, 0.0f, 1.0f);
+                float adjustedWidth = element.type == FurnitureData.ElementType.PLAYER_POSE && facing == Direction.NORTH ? (1.5f + width * 0.5f) : width;
+                line(graphics, vertex.x(), vertex.y(), vertex.z(), nextVertex.x(), nextVertex.y(), nextVertex.z(), adjustedWidth, overlay, 0.0f, 0.0f, 0.0f, 1.0f);
             }
         }
     }
@@ -563,6 +660,35 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
                 history.removeLast();
             }
             history.addFirst(data.toTag());
+
+            // Autosave functionality
+            int autosaveInterval = Config.getInstance().autosaveInterval;
+            if (autosaveInterval >= 0) {
+                long currentTime = System.currentTimeMillis();
+                if (currentTime - lastAutosaveTime > autosaveInterval * 1000L) {
+                    FurnitureDataManager.save(data, new ResourceLocation("local", "autosave"));
+                    lastAutosaveTime = currentTime;
+                }
+            }
+        }
+    }
+
+    public Optional<FurnitureData.Element> getFirstElement() {
+        return selectedElements.isEmpty()
+                ? Optional.empty()
+                : Optional.of(selectedElements.get(0));
+    }
+
+    public boolean isFirstElement(FurnitureData.ElementType type) {
+        return getFirstElement().filter(e -> e.type == type).isPresent();
+    }
+
+    public void selectElement(FurnitureData.Element element, boolean add) {
+        if (!add) {
+            selectedElements.clear();
+        }
+        if (!selectedElements.contains(element)) {
+            selectedElements.add(element);
         }
     }
 }

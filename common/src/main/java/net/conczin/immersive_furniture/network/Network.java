@@ -4,6 +4,7 @@ import net.conczin.immersive_furniture.network.c2s.CraftRequest;
 import net.conczin.immersive_furniture.network.c2s.FurnitureDataRequest;
 import net.conczin.immersive_furniture.network.c2s.CraftRequest;
 import net.conczin.immersive_furniture.network.s2c.FurnitureDataResponse;
+import net.conczin.immersive_furniture.network.s2c.FurnitureInteractMessage;
 import net.conczin.immersive_furniture.network.s2c.FurnitureRegistryMessage;
 import net.conczin.immersive_furniture.network.s2c.PoseOffsetMessage;
 import net.minecraft.network.FriendlyByteBuf;
@@ -36,21 +37,26 @@ public class Network {
         server.getPlayerList().getPlayers().forEach(p -> sendToPlayer(payload, p));
     }
 
+    public static void register(Registrar c) {
+        c.register(CraftRequest.TYPE, CraftRequest.STREAM_CODEC, true);
+        c.register(FurnitureDataRequest.TYPE, FurnitureDataRequest.STREAM_CODEC, true);
+
+        c.register(FurnitureDataResponse.TYPE, FurnitureDataResponse.STREAM_CODEC, false);
+        c.register(FurnitureInteractMessage.TYPE, FurnitureInteractMessage.STREAM_CODEC, false);
+        c.register(FurnitureRegistryMessage.TYPE, FurnitureRegistryMessage.STREAM_CODEC, false);
+        c.register(PoseOffsetMessage.TYPE, PoseOffsetMessage.STREAM_CODEC, false);
+    }
+
+    public interface Registrar {
+        <T extends ImmersivePayload> void register(Class<T> msg, Function<FriendlyByteBuf, T> constructor);
+    }
+
     public interface Sender {
         void sendToPlayer(ServerPlayer player, ImmersivePayload payload);
     }
 
     public interface ClientSender {
         void sendToServer(ImmersivePayload payload);
-    }
-
-    public static void register(Registrar c) {
-        c.register(CraftRequest.TYPE, CraftRequest.STREAM_CODEC, true);
-        c.register(FurnitureDataRequest.TYPE, FurnitureDataRequest.STREAM_CODEC, true);
-
-        c.register(FurnitureDataResponse.TYPE, FurnitureDataResponse.STREAM_CODEC, false);
-        c.register(FurnitureRegistryMessage.TYPE, FurnitureRegistryMessage.STREAM_CODEC, false);
-        c.register(PoseOffsetMessage.TYPE, PoseOffsetMessage.STREAM_CODEC, false);
     }
 
     public interface Registrar {

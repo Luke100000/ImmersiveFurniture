@@ -1,5 +1,7 @@
 package net.conczin.immersive_furniture.data;
 
+import com.mojang.math.Axis;
+import net.minecraft.core.Direction;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
@@ -49,5 +51,14 @@ public class ModelUtils {
         }
 
         return corners;
+    }
+
+    public static Vector3f rotate(Vector3f vec, Direction.Axis axis, float rotation) {
+        switch (axis) {
+            case X -> Axis.XP.rotationDegrees(rotation).transform(vec);
+            case Y -> Axis.YP.rotationDegrees(rotation).transform(vec);
+            case Z -> Axis.ZP.rotationDegrees(rotation).transform(vec);
+        }
+        return vec;
     }
 }

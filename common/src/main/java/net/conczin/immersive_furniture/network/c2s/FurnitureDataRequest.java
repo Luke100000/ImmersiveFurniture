@@ -23,12 +23,13 @@ public record FurnitureDataRequest(String hash) implements ImmersivePayload {
     @Override
     public void handle(Player e) {
         if (e instanceof ServerPlayer sp) {
-            FurnitureData data = FurnitureDataManager.getData(hash);
-
-            // Cache damaged, it's better to return fallback data
-            if (data == null) data = FurnitureData.EMPTY;
-
-            Network.sendToPlayer(new FurnitureDataResponse(hash, data), sp);
+            // Retrieve from hash storage
+            FurnitureData data = FurnitureDataManager.getHashData(hash);
+            if (data != null) {
+                Network.sendToPlayer(new FurnitureDataResponse(hash, data), sp);
+            } else {
+                Common.logger.warn("Client requested missing furniture data for hash {}.", hash);
+            }
         }
     }
 

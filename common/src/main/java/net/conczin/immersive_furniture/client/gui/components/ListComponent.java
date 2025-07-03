@@ -42,13 +42,13 @@ public abstract class ListComponent extends ScreenComponent {
 
         // Page buttons
         screen.addRenderableWidget(
-                new LegacyImageButton(leftPos + 6, topPos + height - 21, 12, 15, 13, 226, 15, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE, b -> {
+                new LegacyImageButton(leftPos + 6, topPos + height - 21, 12, 15, 193, 0, 15, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE, b -> {
                     page = Math.max(0, page - 1);
                     updateSearch();
                 })
         );
         screen.addRenderableWidget(
-                new LegacyImageButton(leftPos + width - 18, topPos + height - 21, 12, 15, 0, 226, 15, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE, b -> {
+                new LegacyImageButton(leftPos + width - 18, topPos + height - 21, 12, 15, 180, 0, 15, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE, b -> {
                     page += 1;
                     updateSearch();
                 })

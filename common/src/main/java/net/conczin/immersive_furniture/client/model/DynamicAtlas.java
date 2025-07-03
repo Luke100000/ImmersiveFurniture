@@ -15,7 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 
 public class DynamicAtlas extends DynamicTexture {
-    public static final DynamicAtlas BAKED = new DynamicAtlas(512, "baked");
+    public static final DynamicAtlas BAKED = new DynamicAtlas(1024, "baked");
     public static final DynamicAtlas ENTITY = new DynamicAtlas(512, "entity");
     public static final DynamicAtlas SCRATCH = new DynamicAtlas(512, "scratch");
 
@@ -51,24 +51,49 @@ public class DynamicAtlas extends DynamicTexture {
     }
 
     synchronized public Quad allocate(int w, int h) {
-        for (Quad quad : quads) {
-            if (quad.w >= w && quad.h >= h) {
-                quads.remove(quad);
-                if (quad.w > w) {
-                    quads.add(new Quad(quad.x + w, quad.y, quad.w - w, h));
-                }
-                if (quad.h > h) {
-                    quads.add(new Quad(quad.x, quad.y + h, w, quad.h - h));
-                }
-                if (quad.w > w && quad.h > h) {
-                    quads.add(new Quad(quad.x + w, quad.y + h, quad.w - w, quad.h - h));
-                }
-                allocated += w * h;
-                return new Quad(quad.x, quad.y, w, h);
+        // Find the best fitting quad
+        Quad best = getBestQuad(w, h);
+
+        // And split it
+        if (best != null) {
+            quads.remove(best);
+
+            // Split
+            int dw = best.w - w;
+            int dh = best.h - h;
+
+            if (dw > dh) {
+                if (dw > 0) quads.add(new Quad(best.x + w, best.y, dw, best.h));
+                if (dh > 0) quads.add(new Quad(best.x, best.y + h, w, dh));
+            } else {
+                if (dw > 0) quads.add(new Quad(best.x + w, best.y, dw, h));
+                if (dh > 0) quads.add(new Quad(best.x, best.y + h, best.w, dh));
             }
+
+            allocated += w * h;
+            return new Quad(best.x, best.y, w, h);
         }
+
         full = true;
         return new Quad(0, 0, 0, 0);
+    }
+
+    private Quad getBestQuad(int w, int h) {
+        Quad best = null;
+        int bestLoss = Integer.MAX_VALUE;
+        for (Quad quad : quads) {
+            if (quad.w >= w && quad.h >= h) {
+                int waste = (quad.w * quad.h) - (w * h);
+                float aspect = (float) Math.max(quad.w, quad.h) / Math.min(quad.w, quad.h);
+                int loss = (int) (waste * aspect);
+
+                if (loss < bestLoss) {
+                    best = quad;
+                    bestLoss = loss;
+                }
+            }
+        }
+        return best;
     }
 
     synchronized public void clear() {

@@ -34,11 +34,11 @@ public class AtlasSprite {
             NativeImage[] content = spriteContentsAccessor.getMipLevelData();
 
             // Copy the main image
-            copyRect(source, content[0], x, y, spriteContents.width(), spriteContents.height());
+            copyRect(source, content[0], 0, 0, spriteContents.width(), spriteContents.height());
 
             // Create mipmaps
             for (int i = 1; i < content.length; ++i) {
-                mipTheMap(content[i - 1], content[i], x >> i, y >> i, spriteContents.width() >> i, spriteContents.height() >> i);
+                mipTheMap(content[i - 1], content[i], 0, 0, spriteContents.width() >> i, spriteContents.height() >> i);
             }
 
             upload(x, y, content);

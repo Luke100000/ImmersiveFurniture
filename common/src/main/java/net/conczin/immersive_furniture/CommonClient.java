@@ -2,6 +2,7 @@ package net.conczin.immersive_furniture;
 
 import net.conczin.immersive_furniture.client.DelayedFurnitureRenderer;
 import net.conczin.immersive_furniture.client.model.DynamicAtlas;
+import net.conczin.immersive_furniture.data.FurnitureDataManager;
 import net.conczin.immersive_furniture.network.ClientHandlerImpl;
 
 public class CommonClient {
@@ -17,6 +18,8 @@ public class CommonClient {
         DynamicAtlas.SCRATCH.clear();
         DynamicAtlas.ENTITY.clear();
 
+        FurnitureDataManager.REQUESTED_DATA.clear();
+        FurnitureDataManager.DATA.clear();
         DelayedFurnitureRenderer.INSTANCE.clear();
         InteractionManager.INSTANCE.clearInteraction();
     }

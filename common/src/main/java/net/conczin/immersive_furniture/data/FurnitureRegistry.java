@@ -12,8 +12,4 @@ public class FurnitureRegistry {
     public static String resolve(int identifier) {
         return INSTANCE.identifierToHash.get(identifier);
     }
-
-    public static int resolve(String hash) {
-        return INSTANCE.hashToIdentifier.getOrDefault(hash, 0);
-    }
 }

@@ -1,14 +1,18 @@
 package net.conczin.immersive_furniture.client.model;
 
+import net.conczin.immersive_furniture.Common;
 import net.conczin.immersive_furniture.data.FurnitureData;
 import net.conczin.immersive_furniture.utils.CachedSupplier;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
 
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.function.Function;
@@ -46,19 +50,19 @@ public class FurnitureModelBaker {
     static final ModelBakerImpl modelBaker = new ModelBakerImpl();
 
     public static class CachedBakedModelSet {
-        public final Supplier<BakedModel> R0;
-        public final Supplier<BakedModel> R90;
-        public final Supplier<BakedModel> R180;
-        public final Supplier<BakedModel> R270;
+        public final Supplier<MergedBakedModel> R0;
+        public final Supplier<MergedBakedModel> R90;
+        public final Supplier<MergedBakedModel> R180;
+        public final Supplier<MergedBakedModel> R270;
 
-        public CachedBakedModelSet(DynamicAtlas atlas, BlockModel model) {
+        public CachedBakedModelSet(DynamicAtlas atlas, MultiRenderTypeBlockModel model) {
             this.R0 = new CachedSupplier<>(() -> bakeModel(atlas, model, 0));
             this.R90 = new CachedSupplier<>(() -> bakeModel(atlas, model, 90));
             this.R180 = new CachedSupplier<>(() -> bakeModel(atlas, model, 180));
             this.R270 = new CachedSupplier<>(() -> bakeModel(atlas, model, 270));
         }
 
-        public BakedModel get(int yRot) {
+        public MergedBakedModel get(int yRot) {
             return switch (yRot) {
                 case 0 -> R0.get();
                 case 90 -> R90.get();
@@ -71,7 +75,7 @@ public class FurnitureModelBaker {
 
     private final static Executor executor = Executors.newSingleThreadExecutor();
 
-    public static BakedModel getAsyncModel(FurnitureData data, DynamicAtlas atlas) {
+    public static MergedBakedModel getAsyncModel(FurnitureData data, DynamicAtlas atlas) {
         String hash = data.getHash();
         if (atlas.knownFurniture.containsKey(hash)) {
             return getModel(data, atlas, 0, false);
@@ -88,11 +92,11 @@ public class FurnitureModelBaker {
         }
     }
 
-    public static BakedModel getModel(FurnitureData data, DynamicAtlas atlas) {
+    public static MergedBakedModel getModel(FurnitureData data, DynamicAtlas atlas) {
         return getModel(data, atlas, 0, true);
     }
 
-    public static BakedModel getModel(FurnitureData data, DynamicAtlas atlas, int yRot, boolean force) {
+    public static MergedBakedModel getModel(FurnitureData data, DynamicAtlas atlas, int yRot, boolean force) {
         String hash = data.getHash();
         CachedBakedModelSet cachedBakedModelSet = atlas.knownFurniture.get(hash);
         boolean exist = cachedBakedModelSet != null;
@@ -107,7 +111,7 @@ public class FurnitureModelBaker {
             return cachedBakedModelSet.get(yRot);
         } else {
             float previousUsage = atlas.getUsage();
-            BlockModel model = FurnitureModelFactory.getModel(data, atlas);
+            MultiRenderTypeBlockModel model = FurnitureModelFactory.getModel(data, atlas);
             atlas.uploadIfDirty();
 
             CachedBakedModelSet modelSet = new CachedBakedModelSet(atlas, model);
@@ -125,17 +129,27 @@ public class FurnitureModelBaker {
 
     private final static RandomSource random = RandomSource.create();
 
-    private static BakedModel bakeModel(DynamicAtlas atlas, BlockModel model, int yRot) {
-        BakedModel bake = model.bake(modelBaker,
+    private static MergedBakedModel bakeModel(DynamicAtlas atlas, MultiRenderTypeBlockModel model, int yRot) {
+        Map<RenderType, BakedModel> bakedModels = new LinkedHashMap<>();
+        for (RenderType type : model.models.keySet()) {
+            bakedModels.put(type, bakeModel(atlas, model, type, yRot));
+        }
+        return new MergedBakedModel(bakedModels);
+    }
+
+    private static BakedModel bakeModel(DynamicAtlas atlas, MultiRenderTypeBlockModel model, RenderType type, int yRot) {
+        BakedModel bake = model.models.get(type).bake(modelBaker,
                 material -> atlas == DynamicAtlas.BAKED || !material.texture().getNamespace().equals("immersive_furniture") ? material.sprite() : atlas.sprite,
                 BlockModelRotation.by(0, yRot)
         );
 
-        // Copy color (stored in tint index)
+        // Copy color and emission from elements
         for (BakedQuad quad : bake.getQuads(null, null, random)) {
             int[] vertices = quad.getVertices();
             for (int i = 0; i < vertices.length; i += 8) {
-                vertices[i + 3] = quad.getTintIndex();
+                FurnitureData.Element element = model.getElement(quad.getTintIndex());
+                vertices[i + 3] = element.color;
+                vertices[i + 6] = (element.emission << 20) | (element.emission << 4);
             }
         }
 

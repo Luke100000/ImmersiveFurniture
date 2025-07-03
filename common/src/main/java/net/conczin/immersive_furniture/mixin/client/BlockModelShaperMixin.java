@@ -1,7 +1,7 @@
 package net.conczin.immersive_furniture.mixin.client;
 
 import net.conczin.immersive_furniture.block.BaseFurnitureBlock;
-import net.conczin.immersive_furniture.client.FurnitureBakedModelWrapper;
+import net.conczin.immersive_furniture.client.model.FurnitureBakedModelWrapper;
 import net.minecraft.client.renderer.block.BlockModelShaper;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.world.level.block.state.BlockState;

@@ -2,14 +2,15 @@ package net.conczin.immersive_furniture.block;
 
 import net.conczin.immersive_furniture.InteractionManager;
 import net.conczin.immersive_furniture.data.FurnitureData;
-import net.conczin.immersive_furniture.data.TransparencyType;
 import net.conczin.immersive_furniture.entity.SittingEntity;
 import net.conczin.immersive_furniture.item.FurnitureItem;
 import net.conczin.immersive_furniture.item.Items;
 import net.conczin.immersive_furniture.network.Network;
+import net.conczin.immersive_furniture.network.s2c.FurnitureInteractMessage;
 import net.conczin.immersive_furniture.network.s2c.PoseOffsetMessage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionResult;
@@ -27,7 +28,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
-import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.pathfinder.PathComputationType;
@@ -42,37 +42,50 @@ import java.util.List;
 public abstract class BaseFurnitureBlock extends Block implements SimpleWaterloggedBlock {
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
-    public static final EnumProperty<TransparencyType> TRANSPARENCY = EnumProperty.create("transparency", TransparencyType.class);
 
-    public BaseFurnitureBlock(BlockBehaviour.Properties properties) {
+    public BaseFurnitureBlock(Properties properties) {
         super(properties);
     }
 
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
+        if (hand != InteractionHand.MAIN_HAND) {
+            return InteractionResult.PASS;
+        }
         FurnitureData data = getData(state, level, pos);
         if (data != null) {
             // Find closest pose element
             Vec3 click = new Vec3(hit.getLocation().x - pos.getX(), hit.getLocation().y - pos.getY(), hit.getLocation().z - pos.getZ());
             FurnitureData.PoseOffset offset = data.getClosestPose(click, state.getValue(FACING));
 
+            boolean consume = false;
             if (offset != null) {
                 // Remember interaction for the player for some injection purposes
                 InteractionManager.INSTANCE.addInteraction(player, pos, offset);
-
                 if (offset.pose() == Pose.SLEEPING) {
                     startSleeping(pos, player, offset);
                 } else if (offset.pose() == Pose.SITTING) {
                     startSitting(level, pos, player, offset);
                 }
-
-                return InteractionResult.CONSUME;
+                consume = true;
             }
 
-            Direction facing = state.getValue(FACING);
-            return level.isClientSide && (data.playInteractSound(level, pos, player) | data.emitInteractParticles(pos, facing, player, level::addParticle, false)) ? InteractionResult.CONSUME : InteractionResult.PASS;
+            if (level instanceof ServerLevel serverLevel && (data.hasSounds() || data.hasParticles())) {
+                Network.sendToAllPlayers(serverLevel.getServer(), new FurnitureInteractMessage(pos));
+                consume = true;
+            }
+            return consume ? InteractionResult.CONSUME : InteractionResult.PASS;
         }
         return InteractionResult.PASS;
+    }
+
+    public void onInteract(Level level, BlockState state, BlockPos pos, Player player) {
+        FurnitureData data = getData(state, level, pos);
+        if (data != null) {
+            Direction facing = state.getValue(FACING);
+            data.playInteractSound(level, pos, player);
+            data.emitInteractParticles(pos, facing, player, level::addParticle, false);
+        }
     }
 
     private static void startSleeping(BlockPos pos, Player player, FurnitureData.PoseOffset offset) {

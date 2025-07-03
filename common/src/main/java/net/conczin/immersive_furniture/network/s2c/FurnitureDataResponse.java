@@ -21,7 +21,7 @@ public record FurnitureDataResponse(String hash, FurnitureData data) implements 
 
     @Override
     public void handle(Player e) {
-        FurnitureDataManager.save(data, ResourceLocation.fromNamespaceAndPath("hash", hash));
+        FurnitureDataManager.save(data, ResourceLocation.fromNamespaceAndPath("cache", hash));
     }
 
     @Override

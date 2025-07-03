@@ -69,8 +69,8 @@ public class Utils {
     }
 
     public static String beatifyPackID(String s) {
-        String[] split = s.split("/");
-        return replaceUglyChars(split[split.length - 1]).replace(".zip", "");
+        String[] split = s.replace(".zip", "").split("/");
+        return replaceUglyChars(split[split.length - 1]);
     }
 
     public static boolean search(String search, String value) {

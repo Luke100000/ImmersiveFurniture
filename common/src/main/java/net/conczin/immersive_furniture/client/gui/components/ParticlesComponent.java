@@ -25,7 +25,7 @@ public class ParticlesComponent extends ListComponent {
 
     @Override
     public void init(int leftPos, int topPos, int width, int height) {
-        if (screen.selectedElement == null) {
+        if (screen.selectedElements.isEmpty()) {
             return;
         }
 
@@ -35,9 +35,8 @@ public class ParticlesComponent extends ListComponent {
         for (int i = 0; i < PAGE_SIZE; i++) {
             int finalI = i;
             Button button = Button.builder(Component.literal(""), b -> {
-                        if (screen.selectedElement == null) return;
                         if (finalI >= locations.size()) return;
-                        screen.selectedElement.particleEmitter.particle = locations.get(finalI);
+                        screen.selectedElements.forEach(e -> e.particleEmitter.particle = locations.get(finalI));
                     })
                     .bounds(leftPos + 5, y, width - 10, 18)
                     .build();

@@ -4,6 +4,7 @@ import net.conczin.immersive_furniture.client.gui.ArtisansWorkstationEditorScree
 import net.conczin.immersive_furniture.client.gui.widgets.SpriteButton;
 import net.conczin.immersive_furniture.client.gui.widgets.StateImageButton;
 import net.conczin.immersive_furniture.client.model.TransparencyManager;
+import net.conczin.immersive_furniture.data.FurnitureData;
 import net.conczin.immersive_furniture.data.TransparencyType;
 import net.conczin.immersive_furniture.mixin.client.SpriteContentsAccessor;
 import net.conczin.immersive_furniture.mixin.client.TextureAtlasAccessor;
@@ -63,9 +64,9 @@ public class SpritesComponent extends ListComponent {
     @Override
     public void init(int leftPos, int topPos, int width, int height) {
         int tx = 7;
-        int u = 64;
+        int u = 0;
         for (FilterType value : FilterType.values()) {
-            StateImageButton button = addToggleButton(leftPos + tx, topPos + 22, 16, u, 224,
+            StateImageButton button = addToggleButton(leftPos + tx, topPos + 22, 16, u, 160,
                     "gui.immersive_furniture.sprite_filter." + value.name().toLowerCase(Locale.ROOT), () -> {
                         filterType = value;
                         screen.init();
@@ -76,11 +77,13 @@ public class SpritesComponent extends ListComponent {
         }
 
         // Vanilla only toggle
-        addToggleButton(leftPos + 80, topPos + 22, 16, 144, 224,
+        addToggleButton(leftPos + 80, topPos + 22, 16, 80, 160,
                 "gui.immersive_furniture.vanilla", () -> {
                     vanillaOnly = !vanillaOnly;
                     screen.init();
                 }).setEnabled(vanillaOnly);
+
+        FurnitureData.Element firstElement = screen.getFirstElement().orElse(null);
 
         // Sprite buttons
         spriteButtons.clear();
@@ -88,18 +91,18 @@ public class SpritesComponent extends ListComponent {
             for (int x = 0; x < 4; x++) {
                 SpriteButton button = new SpriteButton(
                         leftPos + 6 + x * 22, topPos + 44 + y * 22,
-                        22, 22, 234, 162,
+                        22, 22, 146, 0,
                         b -> {
                             ResourceLocation spriteLocation = ((SpriteButton) b).getSpriteLocation();
-                            if (screen.selectedElement != null && spriteLocation != null) {
-                                screen.selectedElement.sprite.sprite = spriteLocation;
+                            if (spriteLocation != null) {
+                                screen.selectedElements.forEach(e -> e.sprite.sprite = spriteLocation);
                                 screen.init();
                             }
                         }
                 );
                 button.setEnabled(
-                        screen.selectedElement != null && button.getSpriteLocation() != null &&
-                        button.getSpriteLocation().equals(screen.selectedElement.sprite.sprite)
+                        firstElement != null && button.getSpriteLocation() != null &&
+                        button.getSpriteLocation().equals(firstElement.sprite.sprite)
                 );
                 spriteButtons.add(button);
                 screen.addRenderableWidget(button);
@@ -147,7 +150,7 @@ public class SpritesComponent extends ListComponent {
 
                 spriteButtons.get(i).setSpriteLocation(location);
                 spriteButtons.get(i).setSprite(sprite);
-                spriteButtons.get(i).setEnabled(screen.selectedElement != null);
+                spriteButtons.get(i).setEnabled(!screen.selectedElements.isEmpty());
             } else {
                 spriteButtons.get(i).setSpriteLocation(null);
                 spriteButtons.get(i).setSprite(null);

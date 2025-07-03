@@ -2,6 +2,7 @@ package net.conczin.immersive_furniture.item;
 
 import net.conczin.immersive_furniture.block.*;
 import net.conczin.immersive_furniture.data.FurnitureData;
+import net.conczin.immersive_furniture.data.FurnitureDataManager;
 import net.conczin.immersive_furniture.data.ServerFurnitureRegistry;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
@@ -9,6 +10,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.ExtraCodecs;
@@ -23,6 +25,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 
+import java.util.*;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.List;
 import java.util.Objects;
 
@@ -97,6 +101,8 @@ public class FurnitureItem extends BlockItem {
         return true;
     }
 
+    private static final Set<String> alreadySaved = new ConcurrentSkipListSet<>();
+
     @Override
     protected boolean placeBlock(BlockPlaceContext context, BlockState state) {
         // First place the main block
@@ -136,6 +142,13 @@ public class FurnitureItem extends BlockItem {
             ServerFurnitureRegistry.increase(serverLevel, getData(context.getItemInHand()));
         }
 
+        // Also explicitly save the data to fix possible save issues
+        String hash = data.getHash();
+        if (!alreadySaved.contains(hash)) {
+            alreadySaved.add(hash);
+            FurnitureDataManager.save(data, new ResourceLocation("hash", hash));
+        }
+
         return true;
     }
 
@@ -163,8 +176,6 @@ public class FurnitureItem extends BlockItem {
             state = Objects.requireNonNull(Blocks.FURNITURE.getStateForPlacement(context))
                     .setValue(FurnitureBlock.IDENTIFIER, identifier);
         }
-
-        state = state.setValue(FurnitureBlock.TRANSPARENCY, data.transparency);
 
         return this.canPlace(context, state) ? state : null;
     }

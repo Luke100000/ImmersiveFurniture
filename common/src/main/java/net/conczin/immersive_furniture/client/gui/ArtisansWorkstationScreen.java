@@ -3,9 +3,7 @@ package net.conczin.immersive_furniture.client.gui;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.conczin.immersive_furniture.Common;
 import net.conczin.immersive_furniture.client.PreviewParticleEngine;
-import net.conczin.immersive_furniture.client.model.DynamicAtlas;
-import net.conczin.immersive_furniture.client.model.FurnitureModelBaker;
-import net.conczin.immersive_furniture.client.model.MaterialRegistry;
+import net.conczin.immersive_furniture.client.model.*;
 import net.conczin.immersive_furniture.client.renderer.FurnitureBlockEntityRenderer;
 import net.conczin.immersive_furniture.data.FurnitureData;
 import net.minecraft.client.Minecraft;
@@ -18,7 +16,6 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.phys.Vec3;
@@ -32,8 +29,10 @@ import java.util.Map;
 
 public abstract class ArtisansWorkstationScreen extends Screen {
     public static final Component TITLE = Component.translatable("item.immersive_furniture.artisans_workstation");
+
     public static final ResourceLocation TEXTURE = Common.locate("textures/gui/gui.png");
     public static final int TEXTURE_SIZE = 256;
+
     protected Component error;
     protected long lastErrorTime = 0;
     protected long lastCriticalActionAttempt = 0;
@@ -42,6 +41,8 @@ public abstract class ArtisansWorkstationScreen extends Screen {
     int windowHeight = 180;
     int leftPos;
     int topPos;
+
+    boolean nightMode = false;
 
     public ArtisansWorkstationScreen() {
         super(TITLE);
@@ -72,7 +73,7 @@ public abstract class ArtisansWorkstationScreen extends Screen {
         graphics.blit(TEXTURE, x + 16, y + 16, w - 32, h - 32, originX + 16, originY + 16, 16, 16, TEXTURE_SIZE, TEXTURE_SIZE);
     }
 
-    static void renderModel(GuiGraphics graphics, FurnitureData data, double x, double y, double size, float yaw, float pitch) {
+    void renderModel(GuiGraphics graphics, FurnitureData data, double x, double y, double size, float yaw, float pitch) {
         graphics.pose().pushPose();
         graphics.pose().translate(x, y, 100.0);
         graphics.pose().mulPose(new Matrix4f().scaling((float) (size / Math.max(1.0, data.getSize() / 16.0) * 0.4)));
@@ -84,10 +85,13 @@ public abstract class ArtisansWorkstationScreen extends Screen {
         graphics.pose().popPose();
     }
 
-    private static BakedModel lastBakedModel = null;
+    private static MergedBakedModel lastBakedModel = null;
 
-    static void renderModel(GuiGraphics graphics, FurnitureData data, float yaw, float pitch, boolean inEditor) {
-        BakedModel bakedModel = FurnitureModelBaker.getAsyncModel(data, DynamicAtlas.SCRATCH);
+    void renderModel(GuiGraphics graphics, FurnitureData data, float yaw, float pitch, boolean inEditor) {
+        TransparencyManager.heySodiumImInUse(data);
+
+        if (inEditor) TransparencyManager.prepare(data);
+        MergedBakedModel bakedModel = FurnitureModelBaker.getAsyncModel(data, DynamicAtlas.SCRATCH);
         if (inEditor) {
             if (bakedModel == null) {
                 bakedModel = lastBakedModel;
@@ -97,7 +101,16 @@ public abstract class ArtisansWorkstationScreen extends Screen {
         }
 
         if (bakedModel != null) {
-            FurnitureBlockEntityRenderer.renderFurniture(null, graphics.pose(), graphics.bufferSource(), 0xF000F0, OverlayTexture.NO_OVERLAY, data, bakedModel, DynamicAtlas.SCRATCH);
+            int light = nightMode ? data.lightLevel : 15;
+            FurnitureBlockEntityRenderer.renderFurniture(
+                    null,
+                    graphics.pose(),
+                    graphics.bufferSource(),
+                    light << 20 | light << 4 | light,
+                    OverlayTexture.NO_OVERLAY,
+                    bakedModel,
+                    DynamicAtlas.SCRATCH
+            );
         }
 
         // Particles

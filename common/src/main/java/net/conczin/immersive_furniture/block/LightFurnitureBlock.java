@@ -26,8 +26,7 @@ public class LightFurnitureBlock extends BaseFurnitureBlock {
                 .setValue(IDENTIFIER, 0)
                 .setValue(LIGHT, 0)
                 .setValue(WATERLOGGED, false)
-                .setValue(FACING, Direction.NORTH)
-                .setValue(TRANSPARENCY, TransparencyType.SOLID));
+                .setValue(FACING, Direction.NORTH));
     }
 
     @Override
@@ -42,7 +41,7 @@ public class LightFurnitureBlock extends BaseFurnitureBlock {
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(IDENTIFIER, LIGHT, WATERLOGGED, FACING, TRANSPARENCY);
+        builder.add(IDENTIFIER, LIGHT, WATERLOGGED, FACING);
     }
 
     @Override

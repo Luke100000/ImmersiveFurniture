@@ -28,7 +28,7 @@ public record FurnitureRegistryMessage(Map<Integer, String> registry) implements
             FurnitureRegistry.INSTANCE.hashToIdentifier.put(entry.getValue(), entry.getKey());
 
             // Download all data now, since it's harder to differentiate between server and client later on
-            FurnitureDataManager.getData(ResourceLocation.fromNamespaceAndPath("hash", entry.getValue()), true);
+            FurnitureDataManager.getCachedData(entry.getValue());
         }
     }
 

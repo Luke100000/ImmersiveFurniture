@@ -32,7 +32,7 @@ public class SoundsComponent extends ListComponent {
 
     @Override
     public void init(int leftPos, int topPos, int width, int height) {
-        if (screen.selectedElement == null) {
+        if (screen.selectedElements.isEmpty()) {
             return;
         }
 
@@ -42,9 +42,8 @@ public class SoundsComponent extends ListComponent {
         for (int i = 0; i < PAGE_SIZE; i++) {
             int finalI = i;
             Button button = Button.builder(Component.literal(""), b -> {
-                        if (screen.selectedElement == null) return;
                         if (finalI >= locations.size()) return;
-                        screen.selectedElement.soundEmitter.sound = locations.get(finalI);
+                        screen.selectedElements.forEach(e -> e.soundEmitter.sound = locations.get(finalI));
                     })
                     .bounds(leftPos + 5, y, width - 29, 18)
                     .build();
@@ -53,7 +52,7 @@ public class SoundsComponent extends ListComponent {
 
             // Sample sound button
             screen.addRenderableWidget(new LegacyImageButton(
-                    leftPos + width - 23, y, 18, 18, 238, 220, 18, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE,
+                    leftPos + width - 23, y, 18, 18, 238, 0, 18, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE,
                     b -> {
                         if (finalI >= locations.size()) return;
                         SoundEvent soundEvent = BuiltInRegistries.SOUND_EVENT.get(locations.get(finalI));
