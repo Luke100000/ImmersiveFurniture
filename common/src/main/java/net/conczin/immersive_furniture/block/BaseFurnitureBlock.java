@@ -48,9 +48,6 @@ public abstract class BaseFurnitureBlock extends Block implements SimpleWaterlog
 
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
-        if (hand != InteractionHand.MAIN_HAND) {
-            return InteractionResult.PASS;
-        }
         FurnitureData data = getData(state, level, pos);
         if (data != null) {
             // Find closest pose element

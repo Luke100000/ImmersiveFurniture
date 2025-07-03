@@ -665,7 +665,7 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
             if (autosaveInterval >= 0) {
                 long currentTime = System.currentTimeMillis();
                 if (currentTime - lastAutosaveTime > autosaveInterval * 1000L) {
-                    FurnitureDataManager.save(data, new ResourceLocation("local", "autosave"));
+                    FurnitureDataManager.save(data, ResourceLocation.fromNamespaceAndPath("local", "autosave"));
                     lastAutosaveTime = currentTime;
                 }
             }

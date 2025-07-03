@@ -11,9 +11,7 @@ import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
@@ -25,20 +23,15 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 
-import java.util.*;
-import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 public class FurnitureItem extends BlockItem {
     public static final DataComponentType<FurnitureData> FURNITURE = Registry.register(BuiltInRegistries.DATA_COMPONENT_TYPE, "furniture", DataComponentType.<FurnitureData>builder()
             .persistent(FurnitureData.CODEC)
             .networkSynchronized(FurnitureData.STREAM_CODEC)
-            .build());
-
-    public static final DataComponentType<String> FURNITURE_HASH = Registry.register(BuiltInRegistries.DATA_COMPONENT_TYPE, "furniture_hash", DataComponentType.<String>builder()
-            .persistent(ExtraCodecs.ESCAPED_STRING)
-            .networkSynchronized(ByteBufCodecs.STRING_UTF8)
             .build());
 
     public FurnitureItem(Properties settings) {
@@ -58,7 +51,7 @@ public class FurnitureItem extends BlockItem {
     }
 
     public static FurnitureData getData(ItemStack stack) {
-        return stack.get(FURNITURE);
+        return stack.getOrDefault(FURNITURE, FurnitureData.EMPTY);
     }
 
     public static void setData(ItemStack stack, FurnitureData data) {
@@ -146,7 +139,7 @@ public class FurnitureItem extends BlockItem {
         String hash = data.getHash();
         if (!alreadySaved.contains(hash)) {
             alreadySaved.add(hash);
-            FurnitureDataManager.save(data, new ResourceLocation("hash", hash));
+            FurnitureDataManager.save(data, ResourceLocation.fromNamespaceAndPath("hash", hash));
         }
 
         return true;

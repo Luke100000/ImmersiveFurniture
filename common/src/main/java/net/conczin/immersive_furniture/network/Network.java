@@ -2,8 +2,6 @@ package net.conczin.immersive_furniture.network;
 
 import net.conczin.immersive_furniture.network.c2s.CraftRequest;
 import net.conczin.immersive_furniture.network.c2s.FurnitureDataRequest;
-import net.conczin.immersive_furniture.network.c2s.CraftRequest;
-import net.conczin.immersive_furniture.network.c2s.FurnitureDataRequest;
 import net.conczin.immersive_furniture.network.s2c.FurnitureDataResponse;
 import net.conczin.immersive_furniture.network.s2c.FurnitureInteractMessage;
 import net.conczin.immersive_furniture.network.s2c.FurnitureRegistryMessage;
@@ -49,7 +47,7 @@ public class Network {
     }
 
     public interface Registrar {
-        <T extends ImmersivePayload> void register(Class<T> msg, Function<FriendlyByteBuf, T> constructor);
+        <T extends ImmersivePayload> void register(CustomPacketPayload.Type<T> type, StreamCodec<FriendlyByteBuf, T> codec, boolean isServer);
     }
 
     public interface Sender {
@@ -58,9 +56,5 @@ public class Network {
 
     public interface ClientSender {
         void sendToServer(ImmersivePayload payload);
-    }
-
-    public interface Registrar {
-        <T extends ImmersivePayload> void register(CustomPacketPayload.Type<T> type, StreamCodec<FriendlyByteBuf, T> codec, boolean isServer);
     }
 }

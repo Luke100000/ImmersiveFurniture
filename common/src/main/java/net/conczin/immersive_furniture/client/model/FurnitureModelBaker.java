@@ -1,6 +1,5 @@
 package net.conczin.immersive_furniture.client.model;
 
-import net.conczin.immersive_furniture.Common;
 import net.conczin.immersive_furniture.data.FurnitureData;
 import net.conczin.immersive_furniture.utils.CachedSupplier;
 import net.minecraft.client.renderer.RenderType;
@@ -42,6 +41,16 @@ public class FurnitureModelBaker {
 
         @SuppressWarnings("unused")
         public Function<Material, TextureAtlasSprite> getModelTextureGetter() {
+            return null;
+        }
+
+        @SuppressWarnings("unused") // NeoForge compatibility
+        public UnbakedModel getTopLevelModel(ModelResourceLocation location) {
+            return null;
+        }
+
+        @SuppressWarnings("unused") // NeoForge compatibility
+        public BakedModel bakeUncached(UnbakedModel model, ModelState state, Function<Material, TextureAtlasSprite> sprites) {
             return null;
         }
     }

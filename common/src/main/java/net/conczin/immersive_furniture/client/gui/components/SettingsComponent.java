@@ -99,7 +99,7 @@ public class SettingsComponent extends ScreenComponent {
             FurnitureDataManager.saveLocalFile(screen.data);
 
             // Delete the autosave file if it exists
-            FurnitureDataManager.deleteLocalFile(new ResourceLocation("local", "autosave"));
+            FurnitureDataManager.deleteLocalFile(ResourceLocation.fromNamespaceAndPath("local", "autosave"));
 
             // Switch to the library screen
             ArtisansWorkstationLibraryScreen libraryScreen = new ArtisansWorkstationLibraryScreen();
@@ -147,7 +147,7 @@ public class SettingsComponent extends ScreenComponent {
                 data.sources.add(location.getNamespace());
 
                 // Also try to detect resource packs
-                ResourceLocation textureLocation = new ResourceLocation(location.getNamespace(), "textures/" + location.getPath() + ".png");
+                ResourceLocation textureLocation = ResourceLocation.fromNamespaceAndPath(location.getNamespace(), "textures/" + location.getPath() + ".png");
                 Minecraft.getInstance().getResourceManager().getResource(textureLocation)
                         .ifPresent(resource -> data.sources.add(Utils.beatifyPackID(resource.sourcePackId())));
             }

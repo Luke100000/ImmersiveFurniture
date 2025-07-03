@@ -7,9 +7,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
-import net.minecraftforge.fml.ModList;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 
 
@@ -25,31 +25,27 @@ public class NeoForgeBusEvents {
         }
     }
 
+    private static boolean warned = false;
+
     @SubscribeEvent
     public static void tick(ClientTickEvent.Pre event) {
         CommonClient.tick();
+
+
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.level != null && mc.player != null && !warned) {
+            warned = true;
+            ModList modList = ModList.get();
+            if (!modList.isLoaded("ferritecore")) {
+                mc.player.sendSystemMessage(Component.translatable("immersive_furniture.ferritecore_missing"));
+            }
+        }
     }
 
     @SubscribeEvent
     public static void onEntityJoinLevel(EntityJoinLevelEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
             ServerFurnitureRegistry.syncWithPlayer(player);
-        }
-    }
-
-    private static boolean warned = false;
-
-    @SubscribeEvent
-    public static void onClientTick(TickEvent.ClientTickEvent event) {
-        if (event.phase == TickEvent.Phase.END) {
-            Minecraft mc = Minecraft.getInstance();
-            if (mc.level != null && mc.player != null && !warned) {
-                warned = true;
-                ModList modList = ModList.get();
-                if (!modList.isLoaded("ferritecore")) {
-                    mc.player.sendSystemMessage(Component.translatable("immersive_furniture.ferritecore_missing"));
-                }
-            }
         }
     }
 }

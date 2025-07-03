@@ -100,7 +100,7 @@ public class FurnitureDataManager {
      * Fetches from cached or hash storage in situations where it's not fully clear whether the call comes from a server or client.
      */
     public static FurnitureData getData(String hash) {
-        ResourceLocation cachedLocation = new ResourceLocation("cache", hash);
+        ResourceLocation cachedLocation = ResourceLocation.fromNamespaceAndPath("cache", hash);
         if (DATA.containsKey(cachedLocation)) {
             return DATA.get(cachedLocation);
         }
@@ -118,7 +118,7 @@ public class FurnitureDataManager {
      * Server-sided access via hash storage.
      */
     public static FurnitureData getHashData(String hash) {
-        return getData(new ResourceLocation("hash", hash));
+        return getData(ResourceLocation.fromNamespaceAndPath("hash", hash));
     }
 
     public static FurnitureData getData(ResourceLocation id) {
