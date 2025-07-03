@@ -4,7 +4,6 @@ import net.conczin.immersive_furniture.data.FurnitureData;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.BlockModel;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 

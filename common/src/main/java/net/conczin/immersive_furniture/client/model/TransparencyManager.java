@@ -3,7 +3,6 @@ package net.conczin.immersive_furniture.client.model;
 import com.mojang.blaze3d.platform.NativeImage;
 import net.conczin.immersive_furniture.data.FurnitureData;
 import net.conczin.immersive_furniture.data.TransparencyType;
-import net.conczin.immersive_furniture.item.FurnitureItem;
 import net.conczin.immersive_furniture.mixin.client.SpriteContentsAccessor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
