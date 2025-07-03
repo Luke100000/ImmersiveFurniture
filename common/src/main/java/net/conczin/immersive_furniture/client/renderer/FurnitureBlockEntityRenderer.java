@@ -101,7 +101,8 @@ public class FurnitureBlockEntityRenderer<T extends FurnitureBlockEntity> implem
             if (resourceLocation.getNamespace().equals("minecraft") != blocksAtlas) continue;
             consumer.putBulkData(pose,
                     quad,
-                    BRIGHTNESS, 1.0f,
+                    BRIGHTNESS,
+                    1.0f,
                     1.0f,
                     1.0f,
                     1.0f,

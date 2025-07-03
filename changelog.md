@@ -12,7 +12,7 @@
 * Fixed tiled rotated sprites
 * Users can now upload modified furniture
 * Missing sprites are no longer rendered (instead of ugly missing textures)
-* Fixed used resources and mods not tracked in tooltip
+* Fixed used resources and mods not tracked in the tooltip
 
 # 0.0.4
 

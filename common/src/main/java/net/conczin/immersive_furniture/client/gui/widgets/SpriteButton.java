@@ -13,7 +13,6 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.inventory.InventoryMenu;
 import org.joml.Matrix4f;
 
 import static net.conczin.immersive_furniture.client.gui.ArtisansWorkstationScreen.TEXTURE;

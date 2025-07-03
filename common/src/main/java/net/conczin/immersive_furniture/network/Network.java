@@ -3,6 +3,7 @@ package net.conczin.immersive_furniture.network;
 import net.conczin.immersive_furniture.network.c2s.CraftRequest;
 import net.conczin.immersive_furniture.network.c2s.FurnitureDataRequest;
 import net.conczin.immersive_furniture.network.c2s.CraftRequest;
+import net.conczin.immersive_furniture.network.c2s.FurnitureDataRequest;
 import net.conczin.immersive_furniture.network.s2c.FurnitureDataResponse;
 import net.conczin.immersive_furniture.network.s2c.FurnitureInteractMessage;
 import net.conczin.immersive_furniture.network.s2c.FurnitureRegistryMessage;
