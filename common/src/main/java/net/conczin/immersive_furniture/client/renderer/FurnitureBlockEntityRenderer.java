@@ -28,6 +28,8 @@ import java.util.Map;
 import static net.minecraft.world.level.SignalGetter.DIRECTIONS;
 
 public class FurnitureBlockEntityRenderer<T extends FurnitureBlockEntity> implements BlockEntityRenderer<T> {
+    public static final float[] BRIGHTNESS = {1.0F, 1.0F, 1.0F, 1.0F};
+
     public FurnitureBlockEntityRenderer(BlockEntityRendererProvider.Context ignoredContext) {
         // NO-OP
     }
@@ -99,7 +101,7 @@ public class FurnitureBlockEntityRenderer<T extends FurnitureBlockEntity> implem
             if (resourceLocation.getNamespace().equals("minecraft") != blocksAtlas) continue;
             consumer.putBulkData(pose,
                     quad,
-                    new float[]{1.0F, 1.0F, 1.0F, 1.0F},
+                    BRIGHTNESS,
                     1.0f,
                     1.0f,
                     1.0f,
