@@ -214,7 +214,7 @@ public class ModelComponent extends ScreenComponent {
         });
         ry.setEnabled(firstElement.axis != Direction.Axis.Y);
         rz = addToggleButton(leftPos + 42, y, 16, 48, 192, null, () -> {
-            screen.selectedElements.forEach(e -> e.axis = Direction.Axis.Y);
+            screen.selectedElements.forEach(e -> e.axis = Direction.Axis.Z);
             rx.setEnabled(true);
             ry.setEnabled(true);
             rz.setEnabled(false);
