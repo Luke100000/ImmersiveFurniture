@@ -1,6 +1,8 @@
 package net.conczin.immersive_furniture.network.s2c;
 
+import net.conczin.immersive_furniture.Common;
 import net.conczin.immersive_furniture.block.BaseFurnitureBlock;
+import net.conczin.immersive_furniture.network.ClientHandler;
 import net.conczin.immersive_furniture.network.ImmersivePayload;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
@@ -19,9 +21,6 @@ public record FurnitureInteractMessage(BlockPos pos) implements ImmersivePayload
 
     @Override
     public void handle(Player e) {
-        BlockState blockState = e.level().getBlockState(pos);
-        if (blockState.getBlock() instanceof BaseFurnitureBlock furnitureBlock) {
-            furnitureBlock.onInteract(e.level(), blockState, pos, e);
-        }
+        Common.clientHandler.handleFurnitureInteract(this);
     }
 }

@@ -149,6 +149,7 @@ public class SettingsComponent extends ScreenComponent {
             }
         }
         data.sources.remove("minecraft");
+        data.sources.remove("mod resources");
 
         // Find and log dependencies
         data.dependencies.clear();
@@ -162,5 +163,6 @@ public class SettingsComponent extends ScreenComponent {
             }
         }
         data.dependencies.remove("minecraft");
+        data.dependencies.remove("mod resources");
     }
 }
