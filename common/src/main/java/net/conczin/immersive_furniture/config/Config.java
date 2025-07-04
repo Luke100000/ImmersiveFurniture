@@ -27,6 +27,11 @@ public final class Config extends JsonConfig {
     // Interval in seconds between autosaves in the editor. Negative value disables autosave.
     public int autosaveInterval = 60;
 
+    // The maximum number of mipmap levels supported (0 to disable, 3 for maximum quality).
+    // Higher values reduce the maximum amount of unique furniture that can be rendered fast.
+    // Lower values may lead to artifacts on steep view angles.
+    public int maxMipLevel = 2;
+
     public Config(String name) {
         super(name);
     }

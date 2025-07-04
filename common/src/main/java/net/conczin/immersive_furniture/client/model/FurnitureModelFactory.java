@@ -4,6 +4,7 @@ import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.datafixers.util.Either;
 import net.conczin.immersive_furniture.Common;
 import net.conczin.immersive_furniture.client.Utils;
+import net.conczin.immersive_furniture.config.Config;
 import net.conczin.immersive_furniture.data.ElementRotation;
 import net.conczin.immersive_furniture.data.FurnitureData;
 import net.conczin.immersive_furniture.data.ModelUtils;
@@ -79,7 +80,18 @@ public class FurnitureModelFactory {
 
         // Allocate pixels
         Vector2i dimensions = ClientModelUtils.getFaceDimensions(element, direction);
-        DynamicAtlas.Quad quad = atlas.allocate(dimensions.x, dimensions.y);
+
+        // Padding
+        int level = 1;
+        if (atlas == DynamicAtlas.BAKED) {
+            int i = Minecraft.getInstance().options.mipmapLevels().get();
+            int panic = atlas.getUsage() > 0.5 ? (atlas.getUsage() > 0.75 ? 2 : 1) : 0;
+            level = (int) Math.pow(2, Math.max(0, Math.min(i - panic, Config.getInstance().maxMipLevel)));
+        }
+        DynamicAtlas.Quad quad = atlas.allocate(
+                (int) (Math.ceil(dimensions.x / (double) level) * level),
+                (int) (Math.ceil(dimensions.y / (double) level) * level)
+        );
 
         if (quad.w() > 0 && quad.h() > 0) {
             // Render
@@ -152,6 +164,20 @@ public class FurnitureModelFactory {
                     } else {
                         color = baked[x + y * dimensions.x];
                     }
+                    pixels.setPixelRGBA(quad.x() + x, quad.y() + y, color);
+                }
+            }
+
+            // Padding
+            for (int x = dimensions.x(); x < quad.w(); x++) {
+                for (int y = 0; y < dimensions.y(); y++) {
+                    int color = pixels.getPixelRGBA(quad.x() + x - 1, quad.y() + y);
+                    pixels.setPixelRGBA(quad.x() + x, quad.y() + y, color);
+                }
+            }
+            for (int y = dimensions.y(); y < quad.h(); y++) {
+                for (int x = 0; x < quad.w(); x++) {
+                    int color = pixels.getPixelRGBA(quad.x() + x, quad.y() + y - 1);
                     pixels.setPixelRGBA(quad.x() + x, quad.y() + y, color);
                 }
             }

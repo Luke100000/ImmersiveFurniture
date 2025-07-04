@@ -1,6 +1,7 @@
 # 0.0.7
 
 * Fixed interact not interacting on Forge
+* Fixed issues with mipmapping
 
 # 0.0.6
 
