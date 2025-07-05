@@ -594,7 +594,18 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
             hoverResult = null;
         } else {
             results.sort((a, b) -> Float.compare(b.depth, a.depth));
-            hoverResult = results.get(elementShift % results.size());
+
+            int index = 0;
+            if (!selectedElements.isEmpty() && !(hasShiftDown() && selectedElements.size() > 1)) {
+                for (int i = 0; i < results.size(); i++) {
+                    if (selectedElements.contains(results.get(i).element())) {
+                        index = i;
+                        break;
+                    }
+                }
+            }
+
+            hoverResult = results.get((index + elementShift) % results.size());
 
             // Highlight the hovered element
             float selectionWidth = selectedElements.contains(hoverResult.element()) ? 1.25f : 1.0f;
