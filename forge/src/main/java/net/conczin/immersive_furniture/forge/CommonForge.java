@@ -30,10 +30,7 @@ import java.util.function.Function;
 @Mod.EventBusSubscriber(modid = Common.MOD_ID, bus = Bus.MOD)
 public final class CommonForge {
     private static <T> void registerHelper(RegisterEvent event, Registry<T> register, Consumer<Common.RegisterHelper<T>> consumer) {
-        event.register(
-                register.key(),
-                registry -> consumer.accept(registry::register)
-        );
+        event.register(register.key(), registry -> consumer.accept(registry::register));
     }
 
     @SubscribeEvent
@@ -62,7 +59,6 @@ public final class CommonForge {
             PROTOCOL_VERSION::equals
     );
     private static int id = 0;
-
 
     static class ForgeRegistrar implements Network.Registrar {
         @Override
