@@ -5,6 +5,7 @@
   "immersive_furniture.not_enough_material": "Не достатньо матеріалу для створення!",
   "immersive_furniture.indium_missing": "Захоплюючий меблі вимагає щоб Індій працював належним чином з Содюмом!",
   "immersive_furniture.ferritecore_missing": "Захоплюючий меблі дуже рекомендує FerriteCore для зменшення часу завантаження!",
+  "immersive_furniture.packetfixer_missing": "Імерсивна меблі вимагає Fixer!",
   "gui.immersive_furniture.furniture": "Меблі",
   "gui.immersive_furniture.tag.living_room": "Вітальня",
   "gui.immersive_furniture.tag.bed_room": "Спальня",
