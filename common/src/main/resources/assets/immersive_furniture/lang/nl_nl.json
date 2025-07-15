@@ -5,6 +5,7 @@
   "immersive_furniture.not_enough_material": "Niet genoeg vervaardigingsmateriaal!",
   "immersive_furniture.indium_missing": "Immersieve meubilair vereist dat India correct werkt met Sodium!",
   "immersive_furniture.ferritecore_missing": "Immersieve meubilair beveelt FerriteCore sterk aan om de laadtijd te verminderen!",
+  "immersive_furniture.packetfixer_missing": "Immersieve meubilair vereist Packet Fixer!",
   "gui.immersive_furniture.furniture": "Meubels",
   "gui.immersive_furniture.tag.living_room": "Woonkamer",
   "gui.immersive_furniture.tag.bed_room": "Slaapkamer",
