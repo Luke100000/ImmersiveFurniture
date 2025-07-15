@@ -1,5 +1,7 @@
 package net.conczin.immersive_furniture.client.gui;
 
+import com.mojang.blaze3d.platform.Lighting;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.conczin.immersive_furniture.Common;
 import net.conczin.immersive_furniture.client.PreviewParticleEngine;
@@ -106,7 +108,7 @@ public abstract class ArtisansWorkstationScreen extends Screen {
                     null,
                     graphics.pose(),
                     graphics.bufferSource(),
-                    light << 20 | light << 4 | light,
+                    light << 20 | light << 4,
                     OverlayTexture.NO_OVERLAY,
                     bakedModel,
                     DynamicAtlas.SCRATCH
@@ -151,13 +153,6 @@ public abstract class ArtisansWorkstationScreen extends Screen {
         vertexConsumer.addVertex(matrix4f, x1 + nx + 0.5f, y1 + ny + 0.5f, z1 + z).setColor(r, g, b, a);
         vertexConsumer.addVertex(matrix4f, x0 + nx + 0.5f, y0 + ny + 0.5f, z0 + z).setColor(r, g, b, a);
         vertexConsumer.addVertex(matrix4f, x0 - nx + 0.5f, y0 - ny + 0.5f, z0 + z).setColor(r, g, b, a);
-    }
-
-    @Override
-    public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
-        renderBackground(graphics, mouseX, mouseY, delta);
-
-        super.render(graphics, mouseX, mouseY, delta);
     }
 
     @Override

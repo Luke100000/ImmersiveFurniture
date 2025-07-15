@@ -65,29 +65,31 @@ public class PreviewParticleEngine {
     public void render(PoseStack poseStack, LightTexture lightTexture, Camera camera, float partialTicks) {
         lightTexture.turnOnLightLayer();
         RenderSystem.enableDepthTest();
+
         Matrix4fStack viewStack = RenderSystem.getModelViewStack();
         viewStack.pushMatrix();
         viewStack.mul(poseStack.last().pose());
-
         RenderSystem.applyModelViewMatrix();
 
         TextureManager textureManager = Minecraft.getInstance().getTextureManager();
 
-        for (ParticleRenderType particleRenderType : RENDER_ORDER) {
-            Iterable<Particle> iterable = this.particles.get(particleRenderType);
-            if (iterable == null) continue;
-            RenderSystem.setShader(GameRenderer::getParticleShader);
-            Tesselator tesselator = Tesselator.getInstance();
-            BufferBuilder bufferbuilder = particleRenderType.begin(tesselator, textureManager);
-            if (bufferbuilder != null) {
-                particleRenderType.begin(tesselator, textureManager);
-                for (Particle particle : iterable) {
-                    particle.render(bufferbuilder, camera, partialTicks);
+        for (ParticleRenderType particlerendertype : RENDER_ORDER) {
+            Queue<Particle> queue = this.particles.get(particlerendertype);
+            if (queue != null && !queue.isEmpty()) {
+                RenderSystem.setShader(GameRenderer::getParticleShader);
+                Tesselator tesselator = Tesselator.getInstance();
+                BufferBuilder bufferbuilder = particlerendertype.begin(tesselator, textureManager);
+                if (bufferbuilder != null) {
+                    for (Particle particle : queue) {
+                        particle.render(bufferbuilder, camera, partialTicks);
+                    }
                 }
             }
         }
+
         viewStack.popMatrix();
         RenderSystem.applyModelViewMatrix();
+
         RenderSystem.depthMask(true);
         RenderSystem.disableBlend();
         lightTexture.turnOffLightLayer();

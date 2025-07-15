@@ -51,7 +51,6 @@ public final class CommonNeoForge {
         }
     }
 
-
     static class NeoForgeRegistrar implements Network.Registrar {
         PayloadRegistrar registrar;
 
