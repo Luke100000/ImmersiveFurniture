@@ -5,6 +5,7 @@
   "immersive_furniture.not_enough_material": "Tidak cukup bahan kerajinan!",
   "immersive_furniture.indium_missing": "Furnitur Immersive membutuhkan Indium agar dapat berjalan dengan baik dengan Sodium!",
   "immersive_furniture.ferritecore_missing": "Immersive Furniture sangat merekomendasikan FerriteCore untuk mengurangi waktu pemuatan!",
+  "immersive_furniture.packetfixer_missing": "Furnitur Imersif membutuhkan Packet Fixer!",
   "gui.immersive_furniture.furniture": "Furnitur",
   "gui.immersive_furniture.tag.living_room": "Ruang Tamu",
   "gui.immersive_furniture.tag.bed_room": "Kamar Tidur",
