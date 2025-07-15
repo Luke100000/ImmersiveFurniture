@@ -5,6 +5,7 @@
   "immersive_furniture.not_enough_material": "วัสดุทำของไม่พอ!",
   "immersive_furniture.indium_missing": "เฟอร์นิเจอร์ดื่มด่ำต้องการอินเดียมในการทำงานอย่างถูกต้องกับโซเดียม!",
   "immersive_furniture.ferritecore_missing": "เฟอร์นิเจอร์อิน immersive แนะนำ FerriteCore อย่างมากเพื่อลดเวลาในการโหลด!",
+  "immersive_furniture.packetfixer_missing": "เฟอร์นิเจอร์ที่ดื่มด่ำต้องการ Packet Fixer!",
   "gui.immersive_furniture.furniture": "เฟอร์นิเจอร์",
   "gui.immersive_furniture.tag.living_room": "ห้องนั่งเล่น",
   "gui.immersive_furniture.tag.bed_room": "ห้องนอน",
