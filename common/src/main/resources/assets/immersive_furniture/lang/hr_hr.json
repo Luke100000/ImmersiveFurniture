@@ -5,6 +5,7 @@
   "immersive_furniture.not_enough_material": "Nema dovoljno materijala za izradu!",
   "immersive_furniture.indium_missing": "Zaronk koji immersivni namještaj zahtijeva Indij za pravilno funkcioniranje s Natrijem!",
   "immersive_furniture.ferritecore_missing": "Zavisni namještaj toplo preporučuje FerriteCore kako bi smanjio vrijeme učitavanja!",
+  "immersive_furniture.packetfixer_missing": "Imersivni namještaj zahtijeva Packet Fixer!",
   "gui.immersive_furniture.furniture": "Namještaj",
   "gui.immersive_furniture.tag.living_room": "Dnevna soba",
   "gui.immersive_furniture.tag.bed_room": "Spavaća soba",
