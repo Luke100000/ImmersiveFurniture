@@ -5,6 +5,7 @@
   "immersive_furniture.not_enough_material": "Tidak cukup bahan crafting!",
   "immersive_furniture.indium_missing": "Perabot Immersive memerlukan Indium untuk berfungsi dengan baik dengan Natrium!",
   "immersive_furniture.ferritecore_missing": "Perabot Imersif sangat mengesyorkan FerriteCore untuk mengurangkan masa memuat!",
+  "immersive_furniture.packetfixer_missing": "Perabot Imersif memerlukan Packet Fixer!",
   "gui.immersive_furniture.furniture": "Perabot",
   "gui.immersive_furniture.tag.living_room": "Ruang Tamu",
   "gui.immersive_furniture.tag.bed_room": "Bilik Tidur",
