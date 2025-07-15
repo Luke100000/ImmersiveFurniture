@@ -34,7 +34,8 @@
     "java": ">=17"
   },
   "suggests": {
-    "ferritecore": "*"
+    "ferritecore": "*",
+    "packetfixer": "*"
   }
 }
   

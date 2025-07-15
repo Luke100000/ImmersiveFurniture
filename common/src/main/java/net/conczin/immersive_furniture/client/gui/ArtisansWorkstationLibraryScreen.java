@@ -360,6 +360,7 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
             FurnitureData data = FurnitureDataManager.getData(selected);
 
             if (data != null) {
+                graphics.pose().pushPose();
                 graphics.pose().translate(0, 0, 1024);
                 graphics.enableScissor(leftPos + 6, topPos + 6, leftPos + windowWidth - 6, topPos + windowHeight - 28 - 6);
                 renderModel(graphics, data, leftPos + windowWidth / 2.0, topPos + windowHeight / 2.0, windowHeight - 28, previewYaw, previewPitch);
@@ -371,7 +372,6 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
                 graphics.drawString(font, Component.translatable("gui.immersive_furniture.author", data.author).withStyle(ChatFormatting.ITALIC).withStyle(ChatFormatting.GRAY), leftPos + 8, topPos + 18, 0xFFFFFF);
 
                 // Icon and cost
-                graphics.pose().pushPose();
                 graphics.pose().translate(leftPos + windowWidth, topPos + windowHeight - 28, 0);
                 graphics.pose().scale(1.5f, 1.5f, 1.5f);
                 MutableComponent cost = Component.literal(String.valueOf(data.getCost()));

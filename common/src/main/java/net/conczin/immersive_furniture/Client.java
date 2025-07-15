@@ -4,8 +4,10 @@ import net.conczin.immersive_furniture.client.DelayedFurnitureRenderer;
 import net.conczin.immersive_furniture.client.model.DynamicAtlas;
 import net.conczin.immersive_furniture.data.FurnitureDataManager;
 import net.conczin.immersive_furniture.network.ClientHandlerImpl;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.player.Player;
 
-public class CommonClient {
+public class Client {
     public static void postLoad() {
         Common.clientHandler = new ClientHandlerImpl();
 
@@ -26,5 +28,9 @@ public class CommonClient {
 
     public static void tick() {
         DelayedFurnitureRenderer.INSTANCE.tick();
+    }
+
+    public static void dependencyWarn(Player player, String key) {
+        player.sendSystemMessage(Component.translatable("immersive_furniture." + key + "_missing"));
     }
 }

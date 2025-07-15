@@ -34,3 +34,10 @@ mandatory = false
 versionRange = "*"
 ordering = "NONE"
 side = "BOTH"
+
+[[dependencies.${ mod_id }]]
+modId = "packetfixer"
+mandatory = false
+versionRange = "*"
+ordering = "NONE"
+side = "BOTH"

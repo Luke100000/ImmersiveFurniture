@@ -1,6 +1,6 @@
 package net.conczin.immersive_furniture.mixin.client;
 
-import net.conczin.immersive_furniture.CommonClient;
+import net.conczin.immersive_furniture.Client;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import org.spongepowered.asm.mixin.Mixin;
@@ -12,6 +12,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class MinecraftMixin {
     @Inject(method = "setLevel(Lnet/minecraft/client/multiplayer/ClientLevel;)V", at = @At("HEAD"))
     private void immersiveFurniture$onSetLevel(ClientLevel levelClient, CallbackInfo ci) {
-        CommonClient.onLevelLoad();
+        Client.onLevelLoad();
     }
 }

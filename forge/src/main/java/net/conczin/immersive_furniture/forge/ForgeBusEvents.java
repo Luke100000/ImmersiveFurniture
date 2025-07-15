@@ -1,10 +1,9 @@
 package net.conczin.immersive_furniture.forge;
 
+import net.conczin.immersive_furniture.Client;
 import net.conczin.immersive_furniture.Common;
-import net.conczin.immersive_furniture.CommonClient;
 import net.conczin.immersive_furniture.data.ServerFurnitureRegistry;
 import net.minecraft.client.Minecraft;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
@@ -21,7 +20,7 @@ public class ForgeBusEvents {
     public static void onClientStart(TickEvent.ClientTickEvent event) {
         //forge decided to be funny and won't trigger the client load event
         if (firstLoad) {
-            CommonClient.postLoad();
+            Client.postLoad();
             firstLoad = false;
         }
     }
@@ -29,7 +28,7 @@ public class ForgeBusEvents {
     @SubscribeEvent
     public static void tick(TickEvent event) {
         if (event.type == TickEvent.Type.CLIENT && event.phase == TickEvent.Phase.START) {
-            CommonClient.tick();
+            Client.tick();
         }
     }
 
@@ -49,8 +48,13 @@ public class ForgeBusEvents {
             if (mc.level != null && mc.player != null && !warned) {
                 warned = true;
                 ModList modList = ModList.get();
+
                 if (!modList.isLoaded("ferritecore")) {
-                    mc.player.sendSystemMessage(Component.translatable("immersive_furniture.ferritecore_missing"));
+                    Client.dependencyWarn(mc.player, "ferritecore");
+                }
+
+                if (!modList.isLoaded("packetfixer")) {
+                    Client.dependencyWarn(mc.player, "packetfixer");
                 }
             }
         }
