@@ -5,6 +5,7 @@
   "immersive_furniture.not_enough_material": "Hindi sapat ang materyales sa paggawa!",
   "immersive_furniture.indium_missing": "Kailangan ng Immersive Furniture ng Indium upang gumana ng maayos kasama ng Sodium!",
   "immersive_furniture.ferritecore_missing": "Pinapayo ng Immersive Furniture ang FerriteCore upang mabawasan ang oras ng pag-load!",
+  "immersive_furniture.packetfixer_missing": "Ang Immersive Furniture ay nangangailangan ng Packet Fixer!",
   "gui.immersive_furniture.furniture": "Muwebles",
   "gui.immersive_furniture.tag.living_room": "Sala",
   "gui.immersive_furniture.tag.bed_room": "Silid-tulugan",
