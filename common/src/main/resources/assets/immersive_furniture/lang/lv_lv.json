@@ -5,6 +5,7 @@
   "immersive_furniture.not_enough_material": "Nav pietiekami daudz materiālu amatniecībai!",
   "immersive_furniture.indium_missing": "Lai Immersive Furniture darbotos pareizi, ir nepieciešams Indium un Sodium!",
   "immersive_furniture.ferritecore_missing": "Immersive Furniture ļoti iesaka FerriteCore, lai samazinātu ielādes laiku!",
+  "immersive_furniture.packetfixer_missing": "Immersive Furniture ir nepieciešams Packet Fixer!",
   "gui.immersive_furniture.furniture": "Mēbeles",
   "gui.immersive_furniture.tag.living_room": "Dzīvojamā istaba",
   "gui.immersive_furniture.tag.bed_room": "Guļamistaba",
