@@ -5,6 +5,7 @@
   "immersive_furniture.not_enough_material": "Yeterli üretim malzemesi yok!",
   "immersive_furniture.indium_missing": "Sürükleyici Mobilya, Sodyum ile düzgün çalışması için İndiyum gerektirir!",
   "immersive_furniture.ferritecore_missing": "Immersive Furniture, yükleme süresini azaltmak için FerriteCore'u şiddetle tavsiye eder!",
+  "immersive_furniture.packetfixer_missing": "Immersive Furniture için Packet Fixer gerekiyor!",
   "gui.immersive_furniture.furniture": "Mobilya",
   "gui.immersive_furniture.tag.living_room": "Oturma Odası",
   "gui.immersive_furniture.tag.bed_room": "Yatak Odası",
