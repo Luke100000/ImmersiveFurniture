@@ -5,6 +5,7 @@
   "immersive_furniture.not_enough_material": "Minga basta material de crafting!",
   "immersive_furniture.indium_missing": "L'arredament immersiv el ghe vole Indium per funzionà ben con Sodium!",
   "immersive_furniture.ferritecore_missing": "Immersive Furniture al raccomanda fort FerriteCore per reduc i tempi de carregament!",
+  "immersive_furniture.packetfixer_missing": "El Mobili Immersiv l'ha bisogn de 'l Packet Fixer!",
   "gui.immersive_furniture.furniture": "Mobili",
   "gui.immersive_furniture.tag.living_room": "Soggiorno",
   "gui.immersive_furniture.tag.bed_room": "Camera",
