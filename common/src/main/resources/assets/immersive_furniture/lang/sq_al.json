@@ -5,6 +5,7 @@
   "immersive_furniture.not_enough_material": "Nuk ka mjaftueshëm materiale artizanal!",
   "immersive_furniture.indium_missing": "Mobiljet immersive kërkojnë Indium për të funksionuar siç duhet me Sodium!",
   "immersive_furniture.ferritecore_missing": "Mobiljet Imersive rekomandon fuqishëm FerriteCore për të reduktuar kohën e ngarkesës!",
+  "immersive_furniture.packetfixer_missing": "Mobilje të përfshira kërkon Packet Fixer!",
   "gui.immersive_furniture.furniture": "Mëmoblje",
   "gui.immersive_furniture.tag.living_room": "Dhoma e Ndenjies",
   "gui.immersive_furniture.tag.bed_room": "Dhoma e Fjetjes",
