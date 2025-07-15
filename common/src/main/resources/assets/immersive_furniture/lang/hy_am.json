@@ -5,6 +5,7 @@
   "immersive_furniture.not_enough_material": "Չափը բավարար չէ!",
   "immersive_furniture.indium_missing": "Իմերսիվ կահույքը պահանջում է Ինդիում՝ Աղիայի հետ ճիշտ աշխատելու համար!",
   "immersive_furniture.ferritecore_missing": "Ավելի լավն է օգտագործել FerriteCore-ն բեռնումի ժամանակը կրճատելու համար!",
+  "immersive_furniture.packetfixer_missing": "Էմերսիվ կահույքը պահանջում է Packet Fixer!",
   "gui.immersive_furniture.furniture": "Կահույք",
   "gui.immersive_furniture.tag.living_room": "Բնակարանային սենյակ",
   "gui.immersive_furniture.tag.bed_room": "Շարժասենյակ",
