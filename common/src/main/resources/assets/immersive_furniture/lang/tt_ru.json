@@ -5,6 +5,7 @@
   "immersive_furniture.not_enough_material": "Җитәрлек хуҗа матдәләре юк!",
   "immersive_furniture.indium_missing": "Immersive Furniture өчен Sodium белән яхшы эшләү өчен Индиум кирәк!",
   "immersive_furniture.ferritecore_missing": "Иммерсив мебель  загрузка вакытын киметү өчен FerriteCore ны тәкъдим итә!",
+  "immersive_furniture.packetfixer_missing": "Иммерсив Мебель өчен Пакет Төзәтүче кәрәк!",
   "gui.immersive_furniture.furniture": "Мебель",
   "gui.immersive_furniture.tag.living_room": "Торак бүлмәсе",
   "gui.immersive_furniture.tag.bed_room": "Йокы бүлмәсе",
