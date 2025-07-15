@@ -5,6 +5,7 @@
   "immersive_furniture.not_enough_material": "製作材料が足りません。",
   "immersive_furniture.indium_missing": "浸透性家具は、インディウムがSodiumで適切に動作することを要求します!",
   "immersive_furniture.ferritecore_missing": "Immersive Furnitureでは、読み込み時間を短縮するためにFerriteCoreを強く推奨しています。",
+  "immersive_furniture.packetfixer_missing": "没入型家具にはパケットフィクサーが必要です！",
   "gui.immersive_furniture.furniture": "家具",
   "gui.immersive_furniture.tag.living_room": "リビングルーム",
   "gui.immersive_furniture.tag.bed_room": "ベッドルーム",
