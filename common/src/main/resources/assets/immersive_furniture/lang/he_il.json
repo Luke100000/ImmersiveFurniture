@@ -5,6 +5,7 @@
   "immersive_furniture.not_enough_material": "אין מספיק חומרי בעבודות יד!",
   "immersive_furniture.indium_missing": " הרהיטים הבלתי נפרדים דורשים אינדיום כדי לפעול כראוי עם נתרן!",
   "immersive_furniture.ferritecore_missing": "רהיטי Immerisive ממליצים בחום על FerriteCore כדי להפחית את זמן הטעינה!",
+  "immersive_furniture.packetfixer_missing": "ריהוט שטוף דורש מתקן מנות!",
   "gui.immersive_furniture.furniture": "רהיטים",
   "gui.immersive_furniture.tag.living_room": "סלון",
   "gui.immersive_furniture.tag.bed_room": "חדר שינה",
