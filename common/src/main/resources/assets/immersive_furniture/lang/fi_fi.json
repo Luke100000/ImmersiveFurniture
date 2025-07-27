@@ -5,6 +5,7 @@
   "immersive_furniture.not_enough_material": "Materiaalia ei ole tarpeeksi!",
   "immersive_furniture.indium_missing": "Immersive Furniture edellyttää, että Indium toimii kunnolla Sodium!",
   "immersive_furniture.ferritecore_missing": "Immersive Furniture erittäin suosittelee FerriteCorea lyhentämään lastausaikaa!",
+  "immersive_furniture.packetfixer_missing": "Immersive Furniture vaatii Packet Fixer!",
   "gui.immersive_furniture.furniture": "Huonekalut",
   "gui.immersive_furniture.tag.living_room": "Olohuone",
   "gui.immersive_furniture.tag.bed_room": "Makuuhuone",

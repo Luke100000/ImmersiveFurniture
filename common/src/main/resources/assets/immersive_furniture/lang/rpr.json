@@ -5,6 +5,7 @@
   "immersive_furniture.not_enough_material": "Недостаточно матерьяла для ремесла!",
   "immersive_furniture.indium_missing": "Для правильной работы Immersive Furniture требуется Индий с Натрия!",
   "immersive_furniture.ferritecore_missing": "Иммерсивная мебель настоятельно рекомендует FerriteCore для уменьшения времени загрузки!",
+  "immersive_furniture.packetfixer_missing": "Для погружающей мебели требуется Устранитель Пакетов!",
   "gui.immersive_furniture.furniture": "Мебель",
   "gui.immersive_furniture.tag.living_room": "Гостиная",
   "gui.immersive_furniture.tag.bed_room": "Спальня",

@@ -5,6 +5,7 @@
   "immersive_furniture.not_enough_material": "Net gnua Fertigungs-Material!",
   "immersive_furniture.indium_missing": "D'Immersive Möbel brauch'n Indium, damit's richtig mit Sodium lauft!",
   "immersive_furniture.ferritecore_missing": "D\"immersive Möbel empfehln FerriteCore, um d\"Ladezeit z'reduzieren!",
+  "immersive_furniture.packetfixer_missing": "D'Immersive Möbel braucht'n Packet Fixer!",
   "gui.immersive_furniture.furniture": "Möbel",
   "gui.immersive_furniture.tag.living_room": "Wohnzimmer",
   "gui.immersive_furniture.tag.bed_room": "Schlafzimmer",

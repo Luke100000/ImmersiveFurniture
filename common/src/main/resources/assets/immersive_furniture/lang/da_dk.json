@@ -5,6 +5,7 @@
   "immersive_furniture.not_enough_material": "Ikke nok fremstillingsmateriale!",
   "immersive_furniture.indium_missing": "Immersive Møbler kræver Indium til at køre ordentligt med Sodium!",
   "immersive_furniture.ferritecore_missing": "Immersive Møbler anbefaler stærkt FerriteCore at reducere lastningstiden!",
+  "immersive_furniture.packetfixer_missing": "Imponerende møbler kræver Packet Fixer!",
   "gui.immersive_furniture.furniture": "Møbler",
   "gui.immersive_furniture.tag.living_room": "Stue",
   "gui.immersive_furniture.tag.bed_room": "Soveværelse",

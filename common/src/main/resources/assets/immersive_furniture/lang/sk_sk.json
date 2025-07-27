@@ -5,6 +5,7 @@
   "immersive_furniture.not_enough_material": "Nedostatok materiálu na výrobu!",
   "immersive_furniture.indium_missing": "Immersive Furniture vyžaduje Indium, aby správne fungovalo so Sodíkom!",
   "immersive_furniture.ferritecore_missing": "Spoločnosť Immersive Furniture vrelo odporúča FerriteCore na skrátenie času načítania!",
+  "immersive_furniture.packetfixer_missing": "Immersive Furniture vyžaduje Packet Fixer!",
   "gui.immersive_furniture.furniture": "Nábytok",
   "gui.immersive_furniture.tag.living_room": "Obývacia izba",
   "gui.immersive_furniture.tag.bed_room": "Spálňa",

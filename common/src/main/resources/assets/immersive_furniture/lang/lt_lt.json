@@ -5,6 +5,7 @@
   "immersive_furniture.not_enough_material": "Nepakanka medžiagos amatams!",
   "immersive_furniture.indium_missing": "Kad \"Immersive Furniture\" tinkamai veiktų su \"Sodium\", reikia indžio!",
   "immersive_furniture.ferritecore_missing": "\"Immersive Furniture\" primygtinai rekomenduoja \"FerriteCore\", kad sutrumpintumėte krovimo laiką!",
+  "immersive_furniture.packetfixer_missing": "\"Immersive Furniture\" reikia \"Packet Fixer\"!",
   "gui.immersive_furniture.furniture": "Baldai",
   "gui.immersive_furniture.tag.living_room": "Svetainė",
   "gui.immersive_furniture.tag.bed_room": "Miegamasis",

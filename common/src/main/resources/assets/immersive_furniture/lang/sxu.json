@@ -5,6 +5,7 @@
   "immersive_furniture.not_enough_material": "Nich genuch Handwerksmaterial!",
   "immersive_furniture.indium_missing": "Immersiv Möbel brucht Indium, um mit Sodium richtig z'laafen!",
   "immersive_furniture.ferritecore_missing": "Immersive Möbel empfielt FerriteCore dringen, um die Ladezeit zu verringern!",
+  "immersive_furniture.packetfixer_missing": "Immersive Möbel benötigt den Packet Fixer!",
   "gui.immersive_furniture.furniture": "Möbel",
   "gui.immersive_furniture.tag.living_room": "Wohnzimmer",
   "gui.immersive_furniture.tag.bed_room": "Schlafzimmer",

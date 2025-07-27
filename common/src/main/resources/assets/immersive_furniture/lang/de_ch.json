@@ -5,6 +5,7 @@
   "immersive_furniture.not_enough_material": "Nicht genug Handwerksmaterial!",
   "immersive_furniture.indium_missing": "Immersive Möbel benötigt Indium, um richtig mit Natrium zu funktionieren!",
   "immersive_furniture.ferritecore_missing": "Immersive Möbel empfiehlt dringend FerriteCore, um die Ladezeiten zu verkürzen!",
+  "immersive_furniture.packetfixer_missing": "Immersive Furniture benötigt den Packet Fixer!",
   "gui.immersive_furniture.furniture": "Möbel",
   "gui.immersive_furniture.tag.living_room": "Wohnzimmer",
   "gui.immersive_furniture.tag.bed_room": "Schlafzimmer",

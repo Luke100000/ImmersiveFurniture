@@ -5,6 +5,7 @@
   "immersive_furniture.not_enough_material": "Nincs elég kézműves anyag!",
   "immersive_furniture.indium_missing": "Az Immersive Furniture-nek Indiumra van szüksége a megfelelő működéshez a Sodiummal együtt!",
   "immersive_furniture.ferritecore_missing": "Az Immersive Furniture erősen ajánlja a FerriteCore-t a betöltési idő csökkentése érdekében!",
+  "immersive_furniture.packetfixer_missing": "Az Immersive Furniture csomagjavítót igényel!",
   "gui.immersive_furniture.furniture": "Bútor",
   "gui.immersive_furniture.tag.living_room": "Nappali",
   "gui.immersive_furniture.tag.bed_room": "Hálószoba",

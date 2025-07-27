@@ -5,6 +5,7 @@
   "immersive_furniture.not_enough_material": "Không đủ vật liệu chế tạo!",
   "immersive_furniture.indium_missing": "Nội thất hấp dẫn yêu cầu Indium để hoạt động đúng cách với Sodium!",
   "immersive_furniture.ferritecore_missing": "Nội thất nhập vai khuyến nghị cao FerriteCore để giảm thời gian tải!",
+  "immersive_furniture.packetfixer_missing": "Nội thất sống động yêu cầu Packet Fixer!",
   "gui.immersive_furniture.furniture": "Đồ nội thất",
   "gui.immersive_furniture.tag.living_room": "Phòng khách",
   "gui.immersive_furniture.tag.bed_room": "Phòng ngủ",

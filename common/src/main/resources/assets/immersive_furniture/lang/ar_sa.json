@@ -5,6 +5,7 @@
   "immersive_furniture.not_enough_material": "لا يوجد ما يكفي من المواد الحرفية!",
   "immersive_furniture.indium_missing": "يتطلب الأثاث الغامر إنديوم لكي يعمل بشكل صحيح مع صوديوم!",
   "immersive_furniture.ferritecore_missing": "يُوصى بشدة باستخدام FerriteCore لتقليل وقت التحميل!",
+  "immersive_furniture.packetfixer_missing": "تتطلب الأثاث الغامر إصلاح الحزمة!",
   "gui.immersive_furniture.furniture": "الأثاث",
   "gui.immersive_furniture.tag.living_room": "غرفة المعيشة",
   "gui.immersive_furniture.tag.bed_room": "غرفة النوم",

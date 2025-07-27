@@ -5,6 +5,7 @@
   "immersive_furniture.not_enough_material": "Δεν υπάρχει αρκετό υλικό κατασκευής!",
   "immersive_furniture.indium_missing": "Immersive έπιπλα απαιτεί Indium για να τρέξει σωστά με νάτριο!",
   "immersive_furniture.ferritecore_missing": "Immersive έπιπλα συστήνει ιδιαίτερα FerriteCore για τη μείωση του χρόνου φόρτωσης!",
+  "immersive_furniture.packetfixer_missing": "Immersive έπιπλα απαιτεί Fixer πακέτο!",
   "gui.immersive_furniture.furniture": "Έπιπλα",
   "gui.immersive_furniture.tag.living_room": "Σαλόνι",
   "gui.immersive_furniture.tag.bed_room": "Υπνοδωμάτιο",

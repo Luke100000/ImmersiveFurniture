@@ -5,6 +5,7 @@
   "immersive_furniture.not_enough_material": "Za mało materiału wytwarzającego!",
   "immersive_furniture.indium_missing": "Immerywny mebel wymaga Indium aby działał poprawnie z Sodem!",
   "immersive_furniture.ferritecore_missing": "Immersive Meble rekomendują FerriteCore aby skrócić czas ładowania!",
+  "immersive_furniture.packetfixer_missing": "Wielostronne meble wymagają stałych pakietów!",
   "gui.immersive_furniture.furniture": "Meble",
   "gui.immersive_furniture.tag.living_room": "Pokój",
   "gui.immersive_furniture.tag.bed_room": "Łóżko",

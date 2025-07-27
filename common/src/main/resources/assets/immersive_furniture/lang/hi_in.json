@@ -5,6 +5,7 @@
   "immersive_furniture.not_enough_material": "पर्याप्त क्राफ्टिंग सामग्री नहीं है!",
   "immersive_furniture.indium_missing": "इमर्सिव फर्नीचर को सही ढंग से चलाने के लिए इंडियम की आवश्यकता है!",
   "immersive_furniture.ferritecore_missing": "इमर्सिव फर्नीचर लोडिंग समय को कम करने के लिए फ़ैराइटकोर की अत्यधिक सिफारिश करता है!",
+  "immersive_furniture.packetfixer_missing": "इमर्सिव फर्नीचर को पैकेट फिक्सर की आवश्यकता है!",
   "gui.immersive_furniture.furniture": "फर्नीचर",
   "gui.immersive_furniture.tag.living_room": "लिविंग रूम",
   "gui.immersive_furniture.tag.bed_room": "बेडरूम",

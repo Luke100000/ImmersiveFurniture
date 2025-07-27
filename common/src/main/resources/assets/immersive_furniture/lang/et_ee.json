@@ -5,6 +5,7 @@
   "immersive_furniture.not_enough_material": "Pole piisavalt käsitöömaterjali!",
   "immersive_furniture.indium_missing": "Immersive Furniture nõuab Indiumit, et see töötaks korralikult koos Sodiumiga!",
   "immersive_furniture.ferritecore_missing": "Immersive Furniture soovitab tungivalt FerriteCore'i, et vähendada laadimisaega!",
+  "immersive_furniture.packetfixer_missing": "Immersive Furniture vajab Packet Fixer'i!",
   "gui.immersive_furniture.furniture": "Mööbel",
   "gui.immersive_furniture.tag.living_room": "Elutuba",
   "gui.immersive_furniture.tag.bed_room": "Magamistuba",

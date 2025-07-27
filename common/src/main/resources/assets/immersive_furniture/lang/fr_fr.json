@@ -5,6 +5,7 @@
   "immersive_furniture.not_enough_material": "Pas assez de matériel de fabrication!",
   "immersive_furniture.indium_missing": "Les meubles immersifs ont besoin de l'Indium pour fonctionner correctement avec Sodium !",
   "immersive_furniture.ferritecore_missing": "Meubles immersifs recommande fortement FerriteCore pour réduire le temps de chargement !",
+  "immersive_furniture.packetfixer_missing": "Les Meubles Immersifs ont besoin de Fixateur de Package!",
   "gui.immersive_furniture.furniture": "Meubles",
   "gui.immersive_furniture.tag.living_room": "Salon",
   "gui.immersive_furniture.tag.bed_room": "Chambre à coucher",

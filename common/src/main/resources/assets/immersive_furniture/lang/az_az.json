@@ -5,6 +5,7 @@
   "immersive_furniture.not_enough_material": "Yeterli istehsal materialı yoxdur!",
   "immersive_furniture.indium_missing": "İmmersiv Mebel düzgün işləmək üçün İndium tələb edir!",
   "immersive_furniture.ferritecore_missing": "Immersiv Mebel yüklenmə vaxtını azaltmaq üçün FerriteCore-u tövsiyə edir!",
+  "immersive_furniture.packetfixer_missing": "Daldırıcı Mebel Paket Düzəldici tələb edir!",
   "gui.immersive_furniture.furniture": "Mebel",
   "gui.immersive_furniture.tag.living_room": "Oturma otağı",
   "gui.immersive_furniture.tag.bed_room": "Yataq otağı",
