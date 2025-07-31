@@ -1,5 +1,6 @@
 package net.conczin.immersive_furniture.client.renderer;
 
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
@@ -17,19 +18,23 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Vec3i;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.level.block.state.BlockState;
+import org.joml.Matrix4f;
+import org.joml.Vector3f;
+import org.lwjgl.system.MemoryStack;
 
+import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
 import java.util.List;
 import java.util.Map;
 
 import static net.minecraft.world.level.SignalGetter.DIRECTIONS;
 
 public class FurnitureBlockEntityRenderer<T extends FurnitureBlockEntity> implements BlockEntityRenderer<T> {
-    public static final float[] BRIGHTNESS = {1.0F, 1.0F, 1.0F, 1.0F};
-
     public FurnitureBlockEntityRenderer(BlockEntityRendererProvider.Context ignoredContext) {
         // NO-OP
     }
@@ -99,22 +104,45 @@ public class FurnitureBlockEntityRenderer<T extends FurnitureBlockEntity> implem
         for (BakedQuad quad : quads) {
             ResourceLocation resourceLocation = quad.getSprite().atlasLocation();
             if (resourceLocation.getNamespace().equals("minecraft") != blocksAtlas) continue;
-            consumer.putBulkData(pose,
+            putBulkData(consumer, pose,
                     quad,
-                    BRIGHTNESS,
-                    1.0f,
-                    1.0f,
-                    1.0f,
-                    1.0f,
                     new int[]{
                             blend(packedLight, quad.getVertices()[6]),
                             blend(packedLight, quad.getVertices()[8 + 6]),
                             blend(packedLight, quad.getVertices()[16 + 6]),
                             blend(packedLight, quad.getVertices()[24 + 6])
                     },
-                    packedOverlay,
-                    true
+                    packedOverlay
             );
+        }
+    }
+
+    static void putBulkData(VertexConsumer consumer, PoseStack.Pose pose, BakedQuad quad, int[] lightmap, int packedOverlay) {
+        int[] aint = quad.getVertices();
+        Vec3i vec3i = quad.getDirection().getNormal();
+        Matrix4f matrix4f = pose.pose();
+        Vector3f vector3f = pose.transformNormal((float) vec3i.getX(), (float) vec3i.getY(), (float) vec3i.getZ(), new Vector3f());
+        int j = aint.length / 8;
+
+        try (MemoryStack memorystack = MemoryStack.stackPush()) {
+            ByteBuffer bytebuffer = memorystack.malloc(DefaultVertexFormat.BLOCK.getVertexSize());
+            IntBuffer intbuffer = bytebuffer.asIntBuffer();
+
+            for (int l = 0; l < j; ++l) {
+                intbuffer.clear();
+                intbuffer.put(aint, l * 8, 8);
+
+                int j1 = lightmap[l];
+                float f10 = bytebuffer.getFloat(16);
+                float f9 = bytebuffer.getFloat(20);
+
+                float f = bytebuffer.getFloat(0);
+                float f1 = bytebuffer.getFloat(4);
+                float f2 = bytebuffer.getFloat(8);
+                Vector3f vector3f1 = matrix4f.transformPosition(f, f1, f2, new Vector3f());
+
+                consumer.addVertex(vector3f1.x(), vector3f1.y(), vector3f1.z(), -1, f10, f9, packedOverlay, j1, vector3f.x(), vector3f.y(), vector3f.z());
+            }
         }
     }
 
