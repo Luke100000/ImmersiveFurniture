@@ -74,8 +74,6 @@ public class FurnitureModelBaker {
         }
     }
 
-    private final static Executor executor = Executors.newSingleThreadExecutor();
-
     public static MergedBakedModel getAsyncModel(FurnitureData data, DynamicAtlas atlas) {
         String hash = data.getHash();
         if (atlas.knownFurniture.containsKey(hash)) {
@@ -83,7 +81,7 @@ public class FurnitureModelBaker {
         } else {
             if (!atlas.asyncRequestedFurniture.contains(hash)) {
                 atlas.asyncRequestedFurniture.add(hash);
-                executor.execute(() -> {
+                Common.EXECUTOR.execute(() -> {
                     if (getModel(data, atlas, 0, false) == null) {
                         atlas.asyncRequestedFurniture.remove(hash);
                     }

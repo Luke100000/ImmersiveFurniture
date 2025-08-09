@@ -1,5 +1,6 @@
 package net.conczin.immersive_furniture.data;
 
+import net.conczin.immersive_furniture.Common;
 import net.conczin.immersive_furniture.client.model.DynamicAtlas;
 import net.conczin.immersive_furniture.config.Config;
 import net.conczin.immersive_furniture.utils.NBTHelper;
@@ -22,6 +23,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.joml.Quaternionf;
@@ -30,6 +32,7 @@ import org.joml.Vector3i;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 public class FurnitureData {
     public static final FurnitureData EMPTY = new FurnitureData();
@@ -50,7 +53,8 @@ public class FurnitureData {
     public Vector3i size = new Vector3i(1, 1, 1);
 
     private String hash;
-    private Map<Direction, VoxelShape> cachedShapes = new ConcurrentHashMap<>();
+    private final Map<Direction, VoxelShape> cachedShapes = new ConcurrentHashMap<>();
+    private final Set<Direction> requestedShapes = new ConcurrentSkipListSet<>();
     public long lastTick = 0;
 
     public FurnitureData() {
@@ -92,7 +96,6 @@ public class FurnitureData {
         this.dependencies.addAll(data.dependencies);
 
         this.hash = null;
-        this.cachedShapes = new ConcurrentHashMap<>();
         this.lastTick = 0;
 
         for (Element element : data.elements) {
@@ -203,6 +206,7 @@ public class FurnitureData {
     public void dirty() {
         hash = null;
         cachedShapes.clear();
+        requestedShapes.clear();
         for (Element element : elements) {
             element.rotationAxes = null;
             element.bakedTexture.clear();
@@ -413,11 +417,23 @@ public class FurnitureData {
         return cachedShapes.computeIfAbsent(rotation, this::computeShape);
     }
 
+    public VoxelShape getShapeLazy(Direction rotation) {
+        if (cachedShapes.containsKey(rotation)) {
+            return cachedShapes.get(rotation);
+        }
+        if (!requestedShapes.contains(rotation)) {
+            requestedShapes.add(rotation);
+            Common.EXECUTOR.execute(() -> getShape(rotation));
+        }
+        return null;
+    }
+
     private VoxelShape computeShape(Direction r) {
         return elements.stream()
                 .filter(e -> e.type == ElementType.ELEMENT && !e.isFlat())
                 .map(element -> getBox(element, r))
-                .reduce(Shapes::or)
+                .reduce((a, b) -> Shapes.joinUnoptimized(a, b, BooleanOp.OR))
+                .map(VoxelShape::optimize)
                 .orElse(Block.box(2, 2, 2, 14, 14, 14));
     }
 

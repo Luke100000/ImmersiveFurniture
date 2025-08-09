@@ -40,25 +40,26 @@ public abstract class LevelRendererMixin {
             ItemStack stack = player.getMainHandItem();
             if (!stack.isEmpty() && stack.getItem() instanceof FurnitureItem) {
                 FurnitureData data = FurnitureItem.getData(stack);
-                if (data != null) {
-                    Direction direction = player.getDirection().getOpposite();
-                    VoxelShape shape = data.getShape(direction);
-                    BlockPos clickedPos = new BlockPlaceContext(new UseOnContext(player, InteractionHand.MAIN_HAND, blockHitResult)).getClickedPos();
+                if (data == null) return;
 
-                    renderShape(poseStack,
-                            consumer,
-                            shape,
-                            (double) clickedPos.getX() - camX,
-                            (double) clickedPos.getY() - camY,
-                            (double) clickedPos.getZ() - camZ,
-                            0.0F,
-                            0.0F,
-                            0.0F,
-                            0.4F
-                    );
+                Direction direction = player.getDirection().getOpposite();
+                VoxelShape shape = data.getShapeLazy(direction);
+                if (shape == null) return;
 
-                    ci.cancel();
-                }
+                BlockPos clickedPos = new BlockPlaceContext(new UseOnContext(player, InteractionHand.MAIN_HAND, blockHitResult)).getClickedPos();
+                renderShape(poseStack,
+                        consumer,
+                        shape,
+                        (double) clickedPos.getX() - camX,
+                        (double) clickedPos.getY() - camY,
+                        (double) clickedPos.getZ() - camZ,
+                        0.0F,
+                        0.0F,
+                        0.0F,
+                        0.4F
+                );
+
+                ci.cancel();
             }
         }
     }
