@@ -5,6 +5,7 @@ import net.conczin.immersive_furniture.Common;
 import net.conczin.immersive_furniture.data.ServerFurnitureRegistry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -12,8 +13,8 @@ import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 
 
-@Mod.EventBusSubscriber(modid = Common.MOD_ID)
-public class ForgeBusEvents {
+@Mod.EventBusSubscriber(modid = Common.MOD_ID, value = Dist.CLIENT)
+public class ClientForgeBusEvents {
     public static boolean firstLoad = true;
 
     @SubscribeEvent
@@ -29,13 +30,6 @@ public class ForgeBusEvents {
     public static void tick(TickEvent event) {
         if (event.type == TickEvent.Type.CLIENT && event.phase == TickEvent.Phase.START) {
             Client.tick();
-        }
-    }
-
-    @SubscribeEvent
-    public static void onEntityJoinLevel(EntityJoinLevelEvent event) {
-        if (event.getEntity() instanceof ServerPlayer player) {
-            ServerFurnitureRegistry.syncWithPlayer(player);
         }
     }
 
