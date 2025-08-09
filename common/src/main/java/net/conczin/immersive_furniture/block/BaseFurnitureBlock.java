@@ -100,6 +100,10 @@ public abstract class BaseFurnitureBlock extends Block implements SimpleWaterlog
                 player.displayClientMessage(problem.getMessage(), true);
             }
         });
+
+        if (player instanceof ServerPlayer serverPlayer) {
+            serverPlayer.setRespawnPosition(player.level().dimension(), pos, player.getYRot(), true, true);
+        }
     }
 
     private static void startSitting(Level level, BlockPos pos, Player player, FurnitureData.PoseOffset offset) {

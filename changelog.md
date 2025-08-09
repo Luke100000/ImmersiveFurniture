@@ -1,6 +1,7 @@
 # 0.0.8
 
 * Optimized and threaded shape generation to avoid spikes at super complex models
+* Beds now allow respawning
 
 # 0.0.7
 

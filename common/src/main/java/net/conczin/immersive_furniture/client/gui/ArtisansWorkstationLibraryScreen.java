@@ -507,6 +507,19 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
         return super.mouseClicked(mouseX, mouseY, button);
     }
 
+    @Override
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
+        if (selected != null) {
+            if (button == 0) {
+                previewYaw += (float) (dragX * 0.015f);
+                previewPitch -= (float) (dragY * 0.015f);
+            }
+            return true;
+        }
+
+        return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
+    }
+
     public void setSelected(ResourceLocation location) {
         this.selected = location;
         previewYaw = (float) (-Math.PI / 4 * 3);
@@ -627,18 +640,5 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
             }
             uploading = false;
         });
-    }
-
-    @Override
-    public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
-        if (selected != null) {
-            if (button == 0) {
-                previewYaw += (float) (dragX * 0.015f);
-                previewPitch -= (float) (dragY * 0.015f);
-            }
-            return true;
-        }
-
-        return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
     }
 }
