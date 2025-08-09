@@ -455,7 +455,7 @@ public class FurnitureData {
         };
     }
 
-    private static VoxelShape getBox(Element element, Direction rotation) {
+    private VoxelShape getBox(Element element, Direction rotation) {
         Vector3f from = new Vector3f(Float.MAX_VALUE, Float.MAX_VALUE, Float.MAX_VALUE);
         Vector3f to = new Vector3f(-Float.MAX_VALUE, -Float.MAX_VALUE, -Float.MAX_VALUE);
         Vector3f[] corners = ModelUtils.getCorners(element);
@@ -488,16 +488,19 @@ public class FurnitureData {
             to.z = to.z * fraction + mid * (1.0f - fraction);
         }
 
+        // Rotate the box
         Vector3f rotatedFrom = rotate(from, rotation);
         Vector3f rotatedTo = rotate(to, rotation);
 
+        // Quantize the box
+        float resolution = elements.size() > 96 ? 1.0f : elements.size() > 48 ? 2.0f : 4.0f;
         return Block.box(
-                Math.min(rotatedFrom.x, rotatedTo.x),
-                Math.min(rotatedFrom.y, rotatedTo.y),
-                Math.min(rotatedFrom.z, rotatedTo.z),
-                Math.max(rotatedFrom.x, rotatedTo.x),
-                Math.max(rotatedFrom.y, rotatedTo.y),
-                Math.max(rotatedFrom.z, rotatedTo.z)
+                Math.round(Math.min(rotatedFrom.x, rotatedTo.x) * resolution) / resolution,
+                Math.round(Math.min(rotatedFrom.y, rotatedTo.y) * resolution) / resolution,
+                Math.round(Math.min(rotatedFrom.z, rotatedTo.z) * resolution) / resolution,
+                Math.round(Math.max(rotatedFrom.x, rotatedTo.x) * resolution) / resolution,
+                Math.round(Math.max(rotatedFrom.y, rotatedTo.y) * resolution) / resolution,
+                Math.round(Math.max(rotatedFrom.z, rotatedTo.z) * resolution) / resolution
         );
     }
 
