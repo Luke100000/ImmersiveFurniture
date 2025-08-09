@@ -15,6 +15,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -31,6 +32,7 @@ import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.pathfinder.PathComputationType;
 import net.minecraft.world.level.storage.loot.LootParams;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
@@ -229,6 +231,10 @@ public abstract class BaseFurnitureBlock extends Block implements SimpleWaterlog
                         }
                     }
                 }
+
+                // Unmount all entities sitting on the furniture
+                AABB aabb = new AABB(pos, pos.offset(data.size.x, data.size.y, data.size.z)).inflate(1.0f);
+                level.getEntitiesOfClass(SittingEntity.class, aabb).forEach(Entity::ejectPassengers);
             }
 
             if (!player.isCreative()) {
