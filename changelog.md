@@ -2,6 +2,7 @@
 
 * Optimized and threaded shape generation to avoid spikes at super complex models
 * Beds now allow respawning
+* New worlds can now be copied without data loss
 
 # 0.0.7
 
@@ -51,10 +52,17 @@ Initial release
 
 # Bugs
 
-* On flat elements (sprites mostly) the direction is picked oddly
-
-# TODO
-
 * Blockbench/JSON block and item model import
 * Datapack support
 * Only play the closest sound + particles and those stacked?
+    * Needs a flag somewhere, should not be defaulted
+* Non latin search not searching
+* Redstone signal and turn light on and off
+    * Inventory content, or on-right-click (strength slider?)
+* Redstone input shall trigger right click
+* Multi craft intransparent and hard to use (E.g. "hold shift, hold space")
+* On flat elements (sprites mostly) the direction is picked oddly
+* Check if the block still exists when interacting
+* Better dismounting
+* Filter likes button and config
+* Why no leaves?

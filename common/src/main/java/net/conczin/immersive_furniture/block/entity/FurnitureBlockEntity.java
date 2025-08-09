@@ -9,7 +9,6 @@ import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -57,7 +56,7 @@ public class FurnitureBlockEntity extends BlockEntity implements Container, Menu
 
         if (this.data != null) {
             if (Config.getInstance().saveAsHash) {
-                FurnitureDataManager.save(data, new ResourceLocation("hash", this.data.getHash()));
+                FurnitureDataManager.saveHashData(this.data);
                 tag.putString(FurnitureItem.FURNITURE_HASH, this.data.getHash());
             } else {
                 tag.put(FurnitureItem.FURNITURE, this.data.toTag());

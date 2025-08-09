@@ -8,7 +8,6 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.BlockItem;
@@ -21,8 +20,10 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 
-import java.util.*;
-import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 public class FurnitureItem extends BlockItem {
     public static final String FURNITURE = "Furniture";
@@ -103,8 +104,6 @@ public class FurnitureItem extends BlockItem {
         return true;
     }
 
-    private static final Set<String> alreadySaved = new ConcurrentSkipListSet<>();
-
     @Override
     protected boolean placeBlock(BlockPlaceContext context, BlockState state) {
         // First place the main block
@@ -145,11 +144,7 @@ public class FurnitureItem extends BlockItem {
         }
 
         // Also explicitly save the data to fix possible save issues
-        String hash = data.getHash();
-        if (!alreadySaved.contains(hash)) {
-            alreadySaved.add(hash);
-            FurnitureDataManager.save(data, new ResourceLocation("hash", hash));
-        }
+        FurnitureDataManager.saveHashData(data);
 
         return true;
     }

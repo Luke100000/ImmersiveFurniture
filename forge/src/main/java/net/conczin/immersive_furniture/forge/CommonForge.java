@@ -4,6 +4,7 @@ import net.conczin.immersive_furniture.Common;
 import net.conczin.immersive_furniture.Sounds;
 import net.conczin.immersive_furniture.block.Blocks;
 import net.conczin.immersive_furniture.block.entity.BlockEntityTypes;
+import net.conczin.immersive_furniture.data.FurnitureDataManager;
 import net.conczin.immersive_furniture.entity.Entities;
 import net.conczin.immersive_furniture.item.Items;
 import net.conczin.immersive_furniture.network.ImmersivePayload;
@@ -14,7 +15,9 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.storage.LevelResource;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
+import net.minecraftforge.event.server.ServerAboutToStartEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
@@ -89,5 +92,10 @@ public final class CommonForge {
         } else if (event.getTabKey() == CreativeModeTabs.INGREDIENTS) {
             event.accept(Items.CRAFTING_MATERIAL);
         }
+    }
+
+    @SubscribeEvent
+    public void onServerAboutToStart(ServerAboutToStartEvent event) {
+        FurnitureDataManager.setWorldRoot(event.getServer().getWorldPath(LevelResource.ROOT));
     }
 }

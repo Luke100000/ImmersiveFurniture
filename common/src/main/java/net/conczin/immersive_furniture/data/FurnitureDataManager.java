@@ -13,29 +13,51 @@ import net.minecraft.resources.ResourceLocation;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 import static net.conczin.immersive_furniture.data.api.API.request;
 
 public class FurnitureDataManager {
+    public static final Path gameRoot = Path.of("./immersive_furniture");
+    public static Path worldRoot = Path.of("./immersive_furniture");
+
     public static final Map<ResourceLocation, FurnitureData> DATA = new ConcurrentHashMap<>();
     public static final Set<ResourceLocation> REQUESTED_DATA = ConcurrentHashMap.newKeySet();
 
+    private static final Set<String> alreadySaved = new ConcurrentSkipListSet<>();
+
+    public static void setWorldRoot(Path worldPath) {
+        worldRoot = worldPath.resolve("immersive_furniture").normalize();
+        alreadySaved.clear();
+    }
+
+    public static void setWorldRoot() {
+        worldRoot = gameRoot;
+        alreadySaved.clear();
+    }
+
     private static File getFile(ResourceLocation id) {
-        File file = new File("./immersive_furniture/" + id.getNamespace() + "/" + id.getPath() + ".nbt");
+        // Most files are stored in the game root
+        String path = id.getNamespace() + "/" + id.getPath() + ".nbt";
+        File oldFile = gameRoot.resolve(path).toFile();
+        if (oldFile.exists()) return oldFile;
+
+        // But the hashed files are stored in the world root to allow copying worlds
+        File file = oldFile;
+        if (id.getNamespace().equals("hash")) {
+            file = worldRoot.resolve(path).toFile();
+        }
 
         //noinspection ResultOfMethodCallIgnored
         file.getParentFile().mkdirs();
 
         return file;
-    }
-
-    private static File getLocalFile(FurnitureData data) {
-        return getFile(getSafeLocalLocation(data));
     }
 
     private static void delete(File file) {
@@ -74,7 +96,7 @@ public class FurnitureDataManager {
     }
 
     public static boolean localFileExists(FurnitureData data) {
-        return getLocalFile(data).exists();
+        return getFile(getSafeLocalLocation(data)).exists();
     }
 
     public static void deleteLocalFile(ResourceLocation location) {
@@ -93,6 +115,16 @@ public class FurnitureDataManager {
         } catch (IOException e) {
             Common.logger.error("Failed to save local file: {}", cache.getPath(), e);
         }
+    }
+
+    /**
+     * Saves the furniture data to the hash storage.
+     */
+    public static void saveHashData(FurnitureData data) {
+        String hash = data.getHash();
+        if (alreadySaved.contains(hash)) return;
+        alreadySaved.add(hash);
+        FurnitureDataManager.save(data, new ResourceLocation("hash", data.getHash()));
     }
 
     /**
