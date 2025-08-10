@@ -102,6 +102,7 @@
   "gui.immersive_furniture.create": "Яңы",
   "gui.immersive_furniture.create.hint": "Яңы мебелде үҙ ҡулдары менән эшлә.",
   "gui.immersive_furniture.craft": "Яһау",
+  "gui.immersive_furniture.craft.hint": "Шифтты тотоп 64x әҙерлә.\nКонтролды тотоп экранды асыҡ тот.",
   "gui.immersive_furniture.overwrite_file": "Элементар файлды өҙөргө вәкиле!",
   "gui.immersive_furniture.authenticating": "Аутентификация",
   "gui.immersive_furniture.authenticating_browser": "Аутентификацияны браузерҙа тамамлағыҙ!",
