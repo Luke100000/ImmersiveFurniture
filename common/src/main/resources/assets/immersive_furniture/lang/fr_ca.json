@@ -102,6 +102,7 @@
   "gui.immersive_furniture.create": "Créer",
   "gui.immersive_furniture.create.hint": "Créez un nouveau meuble à partir de zéro.",
   "gui.immersive_furniture.craft": "Créer",
+  "gui.immersive_furniture.craft.hint": "Maintenez la touche majuscule enfoncée pour fabriquer 64x.\nMaintenez Ctrl enfoncé pour garder l'écran ouvert.",
   "gui.immersive_furniture.overwrite_file": "Cela écrasera le fichier existant !",
   "gui.immersive_furniture.authenticating": "Authentification",
   "gui.immersive_furniture.authenticating_browser": "Continuez l'authentification dans votre navigateur !",
