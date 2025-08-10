@@ -102,6 +102,7 @@
   "gui.immersive_furniture.create": "Crear",
   "gui.immersive_furniture.create.hint": "Crea un mobiliariu nuevu desde cero.",
   "gui.immersive_furniture.craft": "Crear",
+  "gui.immersive_furniture.craft.hint": "Manten shift pa fabricar 64x.\nManten ctrl pa que la pantalla siga visible.",
   "gui.immersive_furniture.overwrite_file": "Sobreescribirá el fichier existente!",
   "gui.immersive_furniture.authenticating": "Autenticando",
   "gui.immersive_furniture.authenticating_browser": "Completa l'autenticación nel navegador!",
