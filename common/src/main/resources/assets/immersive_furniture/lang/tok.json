@@ -102,6 +102,7 @@
   "gui.immersive_furniture.create": "kama",
   "gui.immersive_furniture.create.hint": "kama palisa sin.",
   "gui.immersive_furniture.craft": "kama palisa",
+  "gui.immersive_furniture.craft.hint": "tawa lawa kepeken shift tawa 64x.\ntawa lawa kepeken ctrl tawa kepeken palisa.",
   "gui.immersive_furniture.overwrite_file": "kama suno sin!",
   "gui.immersive_furniture.authenticating": "kama tan",
   "gui.immersive_furniture.authenticating_browser": "kama ta e mun tenpo!",
