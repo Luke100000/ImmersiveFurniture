@@ -102,6 +102,7 @@
   "gui.immersive_furniture.create": "Crear",
   "gui.immersive_furniture.create.hint": "Crea un nou mobiliari des de zero.",
   "gui.immersive_furniture.craft": "Fabricar",
+  "gui.immersive_furniture.craft.hint": "Mantingueu la tecla shift per fabricar 64x.\nMantingueu la tecla ctrl per mantenir la pantalla oberta.",
   "gui.immersive_furniture.overwrite_file": "Es sobreescriurà el fitxer existent!",
   "gui.immersive_furniture.authenticating": "Autenticant",
   "gui.immersive_furniture.authenticating_browser": "Completa l'autenticació al teu navegador!",
