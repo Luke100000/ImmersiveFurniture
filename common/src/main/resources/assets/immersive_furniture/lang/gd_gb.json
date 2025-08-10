@@ -102,6 +102,7 @@
   "gui.immersive_furniture.create": "Cruthaich",
   "gui.immersive_furniture.create.hint": "Cruthaich ùr a’ toirt a-mach.",
   "gui.immersive_furniture.craft": "Craft",
+  "gui.immersive_furniture.craft.hint": "Cùm shift gus craft 64x.\nCùm ctrl gus cumail orra.",
   "gui.immersive_furniture.overwrite_file": "Cuiridh seo às an faidhle a th’ ann!",
   "gui.immersive_furniture.authenticating": "A’ dearbhadh",
   "gui.immersive_furniture.authenticating_browser": "Cuir crìoch air a’ dearbhadh anns a’ bhrabhsair agad!",
