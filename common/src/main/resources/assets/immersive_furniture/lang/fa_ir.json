@@ -102,6 +102,7 @@
   "gui.immersive_furniture.create": "ایجاد",
   "gui.immersive_furniture.create.hint": "یک مبل جدید از ابتدا ایجاد کنید.",
   "gui.immersive_furniture.craft": "ساخت",
+  "gui.immersive_furniture.craft.hint": "Shift را نگه دارید تا 64x بسازید.\nCTRL را نگه دارید تا صفحه باز بماند.",
   "gui.immersive_furniture.overwrite_file": "بر روی فایل موجود بازنویسی خواهد شد!",
   "gui.immersive_furniture.authenticating": "در حال تأیید هویت",
   "gui.immersive_furniture.authenticating_browser": "تأیید هویت را در مرورگر خود تکمیل کنید!",
