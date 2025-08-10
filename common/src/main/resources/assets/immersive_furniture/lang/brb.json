@@ -102,6 +102,7 @@
   "gui.immersive_furniture.create": "Maak",
   "gui.immersive_furniture.create.hint": "Maak een nieuw meubelstuk vanuit het niets.",
   "gui.immersive_furniture.craft": "Brouwen",
+  "gui.immersive_furniture.craft.hint": "Houd shift om 64x te maken.\nHoud ctrl om het scherm open te houden.",
   "gui.immersive_furniture.overwrite_file": "Zal bestaand bestand overschrijven!",
   "gui.immersive_furniture.authenticating": "Authenticeren",
   "gui.immersive_furniture.authenticating_browser": "Voltooi authenticatie in je browser!",
