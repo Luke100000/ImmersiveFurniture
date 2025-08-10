@@ -102,6 +102,7 @@
   "gui.immersive_furniture.create": "crei",
   "gui.immersive_furniture.create.hint": "crei lo jence tu'a lo crino.",
   "gui.immersive_furniture.craft": "crafte",
+  "gui.immersive_furniture.craft.hint": "ca'o shift lo nu klama 64x.\nca'o ctrl lo nu co se na'e claxu lo skami.",
   "gui.immersive_furniture.overwrite_file": "co ta claxu!",
   "gui.immersive_furniture.authenticating": "se jenda",
   "gui.immersive_furniture.authenticating_browser": "se jenda la kabri",
