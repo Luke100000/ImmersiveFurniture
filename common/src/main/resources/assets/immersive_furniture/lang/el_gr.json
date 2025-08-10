@@ -102,6 +102,7 @@
   "gui.immersive_furniture.create": "Δημιουργία",
   "gui.immersive_furniture.create.hint": "Δημιουργήστε ένα νέο έπιπλο από το μηδέν.",
   "gui.immersive_furniture.craft": "Κατασκευή",
+  "gui.immersive_furniture.craft.hint": "Κρατήστε πατημένο το shift για να κατασκευάσετε 64x.\nΚρατήστε το ctrl για να κρατήσετε την οθόνη ανοιχτή.",
   "gui.immersive_furniture.overwrite_file": "Θα αντικαταστήσει το υπάρχον αρχείο!",
   "gui.immersive_furniture.authenticating": "Ταυτοποίηση",
   "gui.immersive_furniture.authenticating_browser": "Πλήρης ταυτοποίηση στο πρόγραμμα περιήγησής σας!",
