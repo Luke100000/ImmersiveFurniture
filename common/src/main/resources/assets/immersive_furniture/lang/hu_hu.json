@@ -102,6 +102,7 @@
   "gui.immersive_furniture.create": "Hozzon létre",
   "gui.immersive_furniture.create.hint": "Hozzon létre egy új bútort a semmiből.",
   "gui.immersive_furniture.craft": "Craft",
+  "gui.immersive_furniture.craft.hint": "Tartsa lenyomva a shiftet a 64x kézműveshez.\nTartsd lenyomva a ctrl-t, hogy a képernyő nyitva maradjon.",
   "gui.immersive_furniture.overwrite_file": "Felülírja a meglévő fájlt!",
   "gui.immersive_furniture.authenticating": "Hitelesítés",
   "gui.immersive_furniture.authenticating_browser": "Teljes hitelesítés a böngészőben!",
