@@ -102,6 +102,7 @@
   "gui.immersive_furniture.create": "Ստեղծել",
   "gui.immersive_furniture.create.hint": "Ստեղծեք նոր կահույք՝ սկսելուց.",
   "gui.immersive_furniture.craft": "Խորովել",
+  "gui.immersive_furniture.craft.hint": "Պահեցրեք shift սալիկը 64x զարդարելու համար։\nՊահեցրեք ctrl-ը, որպեսզի արդյունքը պահվի էկրանում:",
   "gui.immersive_furniture.overwrite_file": "Կրկին կհաջողվի գոյություն ունեցող ֆայլը!",
   "gui.immersive_furniture.authenticating": "Հաստատման գործընթաց",
   "gui.immersive_furniture.authenticating_browser": "Ավcomplete նախնական և ձեր զննումը կատարվի!",
