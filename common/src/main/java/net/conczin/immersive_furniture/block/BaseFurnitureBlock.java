@@ -75,9 +75,18 @@ public abstract class BaseFurnitureBlock extends Block implements SimpleWaterlog
                 Network.sendToAllPlayers(serverLevel.getServer(), new FurnitureInteractMessage(pos));
                 consume = true;
             }
+
+            if (toggleLight(data, state, level, pos)) {
+                consume = true;
+            }
+
             return consume ? InteractionResult.CONSUME : InteractionResult.PASS;
         }
         return InteractionResult.PASS;
+    }
+
+    public boolean toggleLight(FurnitureData data, BlockState state, Level level, BlockPos pos) {
+        return false;
     }
 
     public void onInteract(Level level, BlockState state, BlockPos pos, Player player) {

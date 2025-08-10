@@ -83,4 +83,18 @@ public class EntityFurnitureBlock extends BaseFurnitureBlock implements EntityBl
         }
         super.onRemove(state, level, pos, newState, movedByPiston);
     }
+
+    @Override
+    public boolean toggleLight(FurnitureData data, BlockState state, Level level, BlockPos pos) {
+        if (state.getValue(LIGHT) == 0) {
+            // Turn on the light
+            state = state.setValue(LIGHT, data.lightLevel);
+            level.setBlockAndUpdate(pos, state);
+        } else {
+            // Turn off the light
+            state = state.setValue(LIGHT, 0);
+            level.setBlockAndUpdate(pos, state);
+        }
+        return true;
+    }
 }
