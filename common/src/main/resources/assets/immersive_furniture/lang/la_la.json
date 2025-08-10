@@ -102,6 +102,7 @@
   "gui.immersive_furniture.create": "Crea",
   "gui.immersive_furniture.create.hint": "Crea novam supellectilem ab initio.",
   "gui.immersive_furniture.craft": "Finge",
+  "gui.immersive_furniture.craft.hint": "Tenere shift ad funiculos 64x.\nTenere ctrl ad servandum velum apertum.",
   "gui.immersive_furniture.overwrite_file": "Supervacane existentem fasciculum!",
   "gui.immersive_furniture.authenticating": "Authenticatio",
   "gui.immersive_furniture.authenticating_browser": "Completa authenticationem in tuo navigatore!",
