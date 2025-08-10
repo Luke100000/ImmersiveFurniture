@@ -102,6 +102,7 @@
   "gui.immersive_furniture.create": "Búa til",
   "gui.immersive_furniture.create.hint": "Búa til nýtt húsgagn frá grunni.",
   "gui.immersive_furniture.craft": "Handverki",
+  "gui.immersive_furniture.craft.hint": "Haltu shift til að smíða 64x.\nHaltu ctrl til að halda skjánum opnum.",
   "gui.immersive_furniture.overwrite_file": "Mun yfirskrufa núverandi skrá!",
   "gui.immersive_furniture.authenticating": "Að staðfestingu",
   "gui.immersive_furniture.authenticating_browser": "Ljúktu staðfestingu í vafranum þínum!",
