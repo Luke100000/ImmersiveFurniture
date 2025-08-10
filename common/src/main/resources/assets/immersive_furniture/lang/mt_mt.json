@@ -102,6 +102,7 @@
   "gui.immersive_furniture.create": "Oħloq",
   "gui.immersive_furniture.create.hint": "Oħloq għamara ġdida minn xejn.",
   "gui.immersive_furniture.craft": "Ħaġġa",
+  "gui.immersive_furniture.craft.hint": "Iġġorr shift biex toħloq 64x.\nIġġorr ctrl biex iżżomm il-iskrin miftuħ.",
   "gui.immersive_furniture.overwrite_file": "Se tissostitwixxi il-fajl eżistenti!",
   "gui.immersive_furniture.authenticating": "Qed tiċċekkjja",
   "gui.immersive_furniture.authenticating_browser": "Kompli l-awtentikazzjoni fil-browser tiegħek!",
