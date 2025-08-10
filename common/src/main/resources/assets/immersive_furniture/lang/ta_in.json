@@ -102,6 +102,7 @@
   "gui.immersive_furniture.create": "உருவாக்கு",
   "gui.immersive_furniture.create.hint": "புதிய ஒரு மரச்சாமானை உருவாக்கவும்.",
   "gui.immersive_furniture.craft": "தயாரிக்க",
+  "gui.immersive_furniture.craft.hint": "Shift ஐ அழுத்தி 64x இல் கலக்கவும்.\nஸ்கிரீனை திறந்துவைக்க ctrl ஐ பிடிக்கவும்.",
   "gui.immersive_furniture.overwrite_file": "இருக்கும் கோப்பை மேலெழுதும்!",
   "gui.immersive_furniture.authenticating": "உறுதிப்படுத்தல்",
   "gui.immersive_furniture.authenticating_browser": "உங்கள் உலாவியில் உறுதிப்படுத்தலை முடிக்கவும்!",
