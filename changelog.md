@@ -5,6 +5,7 @@
 * New worlds can now be copied without data loss
 * Destroying furniture now kicks off passengers
 * Fixed position when sleeping
+* You can now hold space to keep the screen open when crafting furniture
 
 # 0.0.7
 
@@ -58,11 +59,13 @@ Initial release
 * Datapack support
 * Only play the closest sound + particles and those stacked?
     * Needs a flag somewhere, should not be defaulted
-* Non latin search not searching
+* On flat elements (sprites mostly) the direction is picked oddly
 * Redstone signal and turn light on and off
     * Inventory content, or on-right-click (strength slider?)
 * Redstone input shall trigger right click
-* Multi craft intransparent and hard to use (E.g. "hold shift, hold space")
-* On flat elements (sprites mostly) the direction is picked oddly
 * Better dismounting
+
+## Backend
+
+* Non latin search not searching
 * Filter likes button and config

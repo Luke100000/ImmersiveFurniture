@@ -85,6 +85,11 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
     }
 
     @Override
+    public boolean isPauseScreen() {
+        return false;
+    }
+
+    @Override
     protected void init() {
         super.init();
 
@@ -274,9 +279,12 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
             addRenderableWidget(
                     Button.builder(Component.translatable("gui.immersive_furniture.craft"), b -> {
                                 Network.sendToServer(new CraftRequest(FurnitureDataManager.getData(selected), holdingShift()));
-                                Minecraft.getInstance().setScreen(null);
+                                if (!holdingCtrl() && !holdingShift()) {
+                                    Minecraft.getInstance().setScreen(null);
+                                }
                             })
                             .bounds(leftPos + windowWidth - 68, topPos + windowHeight - 24, 64, 20)
+                            .tooltip(Tooltip.create(Component.translatable("gui.immersive_furniture.craft.hint")))
                             .build()
             );
         }
@@ -407,6 +415,8 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
         graphics.pose().popPose();
 
         renderError(graphics, selected == null ? height / 2 : topPos + 9);
+
+        graphics.pose().translate(0, 0, 1024);
     }
 
     private boolean isTileHovered(int x, int y) {
@@ -420,6 +430,11 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
     private boolean holdingShift() {
         long window = Minecraft.getInstance().getWindow().getWindow();
         return InputConstants.isKeyDown(window, 340) || InputConstants.isKeyDown(window, 344);
+    }
+
+    private boolean holdingCtrl() {
+        long window = Minecraft.getInstance().getWindow().getWindow();
+        return InputConstants.isKeyDown(window, 341) || InputConstants.isKeyDown(window, 345);
     }
 
     protected ImageButton addButton(int x, int y, int size, int u, int v, String tooltip, Runnable clicked) {
