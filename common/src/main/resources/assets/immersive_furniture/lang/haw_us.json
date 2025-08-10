@@ -102,6 +102,7 @@
   "gui.immersive_furniture.create": "E hoʻokumu",
   "gui.immersive_furniture.create.hint": "E hoʻokumu i ka lula o nā mea aupuni.",
   "gui.immersive_furniture.craft": "E hoʻoikaika",
+  "gui.immersive_furniture.craft.hint": "E waiho i ka ʻan plagani e hoʻololi i ka 64x.\nE waiho i ka ctrl e mālama i ke aniani.",
   "gui.immersive_furniture.overwrite_file": "E kū i ka palena!",
   "gui.immersive_furniture.authenticating": "E hoʻokomo kaʻawale",
   "gui.immersive_furniture.authenticating_browser": "E mālama i ka ʻike ʻana ma kāu ʻike nānā!",
