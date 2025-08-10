@@ -102,6 +102,7 @@
   "gui.immersive_furniture.create": "Luo",
   "gui.immersive_furniture.create.hint": "Luo uusi huonekalu alusta.",
   "gui.immersive_furniture.craft": "Valmista",
+  "gui.immersive_furniture.craft.hint": "Pidda shift ja fas 64x.\nPidda ctrl ja buktá skåppem hárjeh.",
   "gui.immersive_furniture.overwrite_file": "Yli kirjoittaa olemassa olevan tiedoston!",
   "gui.immersive_furniture.authenticating": "Varmennus",
   "gui.immersive_furniture.authenticating_browser": "Suorita varmennus selaimessasi!",
