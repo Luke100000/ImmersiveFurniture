@@ -102,6 +102,7 @@
   "gui.immersive_furniture.create": "Luo",
   "gui.immersive_furniture.create.hint": "Luo uudet huonekalut tyhjästä.",
   "gui.immersive_furniture.craft": "Kokoa",
+  "gui.immersive_furniture.craft.hint": "Pidä siirtymä veneen 64x.\nPidä ctrl pohjassa pitääksesi näytön auki.",
   "gui.immersive_furniture.overwrite_file": "Korvaa olemassa oleva tiedosto!",
   "gui.immersive_furniture.authenticating": "Todentaminen",
   "gui.immersive_furniture.authenticating_browser": "Suorita todennus selaimessasi!",
