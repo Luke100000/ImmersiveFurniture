@@ -102,6 +102,7 @@
   "gui.immersive_furniture.create": "Krouiñ",
   "gui.immersive_furniture.create.hint": "Krouiñ ur gouizhiad nevez a doked.",
   "gui.immersive_furniture.craft": "Crafte",
+  "gui.immersive_furniture.craft.hint": "Samm evezh da zerriñ 64x.\nSamm ctrl da gaout an skeudenn opens.",
   "gui.immersive_furniture.overwrite_file": "A vo moarvat da safariz prientin !",
   "gui.immersive_furniture.authenticating": "Daston",
   "gui.immersive_furniture.authenticating_browser": "Kemer ar dastonenn er rummad !",
