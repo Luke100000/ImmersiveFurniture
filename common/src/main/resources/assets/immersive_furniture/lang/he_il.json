@@ -102,6 +102,7 @@
   "gui.immersive_furniture.create": "צור",
   "gui.immersive_furniture.create.hint": "צור רהיט חדש מאפס.",
   "gui.immersive_furniture.craft": "תסגר",
+  "gui.immersive_furniture.craft.hint": "החזק את מקש Shift כדי ליצור 64x.\nהחזק את מקש Ctrl כדי להשאיר את המסך פתוח.",
   "gui.immersive_furniture.overwrite_file": "ימחק קובץ קיים!",
   "gui.immersive_furniture.authenticating": "מתבצע אימות",
   "gui.immersive_furniture.authenticating_browser": "השלם את האימות בדפדפן שלך!",
