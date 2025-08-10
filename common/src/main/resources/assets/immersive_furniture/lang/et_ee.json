@@ -102,6 +102,7 @@
   "gui.immersive_furniture.create": "Loo",
   "gui.immersive_furniture.create.hint": "Loo uus mööbel nullist.",
   "gui.immersive_furniture.craft": "Craft",
+  "gui.immersive_furniture.craft.hint": "Hoidke vahetust all, et teha 64x.\nHoidke ctrl all, et hoida ekraan avatud.",
   "gui.immersive_furniture.overwrite_file": "Kirjutab olemasoleva faili üle!",
   "gui.immersive_furniture.authenticating": "Autentimine",
   "gui.immersive_furniture.authenticating_browser": "Täielik autentimine brauseris!",
