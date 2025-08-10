@@ -102,6 +102,7 @@
   "gui.immersive_furniture.create": "Krei",
   "gui.immersive_furniture.create.hint": "Krei novan meblon de nulo.",
   "gui.immersive_furniture.craft": "Fabriki",
+  "gui.immersive_furniture.craft.hint": "Tenhu ŝifton por fari 64x.\nTenhu kontrolon por teni la ekranon malferma.",
   "gui.immersive_furniture.overwrite_file": "Superas ekzistantan dosieron!",
   "gui.immersive_furniture.authenticating": "Aŭtentikigante",
   "gui.immersive_furniture.authenticating_browser": "Finu la aŭtentikigon en via retumilo!",
