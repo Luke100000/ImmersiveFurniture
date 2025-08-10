@@ -102,6 +102,7 @@
   "gui.immersive_furniture.create": "Abuur",
   "gui.immersive_furniture.create.hint": "Abuur qeyb cusub oo bilow ah.",
   "gui.immersive_furniture.craft": "Craft",
+  "gui.immersive_furniture.craft.hint": "Fiiro u yeelo shift si aad u sameysato 64x.\nFiiro u yeelo ctrl si aad shaashadda u ilaaliso.",
   "gui.immersive_furniture.overwrite_file": "Waxay masaxaysaa feylkii hore!",
   "gui.immersive_furniture.authenticating": "Ansixinta",
   "gui.immersive_furniture.authenticating_browser": "Dhameystir ansixin browser-kaaga!",
