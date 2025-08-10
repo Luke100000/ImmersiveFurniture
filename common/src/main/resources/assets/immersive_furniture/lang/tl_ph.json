@@ -102,6 +102,7 @@
   "gui.immersive_furniture.create": "Lumikha",
   "gui.immersive_furniture.create.hint": "Lumikha ng bagong muwebles mula sa simula.",
   "gui.immersive_furniture.craft": "Craft",
+  "gui.immersive_furniture.craft.hint": "Hawakan ang shift upang gumawa ng 64x.\nHawakan ang ctrl upang panatilihing bukas ang screen.",
   "gui.immersive_furniture.overwrite_file": "Sasusunod ay papalitan ang umiiral na file!",
   "gui.immersive_furniture.authenticating": "Nagsasagawa ng pagpapatunay",
   "gui.immersive_furniture.authenticating_browser": "Kumpletuhin ang pagpapatunay sa iyong browser!",
