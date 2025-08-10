@@ -102,6 +102,7 @@
   "gui.immersive_furniture.create": "Craft",
   "gui.immersive_furniture.create.hint": "Build a new piece from naught.",
   "gui.immersive_furniture.craft": "Make",
+  "gui.immersive_furniture.craft.hint": "Hold shift to craft 64x.\nHold ctrl to keep the screen open.",
   "gui.immersive_furniture.overwrite_file": "Will overwrite existing file!",
   "gui.immersive_furniture.authenticating": "Authing",
   "gui.immersive_furniture.authenticating_browser": "Finish authing in thy browser!",
