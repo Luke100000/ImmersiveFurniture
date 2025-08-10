@@ -102,6 +102,7 @@
   "gui.immersive_furniture.create": "สร้าง",
   "gui.immersive_furniture.create.hint": "สร้างเฟอร์นิเจอร์ใหม่จากศูนย์.",
   "gui.immersive_furniture.craft": "คราฟต์",
+  "gui.immersive_furniture.craft.hint": "กดปุ่ม Shift ค้างไว้เพื่อสร้าง 64 ชิ้น\nกดปุ่ม Ctrl ค้างไว้เพื่อเปิดหน้าจอค้างไว้",
   "gui.immersive_furniture.overwrite_file": "จะเขียนทับไฟล์ที่มีอยู่!",
   "gui.immersive_furniture.authenticating": "กำลังตรวจสอบสิทธิ์",
   "gui.immersive_furniture.authenticating_browser": "กรุณาทำการตรวจสอบสิทธิ์ในเบราว์เซอร์ของคุณให้เสร็จสิ้น",
