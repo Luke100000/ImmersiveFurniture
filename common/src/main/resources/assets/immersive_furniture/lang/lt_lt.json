@@ -102,6 +102,7 @@
   "gui.immersive_furniture.create": "Sukurti",
   "gui.immersive_furniture.create.hint": "Sukurkite naują baldą nuo nulio.",
   "gui.immersive_furniture.craft": "Amatų",
+  "gui.immersive_furniture.craft.hint": "Laikykite nuspaudę \"Shift\", jei norite plaukti 64x.\nLaikykite ctrl, kad ekranas būtų atidarytas.",
   "gui.immersive_furniture.overwrite_file": "Bus perrašytas esamas failas!",
   "gui.immersive_furniture.authenticating": "Autentiškumo nustatymas",
   "gui.immersive_furniture.authenticating_browser": "Visiškas autentiškumo patvirtinimas naršyklėje!",
