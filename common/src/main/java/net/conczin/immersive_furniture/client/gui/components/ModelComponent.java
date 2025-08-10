@@ -342,7 +342,7 @@ public class ModelComponent extends ScreenComponent {
             });
             addButton(leftPos + 24, topPos + 132, 16, 96, 192, "gui.immersive_furniture.increase_size", () -> {
                 screen.selectedElements.forEach(e -> {
-                    e.sprite.size = Math.max(0.25f, e.sprite.size * 2.0f);
+                    e.sprite.size = Math.min(2.0f, e.sprite.size * 2.0f);
                     e.sanityCheck();
                 });
                 screen.init();

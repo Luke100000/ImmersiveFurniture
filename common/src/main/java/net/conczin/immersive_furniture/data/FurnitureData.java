@@ -345,7 +345,7 @@ public class FurnitureData {
                     Vector3f up = rotateVector(element.getRotationAxes().up(), direction).normalize();
 
                     if (element.playerPose.pose == Pose.SLEEPING) {
-                        center.add(forward.mul(-0.93475f));
+                        center.add(forward.mul(0.5625f));
                         center.sub(up.mul(-0.0625f));
                     } else {
                         center.add(forward.mul(0.125f));

@@ -4,6 +4,7 @@
 * Beds now allow respawning
 * New worlds can now be copied without data loss
 * Destroying furniture now kicks off passengers
+* Fixed position when sleeping
 
 # 0.0.7
 
