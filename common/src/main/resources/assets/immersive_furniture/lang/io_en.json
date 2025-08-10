@@ -102,6 +102,7 @@
   "gui.immersive_furniture.create": "Krei",
   "gui.immersive_furniture.create.hint": "Krei novan meblon de nenio.",
   "gui.immersive_furniture.craft": "Krafti",
+  "gui.immersive_furniture.craft.hint": "Tenere shift por craftar 64x.\nTenere ctrl por retenar la skreno open.",
   "gui.immersive_furniture.overwrite_file": "Superpasos ekzistantan dosieron!",
   "gui.immersive_furniture.authenticating": "Aŭtentikiganta",
   "gui.immersive_furniture.authenticating_browser": "Completi aŭtentikigon en via retumilo!",
