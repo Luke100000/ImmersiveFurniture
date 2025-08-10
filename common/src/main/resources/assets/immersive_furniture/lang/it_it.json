@@ -102,6 +102,7 @@
   "gui.immersive_furniture.create": "Crea",
   "gui.immersive_furniture.create.hint": "Crea un nuovo mobile da zero.",
   "gui.immersive_furniture.craft": "Crea",
+  "gui.immersive_furniture.craft.hint": "Tieni premuto lo spostamento per creare 64x.\nTieni premuto ctrl per mantenere lo schermo aperto.",
   "gui.immersive_furniture.overwrite_file": "Sovrascriverà file esistente!",
   "gui.immersive_furniture.authenticating": "Autenticazione",
   "gui.immersive_furniture.authenticating_browser": "Completa l'autenticazione nel browser!",
