@@ -102,6 +102,7 @@
   "gui.immersive_furniture.create": "שאַפֿן",
   "gui.immersive_furniture.create.hint": "שאַפֿן אַ נייע פֿנעינג פֿון שלאָגן.",
   "gui.immersive_furniture.craft": "קראַפט",
+  "gui.immersive_furniture.craft.hint": "האָלט שיפט צו מאַכן 64x.\nהאָלט קtrl צו באַהאַלטן דעם אויבן פֿאַרשטאַנד.",
   "gui.immersive_furniture.overwrite_file": "וועט איבערשרייַבן דעם עקזיסטירנדע פֿילע!",
   "gui.immersive_furniture.authenticating": "אַוטענטיקאַטיאָן",
   "gui.immersive_furniture.authenticating_browser": "פֿאַרשטיין אַוטענטיקאַטיאָן אין דיין בלעטל!",
