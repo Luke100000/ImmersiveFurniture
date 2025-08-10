@@ -102,6 +102,7 @@
   "gui.immersive_furniture.create": "Buat",
   "gui.immersive_furniture.create.hint": "Buat perabot baru dari awal.",
   "gui.immersive_furniture.craft": "Kerajakan",
+  "gui.immersive_furniture.craft.hint": "Tahan shift untuk membuat 64x.\nTahan ctrl untuk mengekalkan skrin terbuka.",
   "gui.immersive_furniture.overwrite_file": "Akan menimpa fail yang sedia ada!",
   "gui.immersive_furniture.authenticating": "Mengesahkan",
   "gui.immersive_furniture.authenticating_browser": "Selesaikan pengesahan di pelayar anda!",
