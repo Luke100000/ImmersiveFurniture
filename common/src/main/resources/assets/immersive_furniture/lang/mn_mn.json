@@ -102,6 +102,7 @@
   "gui.immersive_furniture.create": "Байгуул",
   "gui.immersive_furniture.create.hint": "Шинэ тавилга бүтээх.",
   "gui.immersive_furniture.craft": "Байгуулах",
+  "gui.immersive_furniture.craft.hint": "64x хийхийн тулд shift товчийг бариарай.\nДэлгэцийг нээлттэй байлгахын тулд ctrl товчийг бариарай.",
   "gui.immersive_furniture.overwrite_file": "Одоогийн фалыг өөрчилнө!",
   "gui.immersive_furniture.authenticating": "Нэвтрэх",
   "gui.immersive_furniture.authenticating_browser": "Таны браузер дээр нэвтрүүлэг хийж дуусгана уу!",
