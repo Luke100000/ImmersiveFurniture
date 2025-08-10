@@ -102,6 +102,7 @@
   "gui.immersive_furniture.create": "إنشاء",
   "gui.immersive_furniture.create.hint": "إنشاء أثاث جديد من الصفر.",
   "gui.immersive_furniture.craft": "حرف",
+  "gui.immersive_furniture.craft.hint": "اضغط على زر Shift لصناعة 64.\nاضغط على زر Ctrl لكي تبقى الشاشة مفتوحة.",
   "gui.immersive_furniture.overwrite_file": "سوف يتم الكتابة فوق الملف الموجود!",
   "gui.immersive_furniture.authenticating": "المصادقة",
   "gui.immersive_furniture.authenticating_browser": "أكمل المصادقة في متصفحك!",
