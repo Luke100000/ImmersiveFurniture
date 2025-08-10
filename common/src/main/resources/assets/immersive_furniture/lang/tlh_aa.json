@@ -102,6 +102,7 @@
   "gui.immersive_furniture.create": "ghu'",
   "gui.immersive_furniture.create.hint": "nI' 'engH vIghoS.",
   "gui.immersive_furniture.craft": "yInshare vIghoS",
+  "gui.immersive_furniture.craft.hint": "vISuD ghap muS 64x.\nvISuD gHID lo'taH mIgh ghuD.",
   "gui.immersive_furniture.overwrite_file": "regh!",
   "gui.immersive_furniture.authenticating": "pab mIgh",
   "gui.immersive_furniture.authenticating_browser": "pab mIgh lo' Qoy!",
