@@ -102,6 +102,7 @@
   "gui.immersive_furniture.create": "Creâ",
   "gui.immersive_furniture.create.hint": "Creâ un mobil di sôl.",
   "gui.immersive_furniture.craft": "Fâ",
+  "gui.immersive_furniture.craft.hint": "Tigni premut per fabricâ 64x.\nTigni ctrl par mantignî il scern open.",
   "gui.immersive_furniture.overwrite_file": "Al scrifarà il file esistent!",
   "gui.immersive_furniture.authenticating": "Autentificazion in cors",
   "gui.immersive_furniture.authenticating_browser": "Completi l'autentificazion tal tu browser!",
