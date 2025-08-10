@@ -102,6 +102,7 @@
   "gui.immersive_furniture.create": "Тудыру",
   "gui.immersive_furniture.create.hint": "Яңа мебельне ясарга.",
   "gui.immersive_furniture.craft": "Дәүләтлечек",
+  "gui.immersive_furniture.craft.hint": "64x эшләү өчен shift тотыгыз.\nЭкранны ачык тоту өчен ctrl тотыгыз.",
   "gui.immersive_furniture.overwrite_file": "Мөһим файлны яңадан язу булачак!",
   "gui.immersive_furniture.authenticating": "Аутентификацияләнеп ята",
   "gui.immersive_furniture.authenticating_browser": "Браузерда аутентификацияне тәмамлагыз!",
