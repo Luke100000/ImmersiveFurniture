@@ -102,6 +102,7 @@
   "gui.immersive_furniture.create": "Crio",
   "gui.immersive_furniture.create.hint": "Crie uma nova mobília a partir do zero.",
   "gui.immersive_furniture.craft": "Fabricar",
+  "gui.immersive_furniture.craft.hint": "Segure shift para fazer 64x.\nSegure ctrl para manter a tela aberta.",
   "gui.immersive_furniture.overwrite_file": "Irá sobrescrever o arquivo existente!",
   "gui.immersive_furniture.authenticating": "Autenticando",
   "gui.immersive_furniture.authenticating_browser": "Complete autenticação no seu navegador!",
