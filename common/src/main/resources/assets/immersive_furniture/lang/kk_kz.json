@@ -102,6 +102,7 @@
   "gui.immersive_furniture.create": "Жасау",
   "gui.immersive_furniture.create.hint": "Нөлден жаңа мебель жасаңыз.",
   "gui.immersive_furniture.craft": "Құрастыру",
+  "gui.immersive_furniture.craft.hint": "64x жасау үшін Shift пернесін басып тұрыңыз.\nЭкранды ашық ұстау үшін Ctrl пернесін басып тұрыңыз.",
   "gui.immersive_furniture.overwrite_file": "Мавон файлын ауыстырады!",
   "gui.immersive_furniture.authenticating": "Тексерілуде",
   "gui.immersive_furniture.authenticating_browser": "Браузерде тексеруді аяқтаңыз!",
