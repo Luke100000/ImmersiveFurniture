@@ -102,6 +102,7 @@
   "gui.immersive_furniture.create": "Izradi",
   "gui.immersive_furniture.create.hint": "Izradite novi namještaj ispočetka.",
   "gui.immersive_furniture.craft": "Izraditi",
+  "gui.immersive_furniture.craft.hint": "Držite shift za izradu 64x.\nDržite ctrl kako biste zadržali otvoren ekran.",
   "gui.immersive_furniture.overwrite_file": "Prepisat će postojeću datoteku!",
   "gui.immersive_furniture.authenticating": "Autentifikacija",
   "gui.immersive_furniture.authenticating_browser": "Završite autentifikaciju u svom pregledniku!",
