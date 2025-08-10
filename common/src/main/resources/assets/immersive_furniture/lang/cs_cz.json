@@ -102,6 +102,7 @@
   "gui.immersive_furniture.create": "Vytvořit",
   "gui.immersive_furniture.create.hint": "Vytvořit nový nábytek od nuly.",
   "gui.immersive_furniture.craft": "Vyrobit",
+  "gui.immersive_furniture.craft.hint": "Podržením klávesy Shift k výrobě 64x.\nPodrž klávesu ctrl pro zachování otevřené obrazovky.",
   "gui.immersive_furniture.overwrite_file": "Přepíše existující soubor!",
   "gui.immersive_furniture.authenticating": "Ověřování",
   "gui.immersive_furniture.authenticating_browser": "Dokončete ověření ve vašem prohlížeči!",
