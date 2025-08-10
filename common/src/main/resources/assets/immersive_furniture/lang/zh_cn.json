@@ -102,6 +102,7 @@
   "gui.immersive_furniture.create": "新建",
   "gui.immersive_furniture.create.hint": "从零开始创建新的家具。",
   "gui.immersive_furniture.craft": "制作",
+  "gui.immersive_furniture.craft.hint": "按住 Shift 键来制作64x。\n按住 ctrl 来保持屏幕打开状态。",
   "gui.immersive_furniture.overwrite_file": "将覆盖现有文件！",
   "gui.immersive_furniture.authenticating": "验证中",
   "gui.immersive_furniture.authenticating_browser": "请在浏览器中进行身份验证！",
