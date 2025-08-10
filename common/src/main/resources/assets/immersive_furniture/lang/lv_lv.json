@@ -102,6 +102,7 @@
   "gui.immersive_furniture.create": "Izveidot",
   "gui.immersive_furniture.create.hint": "Izveidojiet jaunu mēbeli no nulles.",
   "gui.immersive_furniture.craft": "Amatniecība",
+  "gui.immersive_furniture.craft.hint": "Turiet ieslēgtu pārslēgšanas taustiņu, lai veiktu 64x.\nTuriet ctrl, lai ekrāns būtu atvērts.",
   "gui.immersive_furniture.overwrite_file": "Pārraksta esošo failu!",
   "gui.immersive_furniture.authenticating": "Autentiskuma autentificēšana",
   "gui.immersive_furniture.authenticating_browser": "Pilnīga autentifikācija jūsu pārlūkprogrammā!",
