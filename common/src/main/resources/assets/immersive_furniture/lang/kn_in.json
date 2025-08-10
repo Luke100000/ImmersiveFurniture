@@ -102,6 +102,7 @@
   "gui.immersive_furniture.create": "ಸೃಷ್ಟಿಸು",
   "gui.immersive_furniture.create.hint": "ಊಟದಿಂದ ಹೊಸ ಗೃಹಾಭಿವೃದ್ಧಿಯನ್ನು ನಿರ್ಮിക്കുക.",
   "gui.immersive_furniture.craft": "ಕೆಳಗೂ ಬಿಕ್ಕಿ",
+  "gui.immersive_furniture.craft.hint": "Shift ಅನ್ನು ಹಿಡಿದಿಟ್ಟುಕೊಂಡು 64x ಅನ್ನು ತಯಾರಿಸಿ.\nCtrl ಅನ್ನು ಹಿಡಿದಿಟ್ಟುಕೊಂಡು ಪರದೆ ತೆರೆದಿಟ್ಟುಕೊಳ್ಳಿ.",
   "gui.immersive_furniture.overwrite_file": "ಈಗಲಿಯ ಅಪರೂಪ ಮಣ್ಣೆರೆಡು!",
   "gui.immersive_furniture.authenticating": "ಪರಿಶೀಲಿಸಲಾಗುತ್ತಿದೆ",
   "gui.immersive_furniture.authenticating_browser": "ನಿಮ್ಮ ಬ್ರೌಸರ್‌ನಲ್ಲಿ ದೃಢೀಕರಣವನ್ನು ಪೂರ್ಣಗೊಳಿಸಿ!",
