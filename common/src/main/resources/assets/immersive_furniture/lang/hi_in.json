@@ -102,6 +102,7 @@
   "gui.immersive_furniture.create": "बनाएँ",
   "gui.immersive_furniture.create.hint": "खरोंच से नया फर्नीचर बनाएं।",
   "gui.immersive_furniture.craft": "शिल्प",
+  "gui.immersive_furniture.craft.hint": "64x बनाने के लिए शिफ्ट दबाए रखें।\nस्क्रीन को खुला रखने के लिए कंट्रोल दबाए रखें।",
   "gui.immersive_furniture.overwrite_file": "मौजूदा फ़ाइल को अधिलेखित कर देगा!",
   "gui.immersive_furniture.authenticating": "प्रमाणित करना",
   "gui.immersive_furniture.authenticating_browser": "अपने ब्राउज़र में प्रमाणीकरण पूरा करें!",
