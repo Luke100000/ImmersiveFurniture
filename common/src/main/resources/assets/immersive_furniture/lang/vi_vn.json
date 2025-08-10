@@ -102,6 +102,7 @@
   "gui.immersive_furniture.create": "Tạo",
   "gui.immersive_furniture.create.hint": "Tạo một đồ nội thất mới từ đầu.",
   "gui.immersive_furniture.craft": "Chế tạo",
+  "gui.immersive_furniture.craft.hint": "Nhấn giữ phím Shift để tạo 64x.\nNhấn giữ phím Ctrl để giữ màn hình mở.",
   "gui.immersive_furniture.overwrite_file": "Sẽ ghi đè lên tệp tin hiện tại!",
   "gui.immersive_furniture.authenticating": "Đang xác thực",
   "gui.immersive_furniture.authenticating_browser": "Hoàn thành xác thực trong trình duyệt của bạn!",
