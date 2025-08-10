@@ -102,6 +102,7 @@
   "gui.immersive_furniture.create": "Skapa",
   "gui.immersive_furniture.create.hint": "Skapa nya möbler från grunden.",
   "gui.immersive_furniture.craft": "Tillverka",
+  "gui.immersive_furniture.craft.hint": "Håll Skift till hantverk 64x.\nHåll ned ctrl för att hålla skärmen öppen.",
   "gui.immersive_furniture.overwrite_file": "Kommer att skriva över befintlig fil!",
   "gui.immersive_furniture.authenticating": "Autentiserar",
   "gui.immersive_furniture.authenticating_browser": "Fullständig autentisering i din webbläsare!",
