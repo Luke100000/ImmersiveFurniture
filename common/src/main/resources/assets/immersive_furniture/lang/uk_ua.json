@@ -102,6 +102,7 @@
   "gui.immersive_furniture.create": "Створити",
   "gui.immersive_furniture.create.hint": "Створіть нові меблі з нуля.",
   "gui.immersive_furniture.craft": "Створити",
+  "gui.immersive_furniture.craft.hint": "Натисніть клавішу Shift для виготовлення 64x.\nТримати ctrl, щоб тримати екран відкритим.",
   "gui.immersive_furniture.overwrite_file": "Перезапише наявний файл!",
   "gui.immersive_furniture.authenticating": "Аутентифікація",
   "gui.immersive_furniture.authenticating_browser": "Завершіть автентифікацію у вашому браузері!",
