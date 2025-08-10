@@ -102,6 +102,7 @@
   "gui.immersive_furniture.create": "Oluştur",
   "gui.immersive_furniture.create.hint": "Sıfırdan yeni bir mobilya oluşturun.",
   "gui.immersive_furniture.craft": "Zanaat",
+  "gui.immersive_furniture.craft.hint": "64x yapmak için shift tuşunu basılı tutun.\nEkranı açık tutmak için ctrl tuşunu basılı tutun.",
   "gui.immersive_furniture.overwrite_file": "Mevcut dosyanın üzerine yazacak!",
   "gui.immersive_furniture.authenticating": "Doğrulanıyor",
   "gui.immersive_furniture.authenticating_browser": "Doğrulamayı tarayıcınızda bitirin!",
