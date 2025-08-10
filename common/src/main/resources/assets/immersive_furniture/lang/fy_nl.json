@@ -102,6 +102,7 @@
   "gui.immersive_furniture.create": "Skeppen",
   "gui.immersive_furniture.create.hint": "Skep in nij meubel fan scratch.",
   "gui.immersive_furniture.craft": "Oarskje",
+  "gui.immersive_furniture.craft.hint": "Hâld shift om 64x te meitsjen.\nHâld ctrl om it skerm iepen te hâlden.",
   "gui.immersive_furniture.overwrite_file": "Sil besteande bestân oerskriuwe!",
   "gui.immersive_furniture.authenticating": "Authentifikaasje",
   "gui.immersive_furniture.authenticating_browser": "Foltoane autentifikaasje yn jo browser!",
