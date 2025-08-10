@@ -102,6 +102,7 @@
   "gui.immersive_furniture.create": "Ṣẹ́da",
   "gui.immersive_furniture.create.hint": "Ṣẹ́da ẹ̀rẹ́kùsù tuntun láti ìṣàkóso.",
   "gui.immersive_furniture.craft": "Jẹ́jẹ́",
+  "gui.immersive_furniture.craft.hint": "Dẹ́rè shift láti ṣe 64x.\nDẹ́rè ctrl láti pa iboju mọ́.",
   "gui.immersive_furniture.overwrite_file": "Yóò kọ́kọ́ kọ́ fáìlì tó wà!",
   "gui.immersive_furniture.authenticating": "N ṣe ìmúlò",
   "gui.immersive_furniture.authenticating_browser": "Parí ìmúlò ni wẹẹbu rẹ!",
