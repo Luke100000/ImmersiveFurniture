@@ -102,6 +102,7 @@
   "gui.immersive_furniture.create": "Yarada",
   "gui.immersive_furniture.create.hint": "Tamamilə yeni bir mebel yaradın.",
   "gui.immersive_furniture.craft": "İstehsal et",
+  "gui.immersive_furniture.craft.hint": "64x yaratmaq üçün shift basılı saxlayın.\nEkranı açıq saxlamaq üçün ctrl basılı saxlayın.",
   "gui.immersive_furniture.overwrite_file": "Mövcud faylı ərz etdiyinizə əmin olun!",
   "gui.immersive_furniture.authenticating": "Təsdiq edilir",
   "gui.immersive_furniture.authenticating_browser": "Təsdiqi brauzerinizdə tamamlayın!",
