@@ -102,6 +102,7 @@
   "gui.immersive_furniture.create": "Mepụta",
   "gui.immersive_furniture.create.hint": "Mepụta ngwongwo ọhụrụ site na mmalite.",
   "gui.immersive_furniture.craft": "Craft",
+  "gui.immersive_furniture.craft.hint": "Jide shift ka ịme 64x.\nJide ctrl ka ị giữ ihuenyo mepere.",
   "gui.immersive_furniture.overwrite_file": "Ga nwere ntụpọ achịkọta!",
   "gui.immersive_furniture.authenticating": "Na-enyocha",
   "gui.immersive_furniture.authenticating_browser": "Mezgoro njikọ na nbipụta gị!",
