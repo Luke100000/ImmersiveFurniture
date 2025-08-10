@@ -102,6 +102,7 @@
   "gui.immersive_furniture.create": "建立",
   "gui.immersive_furniture.create.hint": "從零開始創造新傢俱。",
   "gui.immersive_furniture.craft": "工藝",
+  "gui.immersive_furniture.craft.hint": "按住 shift 繪製 64x。\n按住 ctrl 可保持畫面開啟。",
   "gui.immersive_furniture.overwrite_file": "將覆寫現有檔案！",
   "gui.immersive_furniture.authenticating": "驗證中",
   "gui.immersive_furniture.authenticating_browser": "在你的瀏覽器中完成驗證！",
