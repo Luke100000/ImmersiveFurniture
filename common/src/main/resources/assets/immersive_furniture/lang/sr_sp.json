@@ -102,6 +102,7 @@
   "gui.immersive_furniture.create": "Стварај",
   "gui.immersive_furniture.create.hint": "Направи нови намештај од почетка.",
   "gui.immersive_furniture.craft": "Направи",
+  "gui.immersive_furniture.craft.hint": "Држите shift да направите 64x.\nДржите ctrl да задржите екран отвореним.",
   "gui.immersive_furniture.overwrite_file": "Пребрисаће постојећу датотеку!",
   "gui.immersive_furniture.authenticating": "Аутентификација",
   "gui.immersive_furniture.authenticating_browser": "Завршите аутентификацију у вашем прегледачу!",
