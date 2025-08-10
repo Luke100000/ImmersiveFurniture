@@ -102,6 +102,7 @@
   "gui.immersive_furniture.create": "Utwórz",
   "gui.immersive_furniture.create.hint": "Utwórz nowy mebel od zera.",
   "gui.immersive_furniture.craft": "Wytwórz",
+  "gui.immersive_furniture.craft.hint": "Przytrzymaj Shift aby stworzyć 64x.\nPrzytrzymaj ctrl, aby ekran był otwarty.",
   "gui.immersive_furniture.overwrite_file": "Nadpisze istniejący plik!",
   "gui.immersive_furniture.authenticating": "Uwierzytelnianie",
   "gui.immersive_furniture.authenticating_browser": "Pełne uwierzytelnienie w przeglądarce!",
