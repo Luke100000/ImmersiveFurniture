@@ -102,6 +102,7 @@
   "gui.immersive_furniture.create": "Создать",
   "gui.immersive_furniture.create.hint": "Создать новую мебель с нуля.",
   "gui.immersive_furniture.craft": "Ремесло",
+  "gui.immersive_furniture.craft.hint": "Удерживай shift, чтобы крафтить 64x.\nУдерживай ctrl, чтобы держать экран открытым.",
   "gui.immersive_furniture.overwrite_file": "Перезаписать существующий файл!",
   "gui.immersive_furniture.authenticating": "Авторизация...",
   "gui.immersive_furniture.authenticating_browser": "Завершите авторизацию в браузере!",
