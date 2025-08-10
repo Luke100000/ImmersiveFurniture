@@ -102,6 +102,7 @@
   "gui.immersive_furniture.create": "만들기",
   "gui.immersive_furniture.create.hint": "처음부터 새 가구를 만듭니다.",
   "gui.immersive_furniture.craft": "Craft",
+  "gui.immersive_furniture.craft.hint": "Shift 키를 길게 눌러 64배로 제작합니다.\n화면을 계속 열어두려면 Ctrl 키를 누릅니다.",
   "gui.immersive_furniture.overwrite_file": "기존 파일을 덮어씁니다!",
   "gui.immersive_furniture.authenticating": "인증 중",
   "gui.immersive_furniture.authenticating_browser": "브라우저에서 인증을 완료하십시오!",
