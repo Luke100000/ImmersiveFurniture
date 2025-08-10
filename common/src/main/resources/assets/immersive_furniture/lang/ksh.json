@@ -102,6 +102,7 @@
   "gui.immersive_furniture.create": "Erstellen",
   "gui.immersive_furniture.create.hint": "Erstelle ein neues Möbelstück von Grund auf.",
   "gui.immersive_furniture.craft": "Herstellen",
+  "gui.immersive_furniture.craft.hint": "Hälp shift um 64x ze schnieden.\nHälp ctrl um de Bildschrim offen ze halden.",
   "gui.immersive_furniture.overwrite_file": "Wird die vorhandene Datei überschreiben!",
   "gui.immersive_furniture.authenticating": "Authentifizierung",
   "gui.immersive_furniture.authenticating_browser": "Vollziehen Sie die Authentifizierung in Ihrem Browser!",
