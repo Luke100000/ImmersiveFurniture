@@ -102,6 +102,7 @@
   "gui.immersive_furniture.create": "Crează",
   "gui.immersive_furniture.create.hint": "Creează o mobilă nouă de la zero.",
   "gui.immersive_furniture.craft": "Fabrică",
+  "gui.immersive_furniture.craft.hint": "Țineți apăsat comutatorul pentru a crea 64x.\nȚineți apăsat ctrl pentru a menține ecranul deschis.",
   "gui.immersive_furniture.overwrite_file": "Va suprascrie fișierul existent!",
   "gui.immersive_furniture.authenticating": "Autentificare",
   "gui.immersive_furniture.authenticating_browser": "Finalizează autentificarea în browser-ul tău!",
