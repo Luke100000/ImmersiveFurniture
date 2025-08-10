@@ -102,6 +102,7 @@
   "gui.immersive_furniture.create": "Kreya",
   "gui.immersive_furniture.create.hint": "Kreya furveth newydh a-dhiworth arghans.",
   "gui.immersive_furniture.craft": "Kraft",
+  "gui.immersive_furniture.craft.hint": "Sofran shift da whel 64x.\nSofran ctrl da keep an skrin dhe vos.",
   "gui.immersive_furniture.overwrite_file": "A vynn overwriya an fyle a vynn!",
   "gui.immersive_furniture.authenticating": "A vynn authentykya",
   "gui.immersive_furniture.authenticating_browser": "Perthya an authentykya e gans ow browser!",
