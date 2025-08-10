@@ -102,6 +102,7 @@
   "gui.immersive_furniture.create": "作成",
   "gui.immersive_furniture.create.hint": "一から新しい家具を作成します。",
   "gui.immersive_furniture.craft": "クラフト",
+  "gui.immersive_furniture.craft.hint": "Shiftキーを押したまま64倍になります。\n画面を開いたままにするにはctrlを押し続けます。",
   "gui.immersive_furniture.overwrite_file": "既存のファイルを上書きします!",
   "gui.immersive_furniture.authenticating": "認証中",
   "gui.immersive_furniture.authenticating_browser": "ブラウザで認証を完了してください！",
