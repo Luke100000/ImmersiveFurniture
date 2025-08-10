@@ -102,6 +102,7 @@
   "gui.immersive_furniture.create": "Opprett",
   "gui.immersive_furniture.create.hint": "Lag en ny møbel fra bunnen av.",
   "gui.immersive_furniture.craft": "Lag",
+  "gui.immersive_furniture.craft.hint": "Hold ned Shift for å lage 64x.\nHold ctrl for å holde skjermen åpen.",
   "gui.immersive_furniture.overwrite_file": "Vil overskrive eksisterende fil!",
   "gui.immersive_furniture.authenticating": "Autentiserer",
   "gui.immersive_furniture.authenticating_browser": "Fullfør autentisering i nettleseren din!",
