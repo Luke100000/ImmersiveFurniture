@@ -102,6 +102,7 @@
   "gui.immersive_furniture.create": "Vytvoriť stránku",
   "gui.immersive_furniture.create.hint": "Vytvorte nový nábytok od základov.",
   "gui.immersive_furniture.craft": "Remeslo",
+  "gui.immersive_furniture.craft.hint": "Podržte Shift a vytvorte 64x.\nPodržte ctrl, aby ste mali otvorenú obrazovku.",
   "gui.immersive_furniture.overwrite_file": "Prepíše existujúci súbor!",
   "gui.immersive_furniture.authenticating": "Overovanie",
   "gui.immersive_furniture.authenticating_browser": "Kompletné overenie v prehliadači!",
