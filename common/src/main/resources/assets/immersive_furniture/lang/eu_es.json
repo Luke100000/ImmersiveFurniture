@@ -102,6 +102,7 @@
   "gui.immersive_furniture.create": "Sortu",
   "gui.immersive_furniture.create.hint": "Sortu altzari berri bat hasieratik.",
   "gui.immersive_furniture.craft": "Eraiki",
+  "gui.immersive_furniture.craft.hint": "Tatu 64x sortzeko shift mantendu.\nEgurra itxi mantentzeko ctrl ukatu.",
   "gui.immersive_furniture.overwrite_file": "Existitzen den fitxategia idazten du!",
   "gui.immersive_furniture.authenticating": "Egin behar duen baieztapena",
   "gui.immersive_furniture.authenticating_browser": "Zure nabigatzailean baieztapena egin!",
