@@ -102,6 +102,7 @@
   "gui.immersive_furniture.create": "შექმნა",
   "gui.immersive_furniture.create.hint": "ახალი ავეჯის შექმნა.",
   "gui.immersive_furniture.craft": "გააკეთეთ",
+  "gui.immersive_furniture.craft.hint": "დაიჭირეთ Shift 64x-ის შესაქმნელად.\nდაიჭირეთ Ctrl, რათა ეკრანი დარჩეს ღია.",
   "gui.immersive_furniture.overwrite_file": "შეიძლება ასაწერად არსებული ფაილზე გაგზავნა!",
   "gui.immersive_furniture.authenticating": "ავთენტიფიკაცია",
   "gui.immersive_furniture.authenticating_browser": "გავრცელებაში მიაწვდეთ ავტორიზაცია!",
