@@ -102,6 +102,7 @@
   "gui.immersive_furniture.create": "Cruthaigh",
   "gui.immersive_furniture.create.hint": "Cruthaigh troscán nua ó thús.",
   "gui.immersive_furniture.craft": "Craft",
+  "gui.immersive_furniture.craft.hint": "Coimeád shift le haghaidh 64x a chruthú.\nCoimeád ctrl le cur ar atriomh an scáileáin.",
   "gui.immersive_furniture.overwrite_file": "Scriosfaidh sé comhad atá ann cheana!",
   "gui.immersive_furniture.authenticating": "Ag aithint",
   "gui.immersive_furniture.authenticating_browser": "Críochnaigh aithint i do bhrabhsálaí!",
