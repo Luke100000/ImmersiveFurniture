@@ -38,9 +38,11 @@ public class FurnitureData {
     public static final FurnitureData EMPTY = new FurnitureData();
 
     public String name = "Empty";
-    public String tag = "Miscellaneous";
+    public String tag = "miscellaneous";
     public int lightLevel;
     public int inventorySize;
+    public boolean toggleWithRightClick;
+    public boolean toggleLight;
 
     public int contentid = -1;
     public String author = "Unknown";
@@ -66,6 +68,8 @@ public class FurnitureData {
         this.tag = NBTHelper.getString(tag, "Tag", this.tag);
         this.lightLevel = NBTHelper.getInt(tag, "LightLevel", lightLevel);
         this.inventorySize = NBTHelper.getInt(tag, "InventorySize", inventorySize);
+        this.toggleWithRightClick = NBTHelper.getBoolean(tag, "ToggleWithRightClick", toggleWithRightClick);
+        this.toggleLight = NBTHelper.getBoolean(tag, "ToggleLight", toggleLight);
         this.contentid = NBTHelper.getInt(tag, "ContentID", contentid);
         this.author = NBTHelper.getString(tag, "Author", author);
         this.originalAuthor = NBTHelper.getString(tag, "OriginalAuthor", originalAuthor);
@@ -90,6 +94,8 @@ public class FurnitureData {
         this.tag = data.tag;
         this.lightLevel = data.lightLevel;
         this.inventorySize = data.inventorySize;
+        this.toggleWithRightClick = data.toggleWithRightClick;
+        this.toggleLight = data.toggleLight;
         this.author = data.author;
         this.originalAuthor = data.originalAuthor.isEmpty() ? data.author : data.originalAuthor;
         this.sources.addAll(data.sources);
@@ -111,6 +117,8 @@ public class FurnitureData {
         tag.putString("Tag", this.tag);
         tag.putInt("LightLevel", lightLevel);
         tag.putInt("InventorySize", inventorySize);
+        tag.putBoolean("ToggleWithRightClick", toggleWithRightClick);
+        tag.putBoolean("ToggleLight", toggleLight);
         tag.putInt("ContentID", contentid);
         tag.putString("Author", author);
         tag.putString("OriginalAuthor", originalAuthor);

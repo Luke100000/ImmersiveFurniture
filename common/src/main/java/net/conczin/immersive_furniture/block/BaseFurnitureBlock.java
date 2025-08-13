@@ -43,6 +43,7 @@ import java.util.List;
 public abstract class BaseFurnitureBlock extends Block implements SimpleWaterloggedBlock {
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
+    public static final BooleanProperty ACTIVE = BooleanProperty.create("active");
 
     public BaseFurnitureBlock(Properties properties) {
         super(properties);
@@ -59,6 +60,7 @@ public abstract class BaseFurnitureBlock extends Block implements SimpleWaterlog
             Vec3 click = new Vec3(hit.getLocation().x - pos.getX(), hit.getLocation().y - pos.getY(), hit.getLocation().z - pos.getZ());
             FurnitureData.PoseOffset offset = data.getClosestPose(click, state.getValue(FACING));
 
+            // Interact with the pose
             boolean consume = false;
             if (offset != null) {
                 // Remember interaction for the player for some injection purposes
@@ -71,12 +73,15 @@ public abstract class BaseFurnitureBlock extends Block implements SimpleWaterlog
                 consume = true;
             }
 
-            if (level instanceof ServerLevel serverLevel && (data.hasSounds() || data.hasParticles())) {
-                Network.sendToAllPlayers(serverLevel.getServer(), new FurnitureInteractMessage(pos));
+            // This furniture can be toggled with a right-click
+            if (data.toggleWithRightClick) {
+                toggle(data, state, level, pos);
                 consume = true;
             }
 
-            if (toggleLight(data, state, level, pos)) {
+            // This furniture has sound or particle effects
+            if (level instanceof ServerLevel serverLevel && (data.hasSounds() || data.hasParticles())) {
+                Network.sendToAllPlayers(serverLevel.getServer(), new FurnitureInteractMessage(pos));
                 consume = true;
             }
 
@@ -85,8 +90,14 @@ public abstract class BaseFurnitureBlock extends Block implements SimpleWaterlog
         return InteractionResult.PASS;
     }
 
-    public boolean toggleLight(FurnitureData data, BlockState state, Level level, BlockPos pos) {
-        return false;
+    public void toggle(FurnitureData data, BlockState state, Level level, BlockPos pos) {
+        state = state.setValue(ACTIVE, !state.getValue(ACTIVE));
+        state = toggleLight(data, state, level, pos);
+        level.setBlock(pos, state, 3);
+    }
+
+    public BlockState toggleLight(FurnitureData data, BlockState state, Level level, BlockPos pos) {
+        return state;
     }
 
     public void onInteract(Level level, BlockState state, BlockPos pos, Player player) {

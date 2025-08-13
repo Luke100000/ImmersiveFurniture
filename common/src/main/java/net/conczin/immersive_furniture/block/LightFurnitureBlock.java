@@ -25,7 +25,8 @@ public class LightFurnitureBlock extends BaseFurnitureBlock {
                 .setValue(IDENTIFIER, 0)
                 .setValue(LIGHT, 0)
                 .setValue(WATERLOGGED, false)
-                .setValue(FACING, Direction.NORTH));
+                .setValue(FACING, Direction.NORTH)
+                .setValue(ACTIVE, false));
     }
 
     @Override
@@ -40,7 +41,7 @@ public class LightFurnitureBlock extends BaseFurnitureBlock {
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(IDENTIFIER, LIGHT, WATERLOGGED, FACING);
+        builder.add(IDENTIFIER, LIGHT, WATERLOGGED, FACING, ACTIVE);
     }
 
     @Override
@@ -51,16 +52,7 @@ public class LightFurnitureBlock extends BaseFurnitureBlock {
     }
 
     @Override
-    public boolean toggleLight(FurnitureData data, BlockState state, Level level, BlockPos pos) {
-        if (state.getValue(LIGHT) == 0) {
-            // Turn on the light
-            state = state.setValue(LIGHT, (int) Math.ceil(data.lightLevel / 3.0f));
-            level.setBlockAndUpdate(pos, state);
-        } else {
-            // Turn off the light
-            state = state.setValue(LIGHT, 0);
-            level.setBlockAndUpdate(pos, state);
-        }
-        return true;
+    public BlockState toggleLight(FurnitureData data, BlockState state, Level level, BlockPos pos) {
+        return state.setValue(LIGHT, data.toggleLight && state.getValue(ACTIVE) ? 0 : (int) Math.ceil(data.lightLevel / 3.0f));
     }
 }
