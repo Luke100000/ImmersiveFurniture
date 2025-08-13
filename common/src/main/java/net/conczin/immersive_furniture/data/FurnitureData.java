@@ -56,6 +56,7 @@ public class FurnitureData {
 
     private String hash;
     private final Map<Direction, VoxelShape> cachedShapes = new ConcurrentHashMap<>();
+    private final Map<Integer, VoxelShape> cachedSubShapes = new ConcurrentHashMap<>();
     private final Set<Direction> requestedShapes = new ConcurrentSkipListSet<>();
     public long lastTick = 0;
 
@@ -214,6 +215,7 @@ public class FurnitureData {
     public void dirty() {
         hash = null;
         cachedShapes.clear();
+        cachedSubShapes.clear();
         requestedShapes.clear();
         for (Element element : elements) {
             element.rotationAxes = null;
@@ -425,6 +427,13 @@ public class FurnitureData {
         return cachedShapes.computeIfAbsent(rotation, this::computeShape);
     }
 
+    public VoxelShape getShape(Direction rotation, int offsetX, int offsetY, int offsetZ) {
+        return cachedSubShapes.computeIfAbsent(
+                (((rotation.ordinal() * 31) + offsetX) * 31 + offsetY) * 31 + offsetZ,
+                key -> computeShape(rotation, offsetX, offsetY, offsetZ)
+        );
+    }
+
     public VoxelShape getShapeLazy(Direction rotation) {
         if (cachedShapes.containsKey(rotation)) {
             return cachedShapes.get(rotation);
@@ -436,6 +445,7 @@ public class FurnitureData {
         return null;
     }
 
+    // Computes the entire shape for visualization
     private VoxelShape computeShape(Direction r) {
         return elements.stream()
                 .filter(e -> e.type == ElementType.ELEMENT && !e.isFlat())
@@ -443,6 +453,56 @@ public class FurnitureData {
                 .reduce((a, b) -> Shapes.joinUnoptimized(a, b, BooleanOp.OR))
                 .map(VoxelShape::optimize)
                 .orElse(Block.box(2, 2, 2, 14, 14, 14));
+    }
+
+    public int getRotatedX(Direction facing, int x, int z) {
+        return switch (facing) {
+            case SOUTH -> -x;
+            case EAST -> -z;
+            case WEST -> z;
+            default -> x;
+        };
+    }
+
+    public int getRotatedZ(Direction facing, int x, int z) {
+        return switch (facing) {
+            case SOUTH -> -z;
+            case EAST -> x;
+            case WEST -> -x;
+            default -> z;
+        };
+    }
+
+    // Computes a fraction of a shape for collision
+    public VoxelShape computeShape(Direction rotation, int offsetX, int offsetY, int offsetZ) {
+        Vector3f start = rotate(new Vector3f(
+                offsetX == 0 ? -8 : 0,
+                offsetY == 0 ? -8 : 0,
+                offsetZ == 0 ? -8 : 0
+        ), rotation);
+
+        Vector3f stop = rotate(new Vector3f(
+                offsetX == size.x - 1 ? 24 : 16,
+                offsetY == size.y - 1 ? 24 : 16,
+                offsetZ == size.z - 1 ? 24 : 16
+        ), rotation);
+
+        return Shapes.join(
+                getShape(rotation).move(
+                        -getRotatedX(rotation, offsetX, offsetZ),
+                        -offsetY,
+                        -getRotatedZ(rotation, offsetX, offsetZ)
+                ),
+                Block.box(
+                        Math.min(start.x, stop.x),
+                        Math.min(start.y, stop.y),
+                        Math.min(start.z, stop.z),
+                        Math.max(start.x, stop.x),
+                        Math.max(start.y, stop.y),
+                        Math.max(start.z, stop.z)
+                ),
+                BooleanOp.AND
+        );
     }
 
     private static Vector3f rotate(Vector3f vec, Direction direction) {

@@ -1,5 +1,6 @@
 package net.conczin.immersive_furniture.block;
 
+import net.conczin.immersive_furniture.data.FurnitureData;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
@@ -79,11 +80,15 @@ public class FurnitureProxyBlock extends Block {
             BlockPos basePos = getBasePos(state, pos);
             BlockState baseState = level.getBlockState(basePos);
             if (baseState.getBlock() instanceof BaseFurnitureBlock baseBlock) {
-                return baseBlock.getShape(baseState, level, basePos, context).move(
-                        basePos.getX() - pos.getX(),
-                        basePos.getY() - pos.getY(),
-                        basePos.getZ() - pos.getZ()
-                );
+                FurnitureData data = baseBlock.getData(state, level, basePos);
+                if (data != null) {
+                    return data.getShape(
+                            state.getValue(FACING),
+                            state.getValue(OFFSET_X),
+                            state.getValue(OFFSET_Y),
+                            state.getValue(OFFSET_Z)
+                    );
+                }
             }
         }
 

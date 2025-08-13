@@ -6,6 +6,7 @@
     * Can be toggled to also affect light
 * Comparator now reads inventory fill state
 * Optimized and threaded shape generation to avoid spikes at super complex models
+    * Only the selected block of multi-block furniture is now outlined when hovered
 * Beds now allow respawning
 * Fixed position when sleeping
 * Dismount position on sitting furniture is now way more reasonable
@@ -66,7 +67,7 @@ Initial release
 * Datapack support
 * On flat elements (sprites mostly) the direction is picked oddly
 * Better dismounting
-* Give elements a mask based on active state
+* Give elements a mask based on the active state
     * This automatically allows for doors and stuff
     * This requires two sets of collisions and models
     * Needs a preview button
