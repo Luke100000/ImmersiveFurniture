@@ -70,7 +70,7 @@ public abstract class BaseFurnitureBlock extends Block implements SimpleWaterlog
                 if (offset.pose() == Pose.SLEEPING) {
                     startSleeping(pos, player, offset);
                 } else if (offset.pose() == Pose.SITTING) {
-                    startSitting(level, pos, player, offset);
+                    startSitting(data, level, pos, state.getValue(FACING), player, offset);
                 }
                 consume = true;
             }
@@ -136,14 +136,15 @@ public abstract class BaseFurnitureBlock extends Block implements SimpleWaterlog
         }
     }
 
-    private static void startSitting(Level level, BlockPos pos, Player player, FurnitureData.PoseOffset offset) {
+    private static void startSitting(FurnitureData data, Level level, BlockPos pos, Direction direction, Player player, FurnitureData.PoseOffset offset) {
         // Create an entity to fake sitting
         if (!level.isClientSide) {
-            SittingEntity sittingEntity = new SittingEntity(level, new Vec3(
+            Vec3 position = new Vec3(
                     pos.getX() + offset.offset().x,
                     pos.getY() + offset.offset().y,
                     pos.getZ() + offset.offset().z
-            ), new Vec3(player.getX(), player.getY(), player.getZ()));
+            );
+            SittingEntity sittingEntity = new SittingEntity(level, position, pos, data.size, direction, new Vec3(player.getX(), player.getY(), player.getZ()));
             sittingEntity.setYRot(offset.rotation());
             player.startRiding(sittingEntity);
             sittingEntity.clampRotation(player);

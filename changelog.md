@@ -8,6 +8,7 @@
 * Optimized and threaded shape generation to avoid spikes at super complex models
 * Beds now allow respawning
 * Fixed position when sleeping
+* Dismount position on sitting furniture is now way more reasonable
 * New worlds can now be copied without data loss
 * Destroying furniture now kicks off passengers
 * You can now hold space to keep the screen open when crafting furniture
@@ -59,7 +60,7 @@
 
 Initial release
 
-# Bugs
+# TODO
 
 * Blockbench/JSON block and item model import
 * Datapack support
