@@ -55,6 +55,7 @@ public abstract class BaseFurnitureBlock extends Block implements SimpleWaterlog
         if (hand != InteractionHand.MAIN_HAND) {
             return InteractionResult.PASS;
         }
+
         FurnitureData data = getData(state, level, pos);
         if (data != null) {
             // Find closest pose element
@@ -74,29 +75,33 @@ public abstract class BaseFurnitureBlock extends Block implements SimpleWaterlog
                 consume = true;
             }
 
-            // This furniture can be toggled with a right-click
-            if (data.toggleWithRightClick) {
-                toggle(data, state, level, pos);
-                consume = true;
-            }
-
-            // This furniture has sound or particle effects
-            if (level instanceof ServerLevel serverLevel && (data.hasSounds() || data.hasParticles())) {
-                Network.sendToAllPlayers(serverLevel.getServer(), new FurnitureInteractMessage(pos));
-                consume = true;
-            }
+            consume = trigger(data, state, level, pos, data.toggleWithRightClick) || consume;
 
             return consume ? InteractionResult.CONSUME : InteractionResult.PASS;
+        } else {
+            return InteractionResult.PASS;
         }
-        return InteractionResult.PASS;
     }
 
-    public void toggle(FurnitureData data, BlockState state, Level level, BlockPos pos) {
-        state = state.cycle(ACTIVE);
-        if (data != null) {
+    public boolean trigger(FurnitureData data, BlockState state, Level level, BlockPos pos, boolean toggle) {
+        boolean consume = false;
+
+        // This furniture can be toggled with a right-click
+        if (toggle) {
+            state = state.cycle(ACTIVE);
             state = toggleLight(data, state, level, pos);
+            boolean requiresRerender = false;
+            level.setBlock(pos, state, requiresRerender ? 3 : 7);
+            consume = true;
         }
-        level.setBlock(pos, state, 3);
+
+        // This furniture has sound or particle effects
+        if (level instanceof ServerLevel serverLevel && (data.hasSounds() || data.hasParticles())) {
+            Network.sendToAllPlayers(serverLevel.getServer(), new FurnitureInteractMessage(pos));
+            consume = true;
+        }
+
+        return consume;
     }
 
     public BlockState toggleLight(FurnitureData data, BlockState state, Level level, BlockPos pos) {
@@ -285,7 +290,9 @@ public abstract class BaseFurnitureBlock extends Block implements SimpleWaterlog
             boolean flag = state.getValue(ACTIVE);
             if (flag != level.hasNeighborSignal(pos)) {
                 FurnitureData data = getData(state, level, pos);
-                toggle(data, state, level, pos);
+                if (data != null) {
+                    trigger(data, state, level, pos, true);
+                }
             }
         }
     }

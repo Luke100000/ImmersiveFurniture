@@ -63,13 +63,12 @@ Initial release
 
 * Blockbench/JSON block and item model import
 * Datapack support
-* Only play the closest sound + particles and those stacked?
-    * Needs a flag somewhere, should not be defaulted
 * On flat elements (sprites mostly) the direction is picked oddly
-* Redstone signal and turn light on and off
-    * Inventory content, or on-right-click (strength slider?)
-* Redstone input shall trigger right click
 * Better dismounting
+* Give elements a mask based on active state
+    * This automatically allows for doors and stuff
+    * This requires two sets of collisions and models
+    * Needs a preview button
 
 ## Backend
 

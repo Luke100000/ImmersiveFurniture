@@ -146,7 +146,7 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
         addRenderableWidget(helpButton);
 
         // Night-mode button
-        MutableComponent nightModeText = Component.translatable("gui.immersive_furniture.nightmode");
+        MutableComponent nightModeText = Component.translatable(nightMode ? "gui.immersive_furniture.nightmode" : "gui.immersive_furniture.daymode");
         StateImageButton nightModeButton = new StateImageButton(
                 leftPos + windowWidth + 1, topPos + windowHeight - 19, 16, 16,
                 256 - 48, 160, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE,

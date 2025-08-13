@@ -95,14 +95,14 @@ public class SettingsComponent extends ScreenComponent {
             screen.data.toggleWithRightClick = !screen.data.toggleWithRightClick;
             screen.init();
         });
-        rightClickToggle.setEnabled(screen.data.toggleWithRightClick);
+        rightClickToggle.setEnabled(!screen.data.toggleWithRightClick);
 
         // Toggle light
         StateImageButton lightToggle = addToggleButton(leftPos + 24, togglesY, 16, 208, 160, "gui.immersive_furniture.toggle_light", () -> {
             screen.data.toggleLight = !screen.data.toggleLight;
             screen.init();
         });
-        lightToggle.setEnabled(screen.data.toggleLight);
+        lightToggle.setEnabled(!screen.data.toggleLight);
 
         // Save
         addButton("gui.immersive_furniture.save", b -> {
