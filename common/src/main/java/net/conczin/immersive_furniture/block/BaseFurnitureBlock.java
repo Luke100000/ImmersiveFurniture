@@ -18,6 +18,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
@@ -91,8 +92,10 @@ public abstract class BaseFurnitureBlock extends Block implements SimpleWaterlog
     }
 
     public void toggle(FurnitureData data, BlockState state, Level level, BlockPos pos) {
-        state = state.setValue(ACTIVE, !state.getValue(ACTIVE));
-        state = toggleLight(data, state, level, pos);
+        state = state.cycle(ACTIVE);
+        if (data != null) {
+            state = toggleLight(data, state, level, pos);
+        }
         level.setBlock(pos, state, 3);
     }
 
@@ -265,6 +268,26 @@ public abstract class BaseFurnitureBlock extends Block implements SimpleWaterlog
         }
 
         super.playerWillDestroy(level, pos, state, player);
+    }
+
+    // Redstone behavior section
+
+    public boolean hasAnalogOutputSignal(BlockState state) {
+        return true;
+    }
+
+    public int getAnalogOutputSignal(BlockState blockState, Level level, BlockPos pos) {
+        return AbstractContainerMenu.getRedstoneSignalFromBlockEntity(level.getBlockEntity(pos));
+    }
+
+    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos fromPos, boolean isMoving) {
+        if (!level.isClientSide) {
+            boolean flag = state.getValue(ACTIVE);
+            if (flag != level.hasNeighborSignal(pos)) {
+                FurnitureData data = getData(state, level, pos);
+                toggle(data, state, level, pos);
+            }
+        }
     }
 
     /**

@@ -1,5 +1,10 @@
 # 0.0.8
 
+* Furniture now has an active state
+    * Reacts to redstone signals
+    * Can be toggled with right-click (if enabled in the editor)
+    * Can be toggled to also affect light
+* Comparator now reads inventory fill state
 * Optimized and threaded shape generation to avoid spikes at super complex models
 * Beds now allow respawning
 * Fixed position when sleeping
