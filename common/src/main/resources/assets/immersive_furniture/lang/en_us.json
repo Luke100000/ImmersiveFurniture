@@ -133,7 +133,8 @@
   "gui.immersive_furniture.back": "Back",
 
   "gui.immersive_furniture.sort.date": "Sort by date",
-  "gui.immersive_furniture.sort.favorites": "Sort by favorites",
+  "gui.immersive_furniture.sort.likes": "Sort by favorites",
+  "gui.immersive_furniture.sort.recommendations": "Recommended ordering",
 
   "gui.immersive_furniture.tab.cancel": "Cancel",
 

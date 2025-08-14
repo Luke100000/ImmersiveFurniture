@@ -14,6 +14,7 @@
 * Destroying furniture now kicks off passengers
 * You can now hold space to keep the screen open when crafting furniture
 * Crafting sounds
+* Added better furniture sorting to balance popular and new furniture
 
 # 0.0.7
 

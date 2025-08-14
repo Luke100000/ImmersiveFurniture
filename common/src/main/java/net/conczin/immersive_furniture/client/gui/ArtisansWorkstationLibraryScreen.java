@@ -45,6 +45,34 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
         SUBMISSIONS,
     }
 
+    public enum SortingMode {
+        DATE(88),
+        LIKES(66),
+        RECOMMENDATIONS(154);
+
+        private final int u;
+
+        SortingMode(int u) {
+            this.u = u;
+        }
+
+        public SortingMode cycle() {
+            return switch (this) {
+                case DATE -> LIKES;
+                case LIKES -> RECOMMENDATIONS;
+                case RECOMMENDATIONS -> DATE;
+            };
+        }
+
+        public int getU() {
+            return u;
+        }
+
+        public String key() {
+            return name().toLowerCase(Locale.ROOT);
+        }
+    }
+
     private boolean uploading = false;
     private boolean awaitingAuthentication = false;
     private boolean awaitingSearch = false;
@@ -55,7 +83,7 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
     private boolean isBrowserOpen = false;
     private boolean authenticated = false;
 
-    private boolean sortByDate = false;
+    private SortingMode order = SortingMode.RECOMMENDATIONS;
     private String tagFilter = "miscellaneous";
 
     Tab tab = Tab.GLOBAL;
@@ -140,12 +168,12 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
 
             // Sort by date
             addRenderableWidget(
-                    new ImageButton(leftPos + 3, y, 22, 22, sortByDate ? 88 : 66, 114, 22, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE, b -> {
-                        sortByDate = !sortByDate;
+                    new ImageButton(leftPos + 3, y, 22, 22, order.getU(), 114, 22, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE, b -> {
+                        order = order.cycle();
                         shouldSearch = true;
                         init();
                     })
-            ).setTooltip(Tooltip.create(Component.translatable(sortByDate ? "gui.immersive_furniture.sort.favorites" : "gui.immersive_furniture.sort.date")));
+            ).setTooltip(Tooltip.create(Component.translatable("gui.immersive_furniture.sort." + order.key())));
 
             // Page buttons
             addRenderableWidget(
@@ -581,7 +609,7 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
                 Response response = request(API.HttpMethod.GET, ContentListResponse::new, "v2/content/furniture", Map.of(
                         "whitelist", lastSearch + (tagFilter.equals("miscellaneous") ? "" : "," + tagFilter),
                         "blacklist", "",
-                        "order", sortByDate ? "date" : "likes",
+                        "order", order.key(),
                         "track", tab == Tab.FAVORITES ? "likes" : tab == Tab.SUBMISSIONS ? "submissions" : "all",
                         "descending", "true",
                         "offset", String.valueOf(page * ENTRIES_PER_PAGE),
