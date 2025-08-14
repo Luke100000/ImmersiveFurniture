@@ -157,6 +157,7 @@ public abstract class BaseFurnitureBlock extends Block implements SimpleWaterlog
 
     @Override
     public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
+        if (state.getValue(ACTIVE)) return;
         FurnitureData data = getData(state, level, pos);
         if (data != null) {
             Direction facing = state.getValue(FACING);
