@@ -80,7 +80,7 @@ public class FurnitureProxyBlock extends Block {
             BlockPos basePos = getBasePos(state, pos);
             BlockState baseState = level.getBlockState(basePos);
             if (baseState.getBlock() instanceof BaseFurnitureBlock baseBlock) {
-                FurnitureData data = baseBlock.getData(state, level, basePos);
+                FurnitureData data = baseBlock.getData(baseState, level, basePos);
                 if (data != null) {
                     return data.getShape(
                             state.getValue(FACING),

@@ -1,3 +1,7 @@
+# 0.0.9
+
+* Fixed a crash
+
 # 0.0.8
 
 * Furniture now has an active state
@@ -12,7 +16,7 @@
 * Dismount position on sitting furniture is now way more reasonable
 * New worlds can now be copied without data loss
 * Destroying furniture now kicks off passengers
-* You can now hold space to keep the screen open when crafting furniture
+* You can now hold ctrl to keep the screen open when crafting furniture
 * Crafting sounds
 * Added better furniture sorting to balance popular and new furniture
 
