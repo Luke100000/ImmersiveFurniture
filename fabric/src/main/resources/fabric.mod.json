@@ -13,7 +13,7 @@
     "issues": "${mod_issues}"
   },
   "license": "${license}",
-  "icon": "assets/immersive_furniture/icon.png",
+  "icon": "icon.png",
   "environment": "*",
   "entrypoints": {
     "main": [
