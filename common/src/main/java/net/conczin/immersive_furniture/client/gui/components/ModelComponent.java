@@ -107,6 +107,13 @@ public class ModelComponent extends ScreenComponent {
         // Duplicate
         addButton(leftPos + 42, topPos + height - 22, 16, 160, 192, "gui.immersive_furniture.duplicate_element", this::duplicateElements);
 
+        // Mask toggle
+        int u = 208 + (firstElement.mask - 1) * 16;
+        addToggleButton(leftPos + 78, topPos + height - 22, 16, u, 224, "gui.immersive_furniture.mask." + firstElement.mask, () -> {
+            screen.selectedElements.forEach(e -> e.mask = e.mask % 3 + 1);
+            screen.init();
+        }).setEnabled(false);
+
         // Position
         int y = topPos + 17;
         px = addNewFloatBox(leftPos + 6, y, 28);
@@ -229,6 +236,13 @@ public class ModelComponent extends ScreenComponent {
             addToggleButton(leftPos + 6 + type.ordinal() * 18, topPos + 94, 16, 176 + type.ordinal() * 16, 192, "gui.immersive_furniture.element_type." + type.name().toLowerCase(), () -> {
                 screen.selectedElements.forEach(e -> {
                     e.type = type;
+
+                    // Update mask based on type: 1 for emitters, 3 otherwise
+                    if (type == FurnitureData.ElementType.PARTICLE_EMITTER || type == FurnitureData.ElementType.SOUND_EMITTER) {
+                        e.mask = 1;
+                    } else {
+                        e.mask = 3;
+                    }
                     e.sanityCheck();
                 });
                 screen.init();

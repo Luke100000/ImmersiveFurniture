@@ -42,7 +42,7 @@ public abstract class ArtisansWorkstationScreen extends Screen {
     int leftPos;
     int topPos;
 
-    boolean nightMode = false;
+    boolean nightMode = false; // TODO: There is no button yet in the library screen
 
     public ArtisansWorkstationScreen() {
         super(TITLE);

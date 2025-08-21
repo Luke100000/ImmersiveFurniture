@@ -16,6 +16,7 @@ import net.conczin.immersive_furniture.data.ModelUtils;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.core.Direction;
@@ -67,6 +68,7 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
     Page currentPage = Page.MODEL;
 
     boolean backwardsCheckerPlane = true;
+    int currentState = 0;
 
     public enum Page {
         MODEL,
@@ -146,36 +148,40 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
         addRenderableWidget(helpButton);
 
         // Night-mode button
-        MutableComponent nightModeText = Component.translatable(nightMode ? "gui.immersive_furniture.nightmode" : "gui.immersive_furniture.daymode");
-        StateImageButton nightModeButton = new StateImageButton(
-                leftPos + windowWidth + 1, topPos + windowHeight - 19, 16, 16,
-                256 - 48, 160, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE,
-                b -> {
+        sideButton(nightMode ? "gui.immersive_furniture.nightmode" : "gui.immersive_furniture.daymode",
+                topPos + windowHeight - 19, 208, 160, nightMode, b -> {
                     nightMode = !nightMode;
                     init();
-                },
-                nightModeText
-        );
-        nightModeButton.setTooltip(Tooltip.create(nightModeText));
-        nightModeButton.setEnabled(nightMode);
-        addRenderableWidget(nightModeButton);
+                });
 
         // Backwards checker plane button
-        MutableComponent backwardsCheckerPlaneText = Component.translatable("gui.immersive_furniture.backwards_checkerplane");
-        StateImageButton backwardsCheckerButton = new StateImageButton(
-                leftPos + windowWidth + 1, topPos + windowHeight - 36, 16, 16,
-                256 - 32, 160, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE,
-                b -> {
+        sideButton("gui.immersive_furniture.backwards_checkerplane",
+                topPos + windowHeight - 36, 224, 160, backwardsCheckerPlane, b -> {
                     backwardsCheckerPlane = !backwardsCheckerPlane;
                     init();
-                },
-                backwardsCheckerPlaneText
-        );
-        backwardsCheckerButton.setTooltip(Tooltip.create(backwardsCheckerPlaneText));
-        backwardsCheckerButton.setEnabled(backwardsCheckerPlane);
-        addRenderableWidget(backwardsCheckerButton);
+                });
+
+        // Current state toggle button
+        sideButton("gui.immersive_furniture.current_state",
+                topPos + windowHeight - 53, 208 + currentState * 16, 224, false, b -> {
+                    currentState = (currentState == 0) ? 1 : 0;
+                    init();
+                });
 
         addHistory();
+    }
+
+    private void sideButton(String tooltip, int y, int u, int v, boolean enabled, Button.OnPress action) {
+        MutableComponent text = Component.translatable(tooltip);
+        StateImageButton state = new StateImageButton(
+                leftPos + windowWidth + 1, y, 16, 16,
+                u, v, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE,
+                action,
+                text
+        );
+        state.setTooltip(Tooltip.create(text));
+        state.setEnabled(enabled);
+        addRenderableWidget(state);
     }
 
     private void cancel() {

@@ -1,3 +1,7 @@
+# 0.1.0
+
+* Some special sounds are no longer played globally
+
 # 0.0.9
 
 * Fixed a crash

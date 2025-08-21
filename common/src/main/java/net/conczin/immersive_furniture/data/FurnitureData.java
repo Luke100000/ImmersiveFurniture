@@ -594,6 +594,7 @@ public class FurnitureData {
         public ElementType type = ElementType.ELEMENT;
         public int color = -1;
         public int emission = 0;
+        public int mask = 3;
         public Material material;
         public ParticleEmitter particleEmitter;
         public SoundEmitter soundEmitter;
@@ -626,6 +627,7 @@ public class FurnitureData {
             this.soundEmitter = new SoundEmitter(tag.getCompound("SoundEmitter"));
             this.playerPose = new PlayerPose(tag.getCompound("PlayerPose"));
             this.sprite = new Sprite(tag.getCompound("Sprite"));
+            this.mask = NBTHelper.getInt(tag, "Mask", this.mask);
 
             CompoundTag bakedTextureTag = tag.getCompound("BakedTexture");
             for (String key : bakedTextureTag.getAllKeys()) {
@@ -641,6 +643,7 @@ public class FurnitureData {
             this.type = element.type;
             this.color = element.color;
             this.emission = element.emission;
+            this.mask = element.mask;
             this.material = new Material(element.material);
             this.particleEmitter = new ParticleEmitter(element.particleEmitter);
             this.soundEmitter = new SoundEmitter(element.soundEmitter);
@@ -659,6 +662,7 @@ public class FurnitureData {
             tag.putString("Type", type.name().toLowerCase());
             tag.putInt("Color", color);
             tag.putInt("Emission", emission);
+            tag.putInt("Mask", mask);
 
             if (type == ElementType.ELEMENT) {
                 tag.put("Material", material.toTag());
