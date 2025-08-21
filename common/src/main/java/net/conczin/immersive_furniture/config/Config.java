@@ -11,6 +11,9 @@ public final class Config extends JsonConfig {
     public List<String> favorites = new LinkedList<>();
     public String immersiveLibraryUrl = "https://mca.conczin.net";
 
+
+    public int maximumInteractDistance = 128;
+
     // How many times the same furniture needs to be placed before low-memory mode is activated.
     // That mode is limited to 1024 unique furniture and cannot be cleaned up again.
     // All other furniture is more expensive since they require a block entity.

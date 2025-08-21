@@ -1,6 +1,7 @@
 package net.conczin.immersive_furniture.block;
 
 import net.conczin.immersive_furniture.InteractionManager;
+import net.conczin.immersive_furniture.config.Config;
 import net.conczin.immersive_furniture.data.FurnitureData;
 import net.conczin.immersive_furniture.entity.SittingEntity;
 import net.conczin.immersive_furniture.item.FurnitureItem;
@@ -97,7 +98,12 @@ public abstract class BaseFurnitureBlock extends Block implements SimpleWaterlog
 
         // This furniture has sound or particle effects
         if (level instanceof ServerLevel serverLevel && (data.hasSounds() || data.hasParticles())) {
-            Network.sendToAllPlayers(serverLevel.getServer(), new FurnitureInteractMessage(pos));
+            FurnitureInteractMessage message = new FurnitureInteractMessage(pos);
+            int maxDist = Config.getInstance().maximumInteractDistance;
+            serverLevel.getServer().getPlayerList().getPlayers().forEach(p -> {
+                double dist = pos.distToCenterSqr(p.getX(), p.getY(), p.getZ());
+                if (maxDist <= 0 || dist < maxDist * maxDist) Network.sendToPlayer(message, p);
+            });
             consume = true;
         }
 
