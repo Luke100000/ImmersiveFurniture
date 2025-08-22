@@ -50,15 +50,15 @@ public class FurnitureModelBaker {
     private static final ModelBakerImpl modelBaker = new ModelBakerImpl();
     private final static RandomSource random = RandomSource.create();
 
-    private static MergedBakedModel bakeModel(DynamicAtlas atlas, MultiRenderTypeBlockModel model, int yRot, int state) {
+    private static CompositeBakedModel bakeModel(DynamicAtlas atlas, CompositeBlockModel model, int yRot, int state) {
         Map<RenderType, BakedModel> bakedModels = new LinkedHashMap<>();
         for (RenderType type : model.models.get(state).keySet()) {
             bakedModels.put(type, bakeModel(atlas, model, type, yRot, state));
         }
-        return new MergedBakedModel(bakedModels);
+        return new CompositeBakedModel(bakedModels);
     }
 
-    private static BakedModel bakeModel(DynamicAtlas atlas, MultiRenderTypeBlockModel model, RenderType type, int yRot, int state) {
+    private static BakedModel bakeModel(DynamicAtlas atlas, CompositeBlockModel model, RenderType type, int yRot, int state) {
         BakedModel bake = model.models.get(state).get(type).bake(modelBaker,
                 material -> atlas == DynamicAtlas.BAKED || !material.texture().getNamespace().equals("immersive_furniture") ? material.sprite() : atlas.sprite,
                 BlockModelRotation.by(0, yRot),
@@ -82,11 +82,11 @@ public class FurnitureModelBaker {
      * Maintains a cached set of baked models for each rotation and state.
      */
     public static class CachedBakedModelSet {
-        private static final Supplier<MergedBakedModel> EMPTY = () -> new MergedBakedModel(Map.of());
+        private static final Supplier<CompositeBakedModel> EMPTY = () -> new CompositeBakedModel(Map.of());
 
-        public final Map<Integer, Supplier<MergedBakedModel>> variations = new HashMap<>();
+        public final Map<Integer, Supplier<CompositeBakedModel>> variations = new HashMap<>();
 
-        public CachedBakedModelSet(DynamicAtlas atlas, MultiRenderTypeBlockModel model) {
+        public CachedBakedModelSet(DynamicAtlas atlas, CompositeBlockModel model) {
             for (int rot = 0; rot < 360; rot += 90) {
                 for (Integer state : model.models.keySet()) {
                     int finalRot = rot;
@@ -95,7 +95,7 @@ public class FurnitureModelBaker {
             }
         }
 
-        public MergedBakedModel get(int yRot, int state) {
+        public CompositeBakedModel get(int yRot, int state) {
             return variations.getOrDefault(yRot + state, variations.getOrDefault(yRot, EMPTY)).get();
         }
     }
@@ -103,7 +103,7 @@ public class FurnitureModelBaker {
     /**
      * Builds and bake in the background, returns only if already done.
      */
-    public static MergedBakedModel getAsyncModel(FurnitureData data, DynamicAtlas atlas, int state) {
+    public static CompositeBakedModel getAsyncModel(FurnitureData data, DynamicAtlas atlas, int state) {
         String hash = data.getHash();
         if (atlas.knownFurniture.containsKey(hash)) {
             return getModel(data, atlas, 0, state, false);
@@ -123,7 +123,7 @@ public class FurnitureModelBaker {
     /**
      * Builds the default state usually used for items or previews.
      */
-    public static MergedBakedModel getModel(FurnitureData data, DynamicAtlas atlas) {
+    public static CompositeBakedModel getModel(FurnitureData data, DynamicAtlas atlas) {
         return getModel(data, atlas, 0, 0, true);
     }
 
@@ -131,7 +131,7 @@ public class FurnitureModelBaker {
      * Build, bake, and cache a specific state and rotation.
      * Can return null if atlas is full unless forced.
      */
-    public static MergedBakedModel getModel(FurnitureData data, DynamicAtlas atlas, int yRot, int state, boolean force) {
+    public static CompositeBakedModel getModel(FurnitureData data, DynamicAtlas atlas, int yRot, int state, boolean force) {
         String hash = data.getHash();
         CachedBakedModelSet cachedBakedModelSet = atlas.knownFurniture.get(hash);
         boolean exist = cachedBakedModelSet != null;
@@ -146,7 +146,7 @@ public class FurnitureModelBaker {
             return cachedBakedModelSet.get(yRot, state);
         } else {
             float previousUsage = atlas.getUsage();
-            MultiRenderTypeBlockModel model = FurnitureModelFactory.getModel(data, atlas);
+            CompositeBlockModel model = FurnitureModelFactory.getModel(data, atlas);
             atlas.uploadIfDirty();
 
             CachedBakedModelSet modelSet = new CachedBakedModelSet(atlas, model);

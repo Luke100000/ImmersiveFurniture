@@ -499,11 +499,11 @@ public class FurnitureModelFactory {
      * Create a furniture model and its texture.
      * This function is somewhat slow, call async whenever possible
      */
-    public static MultiRenderTypeBlockModel getModel(FurnitureData data, DynamicAtlas atlas) {
+    public static CompositeBlockModel getModel(FurnitureData data, DynamicAtlas atlas) {
         FurnitureModelFactory factory = new FurnitureModelFactory(data, atlas);
 
         // Create a model for each transparency type
-        MultiRenderTypeBlockModel composite = new MultiRenderTypeBlockModel(factory.indexToElement);
+        CompositeBlockModel composite = new CompositeBlockModel(factory.indexToElement);
         composite.addModel(RenderType.solid(), factory.getModels(TransparencyType.SOLID));
         composite.addModel(RenderType.cutout(), factory.getModels(TransparencyType.CUTOUT));
         composite.addModel(RenderType.cutoutMipped(), factory.getModels(TransparencyType.CUTOUT_MIPPED));

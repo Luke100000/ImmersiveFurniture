@@ -21,7 +21,7 @@ import java.util.List;
 public class FurnitureBakedModelWrapper implements BakedModel {
     public static BakedModel model = new FurnitureBakedModelWrapper();
 
-    protected static MergedBakedModel getBakedModel(BlockPos pos, BlockState state) {
+    protected static CompositeBakedModel getBakedModel(BlockPos pos, BlockState state) {
         DelayedFurnitureRenderer.Status status = DelayedFurnitureRenderer.INSTANCE.getLoadedStatus(pos);
 
         // Render it

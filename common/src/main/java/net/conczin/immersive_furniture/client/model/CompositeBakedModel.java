@@ -18,12 +18,12 @@ import net.minecraft.world.level.block.state.BlockState;
 import java.util.List;
 import java.util.Map;
 
-public class MergedBakedModel implements BakedModel {
+public class CompositeBakedModel implements BakedModel {
     private final Map<RenderType, BakedModel> models;
     private final BakedModel any;
     private final List<BakedQuad> quads;
 
-    public MergedBakedModel(Map<RenderType, BakedModel> models) {
+    public CompositeBakedModel(Map<RenderType, BakedModel> models) {
         this.models = models;
         this.any = models.values().stream().findAny().orElse(getMissing());
 

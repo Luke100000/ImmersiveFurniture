@@ -87,13 +87,13 @@ public abstract class ArtisansWorkstationScreen extends Screen {
         graphics.pose().popPose();
     }
 
-    private static MergedBakedModel lastBakedModel = null;
+    private static CompositeBakedModel lastBakedModel = null;
 
     void renderModel(GuiGraphics graphics, FurnitureData data, float yaw, float pitch, boolean inEditor) {
         TransparencyManager.heySodiumImInUse(data);
 
         if (inEditor) TransparencyManager.prepare(data);
-        MergedBakedModel bakedModel = FurnitureModelBaker.getAsyncModel(data, DynamicAtlas.SCRATCH, currentState);
+        CompositeBakedModel bakedModel = FurnitureModelBaker.getAsyncModel(data, DynamicAtlas.SCRATCH, currentState);
         if (inEditor) {
             if (bakedModel == null) {
                 bakedModel = lastBakedModel;

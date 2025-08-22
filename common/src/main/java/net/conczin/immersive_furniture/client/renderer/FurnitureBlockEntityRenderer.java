@@ -8,7 +8,7 @@ import net.conczin.immersive_furniture.block.BaseFurnitureBlock;
 import net.conczin.immersive_furniture.block.entity.FurnitureBlockEntity;
 import net.conczin.immersive_furniture.client.model.DynamicAtlas;
 import net.conczin.immersive_furniture.client.model.FurnitureModelBaker;
-import net.conczin.immersive_furniture.client.model.MergedBakedModel;
+import net.conczin.immersive_furniture.client.model.CompositeBakedModel;
 import net.conczin.immersive_furniture.data.FurnitureData;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
@@ -68,7 +68,7 @@ public class FurnitureBlockEntityRenderer<T extends FurnitureBlockEntity> implem
         renderFurniture(state, poseStack, buffer, packedLight, packedOverlay, FurnitureModelBaker.getModel(data, DynamicAtlas.ENTITY), DynamicAtlas.ENTITY);
     }
 
-    public static void renderFurniture(BlockState state, PoseStack poseStack, MultiBufferSource buffer, int packedLight, int packedOverlay, MergedBakedModel bakedModel, DynamicAtlas atlas) {
+    public static void renderFurniture(BlockState state, PoseStack poseStack, MultiBufferSource buffer, int packedLight, int packedOverlay, CompositeBakedModel bakedModel, DynamicAtlas atlas) {
         // Render in two passes since; unliked baked textures, the textures can be on up to two atlases
         for (int i = 0; i < 2; i++) {
             ResourceLocation location = i == 0 ? atlas.getLocation() : InventoryMenu.BLOCK_ATLAS;

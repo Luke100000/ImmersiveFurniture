@@ -1,7 +1,7 @@
 package net.conczin.immersive_furniture.fabric.client;
 
 import net.conczin.immersive_furniture.client.model.FurnitureBakedModelWrapper;
-import net.conczin.immersive_furniture.client.model.MergedBakedModel;
+import net.conczin.immersive_furniture.client.model.CompositeBakedModel;
 import net.fabricmc.fabric.api.renderer.v1.Renderer;
 import net.fabricmc.fabric.api.renderer.v1.RendererAccess;
 import net.fabricmc.fabric.api.renderer.v1.material.BlendMode;
@@ -26,7 +26,7 @@ import java.util.function.Supplier;
 public class FabricFurnitureBakedModelWrapper extends FurnitureBakedModelWrapper implements FabricBakedModel {
     @Override
     public void emitBlockQuads(BlockAndTintGetter blockView, BlockState state, BlockPos pos, Supplier<RandomSource> randomSupplier, RenderContext context) {
-        MergedBakedModel model = getBakedModel(pos, state);
+        CompositeBakedModel model = getBakedModel(pos, state);
         if (model != null) {
             for (Map.Entry<RenderType, BakedModel> entry : model.getModels().entrySet()) {
                 emitBlockQuads(entry.getValue(), BlendMode.fromRenderLayer(entry.getKey()), state, randomSupplier, context, context.getEmitter());
