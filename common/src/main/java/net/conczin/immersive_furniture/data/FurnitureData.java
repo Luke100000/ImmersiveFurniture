@@ -332,8 +332,10 @@ public class FurnitureData {
         if (advanced) {
             int pixels = 0;
             for (Element element : elements) {
-                for (int[] value : element.bakedTexture.values()) {
-                    pixels += value.length;
+                for (Map<Integer, int[]> texture : element.bakedTexture.textures.values()) {
+                    for (Map.Entry<Integer, int[]> states : texture.entrySet()) {
+                        pixels += states.getValue().length;
+                    }
                 }
             }
             double usage = pixels / Math.pow(DynamicAtlas.BAKED.getSize(), 2);
@@ -631,7 +633,7 @@ public class FurnitureData {
         public PlayerPose playerPose;
         public Sprite sprite;
 
-        public Map<Direction, int[]> bakedTexture = new ConcurrentHashMap<>();
+        public ElementBakedTextures bakedTexture = new ElementBakedTextures();
         public ElementRotationAxes rotationAxes;
 
         public Element() {
@@ -658,11 +660,7 @@ public class FurnitureData {
             this.playerPose = new PlayerPose(tag.getCompound("PlayerPose"));
             this.sprite = new Sprite(tag.getCompound("Sprite"));
             this.mask = NBTHelper.getInt(tag, "Mask", this.mask);
-
-            CompoundTag bakedTextureTag = tag.getCompound("BakedTexture");
-            for (String key : bakedTextureTag.getAllKeys()) {
-                bakedTexture.put(Direction.CODEC.byName(key), bakedTextureTag.getIntArray(key));
-            }
+            this.bakedTexture = new ElementBakedTextures(tag.getCompound("BakedTexture"));
         }
 
         public Element(Element element) {
@@ -679,7 +677,7 @@ public class FurnitureData {
             this.soundEmitter = new SoundEmitter(element.soundEmitter);
             this.playerPose = new PlayerPose(element.playerPose);
             this.sprite = new Sprite(element.sprite);
-            this.bakedTexture = new ConcurrentHashMap<>();
+            this.bakedTexture = new ElementBakedTextures();
             this.rotationAxes = null;
         }
 
@@ -696,13 +694,7 @@ public class FurnitureData {
 
             if (type == ElementType.ELEMENT) {
                 tag.put("Material", material.toTag());
-
-                // Textures
-                CompoundTag bakedTextureTag = new CompoundTag();
-                for (Map.Entry<Direction, int[]> entry : bakedTexture.entrySet()) {
-                    bakedTextureTag.putIntArray(entry.getKey().getSerializedName(), entry.getValue());
-                }
-                tag.put("BakedTexture", bakedTextureTag);
+                tag.put("BakedTexture", bakedTexture.toTag());
             } else if (type == ElementType.PARTICLE_EMITTER) {
                 tag.put("ParticleEmitter", particleEmitter.toTag());
             } else if (type == ElementType.SOUND_EMITTER) {
@@ -841,6 +833,57 @@ public class FurnitureData {
 
         public boolean isFlat() {
             return from.x == to.x || from.y == to.y || from.z == to.z;
+        }
+
+        public boolean isMasked(int state) {
+            return (mask & (1 << state)) != 0;
+        }
+    }
+
+    public static class ElementBakedTextures {
+        public Map<Direction, Map<Integer, int[]>> textures = new ConcurrentHashMap<>();
+
+        public ElementBakedTextures() {
+
+        }
+
+        public ElementBakedTextures(CompoundTag tag) {
+            for (String key : tag.getAllKeys()) {
+                String[] split = key.split(":");
+                Direction direction = Direction.CODEC.byName(split[0]);
+                int state = split.length == 1 ? 0 : Integer.parseInt(split[1]);
+                put(direction, state, tag.getIntArray(key));
+            }
+        }
+
+        public CompoundTag toTag() {
+            CompoundTag tag = new CompoundTag();
+            for (Map.Entry<Direction, Map<Integer, int[]>> directionMapEntry : textures.entrySet()) {
+                Direction direction = directionMapEntry.getKey();
+                Map<Integer, int[]> stateMap = directionMapEntry.getValue();
+                for (Map.Entry<Integer, int[]> stateEntry : stateMap.entrySet()) {
+                    int state = stateEntry.getKey();
+                    int[] texture = stateEntry.getValue();
+                    tag.putIntArray(direction.getSerializedName() + ":" + state, texture); // TODO: This will break older clients
+                }
+            }
+            return tag;
+        }
+
+        public void clear() {
+            textures.clear();
+        }
+
+        public int[] get(Direction direction, int state) {
+            Map<Integer, int[]> states = textures.get(direction);
+            return states == null ? null : states.getOrDefault(state, states.get(0));
+        }
+
+        public void put(Direction direction, int state, int[] baked) {
+            Map<Integer, int[]> states = textures.computeIfAbsent(direction, k -> new HashMap<>());
+            if (state == 0 || !states.containsKey(0) || !Arrays.equals(states.get(0), baked)) {
+                states.put(state, baked);
+            }
         }
     }
 
