@@ -57,6 +57,7 @@
   "gui.immersive_furniture.has_sounds": "Has sounds",
   "gui.immersive_furniture.can_sit": "Can sit on",
   "gui.immersive_furniture.can_sleep": "Can sleep on",
+  "gui.immersive_furniture.has_states": "Has animated states",
   "gui.immersive_furniture.sources": "Uses textures of:",
   "gui.immersive_furniture.dependencies": "Requires:",
   "gui.immersive_furniture.tooltip": "Press shift to show more.",

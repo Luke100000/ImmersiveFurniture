@@ -10,10 +10,9 @@ import net.minecraft.client.resources.model.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -48,96 +47,19 @@ public class FurnitureModelBaker {
         }
     }
 
-    static final ModelBakerImpl modelBaker = new ModelBakerImpl();
-
-    public static class CachedBakedModelSet {
-        public final Supplier<MergedBakedModel> R0;
-        public final Supplier<MergedBakedModel> R90;
-        public final Supplier<MergedBakedModel> R180;
-        public final Supplier<MergedBakedModel> R270;
-
-        public CachedBakedModelSet(DynamicAtlas atlas, MultiRenderTypeBlockModel model) {
-            this.R0 = new CachedSupplier<>(() -> bakeModel(atlas, model, 0));
-            this.R90 = new CachedSupplier<>(() -> bakeModel(atlas, model, 90));
-            this.R180 = new CachedSupplier<>(() -> bakeModel(atlas, model, 180));
-            this.R270 = new CachedSupplier<>(() -> bakeModel(atlas, model, 270));
-        }
-
-        public MergedBakedModel get(int yRot) {
-            return switch (yRot) {
-                case 0 -> R0.get();
-                case 90 -> R90.get();
-                case 180 -> R180.get();
-                case 270 -> R270.get();
-                default -> throw new IllegalArgumentException("Invalid rotation: " + yRot);
-            };
-        }
-    }
-
-    public static MergedBakedModel getAsyncModel(FurnitureData data, DynamicAtlas atlas) {
-        String hash = data.getHash();
-        if (atlas.knownFurniture.containsKey(hash)) {
-            return getModel(data, atlas, 0, false);
-        } else {
-            if (!atlas.asyncRequestedFurniture.contains(hash)) {
-                atlas.asyncRequestedFurniture.add(hash);
-                Common.EXECUTOR.execute(() -> {
-                    if (getModel(data, atlas, 0, false) == null) {
-                        atlas.asyncRequestedFurniture.remove(hash);
-                    }
-                });
-            }
-            return null;
-        }
-    }
-
-    public static MergedBakedModel getModel(FurnitureData data, DynamicAtlas atlas) {
-        return getModel(data, atlas, 0, true);
-    }
-
-    public static MergedBakedModel getModel(FurnitureData data, DynamicAtlas atlas, int yRot, boolean force) {
-        String hash = data.getHash();
-        CachedBakedModelSet cachedBakedModelSet = atlas.knownFurniture.get(hash);
-        boolean exist = cachedBakedModelSet != null;
-
-        // The atlas is full, cannot continue
-        if (!force && !exist && atlas.isFull()) {
-            return null;
-        }
-
-        if (exist) {
-            atlas.uploadIfDirty();
-            return cachedBakedModelSet.get(yRot);
-        } else {
-            float previousUsage = atlas.getUsage();
-            MultiRenderTypeBlockModel model = FurnitureModelFactory.getModel(data, atlas);
-            atlas.uploadIfDirty();
-
-            CachedBakedModelSet modelSet = new CachedBakedModelSet(atlas, model);
-            atlas.knownFurniture.put(hash, modelSet);
-
-            // Only add when forced or the atlas had space
-            if (force || !atlas.isFull() && atlas.getUsage() >= previousUsage) {
-                return modelSet.get(yRot);
-            } else {
-                atlas.knownFurniture.remove(hash);
-            }
-        }
-        return null;
-    }
-
+    private static final ModelBakerImpl modelBaker = new ModelBakerImpl();
     private final static RandomSource random = RandomSource.create();
 
-    private static MergedBakedModel bakeModel(DynamicAtlas atlas, MultiRenderTypeBlockModel model, int yRot) {
+    private static MergedBakedModel bakeModel(DynamicAtlas atlas, MultiRenderTypeBlockModel model, int yRot, int state) {
         Map<RenderType, BakedModel> bakedModels = new LinkedHashMap<>();
-        for (RenderType type : model.models.keySet()) {
-            bakedModels.put(type, bakeModel(atlas, model, type, yRot));
+        for (RenderType type : model.models.get(state).keySet()) {
+            bakedModels.put(type, bakeModel(atlas, model, type, yRot, state));
         }
         return new MergedBakedModel(bakedModels);
     }
 
-    private static BakedModel bakeModel(DynamicAtlas atlas, MultiRenderTypeBlockModel model, RenderType type, int yRot) {
-        BakedModel bake = model.models.get(type).bake(modelBaker,
+    private static BakedModel bakeModel(DynamicAtlas atlas, MultiRenderTypeBlockModel model, RenderType type, int yRot, int state) {
+        BakedModel bake = model.models.get(state).get(type).bake(modelBaker,
                 material -> atlas == DynamicAtlas.BAKED || !material.texture().getNamespace().equals("immersive_furniture") ? material.sprite() : atlas.sprite,
                 BlockModelRotation.by(0, yRot),
                 LOCATION
@@ -154,5 +76,89 @@ public class FurnitureModelBaker {
         }
 
         return bake;
+    }
+
+    /**
+     * Maintains a cached set of baked models for each rotation and state.
+     */
+    public static class CachedBakedModelSet {
+        private static final Supplier<MergedBakedModel> EMPTY = () -> new MergedBakedModel(Map.of());
+
+        public final Map<Integer, Supplier<MergedBakedModel>> variations = new HashMap<>();
+
+        public CachedBakedModelSet(DynamicAtlas atlas, MultiRenderTypeBlockModel model) {
+            for (int rot = 0; rot < 360; rot += 90) {
+                for (Integer state : model.models.keySet()) {
+                    int finalRot = rot;
+                    variations.put(rot + state, new CachedSupplier<>(() -> bakeModel(atlas, model, finalRot, state)));
+                }
+            }
+        }
+
+        public MergedBakedModel get(int yRot, int state) {
+            return variations.getOrDefault(yRot + state, variations.getOrDefault(yRot, EMPTY)).get();
+        }
+    }
+
+    /**
+     * Builds and bake in the background, returns only if already done.
+     */
+    public static MergedBakedModel getAsyncModel(FurnitureData data, DynamicAtlas atlas, int state) {
+        String hash = data.getHash();
+        if (atlas.knownFurniture.containsKey(hash)) {
+            return getModel(data, atlas, 0, state, false);
+        } else {
+            if (!atlas.asyncRequestedFurniture.contains(hash)) {
+                atlas.asyncRequestedFurniture.add(hash);
+                Common.EXECUTOR.execute(() -> {
+                    if (getModel(data, atlas, 0, state, false) == null) {
+                        atlas.asyncRequestedFurniture.remove(hash);
+                    }
+                });
+            }
+            return null;
+        }
+    }
+
+    /**
+     * Builds the default state usually used for items or previews.
+     */
+    public static MergedBakedModel getModel(FurnitureData data, DynamicAtlas atlas) {
+        return getModel(data, atlas, 0, 0, true);
+    }
+
+    /**
+     * Build, bake, and cache a specific state and rotation.
+     * Can return null if atlas is full unless forced.
+     */
+    public static MergedBakedModel getModel(FurnitureData data, DynamicAtlas atlas, int yRot, int state, boolean force) {
+        String hash = data.getHash();
+        CachedBakedModelSet cachedBakedModelSet = atlas.knownFurniture.get(hash);
+        boolean exist = cachedBakedModelSet != null;
+
+        // The atlas is full, cannot continue
+        if (!force && !exist && atlas.isFull()) {
+            return null;
+        }
+
+        if (exist) {
+            atlas.uploadIfDirty();
+            return cachedBakedModelSet.get(yRot, state);
+        } else {
+            float previousUsage = atlas.getUsage();
+            MultiRenderTypeBlockModel model = FurnitureModelFactory.getModel(data, atlas);
+            atlas.uploadIfDirty();
+
+            CachedBakedModelSet modelSet = new CachedBakedModelSet(atlas, model);
+            atlas.knownFurniture.put(hash, modelSet); // TODO: Only add if the hash is still the same
+
+            // Only add when forced or the atlas had space
+            if (force || !atlas.isFull() && atlas.getUsage() >= previousUsage) {
+                return modelSet.get(yRot, state);
+            } else {
+                atlas.knownFurniture.remove(hash);
+            }
+        }
+        return null;
     }
 }

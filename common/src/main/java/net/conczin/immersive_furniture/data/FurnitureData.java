@@ -33,6 +33,7 @@ import org.joml.Vector3i;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.stream.Collectors;
 
 public class FurnitureData {
     public static final FurnitureData EMPTY = new FurnitureData();
@@ -255,6 +256,32 @@ public class FurnitureData {
         return elements.stream().anyMatch(e -> e.type == ElementType.PLAYER_POSE && e.playerPose.pose == Pose.SLEEPING);
     }
 
+    /**
+     * @return A set of unique solid states for the furniture, e.g.: a door would return (0, 1)
+     */
+    public Set<Integer> getUniqueSolidStates() {
+        Map<Integer, Long> maskCounts = elements.stream()
+                .filter(e -> e.type == ElementType.ELEMENT || e.type == ElementType.SPRITE)
+                .collect(Collectors.groupingBy(
+                        e -> e.mask,
+                        Collectors.counting()
+                ));
+
+        Set<Integer> states = new HashSet<>();
+        long firstHash = -1;
+        for (int state = 0; state < 2; state++) {
+            long hash = 0;
+            for (Map.Entry<Integer, Long> entry : maskCounts.entrySet()) {
+                if ((entry.getKey() & (1 << state)) != 0) {
+                    hash += 1024L * entry.getKey() + entry.getValue();
+                }
+            }
+            if (hash != firstHash) states.add(state);
+            if (state == 0) firstHash = hash;
+        }
+        return states;
+    }
+
     public List<Component> getTooltip(boolean advanced) {
         List<Component> tooltip = new LinkedList<>();
         tooltip.add(Component.translatable("gui.immersive_furniture.author", author).withStyle(ChatFormatting.ITALIC).withStyle(ChatFormatting.GRAY));
@@ -279,6 +306,9 @@ public class FurnitureData {
         }
         if (canSleep()) {
             tooltip.add(Component.translatable("gui.immersive_furniture.can_sleep").withStyle(ChatFormatting.YELLOW));
+        }
+        if (getUniqueSolidStates().size() > 1) {
+            tooltip.add(Component.translatable("gui.immersive_furniture.has_states").withStyle(ChatFormatting.YELLOW));
         }
         boolean hasAdvanced = false;
         if (!sources.isEmpty()) {

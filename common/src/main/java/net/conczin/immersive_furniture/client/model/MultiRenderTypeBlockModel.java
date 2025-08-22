@@ -8,16 +8,24 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class MultiRenderTypeBlockModel {
+    // The tint index stores the mapping to the original element id.
     public final Map<Integer, FurnitureData.Element> indexToElement;
-    public final Map<RenderType, BlockModel> models = new LinkedHashMap<>();
+
+    // For each state and each render type a separate model
+    public final Map<Integer, Map<RenderType, BlockModel>> models = new LinkedHashMap<>();
 
     public MultiRenderTypeBlockModel(Map<Integer, FurnitureData.Element> indexToElement) {
         this.indexToElement = indexToElement;
     }
 
-    public void addModel(RenderType type, BlockModel model) {
-        if (!model.getElements().isEmpty()) {
-            models.put(type, model);
+    public void addModel(RenderType type, Map<Integer, BlockModel> model) {
+        for (Map.Entry<Integer, BlockModel> entry : model.entrySet()) {
+            if (!entry.getValue().getElements().isEmpty()) {
+                models.computeIfAbsent(
+                        entry.getKey(),
+                        k -> new LinkedHashMap<>()
+                ).put(type, entry.getValue());
+            }
         }
     }
 

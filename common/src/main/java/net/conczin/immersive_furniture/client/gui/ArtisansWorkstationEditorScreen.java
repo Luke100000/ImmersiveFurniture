@@ -68,7 +68,6 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
     Page currentPage = Page.MODEL;
 
     boolean backwardsCheckerPlane = true;
-    int currentState = 0;
 
     public enum Page {
         MODEL,

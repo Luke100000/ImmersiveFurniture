@@ -643,6 +643,7 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
             if (data.hasSounds()) tags.add("has_sounds");
             if (data.canSit()) tags.add("can_sit");
             if (data.canSleep()) tags.add("can_sleep");
+            if (data.getUniqueSolidStates().size() > 1) tags.add("has_states");
             if (!data.dependencies.isEmpty()) tags.add("has_dependencies");
             if (!data.sources.isEmpty()) tags.add("has_modded_textures");
             if (data.inventorySize > 0) tags.add("has_inventory");

@@ -380,19 +380,35 @@ public class FurnitureModelFactory {
         );
     }
 
-    private BlockModel getModel(TransparencyType type) {
+    /**
+     * Returns a block model for a specific render type
+     */
+    private BlockModel getModel(TransparencyType type, int state) {
         return new BlockModel(
                 null,
                 elements.stream()
                         .filter(FurnitureModelFactory::hasFaces)
+                        .filter(e -> (e.mask & (1 << state)) != 0) // TODO: Helper
                         .filter(e -> type == null || getTransparencyType(e) == type)
-                        .map(this::getElement).toList(),
+                        .map(this::getElement)
+                        .toList(),
                 textures,
                 false,
                 BlockModel.GuiLight.SIDE,
                 getTransforms(),
                 List.of()
         );
+    }
+
+    /**
+     * Returns a block model for every state for a specific render type
+     */
+    private Map<Integer, BlockModel> getModels(TransparencyType type) {
+        Map<Integer, BlockModel> models = new HashMap<>();
+        for (Integer state : data.getUniqueSolidStates()) {
+            models.put(state, getModel(type, state));
+        }
+        return models;
     }
 
     private void splitSprites() {
@@ -478,15 +494,20 @@ public class FurnitureModelFactory {
         );
     }
 
+
+    /**
+     * Create a furniture model and its texture.
+     * This function is somewhat slow, call async whenever possible
+     */
     public static MultiRenderTypeBlockModel getModel(FurnitureData data, DynamicAtlas atlas) {
         FurnitureModelFactory factory = new FurnitureModelFactory(data, atlas);
 
         // Create a model for each transparency type
         MultiRenderTypeBlockModel composite = new MultiRenderTypeBlockModel(factory.indexToElement);
-        composite.addModel(RenderType.solid(), factory.getModel(TransparencyType.SOLID));
-        composite.addModel(RenderType.cutout(), factory.getModel(TransparencyType.CUTOUT));
-        composite.addModel(RenderType.cutoutMipped(), factory.getModel(TransparencyType.CUTOUT_MIPPED));
-        composite.addModel(RenderType.translucent(), factory.getModel(TransparencyType.TRANSLUCENT));
+        composite.addModel(RenderType.solid(), factory.getModels(TransparencyType.SOLID));
+        composite.addModel(RenderType.cutout(), factory.getModels(TransparencyType.CUTOUT));
+        composite.addModel(RenderType.cutoutMipped(), factory.getModels(TransparencyType.CUTOUT_MIPPED));
+        composite.addModel(RenderType.translucent(), factory.getModels(TransparencyType.TRANSLUCENT));
         return composite;
     }
 }

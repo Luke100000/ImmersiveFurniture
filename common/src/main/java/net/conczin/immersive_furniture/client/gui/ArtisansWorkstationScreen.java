@@ -42,7 +42,9 @@ public abstract class ArtisansWorkstationScreen extends Screen {
     int leftPos;
     int topPos;
 
-    boolean nightMode = false; // TODO: There is no button yet in the library screen
+    // TODO: There is no button yet in the library screen
+    boolean nightMode = false;
+    int currentState = 0;
 
     public ArtisansWorkstationScreen() {
         super(TITLE);
@@ -91,7 +93,7 @@ public abstract class ArtisansWorkstationScreen extends Screen {
         TransparencyManager.heySodiumImInUse(data);
 
         if (inEditor) TransparencyManager.prepare(data);
-        MergedBakedModel bakedModel = FurnitureModelBaker.getAsyncModel(data, DynamicAtlas.SCRATCH);
+        MergedBakedModel bakedModel = FurnitureModelBaker.getAsyncModel(data, DynamicAtlas.SCRATCH, currentState);
         if (inEditor) {
             if (bakedModel == null) {
                 bakedModel = lastBakedModel;

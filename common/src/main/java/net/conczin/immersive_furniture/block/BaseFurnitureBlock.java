@@ -91,8 +91,7 @@ public abstract class BaseFurnitureBlock extends Block implements SimpleWaterlog
         if (toggle) {
             state = state.cycle(ACTIVE);
             state = toggleLight(data, state, level, pos);
-            boolean requiresRerender = false;
-            level.setBlock(pos, state, requiresRerender ? 3 : 7);
+            level.setBlock(pos, state, data.getUniqueSolidStates().size() > 1 ? 3 : 7);
             consume = true;
         }
 
