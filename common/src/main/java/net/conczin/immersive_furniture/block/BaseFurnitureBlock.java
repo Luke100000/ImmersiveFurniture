@@ -113,12 +113,13 @@ public abstract class BaseFurnitureBlock extends Block implements SimpleWaterlog
         return state;
     }
 
-    public void onInteract(Level level, BlockState state, BlockPos pos, Player player) {
-        FurnitureData data = getData(state, level, pos);
+    public void onInteract(Level level, BlockState blockState, BlockPos pos, Player player) {
+        FurnitureData data = getData(blockState, level, pos);
         if (data != null) {
-            Direction facing = state.getValue(FACING);
-            data.playInteractSound(level, pos, player);
-            data.emitInteractParticles(pos, facing, player, level::addParticle, false);
+            Direction facing = blockState.getValue(FACING);
+            int state = blockState.getValue(ACTIVE) ? 1 : 0;
+            data.playInteractSound(level, pos, state, player);
+            data.emitInteractParticles(pos, facing, state, player, level::addParticle, false);
         }
     }
 
@@ -161,12 +162,13 @@ public abstract class BaseFurnitureBlock extends Block implements SimpleWaterlog
     abstract public FurnitureData getData(BlockState state, BlockGetter level, BlockPos pos);
 
     @Override
-    public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
-        if (state.getValue(ACTIVE)) return;
-        FurnitureData data = getData(state, level, pos);
+    public void animateTick(BlockState blockState, Level level, BlockPos pos, RandomSource random) {
+        if (blockState.getValue(ACTIVE)) return;
+        FurnitureData data = getData(blockState, level, pos);
         if (data != null) {
-            Direction facing = state.getValue(FACING);
-            data.tick(level, pos, facing, random, level::addParticle, false, false);
+            Direction facing = blockState.getValue(FACING);
+            int state = blockState.getValue(ACTIVE) ? 1 : 0;
+            data.tick(level, pos, state, facing, random, level::addParticle, false, false);
         }
     }
 

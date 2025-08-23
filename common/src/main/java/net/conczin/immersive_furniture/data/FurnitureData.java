@@ -224,17 +224,17 @@ public class FurnitureData {
         }
     }
 
-    public void playInteractSound(Level level, BlockPos pos, Player player) {
+    public void playInteractSound(Level level, BlockPos pos, int state, Player player) {
         for (Element element : elements) {
-            if (element.type == ElementType.SOUND_EMITTER && element.soundEmitter.onInteract) {
+            if (element.isMasked(state) && element.type == ElementType.SOUND_EMITTER && element.soundEmitter.onInteract) {
                 playSound(level, pos, player.getRandom(), element);
             }
         }
     }
 
-    public void emitInteractParticles(BlockPos pos, Direction direction, Player player, ParticleConsumer particleConsumer, boolean inScreen) {
+    public void emitInteractParticles(BlockPos pos, Direction direction, int state, Player player, ParticleConsumer particleConsumer, boolean inScreen) {
         for (Element element : elements) {
-            if (element.type == ElementType.PARTICLE_EMITTER && element.particleEmitter.onInteract) {
+            if (element.isMasked(state) && element.type == ElementType.PARTICLE_EMITTER && element.particleEmitter.onInteract) {
                 emitParticles(pos, direction, player.getRandom(), element, particleConsumer, inScreen, 10.0f);
             }
         }
@@ -430,8 +430,9 @@ public class FurnitureData {
         }
     }
 
-    public void tick(Level level, BlockPos pos, Direction direction, RandomSource random, ParticleConsumer particleConsumer, boolean inScreen, boolean inEditor) {
+    public void tick(Level level, BlockPos pos, int state, Direction direction, RandomSource random, ParticleConsumer particleConsumer, boolean inScreen, boolean inEditor) {
         for (Element element : elements) {
+            if (!element.isMasked(state)) continue;
             if (element.type == ElementType.PARTICLE_EMITTER && !element.particleEmitter.onInteract) {
                 emitParticles(pos, direction, random, element, particleConsumer, inScreen, 1.0f);
             } else if (element.type == ElementType.SOUND_EMITTER && (!inScreen || inEditor) && element.soundEmitter.frequency > 0 && random.nextFloat() < element.soundEmitter.frequency) {

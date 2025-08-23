@@ -280,7 +280,7 @@ public class ModelComponent extends ScreenComponent {
                 ClientLevel level = Minecraft.getInstance().level;
                 LocalPlayer player = Minecraft.getInstance().player;
                 if (level != null && player != null && firstElement.particleEmitter.onInteract) {
-                    screen.data.emitInteractParticles(player.getOnPos(), null, player, getParticleEngine(screen.data)::addParticle, true);
+                    screen.data.emitInteractParticles(player.getOnPos(), null, screen.currentState, player, getParticleEngine(screen.data)::addParticle, true);
                 }
             }).setEnabled(!firstElement.particleEmitter.onInteract);
         } else if (firstElement.type == FurnitureData.ElementType.SOUND_EMITTER) {
@@ -319,7 +319,7 @@ public class ModelComponent extends ScreenComponent {
                 ClientLevel level = Minecraft.getInstance().level;
                 LocalPlayer player = Minecraft.getInstance().player;
                 if (level != null && player != null && firstElement.soundEmitter.onInteract) {
-                    screen.data.playInteractSound(level, player.getOnPos(), player);
+                    screen.data.playInteractSound(level, player.getOnPos(), screen.currentState, player);
                 }
             }).setEnabled(!firstElement.soundEmitter.onInteract);
         } else if (firstElement.type == FurnitureData.ElementType.PLAYER_POSE) {
