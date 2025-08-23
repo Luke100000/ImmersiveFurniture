@@ -1,5 +1,6 @@
 package net.conczin.immersive_furniture.client.renderer;
 
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
@@ -19,6 +20,7 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Vec3i;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.inventory.InventoryMenu;
@@ -28,16 +30,20 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
+import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
+import org.joml.Vector4f;
+import org.lwjgl.system.MemoryStack;
 
+import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
 import java.util.List;
 import java.util.Map;
 
 import static net.minecraft.world.level.SignalGetter.DIRECTIONS;
 
 public class FurnitureBlockEntityRenderer<T extends FurnitureBlockEntity> implements BlockEntityRenderer<T> {
-    public static final float[] BRIGHTNESS = {1.0F, 1.0F, 1.0F, 1.0F};
     private final ItemRenderer itemRenderer;
 
     public FurnitureBlockEntityRenderer(BlockEntityRendererProvider.Context context) {
@@ -168,21 +174,41 @@ public class FurnitureBlockEntityRenderer<T extends FurnitureBlockEntity> implem
         for (BakedQuad quad : quads) {
             ResourceLocation resourceLocation = quad.getSprite().atlasLocation();
             if (resourceLocation.getNamespace().equals("minecraft") != blocksAtlas) continue;
-            consumer.putBulkData(pose,
-                    quad,
-                    BRIGHTNESS,
-                    1.0f,
-                    1.0f,
-                    1.0f,
-                    new int[]{
-                            blend(packedLight, quad.getVertices()[6]),
-                            blend(packedLight, quad.getVertices()[8 + 6]),
-                            blend(packedLight, quad.getVertices()[16 + 6]),
-                            blend(packedLight, quad.getVertices()[24 + 6])
-                    },
-                    packedOverlay,
-                    true
-            );
+            putBulkData(consumer, pose, quad, packedLight, packedOverlay);
+        }
+    }
+
+    static void putBulkData(VertexConsumer consumer, PoseStack.Pose pose, BakedQuad quad, int packedLight, int packedOverlay) {
+        int[] vertices = quad.getVertices();
+        Vec3i quadNormal = quad.getDirection().getNormal();
+        Matrix4f matrix4f = pose.pose();
+        Vector3f normal = pose.normal().transform(new Vector3f((float) quadNormal.getX(), (float) quadNormal.getY(), (float) quadNormal.getZ()));
+        int vertexCount = vertices.length / 8;
+
+        try (MemoryStack memorystack = MemoryStack.stackPush()) {
+            ByteBuffer bytebuffer = memorystack.malloc(DefaultVertexFormat.BLOCK.getVertexSize());
+            IntBuffer intbuffer = bytebuffer.asIntBuffer();
+
+            for (int i = 0; i < vertexCount; ++i) {
+                intbuffer.clear();
+                intbuffer.put(vertices, i * 8, 8);
+
+                float x = bytebuffer.getFloat(0);
+                float y = bytebuffer.getFloat(4);
+                float z = bytebuffer.getFloat(8);
+                Vector4f pos = matrix4f.transform(new Vector4f(x, y, z, 1.0f));
+
+                float red = (float) (bytebuffer.get(12) & 255) / 255.0F;
+                float green = (float) (bytebuffer.get(13) & 255) / 255.0F;
+                float blue = (float) (bytebuffer.get(14) & 255) / 255.0F;
+
+                float u = bytebuffer.getFloat(16);
+                float v = bytebuffer.getFloat(20);
+
+                int light = blend(packedLight, quad.getVertices()[i * 8 + 6]);
+
+                consumer.vertex(pos.x(), pos.y(), pos.z(), red, green, blue, 1.0f, u, v, packedOverlay, light, normal.x(), normal.y(), normal.z());
+            }
         }
     }
 
