@@ -220,7 +220,7 @@ public class FurnitureData {
         requestedShapes.clear();
         for (Element element : elements) {
             element.rotationAxes = null;
-            element.bakedTexture.clear();
+            element.bakedTextures.clear();
         }
     }
 
@@ -339,7 +339,7 @@ public class FurnitureData {
         if (advanced) {
             int pixels = 0;
             for (Element element : elements) {
-                for (Map<Integer, int[]> texture : element.bakedTexture.textures.values()) {
+                for (Map<Integer, int[]> texture : element.bakedTextures.textures.values()) {
                     for (Map.Entry<Integer, int[]> states : texture.entrySet()) {
                         pixels += states.getValue().length;
                     }
@@ -642,7 +642,7 @@ public class FurnitureData {
         public PlayerPose playerPose;
         public Sprite sprite;
 
-        public ElementBakedTextures bakedTexture = new ElementBakedTextures();
+        public ElementBakedTextures bakedTextures = new ElementBakedTextures();
         public ElementRotationAxes rotationAxes;
 
         public Element() {
@@ -669,7 +669,10 @@ public class FurnitureData {
             this.playerPose = new PlayerPose(tag.getCompound("PlayerPose"));
             this.sprite = new Sprite(tag.getCompound("Sprite"));
             this.mask = NBTHelper.getInt(tag, "Mask", this.mask);
-            this.bakedTexture = new ElementBakedTextures(tag.getCompound("BakedTexture"));
+            this.bakedTextures = new ElementBakedTextures(
+                    tag.getCompound("BakedTexture"),
+                    tag.getCompound("BakedTextures")
+            );
         }
 
         public Element(Element element) {
@@ -686,7 +689,7 @@ public class FurnitureData {
             this.soundEmitter = new SoundEmitter(element.soundEmitter);
             this.playerPose = new PlayerPose(element.playerPose);
             this.sprite = new Sprite(element.sprite);
-            this.bakedTexture = new ElementBakedTextures();
+            this.bakedTextures = new ElementBakedTextures();
             this.rotationAxes = null;
         }
 
@@ -703,7 +706,7 @@ public class FurnitureData {
 
             if (type == ElementType.ELEMENT) {
                 tag.put("Material", material.toTag());
-                tag.put("BakedTexture", bakedTexture.toTag());
+                bakedTextures.save(tag);
             } else if (type == ElementType.PARTICLE_EMITTER) {
                 tag.put("ParticleEmitter", particleEmitter.toTag());
             } else if (type == ElementType.SOUND_EMITTER) {
@@ -758,6 +761,9 @@ public class FurnitureData {
         public void sanityCheck() {
             if (sprite.item) {
                 sprite.tiled = false;
+
+                // TODO: Remove this once most people ported to 0.1.0
+                sprite.sprite = new ResourceLocation("minecraft:item/bread");
             }
 
             // Pose anchors are the shape of the players' butt
@@ -860,27 +866,38 @@ public class FurnitureData {
 
         }
 
-        public ElementBakedTextures(CompoundTag tag) {
-            for (String key : tag.getAllKeys()) {
+        public ElementBakedTextures(CompoundTag primary, CompoundTag secondary) {
+            loadTextures(primary);
+            loadTextures(secondary);
+        }
+
+        private void loadTextures(CompoundTag secondary) {
+            for (String key : secondary.getAllKeys()) {
                 String[] split = key.split(":");
                 Direction direction = Direction.CODEC.byName(split[0]);
                 int state = split.length == 1 ? 0 : Integer.parseInt(split[1]);
-                put(direction, state, tag.getIntArray(key));
+                put(direction, state, secondary.getIntArray(key));
             }
         }
 
-        public CompoundTag toTag() {
-            CompoundTag tag = new CompoundTag();
+        public void save(CompoundTag tag) {
+            CompoundTag primary = new CompoundTag();
+            CompoundTag secondary = new CompoundTag();
             for (Map.Entry<Direction, Map<Integer, int[]>> directionMapEntry : textures.entrySet()) {
                 Direction direction = directionMapEntry.getKey();
                 Map<Integer, int[]> stateMap = directionMapEntry.getValue();
                 for (Map.Entry<Integer, int[]> stateEntry : stateMap.entrySet()) {
                     int state = stateEntry.getKey();
                     int[] texture = stateEntry.getValue();
-                    tag.putIntArray(direction.getSerializedName() + ":" + state, texture); // TODO: This will break older clients
+                    if (state == 0) {
+                        primary.putIntArray(direction.getSerializedName(), texture);
+                    } else {
+                        secondary.putIntArray(direction.getSerializedName() + ":" + state, texture);
+                    }
                 }
             }
-            return tag;
+            tag.put("BakedTexture", primary);
+            tag.put("BakedTextures", secondary);
         }
 
         public void clear() {

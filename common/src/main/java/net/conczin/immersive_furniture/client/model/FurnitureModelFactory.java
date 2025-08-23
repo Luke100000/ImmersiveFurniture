@@ -114,7 +114,7 @@ public class FurnitureModelFactory {
 
             // Use baked texture if available
             boolean useBaked = true;
-            int[] baked = inEditor ? null : element.bakedTexture.get(direction, state);
+            int[] baked = inEditor ? null : element.bakedTextures.get(direction, state);
             if (baked == null || baked.length != dimensions.x * dimensions.y) {
                 baked = new int[dimensions.x * dimensions.y];
                 useBaked = false;
@@ -200,7 +200,7 @@ public class FurnitureModelFactory {
 
             // Save baked texture
             if (inEditor) {
-                element.bakedTexture.put(direction, state, baked);
+                element.bakedTextures.put(direction, state, baked);
             }
         }
 
