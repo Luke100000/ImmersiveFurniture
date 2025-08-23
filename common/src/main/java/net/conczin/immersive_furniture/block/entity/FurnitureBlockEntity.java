@@ -61,7 +61,7 @@ public class FurnitureBlockEntity extends BlockEntity implements Container, Menu
         if (this.data != null) {
             if (Config.getInstance().saveAsHash) {
                 FurnitureDataManager.saveHashData(this.data);
-                tag.putString(FurnitureItem.FURNITURE_HASH, this.data.getHash());
+                tag.putString(FURNITURE_HASH, this.data.getHash());
             } else {
                 tag.put(FURNITURE, this.data.toTag());
             }

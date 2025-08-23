@@ -1,7 +1,7 @@
 package net.conczin.immersive_furniture.neoforge.client;
 
-import net.conczin.immersive_furniture.client.model.FurnitureBakedModelWrapper;
 import net.conczin.immersive_furniture.client.model.CompositeBakedModel;
+import net.conczin.immersive_furniture.client.model.FurnitureBakedModelWrapper;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.resources.model.BakedModel;

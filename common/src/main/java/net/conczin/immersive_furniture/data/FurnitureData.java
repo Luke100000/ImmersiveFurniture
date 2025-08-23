@@ -1,8 +1,8 @@
 package net.conczin.immersive_furniture.data;
 
+import com.mojang.serialization.Codec;
 import net.conczin.immersive_furniture.Common;
 import net.conczin.immersive_furniture.client.model.DynamicAtlas;
-import com.mojang.serialization.Codec;
 import net.conczin.immersive_furniture.config.Config;
 import net.conczin.immersive_furniture.utils.NBTHelper;
 import net.conczin.immersive_furniture.utils.Utils;
@@ -776,7 +776,7 @@ public class FurnitureData {
                 sprite.tiled = false;
 
                 // TODO: Remove this once most people ported to 0.1.0
-                sprite.sprite = new ResourceLocation("minecraft:item/bread");
+                sprite.sprite = ResourceLocation.withDefaultNamespace("item/bread");
             }
 
             // Pose anchors are the shape of the players' butt

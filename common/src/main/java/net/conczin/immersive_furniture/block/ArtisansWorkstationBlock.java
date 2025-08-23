@@ -3,7 +3,6 @@ package net.conczin.immersive_furniture.block;
 import net.conczin.immersive_furniture.Common;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;

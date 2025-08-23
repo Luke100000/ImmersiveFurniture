@@ -1,7 +1,7 @@
 package net.conczin.immersive_furniture.fabric.client;
 
-import net.conczin.immersive_furniture.client.model.FurnitureBakedModelWrapper;
 import net.conczin.immersive_furniture.client.model.CompositeBakedModel;
+import net.conczin.immersive_furniture.client.model.FurnitureBakedModelWrapper;
 import net.fabricmc.fabric.api.renderer.v1.Renderer;
 import net.fabricmc.fabric.api.renderer.v1.RendererAccess;
 import net.fabricmc.fabric.api.renderer.v1.material.BlendMode;

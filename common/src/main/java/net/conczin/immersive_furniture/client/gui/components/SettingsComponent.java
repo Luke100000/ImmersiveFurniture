@@ -5,10 +5,6 @@ import net.conczin.immersive_furniture.client.gui.ArtisansWorkstationLibraryScre
 import net.conczin.immersive_furniture.client.gui.widgets.BoundedIntSliderButton;
 import net.conczin.immersive_furniture.client.gui.widgets.StateImageButton;
 import net.conczin.immersive_furniture.client.model.*;
-import net.conczin.immersive_furniture.client.model.DynamicAtlas;
-import net.conczin.immersive_furniture.client.model.FurnitureModelFactory;
-import net.conczin.immersive_furniture.client.model.MaterialRegistry;
-import net.conczin.immersive_furniture.client.model.MaterialSource;
 import net.conczin.immersive_furniture.data.FurnitureData;
 import net.conczin.immersive_furniture.data.FurnitureDataManager;
 import net.conczin.immersive_furniture.utils.Utils;

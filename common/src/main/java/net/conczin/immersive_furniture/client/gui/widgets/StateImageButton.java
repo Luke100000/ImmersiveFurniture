@@ -1,6 +1,5 @@
 package net.conczin.immersive_furniture.client.gui.widgets;
 
-import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 

@@ -125,7 +125,7 @@ public class FurnitureDataManager {
         String hash = data.getHash();
         if (alreadySaved.contains(hash)) return;
         alreadySaved.add(hash);
-        FurnitureDataManager.save(data, new ResourceLocation("hash", data.getHash()));
+        FurnitureDataManager.save(data, ResourceLocation.fromNamespaceAndPath("hash", data.getHash()));
     }
 
     /**

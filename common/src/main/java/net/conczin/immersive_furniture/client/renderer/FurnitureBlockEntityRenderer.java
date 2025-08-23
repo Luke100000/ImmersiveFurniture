@@ -30,8 +30,10 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
+import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
+import org.lwjgl.system.MemoryStack;
 
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
@@ -41,7 +43,6 @@ import java.util.Map;
 import static net.minecraft.world.level.SignalGetter.DIRECTIONS;
 
 public class FurnitureBlockEntityRenderer<T extends FurnitureBlockEntity> implements BlockEntityRenderer<T> {
-    public static final float[] BRIGHTNESS = {1.0F, 1.0F, 1.0F, 1.0F};
     private final ItemRenderer itemRenderer;
 
     public FurnitureBlockEntityRenderer(BlockEntityRendererProvider.Context context) {

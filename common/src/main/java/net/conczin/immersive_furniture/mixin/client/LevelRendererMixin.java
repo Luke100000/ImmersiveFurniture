@@ -40,7 +40,6 @@ public abstract class LevelRendererMixin {
             ItemStack stack = player.getMainHandItem();
             if (!stack.isEmpty() && stack.getItem() instanceof FurnitureItem) {
                 FurnitureData data = FurnitureItem.getData(stack);
-                if (data == null) return;
 
                 Direction direction = player.getDirection().getOpposite();
                 VoxelShape shape = data.getShapeLazy(direction);

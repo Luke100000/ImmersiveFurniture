@@ -26,14 +26,14 @@ public abstract class CameraMixin {
     public abstract Vec3 getPosition();
 
     @Shadow
-    protected abstract void move(double distanceOffset, double verticalOffset, double horizontalOffset);
+    protected abstract void move(float zoom, float dy, float dx);
 
     @Inject(method = "setup(Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/world/entity/Entity;ZZF)V", at = @At("TAIL"))
     private void immersiveFurniture$setup(BlockGetter level, Entity entity, boolean detached, boolean thirdPersonReverse, float partialTick, CallbackInfo ci) {
         if (!detached && entity instanceof LivingEntity livingEntity && livingEntity.isSleeping()) {
             InteractionManager.Interaction interaction = InteractionManager.INSTANCE.getInteraction(livingEntity);
             if (interaction != null) {
-                move(0.0, -0.3, 0.0);
+                move(0.0f, -0.3f, 0.0f);
                 setRotation(interaction.offset().rotation(), 0f);
                 Vector3f offset = interaction.offset().offset();
                 BlockPos pos = interaction.pos();

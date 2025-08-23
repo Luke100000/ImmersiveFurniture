@@ -1,7 +1,7 @@
 package net.conczin.immersive_furniture.neoforge;
 
+import net.conczin.immersive_furniture.Client;
 import net.conczin.immersive_furniture.Common;
-import net.conczin.immersive_furniture.CommonClient;
 import net.conczin.immersive_furniture.data.ServerFurnitureRegistry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
@@ -20,7 +20,7 @@ public class NeoForgeBusEvents {
     @SubscribeEvent
     public static void onClientStart(ClientTickEvent.Post event) {
         if (firstLoad) {
-            CommonClient.postLoad();
+            Client.postLoad();
             firstLoad = false;
         }
     }
@@ -29,8 +29,7 @@ public class NeoForgeBusEvents {
 
     @SubscribeEvent
     public static void tick(ClientTickEvent.Pre event) {
-        CommonClient.tick();
-
+        Client.tick();
 
         Minecraft mc = Minecraft.getInstance();
         if (mc.level != null && mc.player != null && !warned) {

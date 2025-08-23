@@ -266,7 +266,7 @@ public abstract class BaseFurnitureBlock extends Block implements SimpleWaterlog
                 }
 
                 // Unmount all entities sitting on the furniture
-                AABB aabb = new AABB(pos, pos.offset(data.size.x, data.size.y, data.size.z)).inflate(1.0f);
+                AABB aabb = new AABB(pos.getX(), pos.getY(), pos.getZ(), pos.getX() + data.size.x, pos.getY() + data.size.y, pos.getZ() + data.size.z).inflate(1.0f);
                 level.getEntitiesOfClass(SittingEntity.class, aabb).forEach(Entity::ejectPassengers);
             }
 
