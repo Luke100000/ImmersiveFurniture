@@ -56,9 +56,9 @@ public class FurnitureData {
     public Vector3i size = new Vector3i(1, 1, 1);
 
     private String hash;
-    private final Map<Direction, VoxelShape> cachedShapes = new ConcurrentHashMap<>();
+    private final Map<Integer, VoxelShape> cachedFullShapes = new ConcurrentHashMap<>();
     private final Map<Integer, VoxelShape> cachedSubShapes = new ConcurrentHashMap<>();
-    private final Set<Direction> requestedShapes = new ConcurrentSkipListSet<>();
+    private final Set<Integer> requestedShapes = new ConcurrentSkipListSet<>();
     public long lastTick = 0;
 
     public FurnitureData() {
@@ -215,7 +215,7 @@ public class FurnitureData {
 
     public void dirty() {
         hash = null;
-        cachedShapes.clear();
+        cachedFullShapes.clear();
         cachedSubShapes.clear();
         requestedShapes.clear();
         for (Element element : elements) {
@@ -455,33 +455,34 @@ public class FurnitureData {
         );
     }
 
-    public VoxelShape getShape(Direction rotation) {
-        return cachedShapes.computeIfAbsent(rotation, this::computeShape);
+    public VoxelShape getShape(Direction rotation, int state) {
+        return cachedFullShapes.computeIfAbsent(rotation.ordinal() * 31 + state, key -> computeShape(rotation, state));
     }
 
-    public VoxelShape getShape(Direction rotation, int offsetX, int offsetY, int offsetZ) {
+    public VoxelShape getShape(Direction rotation, int state, int offsetX, int offsetY, int offsetZ) {
         return cachedSubShapes.computeIfAbsent(
-                (((rotation.ordinal() * 31) + offsetX) * 31 + offsetY) * 31 + offsetZ,
-                key -> computeShape(rotation, offsetX, offsetY, offsetZ)
+                ((((rotation.ordinal() * 31) + offsetX) * 31 + offsetY) * 31 + offsetZ) * 31 + state,
+                key -> computeShape(rotation, state, offsetX, offsetY, offsetZ)
         );
     }
 
     public VoxelShape getShapeLazy(Direction rotation) {
-        if (cachedShapes.containsKey(rotation)) {
-            return cachedShapes.get(rotation);
+        int id = rotation.ordinal() * 31;
+        if (cachedFullShapes.containsKey(id)) {
+            return cachedFullShapes.get(id);
         }
-        if (!requestedShapes.contains(rotation)) {
-            requestedShapes.add(rotation);
-            Common.EXECUTOR.execute(() -> getShape(rotation));
+        if (!requestedShapes.contains(id)) {
+            requestedShapes.add(id);
+            Common.EXECUTOR.execute(() -> getShape(rotation, 0));
         }
         return null;
     }
 
     // Computes the entire shape for visualization
-    private VoxelShape computeShape(Direction r) {
+    private VoxelShape computeShape(Direction rotation, int state) {
         return elements.stream()
-                .filter(e -> e.type == ElementType.ELEMENT && !e.isFlat())
-                .map(element -> getBox(element, r))
+                .filter(e -> e.type == ElementType.ELEMENT && !e.isFlat() && e.isMasked(state))
+                .map(element -> getBox(element, rotation))
                 .reduce((a, b) -> Shapes.joinUnoptimized(a, b, BooleanOp.OR))
                 .map(VoxelShape::optimize)
                 .orElse(Block.box(2, 2, 2, 14, 14, 14));
@@ -506,7 +507,7 @@ public class FurnitureData {
     }
 
     // Computes a fraction of a shape for collision
-    public VoxelShape computeShape(Direction rotation, int offsetX, int offsetY, int offsetZ) {
+    public VoxelShape computeShape(Direction rotation, int state, int offsetX, int offsetY, int offsetZ) {
         Vector3f start = rotate(new Vector3f(
                 offsetX == 0 ? -8 : 0,
                 offsetY == 0 ? -8 : 0,
@@ -520,7 +521,7 @@ public class FurnitureData {
         ), rotation);
 
         return Shapes.join(
-                getShape(rotation).move(
+                getShape(rotation, state).move(
                         -getRotatedX(rotation, offsetX, offsetZ),
                         -offsetY,
                         -getRotatedZ(rotation, offsetX, offsetZ)

@@ -587,6 +587,7 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
 
         // Raycast against each element
         for (FurnitureData.Element element : data.elements) {
+            if (!element.isMasked(currentState)) continue;
             Utils.Ray ray = Utils.inverseTransformRay(mouseX, mouseY, pose, element);
 
             Utils.RaycastResult raycastResult = Utils.raycast(ray, element);

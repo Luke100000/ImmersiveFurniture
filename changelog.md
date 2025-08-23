@@ -75,11 +75,9 @@ Initial release
 * Blockbench/JSON block and item model import
 * Datapack support
 * On flat elements (sprites mostly) the direction is picked oddly
-* Better dismounting
-* Give elements a mask based on the active state
-    * This automatically allows for doors and stuff
-    * This requires two sets of collisions and models
-    * Needs a preview button
+* State
+    * Emitters in the correct state
+    * Check potential downgrade
 
 ## Backend
 

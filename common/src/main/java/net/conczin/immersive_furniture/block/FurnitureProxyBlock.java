@@ -84,6 +84,7 @@ public class FurnitureProxyBlock extends Block {
                 if (data != null) {
                     return data.getShape(
                             state.getValue(FACING),
+                            baseState.getValue(BaseFurnitureBlock.ACTIVE) ? 1 : 0,
                             state.getValue(OFFSET_X),
                             state.getValue(OFFSET_Y),
                             state.getValue(OFFSET_Z)
