@@ -5,6 +5,7 @@
     * This allows, for example, doors, traps, yapping animations, etc.
 * Added "Item Sprites" to display an item in the inventory rather than a sprite
 * Some special sounds are no longer played globally
+* Fixed out-of-sync model previews in the editor
 
 # 0.0.9
 

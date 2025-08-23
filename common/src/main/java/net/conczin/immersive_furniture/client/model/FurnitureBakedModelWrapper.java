@@ -28,7 +28,7 @@ public class FurnitureBakedModelWrapper implements BakedModel {
         if (status.data() != null) {
             int yRot = (int) state.getValue(BaseFurnitureBlock.FACING).getOpposite().toYRot();
             boolean active = state.getValue(BaseFurnitureBlock.ACTIVE);
-            return FurnitureModelBaker.getModel(status.data(), DynamicAtlas.BAKED, yRot, active ? 1 : 0, false);
+            return FurnitureModelBaker.getModel(status.data(), status.data().getHash(), DynamicAtlas.BAKED, yRot, active ? 1 : 0, false);
         } else if (!status.done()) {
             // Schedule a re-render
             DelayedFurnitureRenderer.INSTANCE.delayRendering(pos);

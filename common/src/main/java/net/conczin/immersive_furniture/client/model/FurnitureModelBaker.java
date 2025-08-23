@@ -106,33 +106,29 @@ public class FurnitureModelBaker {
     public static CompositeBakedModel getAsyncModel(FurnitureData data, DynamicAtlas atlas, int state) {
         String hash = data.getHash();
         if (atlas.knownFurniture.containsKey(hash)) {
-            return getModel(data, atlas, 0, state, false);
-        } else {
-            if (!atlas.asyncRequestedFurniture.contains(hash)) {
-                atlas.asyncRequestedFurniture.add(hash);
-                Common.EXECUTOR.execute(() -> {
-                    if (getModel(data, atlas, 0, state, false) == null) {
-                        atlas.asyncRequestedFurniture.remove(hash);
-                    }
-                });
-            }
-            return null;
+            return getModel(data, data.getHash(), atlas, 0, state, false);
+        } else if (!atlas.asyncRequestedFurniture.contains(hash)) {
+            atlas.asyncRequestedFurniture.add(hash);
+            Common.EXECUTOR.execute(() -> {
+                getModel(data, hash, atlas, 0, state, false);
+                atlas.asyncRequestedFurniture.remove(hash);
+            });
         }
+        return null;
     }
 
     /**
      * Builds the default state usually used for items or previews.
      */
     public static CompositeBakedModel getModel(FurnitureData data, DynamicAtlas atlas) {
-        return getModel(data, atlas, 0, 0, true);
+        return getModel(data, data.getHash(), atlas, 0, 0, true);
     }
 
     /**
      * Build, bake, and cache a specific state and rotation.
      * Can return null if atlas is full unless forced.
      */
-    public static CompositeBakedModel getModel(FurnitureData data, DynamicAtlas atlas, int yRot, int state, boolean force) {
-        String hash = data.getHash();
+    public static CompositeBakedModel getModel(FurnitureData data, String hash, DynamicAtlas atlas, int yRot, int state, boolean force) {
         CachedBakedModelSet cachedBakedModelSet = atlas.knownFurniture.get(hash);
         boolean exist = cachedBakedModelSet != null;
 
@@ -149,8 +145,11 @@ public class FurnitureModelBaker {
             CompositeBlockModel model = FurnitureModelFactory.getModel(data, atlas);
             atlas.uploadIfDirty();
 
+            // Only cache if the hash is still the same
             CachedBakedModelSet modelSet = new CachedBakedModelSet(atlas, model);
-            atlas.knownFurniture.put(hash, modelSet); // TODO: Only add if the hash is still the same
+            if (data.getHash().equals(hash)) {
+                atlas.knownFurniture.put(hash, modelSet);
+            }
 
             // Only add when forced or the atlas had space
             if (force || !atlas.isFull() && atlas.getUsage() >= previousUsage) {
