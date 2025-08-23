@@ -93,9 +93,4 @@ public final class CommonForge {
             event.accept(Items.CRAFTING_MATERIAL);
         }
     }
-
-    @SubscribeEvent
-    public void onServerAboutToStart(ServerAboutToStartEvent event) {
-        FurnitureDataManager.setWorldRoot(event.getServer().getWorldPath(LevelResource.ROOT));
-    }
 }

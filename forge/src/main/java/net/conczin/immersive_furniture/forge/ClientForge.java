@@ -24,13 +24,6 @@ public final class ClientForge {
         event.registerEntityRenderer(Entities.SITTING, SittingEntityRenderer::new);
     }
 
-    @SubscribeEvent
-    public void onClientConnected(ClientPlayerNetworkEvent.LoggingIn event) {
-        if (!Minecraft.getInstance().isLocalServer()) {
-            FurnitureDataManager.setWorldRoot();
-        }
-    }
-
     static {
         FurnitureBakedModelWrapper.model = new ForgeFurnitureBakedModelWrapper();
     }

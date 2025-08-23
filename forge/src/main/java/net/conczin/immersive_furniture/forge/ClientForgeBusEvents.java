@@ -2,10 +2,12 @@ package net.conczin.immersive_furniture.forge;
 
 import net.conczin.immersive_furniture.Client;
 import net.conczin.immersive_furniture.Common;
+import net.conczin.immersive_furniture.data.FurnitureDataManager;
 import net.conczin.immersive_furniture.data.ServerFurnitureRegistry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -51,6 +53,13 @@ public class ClientForgeBusEvents {
                     Client.dependencyWarn(mc.player, "packetfixer");
                 }
             }
+        }
+    }
+
+    @SubscribeEvent
+    public static void onClientConnected(ClientPlayerNetworkEvent.LoggingIn event) {
+        if (!Minecraft.getInstance().isLocalServer()) {
+            FurnitureDataManager.setWorldRoot();
         }
     }
 }
