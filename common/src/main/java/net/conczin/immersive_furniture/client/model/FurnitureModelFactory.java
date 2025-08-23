@@ -4,6 +4,8 @@ import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.datafixers.util.Either;
 import net.conczin.immersive_furniture.Common;
 import net.conczin.immersive_furniture.client.Utils;
+import net.conczin.immersive_furniture.client.gui.ArtisansWorkstationEditorScreen;
+import net.conczin.immersive_furniture.config.Config;
 import net.conczin.immersive_furniture.data.ElementRotation;
 import net.conczin.immersive_furniture.data.FurnitureData;
 import net.conczin.immersive_furniture.data.ModelUtils;
@@ -26,29 +28,36 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class FurnitureModelFactory {
+    private final boolean inEditor;
+
     private final FurnitureData data;
     private final DynamicAtlas atlas;
-    private final AmbientOcclusion ao;
+    private final Map<Integer, AmbientOcclusion> aos;
     private int zFightingCounter = 0;
 
-    private final Map<FurnitureData.Element, Map<Direction, BlockElementFace>> faces = new HashMap<>();
+    private final Map<Integer, Map<FurnitureData.Element, Map<Direction, BlockElementFace>>> faces = new HashMap<>();
     private final List<FurnitureData.Element> elements = new LinkedList<>();
     private final Map<String, Either<Material, String>> textures = new HashMap<>();
     private final Map<FurnitureData.Element, Integer> elementToIndex = new HashMap<>();
     private final Map<Integer, FurnitureData.Element> indexToElement = new HashMap<>();
 
     private FurnitureModelFactory(FurnitureData data, DynamicAtlas atlas) {
+        this.inEditor = Minecraft.getInstance().screen instanceof ArtisansWorkstationEditorScreen;
         this.data = data;
         this.atlas = atlas;
 
         splitSprites();
 
         // Populate AO lookup
-        ao = new AmbientOcclusion();
-        for (FurnitureData.Element element : elements) {
-            if (element.type == FurnitureData.ElementType.ELEMENT) {
-                ao.place(element, element.material.transparency == TransparencyType.SOLID ? 1.0f : 0.25f);
+        aos = new HashMap<>();
+        for (int state : data.getUniqueSolidStates()) {
+            AmbientOcclusion ao = new AmbientOcclusion();
+            for (FurnitureData.Element element : elements) {
+                if (element.type == FurnitureData.ElementType.ELEMENT && element.isMasked(state)) {
+                    ao.place(element, element.material.transparency == TransparencyType.SOLID ? 1.0f : 0.25f);
+                }
             }
+            aos.put(state, ao);
         }
 
         // Fetch all textures
@@ -58,19 +67,25 @@ public class FurnitureModelFactory {
                         textures.put(source.toString(), Either.left(new Material(InventoryMenu.BLOCK_ATLAS, source))));
 
         // Fetch all faces
-        elements.stream().filter(FurnitureModelFactory::hasFaces).forEach(e -> faces.put(e, getFaces(e)));
+        for (int state : data.getUniqueSolidStates()) {
+            faces.put(state, elements.stream()
+                    .filter(FurnitureModelFactory::hasFaces)
+                    .filter(e -> e.isMasked(state))
+                    .collect(Collectors.toMap(e -> e, e -> getFaces(e, state))));
+        }
     }
 
     float mod(float a, float b) {
         return (a % b + b) % b;
     }
 
-    private BlockElementFace getFace(FurnitureData.Element element, Direction direction) {
+    private BlockElementFace getFace(FurnitureData.Element element, Direction direction, int state) {
         // Cull fully invisible faces
         float[] fs = ClientModelUtils.getShapeData(element);
         Vector3f[] vertices = ClientModelUtils.getVertices(element, direction, fs, null);
         for (FurnitureData.Element otherElement : elements) {
             if (otherElement == element) continue;
+            if (!otherElement.isMasked(state)) continue;
             if (otherElement.material.transparency != TransparencyType.SOLID) continue;
             if (otherElement.type != FurnitureData.ElementType.ELEMENT) continue;
             if (theSame(element, otherElement) && otherElement.hashCode() < element.hashCode()) continue;
@@ -79,7 +94,18 @@ public class FurnitureModelFactory {
 
         // Allocate pixels
         Vector2i dimensions = ClientModelUtils.getFaceDimensions(element, direction);
-        DynamicAtlas.Quad quad = atlas.allocate(dimensions.x, dimensions.y);
+
+        // Padding
+        int level = 1;
+        if (atlas == DynamicAtlas.BAKED) {
+            int i = Minecraft.getInstance().options.mipmapLevels().get();
+            int panic = atlas.getUsage() > 0.5 ? (atlas.getUsage() > 0.75 ? 2 : 1) : 0;
+            level = (int) Math.pow(2, Math.max(0, Math.min(i - panic, Config.getInstance().maxMipLevel)));
+        }
+        DynamicAtlas.Quad quad = atlas.allocate(
+                (int) (Math.ceil(dimensions.x / (double) level) * level),
+                (int) (Math.ceil(dimensions.y / (double) level) * level)
+        );
 
         if (quad.w() > 0 && quad.h() > 0) {
             // Render
@@ -88,7 +114,7 @@ public class FurnitureModelFactory {
 
             // Use baked texture if available
             boolean useBaked = true;
-            int[] baked = element.bakedTexture.get(direction);
+            int[] baked = inEditor ? null : element.bakedTextures.get(direction, state);
             if (baked == null || baked.length != dimensions.x * dimensions.y) {
                 baked = new int[dimensions.x * dimensions.y];
                 useBaked = false;
@@ -137,7 +163,7 @@ public class FurnitureModelFactory {
                         light += lightEffect.brightness / 100.0f;
 
                         // Ambient Occlusion
-                        float ao = Math.min(1.0f, Math.max(0.0f, 1.0f - this.ao.sample(pos, normal) * 1.5f));
+                        float ao = Math.min(1.0f, Math.max(0.0f, 1.0f - this.aos.get(state).sample(pos, normal) * 1.5f));
                         float emission = element.emission / 15.0f;
                         light *= (ao * (1.0f - emission) + emission);
 
@@ -156,10 +182,25 @@ public class FurnitureModelFactory {
                 }
             }
 
+            // Padding
+            for (int x = dimensions.x(); x < quad.w(); x++) {
+                for (int y = 0; y < dimensions.y(); y++) {
+                    int color = pixels.getPixelRGBA(quad.x() + x - 1, quad.y() + y);
+                    pixels.setPixelRGBA(quad.x() + x, quad.y() + y, color);
+                }
+            }
+            for (int y = dimensions.y(); y < quad.h(); y++) {
+                for (int x = 0; x < quad.w(); x++) {
+                    int color = pixels.getPixelRGBA(quad.x() + x, quad.y() + y - 1);
+                    pixels.setPixelRGBA(quad.x() + x, quad.y() + y, color);
+                }
+            }
+
             atlas.setDirty();
 
-            if (!useBaked) {
-                element.bakedTexture.put(direction, baked);
+            // Save baked texture
+            if (inEditor) {
+                element.bakedTextures.put(direction, state, baked);
             }
         }
 
@@ -221,7 +262,7 @@ public class FurnitureModelFactory {
         return true;
     }
 
-    private boolean mightZFight(FurnitureData.Element element, Map<Direction, BlockElementFace> faces) {
+    private boolean mightZFight(FurnitureData.Element element, Map<Direction, BlockElementFace> faces, int state) {
         for (Direction direction : faces.keySet()) {
             float[] fs = ClientModelUtils.getShapeData(element);
             Vector3f[] vertices = ClientModelUtils.getVertices(element, direction, fs, null);
@@ -241,7 +282,7 @@ public class FurnitureModelFactory {
                     localVerts[i] = lv;
                 }
 
-                Map<Direction, BlockElementFace> otherFaces = this.faces.getOrDefault(otherElement, Collections.emptyMap());
+                Map<Direction, BlockElementFace> otherFaces = this.faces.get(state).getOrDefault(otherElement, Collections.emptyMap());
 
                 float fromX = Math.min(localVerts[0].x, localVerts[2].x);
                 float toX = Math.max(localVerts[0].x, localVerts[2].x);
@@ -298,14 +339,14 @@ public class FurnitureModelFactory {
         return light;
     }
 
-    private BlockElement getElement(FurnitureData.Element element) {
+    private BlockElement getElement(FurnitureData.Element element, int state) {
         Vector3f from = new Vector3f(element.from);
         Vector3f to = new Vector3f(element.to);
 
-        Map<Direction, BlockElementFace> faces = this.faces.getOrDefault(element, Collections.emptyMap());
+        Map<Direction, BlockElementFace> faces = this.faces.get(state).getOrDefault(element, Collections.emptyMap());
 
         // If that element causes Z-fighting with another element, offset it slightly
-        if (mightZFight(element, faces)) {
+        if (!inEditor && mightZFight(element, faces, state)) {
             zFightingCounter++;
             float offset = 0.01f * (zFightingCounter % 7);
             from.sub(offset, offset, offset);
@@ -316,7 +357,7 @@ public class FurnitureModelFactory {
         return new BlockElement(from, to, faces, rotation, true);
     }
 
-    private Map<Direction, BlockElementFace> getFaces(FurnitureData.Element element) {
+    private Map<Direction, BlockElementFace> getFaces(FurnitureData.Element element, int state) {
         if (element.type == FurnitureData.ElementType.SPRITE) {
             TextureAtlas atlas = Minecraft.getInstance().getModelManager().getAtlas(InventoryMenu.BLOCK_ATLAS);
             TextureAtlasSprite sprite = atlas.getSprite(element.sprite.sprite);
@@ -329,7 +370,7 @@ public class FurnitureModelFactory {
             );
         } else {
             return EnumSet.allOf(Direction.class).stream()
-                    .map(dir -> Optional.ofNullable(getFace(element, dir))
+                    .map(dir -> Optional.ofNullable(getFace(element, dir, state))
                             .map(face -> Map.entry(dir, face)))
                     .flatMap(Optional::stream)
                     .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
@@ -354,19 +395,35 @@ public class FurnitureModelFactory {
         );
     }
 
-    private BlockModel getModel(TransparencyType type) {
+    /**
+     * Returns a block model for a specific render type
+     */
+    private BlockModel getModel(TransparencyType type, int state) {
         return new BlockModel(
                 null,
                 elements.stream()
                         .filter(FurnitureModelFactory::hasFaces)
+                        .filter(e -> e.isMasked(state))
                         .filter(e -> type == null || getTransparencyType(e) == type)
-                        .map(this::getElement).toList(),
+                        .map(e -> getElement(e, state))
+                        .toList(),
                 textures,
                 false,
                 BlockModel.GuiLight.SIDE,
                 getTransforms(),
                 List.of()
         );
+    }
+
+    /**
+     * Returns a block model for every state for a specific render type
+     */
+    private Map<Integer, BlockModel> getModels(TransparencyType type) {
+        Map<Integer, BlockModel> models = new HashMap<>();
+        for (Integer state : data.getUniqueSolidStates()) {
+            models.put(state, getModel(type, state));
+        }
+        return models;
     }
 
     private void splitSprites() {
@@ -403,7 +460,7 @@ public class FurnitureModelFactory {
                         elementToIndex.put(tiledElement, index);
                     }
                 }
-            } else {
+            } else if (element.type != FurnitureData.ElementType.SPRITE || !element.sprite.item) {
                 elements.add(element);
                 elementToIndex.put(element, index);
             }
@@ -452,15 +509,20 @@ public class FurnitureModelFactory {
         );
     }
 
-    public static MultiRenderTypeBlockModel getModel(FurnitureData data, DynamicAtlas atlas) {
+
+    /**
+     * Create a furniture model and its texture.
+     * This function is somewhat slow, call async whenever possible
+     */
+    public static CompositeBlockModel getModel(FurnitureData data, DynamicAtlas atlas) {
         FurnitureModelFactory factory = new FurnitureModelFactory(data, atlas);
 
         // Create a model for each transparency type
-        MultiRenderTypeBlockModel composite = new MultiRenderTypeBlockModel(factory.indexToElement);
-        composite.addModel(RenderType.solid(), factory.getModel(TransparencyType.SOLID));
-        composite.addModel(RenderType.cutout(), factory.getModel(TransparencyType.CUTOUT));
-        composite.addModel(RenderType.cutoutMipped(), factory.getModel(TransparencyType.CUTOUT_MIPPED));
-        composite.addModel(RenderType.translucent(), factory.getModel(TransparencyType.TRANSLUCENT));
+        CompositeBlockModel composite = new CompositeBlockModel(factory.indexToElement);
+        composite.addModel(RenderType.solid(), factory.getModels(TransparencyType.SOLID));
+        composite.addModel(RenderType.cutout(), factory.getModels(TransparencyType.CUTOUT));
+        composite.addModel(RenderType.cutoutMipped(), factory.getModels(TransparencyType.CUTOUT_MIPPED));
+        composite.addModel(RenderType.translucent(), factory.getModels(TransparencyType.TRANSLUCENT));
         return composite;
     }
 }

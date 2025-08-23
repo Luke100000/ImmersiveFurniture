@@ -107,6 +107,13 @@ public class ModelComponent extends ScreenComponent {
         // Duplicate
         addButton(leftPos + 42, topPos + height - 22, 16, 160, 192, "gui.immersive_furniture.duplicate_element", this::duplicateElements);
 
+        // Mask toggle
+        int u = 208 + (firstElement.mask - 1) * 16;
+        addToggleButton(leftPos + 78, topPos + height - 22, 16, u, 224, "gui.immersive_furniture.mask." + firstElement.mask, () -> {
+            screen.selectedElements.forEach(e -> e.mask = e.mask % 3 + 1);
+            screen.init();
+        }).setEnabled(false);
+
         // Position
         int y = topPos + 17;
         px = addNewFloatBox(leftPos + 6, y, 28);
@@ -214,7 +221,7 @@ public class ModelComponent extends ScreenComponent {
         });
         ry.setEnabled(firstElement.axis != Direction.Axis.Y);
         rz = addToggleButton(leftPos + 42, y, 16, 48, 192, null, () -> {
-            screen.selectedElements.forEach(e -> e.axis = Direction.Axis.Y);
+            screen.selectedElements.forEach(e -> e.axis = Direction.Axis.Z);
             rx.setEnabled(true);
             ry.setEnabled(true);
             rz.setEnabled(false);
@@ -229,6 +236,13 @@ public class ModelComponent extends ScreenComponent {
             addToggleButton(leftPos + 6 + type.ordinal() * 18, topPos + 94, 16, 176 + type.ordinal() * 16, 192, "gui.immersive_furniture.element_type." + type.name().toLowerCase(), () -> {
                 screen.selectedElements.forEach(e -> {
                     e.type = type;
+
+                    // Update mask based on type: 1 for emitters, 3 otherwise
+                    if (type == FurnitureData.ElementType.PARTICLE_EMITTER || type == FurnitureData.ElementType.SOUND_EMITTER) {
+                        e.mask = 1;
+                    } else {
+                        e.mask = 3;
+                    }
                     e.sanityCheck();
                 });
                 screen.init();
@@ -266,7 +280,7 @@ public class ModelComponent extends ScreenComponent {
                 ClientLevel level = Minecraft.getInstance().level;
                 LocalPlayer player = Minecraft.getInstance().player;
                 if (level != null && player != null && firstElement.particleEmitter.onInteract) {
-                    screen.data.emitInteractParticles(player.getOnPos(), null, player, getParticleEngine(screen.data)::addParticle, true);
+                    screen.data.emitInteractParticles(player.getOnPos(), null, screen.currentState, player, getParticleEngine(screen.data)::addParticle, true);
                 }
             }).setEnabled(!firstElement.particleEmitter.onInteract);
         } else if (firstElement.type == FurnitureData.ElementType.SOUND_EMITTER) {
@@ -305,7 +319,7 @@ public class ModelComponent extends ScreenComponent {
                 ClientLevel level = Minecraft.getInstance().level;
                 LocalPlayer player = Minecraft.getInstance().player;
                 if (level != null && player != null && firstElement.soundEmitter.onInteract) {
-                    screen.data.playInteractSound(level, player.getOnPos(), player);
+                    screen.data.playInteractSound(level, player.getOnPos(), screen.currentState, player);
                 }
             }).setEnabled(!firstElement.soundEmitter.onInteract);
         } else if (firstElement.type == FurnitureData.ElementType.PLAYER_POSE) {
@@ -342,11 +356,31 @@ public class ModelComponent extends ScreenComponent {
             });
             addButton(leftPos + 24, topPos + 132, 16, 96, 192, "gui.immersive_furniture.increase_size", () -> {
                 screen.selectedElements.forEach(e -> {
-                    e.sprite.size = Math.max(0.25f, e.sprite.size * 2.0f);
+                    e.sprite.size = Math.min(2.0f, e.sprite.size * 2.0f);
                     e.sanityCheck();
                 });
                 screen.init();
             });
+
+            // Align toggle (only visible when item == true)
+            if (firstElement.sprite.item) {
+                addToggleButton(leftPos + 78, topPos + 114, 16, 240, 160, "gui.immersive_furniture.align", () -> {
+                    screen.selectedElements.forEach(e -> {
+                        e.sprite.align = !e.sprite.align;
+                        e.sanityCheck();
+                    });
+                    screen.init();
+                }).setEnabled(!firstElement.sprite.align);
+            }
+
+            // Item toggle
+            addToggleButton(leftPos + 60, topPos + 132, 16, 0, 160, "gui.immersive_furniture.item", () -> {
+                screen.selectedElements.forEach(e -> {
+                    e.sprite.item = !e.sprite.item;
+                    e.sanityCheck();
+                });
+                screen.init();
+            }).setEnabled(!firstElement.sprite.item);
 
             // Tiled toggle
             addToggleButton(leftPos + 78, topPos + 132, 16, 144, 192, "gui.immersive_furniture.tiled", () -> {

@@ -17,6 +17,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -44,7 +45,9 @@ public abstract class ArtisansWorkstationScreen extends Screen {
     int leftPos;
     int topPos;
 
+    // TODO: There is no button yet in the library screen
     boolean nightMode = false;
+    public int currentState = 0;
 
     public ArtisansWorkstationScreen() {
         super(TITLE);
@@ -87,13 +90,13 @@ public abstract class ArtisansWorkstationScreen extends Screen {
         graphics.pose().popPose();
     }
 
-    private static MergedBakedModel lastBakedModel = null;
+    private static CompositeBakedModel lastBakedModel = null;
 
     void renderModel(GuiGraphics graphics, FurnitureData data, float yaw, float pitch, boolean inEditor) {
         TransparencyManager.heySodiumImInUse(data);
 
         if (inEditor) TransparencyManager.prepare(data);
-        MergedBakedModel bakedModel = FurnitureModelBaker.getAsyncModel(data, DynamicAtlas.SCRATCH);
+        CompositeBakedModel bakedModel = FurnitureModelBaker.getAsyncModel(data, DynamicAtlas.SCRATCH, currentState);
         if (inEditor) {
             if (bakedModel == null) {
                 bakedModel = lastBakedModel;
@@ -104,15 +107,21 @@ public abstract class ArtisansWorkstationScreen extends Screen {
 
         if (bakedModel != null) {
             int light = nightMode ? data.lightLevel : 15;
+            int packedLight = light << 20 | light << 4;
             FurnitureBlockEntityRenderer.renderFurniture(
                     null,
                     graphics.pose(),
                     graphics.bufferSource(),
-                    light << 20 | light << 4,
+                    packedLight,
                     OverlayTexture.NO_OVERLAY,
                     bakedModel,
                     DynamicAtlas.SCRATCH
             );
+
+            // Draw example items
+            assert this.minecraft != null;
+            ItemRenderer itemRenderer = this.minecraft.getItemRenderer();
+            FurnitureBlockEntityRenderer.drawItems(itemRenderer, this.minecraft.level, null, currentState, graphics.pose(), graphics.bufferSource(), packedLight, OverlayTexture.NO_OVERLAY, data);
         }
 
         // Particles
@@ -128,7 +137,7 @@ public abstract class ArtisansWorkstationScreen extends Screen {
             // We use the animation tick, which is a triangle distribution based on distance to the player,
             // 0.2f is roughly 4 blocks away
             if (level.getRandom().nextFloat() < 0.2f) {
-                data.tick(level, player.getOnPos(), null, level.getRandom(), getParticleEngine(data)::addParticle, true, inEditor);
+                data.tick(level, player.getOnPos(), currentState, null, level.getRandom(), getParticleEngine(data)::addParticle, true, inEditor);
             }
 
             getParticleEngine(data).tick();

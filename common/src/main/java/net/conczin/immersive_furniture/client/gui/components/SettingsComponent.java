@@ -3,6 +3,7 @@ package net.conczin.immersive_furniture.client.gui.components;
 import net.conczin.immersive_furniture.client.gui.ArtisansWorkstationEditorScreen;
 import net.conczin.immersive_furniture.client.gui.ArtisansWorkstationLibraryScreen;
 import net.conczin.immersive_furniture.client.gui.widgets.BoundedIntSliderButton;
+import net.conczin.immersive_furniture.client.gui.widgets.StateImageButton;
 import net.conczin.immersive_furniture.client.model.*;
 import net.conczin.immersive_furniture.client.model.DynamicAtlas;
 import net.conczin.immersive_furniture.client.model.FurnitureModelFactory;
@@ -92,6 +93,21 @@ public class SettingsComponent extends ScreenComponent {
         inventorySlider.setCallback(c -> screen.data.inventorySize = c);
         screen.addRenderableWidget(inventorySlider);
 
+        // Allow toggle with right click
+        int togglesY = topPos + 106;
+        StateImageButton rightClickToggle = addToggleButton(leftPos + 6, togglesY, 16, 192, 160, "gui.immersive_furniture.toggle_with_right_click", () -> {
+            screen.data.toggleWithRightClick = !screen.data.toggleWithRightClick;
+            screen.init();
+        });
+        rightClickToggle.setEnabled(!screen.data.toggleWithRightClick);
+
+        // Toggle light
+        StateImageButton lightToggle = addToggleButton(leftPos + 24, togglesY, 16, 208, 160, "gui.immersive_furniture.toggle_light", () -> {
+            screen.data.toggleLight = !screen.data.toggleLight;
+            screen.init();
+        });
+        lightToggle.setEnabled(!screen.data.toggleLight);
+
         // Save
         addButton("gui.immersive_furniture.save", b -> {
             // Finish and bake the model and save
@@ -136,6 +152,11 @@ public class SettingsComponent extends ScreenComponent {
         // Set author
         data.author = Minecraft.getInstance().getUser().getName();
 
+        // Fix obvious usage errors
+        if (data.hasDisplayItems()) {
+            data.inventorySize = Math.max(1, data.inventorySize);
+        }
+
         // Find and log sources of textures
         data.sources.clear();
         for (FurnitureData.Element element : data.elements) {
@@ -153,6 +174,7 @@ public class SettingsComponent extends ScreenComponent {
             }
         }
         data.sources.remove("minecraft");
+        data.sources.remove("mod resources");
 
         // Find and log dependencies
         data.dependencies.clear();
@@ -166,5 +188,6 @@ public class SettingsComponent extends ScreenComponent {
             }
         }
         data.dependencies.remove("minecraft");
+        data.dependencies.remove("mod resources");
     }
 }

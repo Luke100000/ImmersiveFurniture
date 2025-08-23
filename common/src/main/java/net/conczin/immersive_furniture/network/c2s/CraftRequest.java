@@ -19,6 +19,8 @@ import static net.conczin.immersive_furniture.item.Items.CRAFTING_MATERIAL;
 import static net.conczin.immersive_furniture.item.Items.FURNITURE;
 
 public record CraftRequest(FurnitureData data, boolean shift) implements ImmersivePayload {
+    private static long lastSoundTime = 0;
+
     public static final CustomPacketPayload.Type<CraftRequest> TYPE = new CustomPacketPayload.Type<>(Common.locate("craft_request"));
     public static final StreamCodec<FriendlyByteBuf, CraftRequest> STREAM_CODEC = StreamCodec.composite(
             FurnitureData.STREAM_CODEC, CraftRequest::data,
@@ -46,7 +48,21 @@ public record CraftRequest(FurnitureData data, boolean shift) implements Immersi
                 useResources(e, amount * cost);
             }
             giveFurniture(e, data, amount);
-            e.level().playLocalSound(e.getOnPos(), Sounds.REPAIR, SoundSource.BLOCKS, 1.0F, e.getRandom().nextFloat() * 0.5f + 0.75f, false);
+
+            // Play crafting sound
+            long time = System.currentTimeMillis();
+            float volume = Math.min(1.0f, Math.abs(lastSoundTime - time) / 1000.0f);
+            if (volume > 0.05f) {
+                lastSoundTime = time;
+                e.level().playSound(
+                        null,
+                        e.getOnPos(),
+                        Sounds.ASSEMBLE,
+                        SoundSource.BLOCKS,
+                        (e.getRandom().nextFloat() * 0.2f + 0.8f) * volume,
+                        e.getRandom().nextFloat() * 0.5f + 0.75f
+                );
+            }
         }
     }
 

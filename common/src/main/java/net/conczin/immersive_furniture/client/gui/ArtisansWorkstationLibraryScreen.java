@@ -48,6 +48,34 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
         SUBMISSIONS,
     }
 
+    public enum SortingMode {
+        DATE(88),
+        LIKES(66),
+        RECOMMENDATIONS(154);
+
+        private final int u;
+
+        SortingMode(int u) {
+            this.u = u;
+        }
+
+        public SortingMode cycle() {
+            return switch (this) {
+                case DATE -> LIKES;
+                case LIKES -> RECOMMENDATIONS;
+                case RECOMMENDATIONS -> DATE;
+            };
+        }
+
+        public int getU() {
+            return u;
+        }
+
+        public String key() {
+            return name().toLowerCase(Locale.ROOT);
+        }
+    }
+
     private boolean uploading = false;
     private boolean awaitingAuthentication = false;
     private boolean awaitingSearch = false;
@@ -58,7 +86,7 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
     private boolean isBrowserOpen = false;
     private boolean authenticated = false;
 
-    private boolean sortByDate = false;
+    private SortingMode order = SortingMode.RECOMMENDATIONS;
     private String tagFilter = "miscellaneous";
 
     Tab tab = Tab.GLOBAL;
@@ -85,6 +113,11 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
 
         // Just in case a few jobs failed
         FurnitureDataManager.REQUESTED_DATA.clear();
+    }
+
+    @Override
+    public boolean isPauseScreen() {
+        return false;
     }
 
     @Override
@@ -138,12 +171,12 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
 
             // Sort by date
             addRenderableWidget(
-                    new LegacyImageButton(leftPos + 3, y, 22, 22, sortByDate ? 88 : 66, 114, 22, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE, b -> {
-                        sortByDate = !sortByDate;
+                    new LegacyImageButton(leftPos + 3, y, 22, 22, order.getU(), 114, 22, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE, b -> {
+                        order = order.cycle();
                         shouldSearch = true;
                         init();
                     })
-            ).setTooltip(Tooltip.create(Component.translatable(sortByDate ? "gui.immersive_furniture.sort.favorites" : "gui.immersive_furniture.sort.date")));
+            ).setTooltip(Tooltip.create(Component.translatable("gui.immersive_furniture.sort." + order.key())));
 
             // Page buttons
             addRenderableWidget(
@@ -277,9 +310,12 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
             addRenderableWidget(
                     Button.builder(Component.translatable("gui.immersive_furniture.craft"), b -> {
                                 Network.sendToServer(new CraftRequest(FurnitureDataManager.getData(selected), holdingShift()));
-                                Minecraft.getInstance().setScreen(null);
+                                if (!holdingCtrl() && !holdingShift()) {
+                                    Minecraft.getInstance().setScreen(null);
+                                }
                             })
                             .bounds(leftPos + windowWidth - 68, topPos + windowHeight - 24, 64, 20)
+                            .tooltip(Tooltip.create(Component.translatable("gui.immersive_furniture.craft.hint")))
                             .build()
             );
         }
@@ -363,6 +399,7 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
             FurnitureData data = FurnitureDataManager.getData(selected);
 
             if (data != null) {
+                graphics.pose().pushPose();
                 graphics.pose().translate(0, 0, 1024);
                 graphics.enableScissor(leftPos + 6, topPos + 6, leftPos + windowWidth - 6, topPos + windowHeight - 28 - 6);
                 renderModel(graphics, data, leftPos + windowWidth / 2.0, topPos + windowHeight / 2.0, windowHeight - 28, previewYaw, previewPitch);
@@ -374,7 +411,6 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
                 graphics.drawString(font, Component.translatable("gui.immersive_furniture.author", data.author).withStyle(ChatFormatting.ITALIC).withStyle(ChatFormatting.GRAY), leftPos + 8, topPos + 18, 0xFFFFFF);
 
                 // Icon and cost
-                graphics.pose().pushPose();
                 graphics.pose().translate(leftPos + windowWidth, topPos + windowHeight - 28, 0);
                 graphics.pose().scale(1.5f, 1.5f, 1.5f);
                 MutableComponent cost = Component.literal(String.valueOf(data.getCost()));
@@ -410,6 +446,8 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
         graphics.pose().popPose();
 
         renderError(graphics, selected == null ? height / 2 : topPos + 9);
+
+        graphics.pose().translate(0, 0, 1024);
     }
 
     private boolean isTileHovered(int x, int y) {
@@ -423,6 +461,11 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
     private boolean holdingShift() {
         long window = Minecraft.getInstance().getWindow().getWindow();
         return InputConstants.isKeyDown(window, 340) || InputConstants.isKeyDown(window, 344);
+    }
+
+    private boolean holdingCtrl() {
+        long window = Minecraft.getInstance().getWindow().getWindow();
+        return InputConstants.isKeyDown(window, 341) || InputConstants.isKeyDown(window, 345);
     }
 
     protected ImageButton addButton(int x, int y, int size, int u, int v, String tooltip, Runnable clicked) {
@@ -510,6 +553,19 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
         return super.mouseClicked(mouseX, mouseY, button);
     }
 
+    @Override
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
+        if (selected != null) {
+            if (button == 0) {
+                previewYaw += (float) (dragX * 0.015f);
+                previewPitch -= (float) (dragY * 0.015f);
+            }
+            return true;
+        }
+
+        return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
+    }
+
     public void setSelected(ResourceLocation location) {
         this.selected = location;
         previewYaw = (float) (-Math.PI / 4 * 3);
@@ -556,7 +612,7 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
                 Response response = request(API.HttpMethod.GET, ContentListResponse::new, "v2/content/furniture", Map.of(
                         "whitelist", lastSearch + (tagFilter.equals("miscellaneous") ? "" : "," + tagFilter),
                         "blacklist", "",
-                        "order", sortByDate ? "date" : "likes",
+                        "order", order.key(),
                         "track", tab == Tab.FAVORITES ? "likes" : tab == Tab.SUBMISSIONS ? "submissions" : "all",
                         "descending", "true",
                         "offset", String.valueOf(page * ENTRIES_PER_PAGE),
@@ -590,6 +646,8 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
             if (data.hasSounds()) tags.add("has_sounds");
             if (data.canSit()) tags.add("can_sit");
             if (data.canSleep()) tags.add("can_sleep");
+            if (data.hasDisplayItems()) tags.add("has_display_items");
+            if (data.getUniqueSolidStates().size() > 1) tags.add("has_states");
             if (!data.dependencies.isEmpty()) tags.add("has_dependencies");
             if (!data.sources.isEmpty()) tags.add("has_modded_textures");
             if (data.inventorySize > 0) tags.add("has_inventory");
@@ -630,18 +688,5 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
             }
             uploading = false;
         });
-    }
-
-    @Override
-    public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
-        if (selected != null) {
-            if (button == 0) {
-                previewYaw += (float) (dragX * 0.015f);
-                previewPitch -= (float) (dragY * 0.015f);
-            }
-            return true;
-        }
-
-        return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
     }
 }

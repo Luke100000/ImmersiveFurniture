@@ -2,6 +2,7 @@ package net.conczin.immersive_furniture.mixin.client;
 
 import net.conczin.immersive_furniture.InteractionManager;
 import net.minecraft.client.Camera;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.BlockGetter;
@@ -13,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(Camera.class)
+@Mixin(value = Camera.class, priority = 700)
 public abstract class CameraMixin {
     @Shadow
     protected abstract void setRotation(float yRot, float xRot);
@@ -24,18 +25,22 @@ public abstract class CameraMixin {
     @Shadow
     public abstract Vec3 getPosition();
 
+    @Shadow
+    protected abstract void move(double distanceOffset, double verticalOffset, double horizontalOffset);
+
     @Inject(method = "setup(Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/world/entity/Entity;ZZF)V", at = @At("TAIL"))
     private void immersiveFurniture$setup(BlockGetter level, Entity entity, boolean detached, boolean thirdPersonReverse, float partialTick, CallbackInfo ci) {
-        if (entity instanceof LivingEntity livingEntity && livingEntity.isSleeping()) {
+        if (!detached && entity instanceof LivingEntity livingEntity && livingEntity.isSleeping()) {
             InteractionManager.Interaction interaction = InteractionManager.INSTANCE.getInteraction(livingEntity);
             if (interaction != null) {
+                move(0.0, -0.3, 0.0);
                 setRotation(interaction.offset().rotation(), 0f);
                 Vector3f offset = interaction.offset().offset();
-                Vec3 position = getPosition();
+                BlockPos pos = interaction.pos();
                 setPosition(
-                        position.x + offset.x - 0.5,
-                        position.y + offset.y - 0.5,
-                        position.z + offset.z - 0.5
+                        pos.getX() + offset.x,
+                        pos.getY() + offset.y + 0.4,
+                        pos.getZ() + offset.z
                 );
             }
         }

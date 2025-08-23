@@ -16,8 +16,10 @@ import net.conczin.immersive_furniture.data.ModelUtils;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -125,7 +127,7 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
             x += 26;
             addRenderableWidget(pagePageButton(Page.EFFECTS, x, 2 * 26));
             x += 26;
-        } else if (isFirstElement(FurnitureData.ElementType.SPRITE)) {
+        } else if (isFirstElement(FurnitureData.ElementType.SPRITE) && getFirstElement().filter(e -> !e.sprite.item).isPresent()) {
             addRenderableWidget(pagePageButton(Page.SPRITES, x, 4 * 26));
             x += 26;
             addRenderableWidget(pagePageButton(Page.EFFECTS, x, 2 * 26));
@@ -146,36 +148,40 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
         addRenderableWidget(helpButton);
 
         // Night-mode button
-        MutableComponent nightModeText = Component.translatable("gui.immersive_furniture.nightmode");
-        StateImageButton nightModeButton = new StateImageButton(
-                leftPos + windowWidth + 1, topPos + windowHeight - 19, 16, 16,
-                256 - 48, 160, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE,
-                b -> {
+        sideButton(nightMode ? "gui.immersive_furniture.nightmode" : "gui.immersive_furniture.daymode",
+                topPos + windowHeight - 19, 208, 160, nightMode, b -> {
                     nightMode = !nightMode;
                     init();
-                },
-                nightModeText
-        );
-        nightModeButton.setTooltip(Tooltip.create(nightModeText));
-        nightModeButton.setEnabled(nightMode);
-        addRenderableWidget(nightModeButton);
+                });
 
         // Backwards checker plane button
-        MutableComponent backwardsCheckerPlaneText = Component.translatable("gui.immersive_furniture.backwards_checkerplane");
-        StateImageButton backwardsCheckerButton = new StateImageButton(
-                leftPos + windowWidth + 1, topPos + windowHeight - 36, 16, 16,
-                256 - 32, 160, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE,
-                b -> {
+        sideButton("gui.immersive_furniture.backwards_checkerplane",
+                topPos + windowHeight - 36, 224, 160, backwardsCheckerPlane, b -> {
                     backwardsCheckerPlane = !backwardsCheckerPlane;
                     init();
-                },
-                backwardsCheckerPlaneText
-        );
-        backwardsCheckerButton.setTooltip(Tooltip.create(backwardsCheckerPlaneText));
-        backwardsCheckerButton.setEnabled(backwardsCheckerPlane);
-        addRenderableWidget(backwardsCheckerButton);
+                });
+
+        // Current state toggle button
+        sideButton("gui.immersive_furniture.current_state",
+                topPos + windowHeight - 53, 208 + currentState * 16, 224, false, b -> {
+                    currentState = (currentState == 0) ? 1 : 0;
+                    init();
+                });
 
         addHistory();
+    }
+
+    private void sideButton(String tooltip, int y, int u, int v, boolean enabled, Button.OnPress action) {
+        MutableComponent text = Component.translatable(tooltip);
+        StateImageButton state = new StateImageButton(
+                leftPos + windowWidth + 1, y, 16, 16,
+                u, v, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE,
+                action,
+                text
+        );
+        state.setTooltip(Tooltip.create(text));
+        state.setEnabled(enabled);
+        addRenderableWidget(state);
     }
 
     private void cancel() {
@@ -582,6 +588,7 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
 
         // Raycast against each element
         for (FurnitureData.Element element : data.elements) {
+            if (!element.isMasked(currentState)) continue;
             Utils.Ray ray = Utils.inverseTransformRay(mouseX, mouseY, pose, element);
 
             Utils.RaycastResult raycastResult = Utils.raycast(ray, element);
@@ -594,7 +601,18 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
             hoverResult = null;
         } else {
             results.sort((a, b) -> Float.compare(b.depth, a.depth));
-            hoverResult = results.get(elementShift % results.size());
+
+            int index = 0;
+            if (!selectedElements.isEmpty() && !(hasShiftDown() && selectedElements.size() > 1)) {
+                for (int i = 0; i < results.size(); i++) {
+                    if (selectedElements.contains(results.get(i).element())) {
+                        index = i;
+                        break;
+                    }
+                }
+            }
+
+            hoverResult = results.get((index + elementShift) % results.size());
 
             // Highlight the hovered element
             float selectionWidth = selectedElements.contains(hoverResult.element()) ? 1.25f : 1.0f;

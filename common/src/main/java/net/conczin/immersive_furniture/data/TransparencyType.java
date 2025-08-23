@@ -23,8 +23,4 @@ public enum TransparencyType implements StringRepresentable {
     public String toString() {
         return getSerializedName();
     }
-
-    public boolean isHigherPriorityThan(TransparencyType other) {
-        return ordinal() > other.ordinal();
-    }
 }

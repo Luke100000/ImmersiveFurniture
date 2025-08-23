@@ -9,7 +9,6 @@ import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -42,6 +41,7 @@ public class FurnitureBlockEntity extends BlockEntity implements Container, Menu
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
 
+        this.items.clear();
         ContainerHelper.loadAllItems(tag, this.items, registries);
 
         if (tag.contains(FURNITURE)) {
@@ -60,8 +60,8 @@ public class FurnitureBlockEntity extends BlockEntity implements Container, Menu
 
         if (this.data != null) {
             if (Config.getInstance().saveAsHash) {
-                FurnitureDataManager.save(data, ResourceLocation.fromNamespaceAndPath("hash", this.data.getHash()));
-                tag.putString(FURNITURE_HASH, this.data.getHash());
+                FurnitureDataManager.saveHashData(this.data);
+                tag.putString(FurnitureItem.FURNITURE_HASH, this.data.getHash());
             } else {
                 tag.put(FURNITURE, this.data.toTag());
             }
@@ -119,6 +119,19 @@ public class FurnitureBlockEntity extends BlockEntity implements Container, Menu
     @Override
     public ItemStack getItem(int slot) {
         return getItems().get(slot);
+    }
+
+    @Override
+    public void setChanged() {
+        super.setChanged();
+
+        // Sync inventory changes to the client in case it has display slots
+        if (level != null) {
+            FurnitureData data = getData();
+            if (data != null && data.hasDisplayItems()) {
+                level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 2);
+            }
+        }
     }
 
     @Override

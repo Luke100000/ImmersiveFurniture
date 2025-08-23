@@ -4,6 +4,7 @@ import net.conczin.immersive_furniture.Common;
 import net.conczin.immersive_furniture.Sounds;
 import net.conczin.immersive_furniture.block.Blocks;
 import net.conczin.immersive_furniture.block.entity.BlockEntityTypes;
+import net.conczin.immersive_furniture.data.FurnitureDataManager;
 import net.conczin.immersive_furniture.entity.Entities;
 import net.conczin.immersive_furniture.item.Items;
 import net.conczin.immersive_furniture.network.ImmersivePayload;
@@ -15,6 +16,16 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.storage.LevelResource;
+import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
+import net.minecraftforge.event.server.ServerAboutToStartEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
+import net.minecraftforge.network.NetworkDirection;
+import net.minecraftforge.network.NetworkRegistry;
+import net.minecraftforge.network.simple.SimpleChannel;
+import net.minecraftforge.registries.RegisterEvent;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
@@ -57,7 +68,6 @@ public final class CommonNeoForge {
         public NeoForgeRegistrar(PayloadRegistrar registrar) {
             this.registrar = registrar;
         }
-
         @Override
         public <T extends ImmersivePayload> void register(ImmersivePayload.Type<T> type, StreamCodec<FriendlyByteBuf, T> codec, boolean isServer) {
             if (isServer) {
@@ -82,5 +92,10 @@ public final class CommonNeoForge {
         } else if (event.getTabKey() == CreativeModeTabs.INGREDIENTS) {
             event.accept(Items.CRAFTING_MATERIAL);
         }
+    }
+
+    @SubscribeEvent
+    public void onServerAboutToStart(ServerAboutToStartEvent event) {
+        FurnitureDataManager.setWorldRoot(event.getServer().getWorldPath(LevelResource.ROOT));
     }
 }

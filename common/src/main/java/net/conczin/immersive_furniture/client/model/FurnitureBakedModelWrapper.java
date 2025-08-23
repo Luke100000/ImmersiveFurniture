@@ -20,13 +20,14 @@ import java.util.List;
 public class FurnitureBakedModelWrapper implements BakedModel {
     public static BakedModel model = new FurnitureBakedModelWrapper();
 
-    protected static MergedBakedModel getBakedModel(BlockPos pos, BlockState state) {
+    protected static CompositeBakedModel getBakedModel(BlockPos pos, BlockState state) {
         DelayedFurnitureRenderer.Status status = DelayedFurnitureRenderer.INSTANCE.getLoadedStatus(pos);
 
         // Render it
         if (status.data() != null) {
             int yRot = (int) state.getValue(BaseFurnitureBlock.FACING).getOpposite().toYRot();
-            return FurnitureModelBaker.getModel(status.data(), DynamicAtlas.BAKED, yRot, false);
+            boolean active = state.getValue(BaseFurnitureBlock.ACTIVE);
+            return FurnitureModelBaker.getModel(status.data(), status.data().getHash(), DynamicAtlas.BAKED, yRot, active ? 1 : 0, false);
         } else if (!status.done()) {
             // Schedule a re-render
             DelayedFurnitureRenderer.INSTANCE.delayRendering(pos);

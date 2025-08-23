@@ -1,5 +1,6 @@
 package net.conczin.immersive_furniture.data;
 
+import net.conczin.immersive_furniture.Common;
 import net.conczin.immersive_furniture.client.model.DynamicAtlas;
 import com.mojang.serialization.Codec;
 import net.conczin.immersive_furniture.config.Config;
@@ -25,6 +26,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.joml.Quaternionf;
@@ -33,6 +35,8 @@ import org.joml.Vector3i;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.stream.Collectors;
 
 public class FurnitureData {
     public static final Codec<FurnitureData> CODEC = CompoundTag.CODEC.xmap(
@@ -48,9 +52,11 @@ public class FurnitureData {
     public static final FurnitureData EMPTY = new FurnitureData();
 
     public String name = "Empty";
-    public String tag = "Miscellaneous";
+    public String tag = "miscellaneous";
     public int lightLevel;
     public int inventorySize;
+    public boolean toggleWithRightClick;
+    public boolean toggleLight;
 
     public int contentid = -1;
     public String author = "Unknown";
@@ -63,7 +69,9 @@ public class FurnitureData {
     public Vector3i size = new Vector3i(1, 1, 1);
 
     private String hash;
-    private Map<Direction, VoxelShape> cachedShapes = new ConcurrentHashMap<>();
+    private final Map<Integer, VoxelShape> cachedFullShapes = new ConcurrentHashMap<>();
+    private final Map<Integer, VoxelShape> cachedSubShapes = new ConcurrentHashMap<>();
+    private final Set<Integer> requestedShapes = new ConcurrentSkipListSet<>();
     public long lastTick = 0;
 
     public FurnitureData() {
@@ -75,6 +83,8 @@ public class FurnitureData {
         this.tag = NBTHelper.getString(tag, "Tag", this.tag);
         this.lightLevel = NBTHelper.getInt(tag, "LightLevel", lightLevel);
         this.inventorySize = NBTHelper.getInt(tag, "InventorySize", inventorySize);
+        this.toggleWithRightClick = NBTHelper.getBoolean(tag, "ToggleWithRightClick", toggleWithRightClick);
+        this.toggleLight = NBTHelper.getBoolean(tag, "ToggleLight", toggleLight);
         this.contentid = NBTHelper.getInt(tag, "ContentID", contentid);
         this.author = NBTHelper.getString(tag, "Author", author);
         this.originalAuthor = NBTHelper.getString(tag, "OriginalAuthor", originalAuthor);
@@ -99,13 +109,14 @@ public class FurnitureData {
         this.tag = data.tag;
         this.lightLevel = data.lightLevel;
         this.inventorySize = data.inventorySize;
+        this.toggleWithRightClick = data.toggleWithRightClick;
+        this.toggleLight = data.toggleLight;
         this.author = data.author;
         this.originalAuthor = data.originalAuthor.isEmpty() ? data.author : data.originalAuthor;
         this.sources.addAll(data.sources);
         this.dependencies.addAll(data.dependencies);
 
         this.hash = null;
-        this.cachedShapes = new ConcurrentHashMap<>();
         this.lastTick = 0;
 
         for (Element element : data.elements) {
@@ -121,6 +132,8 @@ public class FurnitureData {
         tag.putString("Tag", this.tag);
         tag.putInt("LightLevel", lightLevel);
         tag.putInt("InventorySize", inventorySize);
+        tag.putBoolean("ToggleWithRightClick", toggleWithRightClick);
+        tag.putBoolean("ToggleLight", toggleLight);
         tag.putInt("ContentID", contentid);
         tag.putString("Author", author);
         tag.putString("OriginalAuthor", originalAuthor);
@@ -215,24 +228,26 @@ public class FurnitureData {
 
     public void dirty() {
         hash = null;
-        cachedShapes.clear();
+        cachedFullShapes.clear();
+        cachedSubShapes.clear();
+        requestedShapes.clear();
         for (Element element : elements) {
             element.rotationAxes = null;
-            element.bakedTexture.clear();
+            element.bakedTextures.clear();
         }
     }
 
-    public void playInteractSound(Level level, BlockPos pos, Player player) {
+    public void playInteractSound(Level level, BlockPos pos, int state, Player player) {
         for (Element element : elements) {
-            if (element.type == ElementType.SOUND_EMITTER && element.soundEmitter.onInteract) {
+            if (element.isMasked(state) && element.type == ElementType.SOUND_EMITTER && element.soundEmitter.onInteract) {
                 playSound(level, pos, player.getRandom(), element);
             }
         }
     }
 
-    public void emitInteractParticles(BlockPos pos, Direction direction, Player player, ParticleConsumer particleConsumer, boolean inScreen) {
+    public void emitInteractParticles(BlockPos pos, Direction direction, int state, Player player, ParticleConsumer particleConsumer, boolean inScreen) {
         for (Element element : elements) {
-            if (element.type == ElementType.PARTICLE_EMITTER && element.particleEmitter.onInteract) {
+            if (element.isMasked(state) && element.type == ElementType.PARTICLE_EMITTER && element.particleEmitter.onInteract) {
                 emitParticles(pos, direction, player.getRandom(), element, particleConsumer, inScreen, 10.0f);
             }
         }
@@ -252,6 +267,36 @@ public class FurnitureData {
 
     public boolean canSleep() {
         return elements.stream().anyMatch(e -> e.type == ElementType.PLAYER_POSE && e.playerPose.pose == Pose.SLEEPING);
+    }
+
+    public boolean hasDisplayItems() {
+        return elements.stream().anyMatch(e -> e.type == ElementType.SPRITE && e.sprite.item);
+    }
+
+    /**
+     * @return A set of unique solid states for the furniture, e.g.: a door would return (0, 1)
+     */
+    public Set<Integer> getUniqueSolidStates() {
+        Map<Integer, Long> maskCounts = elements.stream()
+                .filter(e -> e.type == ElementType.ELEMENT || e.type == ElementType.SPRITE)
+                .collect(Collectors.groupingBy(
+                        e -> e.mask,
+                        Collectors.counting()
+                ));
+
+        Set<Integer> states = new HashSet<>();
+        long firstHash = -1;
+        for (int state = 0; state < 2; state++) {
+            long hash = 0;
+            for (Map.Entry<Integer, Long> entry : maskCounts.entrySet()) {
+                if ((entry.getKey() & (1 << state)) != 0) {
+                    hash += 1024L * entry.getKey() + entry.getValue();
+                }
+            }
+            if (hash != firstHash) states.add(state);
+            if (state == 0) firstHash = hash;
+        }
+        return states;
     }
 
     public List<Component> getTooltip(boolean advanced) {
@@ -279,6 +324,12 @@ public class FurnitureData {
         if (canSleep()) {
             tooltip.add(Component.translatable("gui.immersive_furniture.can_sleep").withStyle(ChatFormatting.YELLOW));
         }
+        if (hasDisplayItems()) {
+            tooltip.add(Component.translatable("gui.immersive_furniture.has_display_items").withStyle(ChatFormatting.YELLOW));
+        }
+        if (getUniqueSolidStates().size() > 1) {
+            tooltip.add(Component.translatable("gui.immersive_furniture.has_states").withStyle(ChatFormatting.YELLOW));
+        }
         boolean hasAdvanced = false;
         if (!sources.isEmpty()) {
             hasAdvanced = true;
@@ -301,8 +352,10 @@ public class FurnitureData {
         if (advanced) {
             int pixels = 0;
             for (Element element : elements) {
-                for (int[] value : element.bakedTexture.values()) {
-                    pixels += value.length;
+                for (Map<Integer, int[]> texture : element.bakedTextures.textures.values()) {
+                    for (Map.Entry<Integer, int[]> states : texture.entrySet()) {
+                        pixels += states.getValue().length;
+                    }
                 }
             }
             double usage = pixels / Math.pow(DynamicAtlas.BAKED.getSize(), 2);
@@ -354,7 +407,7 @@ public class FurnitureData {
                     Vector3f up = rotateVector(element.getRotationAxes().up(), direction).normalize();
 
                     if (element.playerPose.pose == Pose.SLEEPING) {
-                        center.add(forward.mul(-0.93475f));
+                        center.add(forward.mul(0.5625f));
                         center.sub(up.mul(-0.0625f));
                     } else {
                         center.add(forward.mul(0.125f));
@@ -397,8 +450,9 @@ public class FurnitureData {
         }
     }
 
-    public void tick(Level level, BlockPos pos, Direction direction, RandomSource random, ParticleConsumer particleConsumer, boolean inScreen, boolean inEditor) {
+    public void tick(Level level, BlockPos pos, int state, Direction direction, RandomSource random, ParticleConsumer particleConsumer, boolean inScreen, boolean inEditor) {
         for (Element element : elements) {
+            if (!element.isMasked(state)) continue;
             if (element.type == ElementType.PARTICLE_EMITTER && !element.particleEmitter.onInteract) {
                 emitParticles(pos, direction, random, element, particleConsumer, inScreen, 1.0f);
             } else if (element.type == ElementType.SOUND_EMITTER && (!inScreen || inEditor) && element.soundEmitter.frequency > 0 && random.nextFloat() < element.soundEmitter.frequency) {
@@ -422,16 +476,87 @@ public class FurnitureData {
         );
     }
 
-    public VoxelShape getShape(Direction rotation) {
-        return cachedShapes.computeIfAbsent(rotation, this::computeShape);
+    public VoxelShape getShape(Direction rotation, int state) {
+        return cachedFullShapes.computeIfAbsent(rotation.ordinal() * 31 + state, key -> computeShape(rotation, state));
     }
 
-    private VoxelShape computeShape(Direction r) {
+    public VoxelShape getShape(Direction rotation, int state, int offsetX, int offsetY, int offsetZ) {
+        return cachedSubShapes.computeIfAbsent(
+                ((((rotation.ordinal() * 31) + offsetX) * 31 + offsetY) * 31 + offsetZ) * 31 + state,
+                key -> computeShape(rotation, state, offsetX, offsetY, offsetZ)
+        );
+    }
+
+    public VoxelShape getShapeLazy(Direction rotation) {
+        int id = rotation.ordinal() * 31;
+        if (cachedFullShapes.containsKey(id)) {
+            return cachedFullShapes.get(id);
+        }
+        if (!requestedShapes.contains(id)) {
+            requestedShapes.add(id);
+            Common.EXECUTOR.execute(() -> getShape(rotation, 0));
+        }
+        return null;
+    }
+
+    // Computes the entire shape for visualization
+    private VoxelShape computeShape(Direction rotation, int state) {
         return elements.stream()
-                .filter(e -> e.type == ElementType.ELEMENT && !e.isFlat())
-                .map(element -> getBox(element, r))
-                .reduce(Shapes::or)
+                .filter(e -> e.type == ElementType.ELEMENT && !e.isFlat() && e.isMasked(state))
+                .map(element -> getBox(element, rotation))
+                .reduce((a, b) -> Shapes.joinUnoptimized(a, b, BooleanOp.OR))
+                .map(VoxelShape::optimize)
                 .orElse(Block.box(2, 2, 2, 14, 14, 14));
+    }
+
+    public int getRotatedX(Direction facing, int x, int z) {
+        return switch (facing) {
+            case SOUTH -> -x;
+            case EAST -> -z;
+            case WEST -> z;
+            default -> x;
+        };
+    }
+
+    public int getRotatedZ(Direction facing, int x, int z) {
+        return switch (facing) {
+            case SOUTH -> -z;
+            case EAST -> x;
+            case WEST -> -x;
+            default -> z;
+        };
+    }
+
+    // Computes a fraction of a shape for collision
+    public VoxelShape computeShape(Direction rotation, int state, int offsetX, int offsetY, int offsetZ) {
+        Vector3f start = rotate(new Vector3f(
+                offsetX == 0 ? -8 : 0,
+                offsetY == 0 ? -8 : 0,
+                offsetZ == 0 ? -8 : 0
+        ), rotation);
+
+        Vector3f stop = rotate(new Vector3f(
+                offsetX == size.x - 1 ? 24 : 16,
+                offsetY == size.y - 1 ? 24 : 16,
+                offsetZ == size.z - 1 ? 24 : 16
+        ), rotation);
+
+        return Shapes.join(
+                getShape(rotation, state).move(
+                        -getRotatedX(rotation, offsetX, offsetZ),
+                        -offsetY,
+                        -getRotatedZ(rotation, offsetX, offsetZ)
+                ),
+                Block.box(
+                        Math.min(start.x, stop.x),
+                        Math.min(start.y, stop.y),
+                        Math.min(start.z, stop.z),
+                        Math.max(start.x, stop.x),
+                        Math.max(start.y, stop.y),
+                        Math.max(start.z, stop.z)
+                ),
+                BooleanOp.AND
+        );
     }
 
     private static Vector3f rotate(Vector3f vec, Direction direction) {
@@ -452,7 +577,7 @@ public class FurnitureData {
         };
     }
 
-    private static VoxelShape getBox(Element element, Direction rotation) {
+    private VoxelShape getBox(Element element, Direction rotation) {
         Vector3f from = new Vector3f(Float.MAX_VALUE, Float.MAX_VALUE, Float.MAX_VALUE);
         Vector3f to = new Vector3f(-Float.MAX_VALUE, -Float.MAX_VALUE, -Float.MAX_VALUE);
         Vector3f[] corners = ModelUtils.getCorners(element);
@@ -485,16 +610,19 @@ public class FurnitureData {
             to.z = to.z * fraction + mid * (1.0f - fraction);
         }
 
+        // Rotate the box
         Vector3f rotatedFrom = rotate(from, rotation);
         Vector3f rotatedTo = rotate(to, rotation);
 
+        // Quantize the box
+        float resolution = elements.size() > 96 ? 1.0f : elements.size() > 48 ? 2.0f : 4.0f;
         return Block.box(
-                Math.min(rotatedFrom.x, rotatedTo.x),
-                Math.min(rotatedFrom.y, rotatedTo.y),
-                Math.min(rotatedFrom.z, rotatedTo.z),
-                Math.max(rotatedFrom.x, rotatedTo.x),
-                Math.max(rotatedFrom.y, rotatedTo.y),
-                Math.max(rotatedFrom.z, rotatedTo.z)
+                Math.round(Math.min(rotatedFrom.x, rotatedTo.x) * resolution) / resolution,
+                Math.round(Math.min(rotatedFrom.y, rotatedTo.y) * resolution) / resolution,
+                Math.round(Math.min(rotatedFrom.z, rotatedTo.z) * resolution) / resolution,
+                Math.round(Math.max(rotatedFrom.x, rotatedTo.x) * resolution) / resolution,
+                Math.round(Math.max(rotatedFrom.y, rotatedTo.y) * resolution) / resolution,
+                Math.round(Math.max(rotatedFrom.z, rotatedTo.z) * resolution) / resolution
         );
     }
 
@@ -520,13 +648,14 @@ public class FurnitureData {
         public ElementType type = ElementType.ELEMENT;
         public int color = -1;
         public int emission = 0;
+        public int mask = 3;
         public Material material;
         public ParticleEmitter particleEmitter;
         public SoundEmitter soundEmitter;
         public PlayerPose playerPose;
         public Sprite sprite;
 
-        public Map<Direction, int[]> bakedTexture = new ConcurrentHashMap<>();
+        public ElementBakedTextures bakedTextures = new ElementBakedTextures();
         public ElementRotationAxes rotationAxes;
 
         public Element() {
@@ -552,11 +681,11 @@ public class FurnitureData {
             this.soundEmitter = new SoundEmitter(tag.getCompound("SoundEmitter"));
             this.playerPose = new PlayerPose(tag.getCompound("PlayerPose"));
             this.sprite = new Sprite(tag.getCompound("Sprite"));
-
-            CompoundTag bakedTextureTag = tag.getCompound("BakedTexture");
-            for (String key : bakedTextureTag.getAllKeys()) {
-                bakedTexture.put(Direction.CODEC.byName(key), bakedTextureTag.getIntArray(key));
-            }
+            this.mask = NBTHelper.getInt(tag, "Mask", this.mask);
+            this.bakedTextures = new ElementBakedTextures(
+                    tag.getCompound("BakedTexture"),
+                    tag.getCompound("BakedTextures")
+            );
         }
 
         public Element(Element element) {
@@ -567,12 +696,13 @@ public class FurnitureData {
             this.type = element.type;
             this.color = element.color;
             this.emission = element.emission;
+            this.mask = element.mask;
             this.material = new Material(element.material);
             this.particleEmitter = new ParticleEmitter(element.particleEmitter);
             this.soundEmitter = new SoundEmitter(element.soundEmitter);
             this.playerPose = new PlayerPose(element.playerPose);
             this.sprite = new Sprite(element.sprite);
-            this.bakedTexture = new ConcurrentHashMap<>();
+            this.bakedTextures = new ElementBakedTextures();
             this.rotationAxes = null;
         }
 
@@ -585,16 +715,11 @@ public class FurnitureData {
             tag.putString("Type", type.name().toLowerCase());
             tag.putInt("Color", color);
             tag.putInt("Emission", emission);
+            tag.putInt("Mask", mask);
 
             if (type == ElementType.ELEMENT) {
                 tag.put("Material", material.toTag());
-
-                // Textures
-                CompoundTag bakedTextureTag = new CompoundTag();
-                for (Map.Entry<Direction, int[]> entry : bakedTexture.entrySet()) {
-                    bakedTextureTag.putIntArray(entry.getKey().getSerializedName(), entry.getValue());
-                }
-                tag.put("BakedTexture", bakedTextureTag);
+                bakedTextures.save(tag);
             } else if (type == ElementType.PARTICLE_EMITTER) {
                 tag.put("ParticleEmitter", particleEmitter.toTag());
             } else if (type == ElementType.SOUND_EMITTER) {
@@ -647,6 +772,13 @@ public class FurnitureData {
         }
 
         public void sanityCheck() {
+            if (sprite.item) {
+                sprite.tiled = false;
+
+                // TODO: Remove this once most people ported to 0.1.0
+                sprite.sprite = new ResourceLocation("minecraft:item/bread");
+            }
+
             // Pose anchors are the shape of the players' butt
             if (type == ElementType.PLAYER_POSE) {
                 Vector3f center = getCenter();
@@ -733,6 +865,68 @@ public class FurnitureData {
 
         public boolean isFlat() {
             return from.x == to.x || from.y == to.y || from.z == to.z;
+        }
+
+        public boolean isMasked(int state) {
+            return (mask & (1 << state)) != 0;
+        }
+    }
+
+    public static class ElementBakedTextures {
+        public Map<Direction, Map<Integer, int[]>> textures = new ConcurrentHashMap<>();
+
+        public ElementBakedTextures() {
+
+        }
+
+        public ElementBakedTextures(CompoundTag primary, CompoundTag secondary) {
+            loadTextures(primary);
+            loadTextures(secondary);
+        }
+
+        private void loadTextures(CompoundTag secondary) {
+            for (String key : secondary.getAllKeys()) {
+                String[] split = key.split(":");
+                Direction direction = Direction.CODEC.byName(split[0]);
+                int state = split.length == 1 ? 0 : Integer.parseInt(split[1]);
+                put(direction, state, secondary.getIntArray(key));
+            }
+        }
+
+        public void save(CompoundTag tag) {
+            CompoundTag primary = new CompoundTag();
+            CompoundTag secondary = new CompoundTag();
+            for (Map.Entry<Direction, Map<Integer, int[]>> directionMapEntry : textures.entrySet()) {
+                Direction direction = directionMapEntry.getKey();
+                Map<Integer, int[]> stateMap = directionMapEntry.getValue();
+                for (Map.Entry<Integer, int[]> stateEntry : stateMap.entrySet()) {
+                    int state = stateEntry.getKey();
+                    int[] texture = stateEntry.getValue();
+                    if (state == 0) {
+                        primary.putIntArray(direction.getSerializedName(), texture);
+                    } else {
+                        secondary.putIntArray(direction.getSerializedName() + ":" + state, texture);
+                    }
+                }
+            }
+            tag.put("BakedTexture", primary);
+            tag.put("BakedTextures", secondary);
+        }
+
+        public void clear() {
+            textures.clear();
+        }
+
+        public int[] get(Direction direction, int state) {
+            Map<Integer, int[]> states = textures.get(direction);
+            return states == null ? null : states.getOrDefault(state, states.get(0));
+        }
+
+        public void put(Direction direction, int state, int[] baked) {
+            Map<Integer, int[]> states = textures.computeIfAbsent(direction, k -> new HashMap<>());
+            if (state == 0 || !states.containsKey(0) || !Arrays.equals(states.get(0), baked)) {
+                states.put(state, baked);
+            }
         }
     }
 
@@ -903,6 +1097,8 @@ public class FurnitureData {
         public int rotation = 0;
         public float size = 1.0f;
         public boolean tiled = false;
+        public boolean item = false;
+        public boolean align = false;
 
         public Sprite() {
         }
@@ -912,6 +1108,8 @@ public class FurnitureData {
             this.rotation = NBTHelper.getInt(tag, "Rotation", rotation);
             this.size = NBTHelper.getFloat(tag, "Size", size);
             this.tiled = NBTHelper.getBoolean(tag, "Tiled", tiled);
+            this.item = NBTHelper.getBoolean(tag, "Item", item);
+            this.align = NBTHelper.getBoolean(tag, "Align", align);
         }
 
         public Sprite(Sprite sprite) {
@@ -919,6 +1117,8 @@ public class FurnitureData {
             this.rotation = sprite.rotation;
             this.size = sprite.size;
             this.tiled = sprite.tiled;
+            this.item = sprite.item;
+            this.align = sprite.align;
         }
 
         public CompoundTag toTag() {
@@ -927,6 +1127,8 @@ public class FurnitureData {
             tag.putInt("Rotation", rotation);
             tag.putFloat("Size", size);
             tag.putBoolean("Tiled", tiled);
+            tag.putBoolean("Item", item);
+            tag.putBoolean("Align", align);
             return tag;
         }
     }

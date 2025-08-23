@@ -1,14 +1,11 @@
 package net.conczin.immersive_furniture.mixin;
 
 import net.conczin.immersive_furniture.InteractionManager;
-import net.conczin.immersive_furniture.block.BaseFurnitureBlock;
-import net.conczin.immersive_furniture.block.FurnitureProxyBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -31,23 +28,17 @@ public abstract class LivingEntityMixin extends Entity {
     @Shadow
     public abstract boolean isSleeping();
 
-    @Unique
-    private boolean immersiveFurniture$IsFurnitureBed(BlockPos pos) {
-        Block block = this.level().getBlockState(pos).getBlock();
-        return block instanceof BaseFurnitureBlock || block instanceof FurnitureProxyBlock;
-    }
-
     @Inject(method = "checkBedExists()Z", at = @At("HEAD"), cancellable = true)
     private void immersiveFurniture$checkBedExists(CallbackInfoReturnable<Boolean> cir) {
         Optional<BlockPos> sleepingPos = this.getSleepingPos();
-        if (sleepingPos.isPresent() && immersiveFurniture$IsFurnitureBed(sleepingPos.get())) {
+        if (sleepingPos.isPresent() && InteractionManager.isFurnitureBed(this.level(), sleepingPos.get())) {
             cir.setReturnValue(true);
         }
     }
 
     @Inject(method = "setPosToBed(Lnet/minecraft/core/BlockPos;)V", at = @At("HEAD"), cancellable = true)
     private void immersiveFurniture$setPosToBed(BlockPos pos, CallbackInfo ci) {
-        if (immersiveFurniture$IsFurnitureBed(pos)) {
+        if (InteractionManager.isFurnitureBed(this.level(), pos)) {
             immersiveFurniture$MoveToBed();
             ci.cancel();
         }
@@ -63,7 +54,7 @@ public abstract class LivingEntityMixin extends Entity {
     @Unique
     private void immersiveFurniture$MoveToBed() {
         InteractionManager.Interaction interaction = InteractionManager.INSTANCE.getInteraction((LivingEntity) (Object) this);
-        if (interaction != null && immersiveFurniture$IsFurnitureBed(interaction.pos())) {
+        if (interaction != null) {
             float rotation = interaction.offset().rotation();
             setYRot(-rotation - 90f);
             setYBodyRot(-rotation - 90f);

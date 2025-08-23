@@ -56,15 +56,15 @@ public class AtlasSprite {
         static int blend(int... colors) {
             int r = 0, g = 0, b = 0, a = 0;
             for (int c : colors) {
-                r += (c >> 24) & 0xFF;
-                g += (c >> 16) & 0xFF;
-                b += (c >> 8) & 0xFF;
-                a = Math.max(a, c & 0xFF);
+                r += (c >> 16) & 0xFF;
+                g += (c >> 8) & 0xFF;
+                b += c & 0xFF;
+                a = Math.max(a, (c >> 24) & 0xFF);
             }
             r /= colors.length;
             g /= colors.length;
             b /= colors.length;
-            return (r << 24) | (g << 16) | (b << 8) | a;
+            return (a << 24) | (r << 16) | (g << 8) | b;
         }
 
         public void mipTheMap(NativeImage source, NativeImage destination, int xTo, int yTo, int width, int height) {

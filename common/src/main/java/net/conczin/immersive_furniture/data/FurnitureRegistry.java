@@ -4,6 +4,12 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class FurnitureRegistry {
+    /**
+     * A registry mapping furniture identifiers to their corresponding hash.
+     * The server saves and loads this from the world save data.
+     * The client receives and maintains a copy of this registry.
+     * The hash is used to load from the local data cache.
+     */
     public static final FurnitureRegistry INSTANCE = new FurnitureRegistry();
 
     public Map<Integer, String> identifierToHash = new ConcurrentHashMap<>();

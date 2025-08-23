@@ -23,7 +23,8 @@ public class FurnitureBlock extends BaseFurnitureBlock {
         this.registerDefaultState(this.stateDefinition.any()
                 .setValue(IDENTIFIER, 0)
                 .setValue(WATERLOGGED, false)
-                .setValue(FACING, Direction.NORTH));
+                .setValue(FACING, Direction.NORTH)
+                .setValue(ACTIVE, false));
     }
 
     @Override
@@ -38,7 +39,7 @@ public class FurnitureBlock extends BaseFurnitureBlock {
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(IDENTIFIER, WATERLOGGED, FACING);
+        builder.add(IDENTIFIER, WATERLOGGED, FACING, ACTIVE);
     }
 
     public FurnitureData getData(BlockState state, BlockGetter level, BlockPos pos) {

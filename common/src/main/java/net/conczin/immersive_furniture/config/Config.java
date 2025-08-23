@@ -11,6 +11,9 @@ public final class Config extends JsonConfig {
     public List<String> favorites = new LinkedList<>();
     public String immersiveLibraryUrl = "https://mca.conczin.net";
 
+
+    public int maximumInteractDistance = 128;
+
     // How many times the same furniture needs to be placed before low-memory mode is activated.
     // That mode is limited to 1024 unique furniture and cannot be cleaned up again.
     // All other furniture is more expensive since they require a block entity.
@@ -26,6 +29,11 @@ public final class Config extends JsonConfig {
 
     // Interval in seconds between autosaves in the editor. Negative value disables autosave.
     public int autosaveInterval = 60;
+
+    // The maximum number of mipmap levels supported (0 to disable, 3 for maximum quality).
+    // Higher values reduce the maximum amount of unique furniture that can be rendered fast.
+    // Lower values may lead to artifacts on steep view angles.
+    public int maxMipLevel = 2;
 
     public Config(String name) {
         super(name);

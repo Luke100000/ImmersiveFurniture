@@ -4,6 +4,7 @@ import net.conczin.immersive_furniture.Common;
 import net.conczin.immersive_furniture.Sounds;
 import net.conczin.immersive_furniture.block.Blocks;
 import net.conczin.immersive_furniture.block.entity.BlockEntityTypes;
+import net.conczin.immersive_furniture.data.FurnitureDataManager;
 import net.conczin.immersive_furniture.data.ServerFurnitureRegistry;
 import net.conczin.immersive_furniture.entity.Entities;
 import net.conczin.immersive_furniture.item.Items;
@@ -12,6 +13,7 @@ import net.conczin.immersive_furniture.network.Network;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
@@ -24,6 +26,7 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.storage.LevelResource;
 
 import java.util.function.Consumer;
 
@@ -62,6 +65,8 @@ public final class CommonFabric implements ModInitializer {
 
         ServerPlayConnectionEvents.JOIN.register((player, handler, sender) ->
                 ServerFurnitureRegistry.syncWithPlayer(player.player));
+
+        ServerLifecycleEvents.SERVER_STARTING.register((server) -> FurnitureDataManager.setWorldRoot(server.getWorldPath(LevelResource.ROOT)));
 
         ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.FUNCTIONAL_BLOCKS)
                 .register((itemGroup) -> itemGroup.accept(Items.ARTISANS_WORKSTATION));
