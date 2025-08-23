@@ -362,6 +362,17 @@ public class ModelComponent extends ScreenComponent {
                 screen.init();
             });
 
+            // Align toggle (only visible when item == true)
+            if (firstElement.sprite.item) {
+                addToggleButton(leftPos + 78, topPos + 114, 16, 240, 160, "gui.immersive_furniture.align", () -> {
+                    screen.selectedElements.forEach(e -> {
+                        e.sprite.align = !e.sprite.align;
+                        e.sanityCheck();
+                    });
+                    screen.init();
+                }).setEnabled(!firstElement.sprite.align);
+            }
+
             // Item toggle
             addToggleButton(leftPos + 60, topPos + 132, 16, 0, 160, "gui.immersive_furniture.item", () -> {
                 screen.selectedElements.forEach(e -> {

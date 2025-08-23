@@ -1068,6 +1068,7 @@ public class FurnitureData {
         public float size = 1.0f;
         public boolean tiled = false;
         public boolean item = false;
+        public boolean align = false;
 
         public Sprite() {
         }
@@ -1078,6 +1079,7 @@ public class FurnitureData {
             this.size = NBTHelper.getFloat(tag, "Size", size);
             this.tiled = NBTHelper.getBoolean(tag, "Tiled", tiled);
             this.item = NBTHelper.getBoolean(tag, "Item", item);
+            this.align = NBTHelper.getBoolean(tag, "Align", align);
         }
 
         public Sprite(Sprite sprite) {
@@ -1086,6 +1088,7 @@ public class FurnitureData {
             this.size = sprite.size;
             this.tiled = sprite.tiled;
             this.item = sprite.item;
+            this.align = sprite.align;
         }
 
         public CompoundTag toTag() {
@@ -1095,6 +1098,7 @@ public class FurnitureData {
             tag.putFloat("Size", size);
             tag.putBoolean("Tiled", tiled);
             tag.putBoolean("Item", item);
+            tag.putBoolean("Align", align);
             return tag;
         }
     }

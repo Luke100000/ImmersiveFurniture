@@ -115,6 +115,7 @@
   "gui.immersive_furniture.decrease_size": "Decrease Size",
   "gui.immersive_furniture.increase_size": "Increase Size",
   "gui.immersive_furniture.item": "Show inventory slot",
+  "gui.immersive_furniture.align": "Item alignment side",
   "gui.immersive_furniture.tiled": "Tiled Sprite (Liquids, ...)",
 
   "gui.immersive_furniture.login": "Login",

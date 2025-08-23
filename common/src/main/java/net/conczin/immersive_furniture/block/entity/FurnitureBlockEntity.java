@@ -38,6 +38,7 @@ public class FurnitureBlockEntity extends BlockEntity implements Container, Menu
     public void load(CompoundTag tag) {
         super.load(tag);
 
+        this.items.clear();
         ContainerHelper.loadAllItems(tag, this.items);
 
         if (tag.contains(FurnitureItem.FURNITURE)) {
@@ -115,6 +116,19 @@ public class FurnitureBlockEntity extends BlockEntity implements Container, Menu
     @Override
     public ItemStack getItem(int slot) {
         return getItems().get(slot);
+    }
+
+    @Override
+    public void setChanged() {
+        super.setChanged();
+
+        // Sync inventory changes to the client in case it has display slots
+        if (level != null) {
+            FurnitureData data = getData();
+            if (data != null && data.hasDisplayItems()) {
+                level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 2);
+            }
+        }
     }
 
     @Override

@@ -27,6 +27,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
@@ -100,8 +101,13 @@ public class FurnitureBlockEntityRenderer<T extends FurnitureBlockEntity> implem
         int slot = 0;
         for (FurnitureData.Element element : data.elements) {
             if (element.type == FurnitureData.ElementType.SPRITE && element.sprite.item && element.isMasked(state)) {
-                ItemStack itemstack = blockEntity == null ? Items.APPLE.getDefaultInstance() : blockEntity.getItem(slot);
-                if (!itemstack.isEmpty()) {
+                ItemStack itemStack = blockEntity == null ? (
+                        slot % 4 == 0 ? Items.APPLE.getDefaultInstance()
+                                : slot % 4 == 1 ? Items.FURNACE.getDefaultInstance()
+                                : slot % 4 == 2 ? Items.DIAMOND_PICKAXE.getDefaultInstance()
+                                : Items.OAK_FENCE.getDefaultInstance()
+                ) : blockEntity.getItem(slot);
+                if (!itemStack.isEmpty()) {
                     Vector3f center = element.getCenter();
                     Quaternionf quaternion = ModelUtils.getElementRotation(element.getRotation());
 
@@ -109,10 +115,20 @@ public class FurnitureBlockEntityRenderer<T extends FurnitureBlockEntity> implem
                     poseStack.translate(center.x / 16.0, center.y / 16.0, center.z / 16.0);
                     poseStack.mulPose(quaternion);
                     poseStack.scale(element.sprite.size, element.sprite.size, element.sprite.size);
-                    itemRenderer.renderStatic(itemstack, ItemDisplayContext.FIXED, packedLight, packedOverlay, poseStack, buffer, level, slot);
+
+                    // Align the item by its y min bound
+                    BakedModel bakedmodel = itemRenderer.getModel(itemStack, level, null, slot);
+                    AABB box = ModelBoundingBoxFetcher.INSTANCE.getModelBoundingBox(bakedmodel);
+                    if (element.sprite.align) {
+                        poseStack.translate(0.0, -0.5 - box.minY, 0);
+                    } else {
+                        poseStack.translate(0.0, 0, box.minZ);
+                    }
+
+                    itemRenderer.render(itemStack, ItemDisplayContext.FIXED, false, poseStack, buffer, packedLight, packedOverlay, bakedmodel);
                     poseStack.popPose();
+                    slot++;
                 }
-                slot++;
             }
         }
     }
