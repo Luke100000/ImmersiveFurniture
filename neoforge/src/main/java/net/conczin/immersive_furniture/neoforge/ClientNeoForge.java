@@ -12,6 +12,7 @@ import net.conczin.immersive_furniture.network.Network;
 import net.minecraft.client.Minecraft;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
@@ -19,6 +20,7 @@ import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 
 @Mod(value = Common.MOD_ID, dist = Dist.CLIENT)
+@EventBusSubscriber(modid = Common.MOD_ID, value = Dist.CLIENT)
 public final class ClientNeoForge {
     @SubscribeEvent
     public static void onEntityRenderers(EntityRenderersEvent.RegisterRenderers event) {
@@ -32,7 +34,7 @@ public final class ClientNeoForge {
     }
 
     @SubscribeEvent
-    public void onClientConnected(ClientPlayerNetworkEvent.LoggingIn event) {
+    public static void onClientConnected(ClientPlayerNetworkEvent.LoggingIn event) {
         if (!Minecraft.getInstance().isLocalServer()) {
             FurnitureDataManager.setWorldRoot();
         }

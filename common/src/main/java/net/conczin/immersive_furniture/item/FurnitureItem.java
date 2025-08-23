@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Objects;
 
 public class FurnitureItem extends BlockItem {
-    public static final DataComponentType<FurnitureData> FURNITURE = Registry.register(BuiltInRegistries.DATA_COMPONENT_TYPE, "furniture", DataComponentType.<FurnitureData>builder()
+    public static final DataComponentType<FurnitureData> FURNITURE = Registry.register(BuiltInRegistries.DATA_COMPONENT_TYPE, "immersive_furniture:furniture", DataComponentType.<FurnitureData>builder()
             .persistent(FurnitureData.CODEC)
             .networkSynchronized(FurnitureData.STREAM_CODEC)
             .build());

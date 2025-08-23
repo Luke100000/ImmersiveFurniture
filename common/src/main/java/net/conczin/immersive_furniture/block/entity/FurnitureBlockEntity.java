@@ -44,7 +44,9 @@ public class FurnitureBlockEntity extends BlockEntity implements Container, Menu
         this.items.clear();
         ContainerHelper.loadAllItems(tag, this.items, registries);
 
-        if (tag.contains(FURNITURE)) {
+        if (tag.contains("components") && tag.getCompound("components").contains("immersive_furniture:furniture")) {
+            this.data = new FurnitureData(tag.getCompound("components").getCompound("immersive_furniture:furniture"));
+        } else if (tag.contains(FURNITURE)) {
             this.data = new FurnitureData(tag.getCompound(FURNITURE));
         } else if (tag.contains(FURNITURE_HASH)) {
             // Delay loading

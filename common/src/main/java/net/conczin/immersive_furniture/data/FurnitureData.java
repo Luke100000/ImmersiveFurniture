@@ -1178,4 +1178,14 @@ public class FurnitureData {
             return tag;
         }
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        return this == obj || (obj instanceof FurnitureData data && Objects.equals(getHash(), data.getHash()));
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getHash());
+    }
 }
