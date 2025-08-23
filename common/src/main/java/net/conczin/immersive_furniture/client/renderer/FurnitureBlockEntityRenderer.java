@@ -6,21 +6,29 @@ import com.mojang.math.Axis;
 import net.conczin.immersive_furniture.Common;
 import net.conczin.immersive_furniture.block.BaseFurnitureBlock;
 import net.conczin.immersive_furniture.block.entity.FurnitureBlockEntity;
+import net.conczin.immersive_furniture.client.model.CompositeBakedModel;
 import net.conczin.immersive_furniture.client.model.DynamicAtlas;
 import net.conczin.immersive_furniture.client.model.FurnitureModelBaker;
-import net.conczin.immersive_furniture.client.model.CompositeBakedModel;
 import net.conczin.immersive_furniture.data.FurnitureData;
+import net.conczin.immersive_furniture.data.ModelUtils;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.inventory.InventoryMenu;
+import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 
 import java.util.List;
 import java.util.Map;
@@ -29,9 +37,10 @@ import static net.minecraft.world.level.SignalGetter.DIRECTIONS;
 
 public class FurnitureBlockEntityRenderer<T extends FurnitureBlockEntity> implements BlockEntityRenderer<T> {
     public static final float[] BRIGHTNESS = {1.0F, 1.0F, 1.0F, 1.0F};
+    private final ItemRenderer itemRenderer;
 
-    public FurnitureBlockEntityRenderer(BlockEntityRendererProvider.Context ignoredContext) {
-        // NO-OP
+    public FurnitureBlockEntityRenderer(BlockEntityRendererProvider.Context context) {
+        this.itemRenderer = context.getItemRenderer();
     }
 
     @Override
@@ -41,27 +50,71 @@ public class FurnitureBlockEntityRenderer<T extends FurnitureBlockEntity> implem
         FurnitureData data = blockEntity.getData();
         if (data == null) return;
 
+        // Draw item slots
+        BlockState blockState = blockEntity.getBlockState();
+        int state = blockState.getValue(BaseFurnitureBlock.ACTIVE) ? 1 : 0;
+        if (hasItems(blockEntity, data, state)) {
+            poseStack.pushPose();
+            rotate(blockState, poseStack);
+            drawItems(itemRenderer, blockEntity.getLevel(), blockEntity, state, poseStack, buffer, packedLight, packedOverlay, data);
+            poseStack.popPose();
+        }
+
         // If the texture has been baked, we assume it got rendered via the block renderer
         if (DynamicAtlas.BAKED.knownFurniture.containsKey(data.getHash())) {
             return;
         }
 
+        // Otherwise render it expensively
         Common.entityRenders++;
-
         poseStack.pushPose();
+        rotate(blockState, poseStack);
+        renderFurniture(blockState, poseStack, buffer, packedLight, packedOverlay, data);
+        poseStack.popPose();
+    }
 
-        BlockState blockState = blockEntity.getBlockState();
+    private static void rotate(BlockState blockState, PoseStack poseStack) {
         if (blockState.getBlock() instanceof BaseFurnitureBlock) {
             float yaw = -blockState.getValue(BaseFurnitureBlock.FACING).getOpposite().toYRot();
             poseStack.translate(0.5F, 0.5F, 0.5F);
             poseStack.mulPose(Axis.YP.rotationDegrees(yaw));
             poseStack.translate(-0.5F, -0.5F, -0.5F);
         }
+    }
 
-        BlockState state = blockEntity.getBlockState();
-        renderFurniture(state, poseStack, buffer, packedLight, packedOverlay, data);
+    public static boolean hasItems(FurnitureBlockEntity blockEntity, FurnitureData data, int state) {
+        int slot = 0;
+        for (FurnitureData.Element element : data.elements) {
+            if (element.type == FurnitureData.ElementType.SPRITE && element.sprite.item && element.isMasked(state)) {
+                ItemStack itemstack = blockEntity == null ? Items.APPLE.getDefaultInstance() : blockEntity.getItem(slot);
+                if (!itemstack.isEmpty()) {
+                    return true;
+                }
+                slot++;
+            }
+        }
+        return false;
+    }
 
-        poseStack.popPose();
+    public static void drawItems(ItemRenderer itemRenderer, Level level, FurnitureBlockEntity blockEntity, int state, PoseStack poseStack, MultiBufferSource buffer, int packedLight, int packedOverlay, FurnitureData data) {
+        int slot = 0;
+        for (FurnitureData.Element element : data.elements) {
+            if (element.type == FurnitureData.ElementType.SPRITE && element.sprite.item && element.isMasked(state)) {
+                ItemStack itemstack = blockEntity == null ? Items.APPLE.getDefaultInstance() : blockEntity.getItem(slot);
+                if (!itemstack.isEmpty()) {
+                    Vector3f center = element.getCenter();
+                    Quaternionf quaternion = ModelUtils.getElementRotation(element.getRotation());
+
+                    poseStack.pushPose();
+                    poseStack.translate(center.x / 16.0, center.y / 16.0, center.z / 16.0);
+                    poseStack.mulPose(quaternion);
+                    poseStack.scale(element.sprite.size, element.sprite.size, element.sprite.size);
+                    itemRenderer.renderStatic(itemstack, ItemDisplayContext.FIXED, packedLight, packedOverlay, poseStack, buffer, level, slot);
+                    poseStack.popPose();
+                }
+                slot++;
+            }
+        }
     }
 
     public static void renderFurniture(BlockState state, PoseStack poseStack, MultiBufferSource buffer, int packedLight, int packedOverlay, FurnitureData data) {

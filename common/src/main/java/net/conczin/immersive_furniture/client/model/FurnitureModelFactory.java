@@ -460,7 +460,7 @@ public class FurnitureModelFactory {
                         elementToIndex.put(tiledElement, index);
                     }
                 }
-            } else {
+            } else if (element.type != FurnitureData.ElementType.SPRITE || !element.sprite.item) {
                 elements.add(element);
                 elementToIndex.put(element, index);
             }

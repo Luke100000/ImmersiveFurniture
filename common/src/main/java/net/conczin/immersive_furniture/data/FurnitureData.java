@@ -256,6 +256,10 @@ public class FurnitureData {
         return elements.stream().anyMatch(e -> e.type == ElementType.PLAYER_POSE && e.playerPose.pose == Pose.SLEEPING);
     }
 
+    public boolean hasDisplayItems() {
+        return elements.stream().anyMatch(e -> e.type == ElementType.SPRITE && e.sprite.item);
+    }
+
     /**
      * @return A set of unique solid states for the furniture, e.g.: a door would return (0, 1)
      */
@@ -306,6 +310,9 @@ public class FurnitureData {
         }
         if (canSleep()) {
             tooltip.add(Component.translatable("gui.immersive_furniture.can_sleep").withStyle(ChatFormatting.YELLOW));
+        }
+        if (hasDisplayItems()) {
+            tooltip.add(Component.translatable("gui.immersive_furniture.has_display_items").withStyle(ChatFormatting.YELLOW));
         }
         if (getUniqueSolidStates().size() > 1) {
             tooltip.add(Component.translatable("gui.immersive_furniture.has_states").withStyle(ChatFormatting.YELLOW));
@@ -749,6 +756,10 @@ public class FurnitureData {
         }
 
         public void sanityCheck() {
+            if (sprite.item) {
+                sprite.tiled = false;
+            }
+
             // Pose anchors are the shape of the players' butt
             if (type == ElementType.PLAYER_POSE) {
                 Vector3f center = getCenter();
@@ -1056,6 +1067,7 @@ public class FurnitureData {
         public int rotation = 0;
         public float size = 1.0f;
         public boolean tiled = false;
+        public boolean item = false;
 
         public Sprite() {
         }
@@ -1065,6 +1077,7 @@ public class FurnitureData {
             this.rotation = NBTHelper.getInt(tag, "Rotation", rotation);
             this.size = NBTHelper.getFloat(tag, "Size", size);
             this.tiled = NBTHelper.getBoolean(tag, "Tiled", tiled);
+            this.item = NBTHelper.getBoolean(tag, "Item", item);
         }
 
         public Sprite(Sprite sprite) {
@@ -1072,6 +1085,7 @@ public class FurnitureData {
             this.rotation = sprite.rotation;
             this.size = sprite.size;
             this.tiled = sprite.tiled;
+            this.item = sprite.item;
         }
 
         public CompoundTag toTag() {
@@ -1080,6 +1094,7 @@ public class FurnitureData {
             tag.putInt("Rotation", rotation);
             tag.putFloat("Size", size);
             tag.putBoolean("Tiled", tiled);
+            tag.putBoolean("Item", item);
             return tag;
         }
     }

@@ -148,6 +148,11 @@ public class SettingsComponent extends ScreenComponent {
         // Set author
         data.author = Minecraft.getInstance().getUser().getName();
 
+        // Fix obvious usage errors
+        if (data.hasDisplayItems()) {
+            data.inventorySize = Math.max(1, data.inventorySize);
+        }
+
         // Find and log sources of textures
         data.sources.clear();
         for (FurnitureData.Element element : data.elements) {

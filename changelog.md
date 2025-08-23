@@ -1,5 +1,9 @@
 # 0.1.0
 
+* Added furniture states
+    * Elements can now be enabled/disabled based on furniture active state
+    * This allows, for example, doors, traps, yapping animations, etc.
+* Added "Item Sprites" to display an item in the inventory rather than a sprite
 * Some special sounds are no longer played globally
 
 # 0.0.9
@@ -75,9 +79,6 @@ Initial release
 * Blockbench/JSON block and item model import
 * Datapack support
 * On flat elements (sprites mostly) the direction is picked oddly
-* State
-    * Emitters in the correct state
-    * Check potential downgrade
 
 ## Backend
 

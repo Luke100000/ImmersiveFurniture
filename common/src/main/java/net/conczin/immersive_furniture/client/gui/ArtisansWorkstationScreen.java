@@ -15,6 +15,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -104,15 +105,21 @@ public abstract class ArtisansWorkstationScreen extends Screen {
 
         if (bakedModel != null) {
             int light = nightMode ? data.lightLevel : 15;
+            int packedLight = light << 20 | light << 4 | light;
             FurnitureBlockEntityRenderer.renderFurniture(
                     null,
                     graphics.pose(),
                     graphics.bufferSource(),
-                    light << 20 | light << 4 | light,
+                    packedLight,
                     OverlayTexture.NO_OVERLAY,
                     bakedModel,
                     DynamicAtlas.SCRATCH
             );
+
+            // Draw example items
+            assert this.minecraft != null;
+            ItemRenderer itemRenderer = this.minecraft.getItemRenderer();
+            FurnitureBlockEntityRenderer.drawItems(itemRenderer, this.minecraft.level, null, currentState, graphics.pose(), graphics.bufferSource(), packedLight, OverlayTexture.NO_OVERLAY, data);
         }
 
         // Particles

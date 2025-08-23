@@ -19,6 +19,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -126,7 +127,7 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
             x += 26;
             addRenderableWidget(pagePageButton(Page.EFFECTS, x, 2 * 26));
             x += 26;
-        } else if (isFirstElement(FurnitureData.ElementType.SPRITE)) {
+        } else if (isFirstElement(FurnitureData.ElementType.SPRITE) && getFirstElement().filter(e -> !e.sprite.item).isPresent()) {
             addRenderableWidget(pagePageButton(Page.SPRITES, x, 4 * 26));
             x += 26;
             addRenderableWidget(pagePageButton(Page.EFFECTS, x, 2 * 26));

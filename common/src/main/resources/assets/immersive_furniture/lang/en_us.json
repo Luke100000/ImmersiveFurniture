@@ -57,6 +57,7 @@
   "gui.immersive_furniture.has_sounds": "Has sounds",
   "gui.immersive_furniture.can_sit": "Can sit on",
   "gui.immersive_furniture.can_sleep": "Can sleep on",
+  "gui.immersive_furniture.has_display_items": "Displays inventory items",
   "gui.immersive_furniture.has_states": "Has animated states",
   "gui.immersive_furniture.sources": "Uses textures of:",
   "gui.immersive_furniture.dependencies": "Requires:",
@@ -113,6 +114,7 @@
 
   "gui.immersive_furniture.decrease_size": "Decrease Size",
   "gui.immersive_furniture.increase_size": "Increase Size",
+  "gui.immersive_furniture.item": "Show inventory slot",
   "gui.immersive_furniture.tiled": "Tiled Sprite (Liquids, ...)",
 
   "gui.immersive_furniture.login": "Login",
