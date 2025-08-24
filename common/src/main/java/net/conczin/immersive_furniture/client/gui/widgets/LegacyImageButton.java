@@ -34,9 +34,7 @@ public class LegacyImageButton extends ImageButton {
 
     public void renderTexture(GuiGraphics guiGraphics, ResourceLocation texture, int x, int y, int uOffset, int vOffset, int textureDifference, int width, int height, int textureWidth, int textureHeight) {
         int i = vOffset;
-        if (!isActive()) {
-            i += textureDifference * 2;
-        } else if (isHovered()) {
+        if (isHoveredOrFocused()) {
             i += textureDifference;
         }
         RenderSystem.enableDepthTest();

@@ -10,7 +10,6 @@ public class StateImageButton extends LegacyImageButton {
         super(x, y, width, height, xTexStart, yTexStart, height, resourceLocation, textureWidth, textureHeight, onPress, message);
     }
 
-
     @Override
     public boolean isHoveredOrFocused() {
         return isEnabled();

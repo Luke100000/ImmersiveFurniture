@@ -210,4 +210,3 @@ public class FurnitureBlockEntity extends BlockEntity implements Container, Menu
         this.data = data;
     }
 }
-
