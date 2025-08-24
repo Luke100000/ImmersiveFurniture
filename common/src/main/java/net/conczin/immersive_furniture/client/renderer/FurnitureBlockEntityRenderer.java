@@ -22,6 +22,7 @@ import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.FastColor;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.ItemDisplayContext;
@@ -33,8 +34,6 @@ import net.minecraft.world.phys.AABB;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
-import org.joml.Vector4f;
-import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.MemoryStack;
 
 import java.nio.ByteBuffer;
@@ -183,9 +182,10 @@ public class FurnitureBlockEntityRenderer<T extends FurnitureBlockEntity> implem
         int[] vertices = quad.getVertices();
         Vec3i quadNormal = quad.getDirection().getNormal();
         Matrix4f matrix4f = pose.pose();
-        Vector3f normal = pose.normal().transform(new Vector3f((float) quadNormal.getX(), (float) quadNormal.getY(), (float) quadNormal.getZ()));
+        Vector3f normal = pose.normal().transform(new Vector3f((float) quadNormal.getX(), (float) quadNormal.getY(), (float) quadNormal.getZ())).normalize();
         int vertexCount = vertices.length / 8;
 
+        Vector3f pos = new Vector3f();
         try (MemoryStack memorystack = MemoryStack.stackPush()) {
             ByteBuffer bytebuffer = memorystack.malloc(DefaultVertexFormat.BLOCK.getVertexSize());
             IntBuffer intbuffer = bytebuffer.asIntBuffer();
@@ -197,18 +197,15 @@ public class FurnitureBlockEntityRenderer<T extends FurnitureBlockEntity> implem
                 float x = bytebuffer.getFloat(0);
                 float y = bytebuffer.getFloat(4);
                 float z = bytebuffer.getFloat(8);
-                Vector4f pos = matrix4f.transform(new Vector4f(x, y, z, 1.0f));
-
-                float red = (float) (bytebuffer.get(12) & 255) / 255.0F;
-                float green = (float) (bytebuffer.get(13) & 255) / 255.0F;
-                float blue = (float) (bytebuffer.get(14) & 255) / 255.0F;
+                matrix4f.transformPosition(x, y, z, pos);
 
                 float u = bytebuffer.getFloat(16);
                 float v = bytebuffer.getFloat(20);
 
                 int light = blend(packedLight, quad.getVertices()[i * 8 + 6]);
 
-                consumer.vertex(pos.x(), pos.y(), pos.z(), red, green, blue, 1.0f, u, v, packedOverlay, light, normal.x(), normal.y(), normal.z());
+                int color = FastColor.ARGB32.color(bytebuffer.get(12) & 255, bytebuffer.get(13) & 255, bytebuffer.get(14) & 255);
+                consumer.addVertex(pos.x(), pos.y(), pos.z(), color, u, v, packedOverlay, light, normal.x(), normal.y(), normal.z());
             }
         }
     }

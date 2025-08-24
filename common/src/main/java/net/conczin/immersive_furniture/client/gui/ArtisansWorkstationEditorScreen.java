@@ -560,7 +560,7 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
         graphics.pose().translate(-data.size.x / 2.0f, data.size.y / 2.0f, -data.size.z / 2.0f);
         graphics.pose().mulPose(new Matrix4f().scaling(1, -1, 1));
 
-        Lighting.setupLevel();
+        Lighting.setupForEntityInInventory();
 
         // Render the model
         renderModel(graphics, data, yaw, pitch, true);
