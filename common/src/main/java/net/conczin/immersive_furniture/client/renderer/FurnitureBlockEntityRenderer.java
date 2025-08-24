@@ -33,6 +33,8 @@ import net.minecraft.world.phys.AABB;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
+import org.joml.Vector4f;
+import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.MemoryStack;
 
 import java.nio.ByteBuffer;
@@ -173,44 +175,40 @@ public class FurnitureBlockEntityRenderer<T extends FurnitureBlockEntity> implem
         for (BakedQuad quad : quads) {
             ResourceLocation resourceLocation = quad.getSprite().atlasLocation();
             if (resourceLocation.getNamespace().equals("minecraft") != blocksAtlas) continue;
-            putBulkData(consumer, pose,
-                    quad,
-                    new int[]{
-                            blend(packedLight, quad.getVertices()[6]),
-                            blend(packedLight, quad.getVertices()[8 + 6]),
-                            blend(packedLight, quad.getVertices()[16 + 6]),
-                            blend(packedLight, quad.getVertices()[24 + 6])
-                    },
-                    packedOverlay
-            );
+            putBulkData(consumer, pose, quad, packedLight, packedOverlay);
         }
     }
 
-    static void putBulkData(VertexConsumer consumer, PoseStack.Pose pose, BakedQuad quad, int[] lightmap, int packedOverlay) {
-        int[] aint = quad.getVertices();
-        Vec3i vec3i = quad.getDirection().getNormal();
+    static void putBulkData(VertexConsumer consumer, PoseStack.Pose pose, BakedQuad quad, int packedLight, int packedOverlay) {
+        int[] vertices = quad.getVertices();
+        Vec3i quadNormal = quad.getDirection().getNormal();
         Matrix4f matrix4f = pose.pose();
-        Vector3f vector3f = pose.transformNormal((float) vec3i.getX(), (float) vec3i.getY(), (float) vec3i.getZ(), new Vector3f());
-        int j = aint.length / 8;
+        Vector3f normal = pose.normal().transform(new Vector3f((float) quadNormal.getX(), (float) quadNormal.getY(), (float) quadNormal.getZ()));
+        int vertexCount = vertices.length / 8;
 
         try (MemoryStack memorystack = MemoryStack.stackPush()) {
             ByteBuffer bytebuffer = memorystack.malloc(DefaultVertexFormat.BLOCK.getVertexSize());
             IntBuffer intbuffer = bytebuffer.asIntBuffer();
 
-            for (int l = 0; l < j; ++l) {
+            for (int i = 0; i < vertexCount; ++i) {
                 intbuffer.clear();
-                intbuffer.put(aint, l * 8, 8);
+                intbuffer.put(vertices, i * 8, 8);
 
-                int j1 = lightmap[l];
-                float f10 = bytebuffer.getFloat(16);
-                float f9 = bytebuffer.getFloat(20);
+                float x = bytebuffer.getFloat(0);
+                float y = bytebuffer.getFloat(4);
+                float z = bytebuffer.getFloat(8);
+                Vector4f pos = matrix4f.transform(new Vector4f(x, y, z, 1.0f));
 
-                float f = bytebuffer.getFloat(0);
-                float f1 = bytebuffer.getFloat(4);
-                float f2 = bytebuffer.getFloat(8);
-                Vector3f vector3f1 = matrix4f.transformPosition(f, f1, f2, new Vector3f());
+                float red = (float) (bytebuffer.get(12) & 255) / 255.0F;
+                float green = (float) (bytebuffer.get(13) & 255) / 255.0F;
+                float blue = (float) (bytebuffer.get(14) & 255) / 255.0F;
 
-                consumer.addVertex(vector3f1.x(), vector3f1.y(), vector3f1.z(), -1, f10, f9, packedOverlay, j1, vector3f.x(), vector3f.y(), vector3f.z());
+                float u = bytebuffer.getFloat(16);
+                float v = bytebuffer.getFloat(20);
+
+                int light = blend(packedLight, quad.getVertices()[i * 8 + 6]);
+
+                consumer.vertex(pos.x(), pos.y(), pos.z(), red, green, blue, 1.0f, u, v, packedOverlay, light, normal.x(), normal.y(), normal.z());
             }
         }
     }
