@@ -2,11 +2,14 @@ package net.conczin.immersive_furniture.block;
 
 import net.conczin.immersive_furniture.block.entity.FurnitureBlockEntity;
 import net.conczin.immersive_furniture.data.FurnitureData;
+import net.conczin.immersive_furniture.item.FurnitureItem;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -87,5 +90,16 @@ public class EntityFurnitureBlock extends BaseFurnitureBlock implements EntityBl
     @Override
     public BlockState toggleLight(FurnitureData data, BlockState state, Level level, BlockPos pos) {
         return state.setValue(LIGHT, data.toggleLight && state.getValue(ACTIVE) ? 0 : data.lightLevel);
+    }
+
+    @Override
+    public void setPlacedBy(Level level, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
+        super.setPlacedBy(level, pos, state, placer, stack);
+        if (!level.isClientSide) {
+            BlockEntity blockEntity = level.getBlockEntity(pos);
+            if (blockEntity instanceof FurnitureBlockEntity furnitureBlockEntity) {
+                furnitureBlockEntity.setData(FurnitureItem.getData(stack));
+            }
+        }
     }
 }

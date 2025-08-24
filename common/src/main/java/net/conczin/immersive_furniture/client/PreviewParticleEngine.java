@@ -4,9 +4,7 @@ import com.google.common.collect.EvictingQueue;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.BufferBuilder;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.Tesselator;
+import com.mojang.blaze3d.vertex.*;
 import net.conczin.immersive_furniture.client.gui.FakeCamera;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
@@ -82,6 +80,10 @@ public class PreviewParticleEngine {
                 if (bufferbuilder != null) {
                     for (Particle particle : queue) {
                         particle.render(bufferbuilder, camera, partialTicks);
+                    }
+                    MeshData meshdata = bufferbuilder.build();
+                    if (meshdata != null) {
+                        BufferUploader.drawWithShader(meshdata);
                     }
                 }
             }
