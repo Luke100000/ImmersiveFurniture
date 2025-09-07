@@ -18,7 +18,7 @@
     }
   ],
   "result": {
-    "item": "immersive_furniture:crafting_material",
+    "id": "immersive_furniture:crafting_material",
     "count": 16
   }
 }

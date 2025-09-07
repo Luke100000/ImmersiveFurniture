@@ -6,6 +6,9 @@ issueTrackerURL = "${mod_issues}"
 [[mixins]]
 config = "immersive_furniture.mixins.json"
 
+[[mixins]]
+config = "immersive_furniture.neoforge.mixins.json"
+
 [[mods]]
 modId = "${mod_id}"
 version = "${version}"
