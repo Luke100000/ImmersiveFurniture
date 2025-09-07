@@ -221,7 +221,7 @@ public class FurnitureData {
 
     public String getHash() {
         if (hash == null) {
-            hash = Utils.hashNbt(toTag());
+            hash = Utils.hashNbt(new FurnitureData(this).toTag());
         }
         return hash;
     }

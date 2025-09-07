@@ -627,7 +627,7 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
 
         // Highlight all non-solid elements
         for (FurnitureData.Element element : data.elements) {
-            if (element.type != FurnitureData.ElementType.ELEMENT && element.type != FurnitureData.ElementType.SPRITE) {
+            if (element.isMasked(currentState) && element.type != FurnitureData.ElementType.ELEMENT && element.type != FurnitureData.ElementType.SPRITE) {
                 drawSelection(graphics, element, pose, 0.4f, true);
             }
         }

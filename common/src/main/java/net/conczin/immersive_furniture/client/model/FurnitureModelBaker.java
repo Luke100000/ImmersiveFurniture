@@ -113,11 +113,12 @@ public class FurnitureModelBaker {
     public static CompositeBakedModel getAsyncModel(FurnitureData data, DynamicAtlas atlas, int state) {
         String hash = data.getHash();
         if (atlas.knownFurniture.containsKey(hash)) {
-            return getModel(data, data.getHash(), atlas, 0, state, false);
+            return getModel(data, hash, atlas, 0, state, false);
         } else if (!atlas.asyncRequestedFurniture.contains(hash)) {
             atlas.asyncRequestedFurniture.add(hash);
+            FurnitureData copy = new FurnitureData(data);
             Common.EXECUTOR.execute(() -> {
-                getModel(data, hash, atlas, 0, state, false);
+                getModel(copy, hash, atlas, 0, state, false);
                 atlas.asyncRequestedFurniture.remove(hash);
             });
         }
@@ -154,9 +155,7 @@ public class FurnitureModelBaker {
 
             // Only cache if the hash is still the same
             CachedBakedModelSet modelSet = new CachedBakedModelSet(atlas, model);
-            if (data.getHash().equals(hash)) {
-                atlas.knownFurniture.put(hash, modelSet);
-            }
+            atlas.knownFurniture.put(hash, modelSet);
 
             // Only add when forced or the atlas had space
             if (force || !atlas.isFull() && atlas.getUsage() >= previousUsage) {

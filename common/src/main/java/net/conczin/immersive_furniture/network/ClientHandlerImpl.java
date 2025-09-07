@@ -20,7 +20,7 @@ public class ClientHandlerImpl implements ClientHandler {
         if (level == null) return;
         BlockState blockState = level.getBlockState(message.pos());
         if (blockState.getBlock() instanceof BaseFurnitureBlock furnitureBlock) {
-            furnitureBlock.onInteract(level, blockState, message.pos(), minecraft.player);
+            furnitureBlock.onInteract(level, blockState, message.pos(), message.active(), minecraft.player);
         }
     }
 }
