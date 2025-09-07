@@ -208,9 +208,13 @@ public class FurnitureData {
 
     public String getHash() {
         if (hash == null) {
-            hash = Utils.hashNbt(new FurnitureData(this).toTag());
+            hash = computeHash();
         }
         return hash;
+    }
+
+    public String computeHash() {
+        return Utils.hashNbt(new FurnitureData(this).toTag());
     }
 
     public void dirty() {
