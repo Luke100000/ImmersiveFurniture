@@ -9,14 +9,15 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.state.BlockState;
 
-public record FurnitureInteractMessage(BlockPos pos) implements ImmersivePayload {
+public record FurnitureInteractMessage(BlockPos pos, boolean active) implements ImmersivePayload {
     public FurnitureInteractMessage(FriendlyByteBuf b) {
-        this(b.readBlockPos());
+        this(b.readBlockPos(), b.readBoolean());
     }
 
     @Override
     public void encode(FriendlyByteBuf b) {
         b.writeBlockPos(pos);
+        b.writeBoolean(active);
     }
 
     @Override

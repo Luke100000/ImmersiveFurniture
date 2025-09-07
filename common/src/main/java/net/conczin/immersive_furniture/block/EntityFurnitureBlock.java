@@ -35,12 +35,11 @@ public class EntityFurnitureBlock extends BaseFurnitureBlock implements EntityBl
 
     @Override
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
-        if (!level.isClientSide) {
+        if (!player.isCrouching()) {
             BlockEntity blockEntity = level.getBlockEntity(pos);
             if (blockEntity instanceof FurnitureBlockEntity furnitureBlockEntity) {
-                if (player.openMenu(furnitureBlockEntity).isPresent()) {
-                    return InteractionResult.CONSUME;
-                }
+                player.openMenu(furnitureBlockEntity);
+                return InteractionResult.CONSUME;
             }
         }
         return super.use(state, level, pos, player, hand, hit);

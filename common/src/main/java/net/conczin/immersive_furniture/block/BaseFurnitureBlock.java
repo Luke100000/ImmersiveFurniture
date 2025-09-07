@@ -97,7 +97,8 @@ public abstract class BaseFurnitureBlock extends Block implements SimpleWaterlog
 
         // This furniture has sound or particle effects
         if (level instanceof ServerLevel serverLevel && (data.hasSounds() || data.hasParticles())) {
-            FurnitureInteractMessage message = new FurnitureInteractMessage(pos);
+            Boolean active = state.getValue(ACTIVE);
+            FurnitureInteractMessage message = new FurnitureInteractMessage(pos, active);
             int maxDist = Config.getInstance().maximumInteractDistance;
             serverLevel.getServer().getPlayerList().getPlayers().forEach(p -> {
                 double dist = pos.distToCenterSqr(p.getX(), p.getY(), p.getZ());
@@ -113,11 +114,11 @@ public abstract class BaseFurnitureBlock extends Block implements SimpleWaterlog
         return state;
     }
 
-    public void onInteract(Level level, BlockState blockState, BlockPos pos, Player player) {
+    public void onInteract(Level level, BlockState blockState, BlockPos pos, boolean active, Player player) {
         FurnitureData data = getData(blockState, level, pos);
         if (data != null) {
             Direction facing = blockState.getValue(FACING);
-            int state = blockState.getValue(ACTIVE) ? 1 : 0;
+            int state = active ? 1 : 0;
             data.playInteractSound(level, pos, state, player);
             data.emitInteractParticles(pos, facing, state, player, level::addParticle, false);
         }
@@ -163,7 +164,6 @@ public abstract class BaseFurnitureBlock extends Block implements SimpleWaterlog
 
     @Override
     public void animateTick(BlockState blockState, Level level, BlockPos pos, RandomSource random) {
-        if (blockState.getValue(ACTIVE)) return;
         FurnitureData data = getData(blockState, level, pos);
         if (data != null) {
             Direction facing = blockState.getValue(FACING);
