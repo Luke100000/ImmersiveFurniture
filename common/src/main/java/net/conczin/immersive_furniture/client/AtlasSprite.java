@@ -10,7 +10,7 @@ public class AtlasSprite {
     public static class Ticker implements SpriteTicker {
         private final SpriteContents spriteContents;
         private final SpriteContentsAccessor spriteContentsAccessor;
-        private float lastUtilization = 0.0f;
+        private int lastAtlasId = -1;
 
         public Ticker(SpriteContents spriteContents) {
             this.spriteContents = spriteContents;
@@ -25,9 +25,9 @@ public class AtlasSprite {
 
         @Override
         public void tickAndUpload(int x, int y) {
-            float usage = DynamicAtlas.BAKED.getUsage();
-            if (lastUtilization == usage || usage == 0) return;
-            lastUtilization = usage;
+            if (lastAtlasId == DynamicAtlas.BAKED.getLastStateId()) return;
+            if (DynamicAtlas.BAKED.getUsage() == 0) return;
+            lastAtlasId = DynamicAtlas.BAKED.getLastStateId();
 
             NativeImage source = DynamicAtlas.BAKED.getPixels();
             assert source != null;
