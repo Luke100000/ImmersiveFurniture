@@ -18,6 +18,7 @@ public class DynamicAtlas extends DynamicTexture {
     public static final DynamicAtlas ENTITY = new DynamicAtlas(512, "entity");
     public static final DynamicAtlas SCRATCH = new DynamicAtlas(512, "scratch");
 
+    int lastStateId;
     boolean full;
     int allocated;
     int size;
@@ -122,6 +123,7 @@ public class DynamicAtlas extends DynamicTexture {
 
     public void setDirty() {
         this.dirty = true;
+        lastStateId++;
     }
 
     public void uploadIfDirty() {
@@ -129,6 +131,10 @@ public class DynamicAtlas extends DynamicTexture {
             this.upload();
             dirty = false;
         }
+    }
+
+    public int getLastStateId() {
+        return lastStateId;
     }
 
     public record Quad(int x, int y, int w, int h) {
