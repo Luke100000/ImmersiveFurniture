@@ -116,9 +116,8 @@ public class FurnitureModelBaker {
             return getModel(data, hash, atlas, 0, state, false);
         } else if (!atlas.asyncRequestedFurniture.contains(hash)) {
             atlas.asyncRequestedFurniture.add(hash);
-            FurnitureData copy = new FurnitureData(data);
             Common.EXECUTOR.execute(() -> {
-                getModel(copy, hash, atlas, 0, state, false);
+                getModel(data, hash, atlas, 0, state, false);
                 atlas.asyncRequestedFurniture.remove(hash);
             });
         }
@@ -155,7 +154,9 @@ public class FurnitureModelBaker {
 
             // Only cache if the hash is still the same
             CachedBakedModelSet modelSet = new CachedBakedModelSet(atlas, model);
-            atlas.knownFurniture.put(hash, modelSet);
+            if (hash.equals(data.computeHash())) {
+                atlas.knownFurniture.put(hash, modelSet);
+            }
 
             // Only add when forced or the atlas had space
             if (force || !atlas.isFull() && atlas.getUsage() >= previousUsage) {
