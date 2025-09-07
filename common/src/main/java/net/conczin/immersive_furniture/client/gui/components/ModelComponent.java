@@ -236,13 +236,6 @@ public class ModelComponent extends ScreenComponent {
             addToggleButton(leftPos + 6 + type.ordinal() * 18, topPos + 94, 16, 176 + type.ordinal() * 16, 192, "gui.immersive_furniture.element_type." + type.name().toLowerCase(), () -> {
                 screen.selectedElements.forEach(e -> {
                     e.type = type;
-
-                    // Update mask based on type: 1 for emitters, 3 otherwise
-                    if (type == FurnitureData.ElementType.PARTICLE_EMITTER || type == FurnitureData.ElementType.SOUND_EMITTER) {
-                        e.mask = 1;
-                    } else {
-                        e.mask = 3;
-                    }
                     e.sanityCheck();
                 });
                 screen.init();
