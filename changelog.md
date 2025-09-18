@@ -1,6 +1,7 @@
 # 0.1.1
 
 * Fixed interactions blocked
+* Fixed sync issues on forge
 
 # 0.1.0
 
