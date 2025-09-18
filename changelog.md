@@ -1,3 +1,7 @@
+# 0.1.1
+
+* Fixed interactions blocked
+
 # 0.1.0
 
 * Added furniture states
