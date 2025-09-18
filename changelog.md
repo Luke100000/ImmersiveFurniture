@@ -2,6 +2,7 @@
 
 * Fixed interactions blocked
 * Fixed sync issues on forge
+* Fixed texture issues when changing graphics settings mid-game
 
 # 0.1.0
 
