@@ -3,6 +3,7 @@
 * Fixed interactions blocked
 * Fixed sync issues on forge
 * Fixed texture issues when changing graphics settings mid-game
+* Fixed stretched textures when maxMipLevel > 0
 
 # 0.1.0
 
