@@ -95,7 +95,9 @@ public class FurnitureBlockEntity extends BlockEntity implements Container, Menu
 
     @Override
     public int getContainerSize() {
-        return getData().inventorySize * 9;
+        FurnitureData furnitureData = getData();
+        if (furnitureData == null) return 0;
+        return furnitureData.inventorySize * 9;
     }
 
     @Override

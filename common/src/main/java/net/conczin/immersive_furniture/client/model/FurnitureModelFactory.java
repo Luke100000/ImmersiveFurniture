@@ -213,8 +213,8 @@ public class FurnitureModelFactory {
                         new float[]{
                                 quad.x() * uvScale,
                                 quad.y() * uvScale,
-                                (quad.x() + quad.w()) * uvScale,
-                                (quad.y() + quad.h()) * uvScale
+                                (quad.x() + dimensions.x()) * uvScale,
+                                (quad.y() + dimensions.y()) * uvScale
                         },
                         0
                 )

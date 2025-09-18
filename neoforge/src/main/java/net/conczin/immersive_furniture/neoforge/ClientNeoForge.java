@@ -1,5 +1,6 @@
 package net.conczin.immersive_furniture.neoforge;
 
+import net.conczin.immersive_furniture.Client;
 import net.conczin.immersive_furniture.Common;
 import net.conczin.immersive_furniture.block.entity.BlockEntityTypes;
 import net.conczin.immersive_furniture.client.model.FurnitureBakedModelWrapper;
@@ -16,8 +17,11 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
+import net.neoforged.neoforge.client.event.RegisterClientReloadListenersEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
+
+import java.util.concurrent.CompletableFuture;
 
 @Mod(value = Common.MOD_ID, dist = Dist.CLIENT)
 @EventBusSubscriber(modid = Common.MOD_ID, value = Dist.CLIENT)
@@ -38,6 +42,14 @@ public final class ClientNeoForge {
         if (!Minecraft.getInstance().isLocalServer()) {
             FurnitureDataManager.setWorldRoot();
         }
+    }
+
+    @SubscribeEvent
+    public static void onReload(RegisterClientReloadListenersEvent event) {
+        event.registerReloadListener((preparationBarrier, resourceManager, profilerFiller, profilerFiller1, backgroundExecutor, gameExecutor)
+                -> CompletableFuture.supplyAsync(() -> null, backgroundExecutor)
+                .thenCompose(preparationBarrier::wait)
+                .thenRunAsync(Client::onLevelLoad, gameExecutor));
     }
 
     static {
