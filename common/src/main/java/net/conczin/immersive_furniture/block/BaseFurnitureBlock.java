@@ -74,7 +74,7 @@ public abstract class BaseFurnitureBlock extends Block implements SimpleWaterlog
 
             consume = trigger(data, state, level, pos, data.toggleWithRightClick) || consume;
 
-            return consume ? InteractionResult.CONSUME : InteractionResult.PASS;
+            return consume ? InteractionResult.sidedSuccess(level.isClientSide) : InteractionResult.PASS;
         } else {
             return InteractionResult.PASS;
         }
