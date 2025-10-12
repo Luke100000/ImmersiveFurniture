@@ -287,23 +287,25 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
                     normal2 = new Vector3f(0.0f).sub(o);
                 }
             } else {
-                // Offset object by global axis
+                // Offset the object by global axis
                 normal = global;
                 normal2 = global;
             }
 
+            Vector3f fNormal = new Vector3f(normal);
+            Vector3f fNormal2 = new Vector3f(normal2);
+
+            // Rotate by actual axis
+            ModelUtils.rotate(fNormal, draggingContext.element.axis, -draggingContext.element.rotation);
+            ModelUtils.rotate(fNormal, draggingContext.element.axis, draggingContext.element.rotation);
+            ModelUtils.rotate(fNormal2, draggingContext.element.axis, -draggingContext.element.rotation);
+            ModelUtils.rotate(fNormal2, draggingContext.element.axis, draggingContext.element.rotation);
+
             for (FurnitureData.Element element : selectedElements) {
                 if (!draggingContext.originalFrom.containsKey(element)) continue;
+
                 Vector3f originalFrom = draggingContext.originalFrom.get(element);
                 Vector3f originalTo = draggingContext.originalTo.get(element);
-
-                // Rotate by actual axis
-                Vector3f fNormal = new Vector3f(normal);
-                ModelUtils.rotate(fNormal, draggingContext.element.axis, -draggingContext.element.rotation);
-                ModelUtils.rotate(fNormal, element.axis, element.rotation);
-                Vector3f fNormal2 = new Vector3f(normal2);
-                ModelUtils.rotate(fNormal2, draggingContext.element.axis, -draggingContext.element.rotation);
-                ModelUtils.rotate(fNormal2, element.axis, element.rotation);
 
                 if (draggingContext.direction == Direction.DOWN || draggingContext.direction == Direction.WEST || draggingContext.direction == Direction.NORTH) {
                     element.from.x = Math.min(element.to.x, originalFrom.x + fNormal.x);

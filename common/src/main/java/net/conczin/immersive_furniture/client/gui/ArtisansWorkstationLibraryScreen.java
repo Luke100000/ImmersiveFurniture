@@ -323,6 +323,7 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
 
     private void delete() {
         if (lastCriticalActionAttempt + 5000 > System.currentTimeMillis()) {
+            clearError();
             if (tab == Tab.SUBMISSIONS) {
                 FurnitureData model = FurnitureDataManager.getData(selected);
                 if (model != null) {
