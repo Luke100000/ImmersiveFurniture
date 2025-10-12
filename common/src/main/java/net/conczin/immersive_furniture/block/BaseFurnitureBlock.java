@@ -180,7 +180,8 @@ public abstract class BaseFurnitureBlock extends Block implements SimpleWaterlog
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         FurnitureData data = getData(state, level, pos);
         if (data != null) {
-            return data.getShape(state.getValue(FACING), state.getValue(ACTIVE) ? 1 : 0, 0, 0, 0);
+            VoxelShape shape = data.getShapeLazy(state.getValue(FACING), state.getValue(ACTIVE) ? 1 : 0, 0, 0, 0);
+            if (shape != null) return shape;
         }
         return Block.box(2, 2, 2, 14, 14, 14);
     }

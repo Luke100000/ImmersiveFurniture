@@ -25,9 +25,6 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 /**
  * A proxy block used for multi-block furniture structures.
  * It forwards interactions to the base furniture block and
@@ -87,13 +84,14 @@ public class FurnitureProxyBlock extends Block {
             if (baseState != null && baseState.getBlock() instanceof BaseFurnitureBlock baseBlock) {
                 FurnitureData data = baseBlock.getData(baseState, level, basePos);
                 if (data != null) {
-                    return data.getShape( // TODO: Lazy?
+                    VoxelShape shape = data.getShapeLazy(
                             state.getValue(FACING),
                             baseState.getValue(BaseFurnitureBlock.ACTIVE) ? 1 : 0,
                             state.getValue(OFFSET_X),
                             state.getValue(OFFSET_Y),
                             state.getValue(OFFSET_Z)
                     );
+                    if (shape != null) return shape;
                 }
             }
         }
