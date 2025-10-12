@@ -133,8 +133,8 @@ public class FurnitureBlockEntityRenderer<T extends FurnitureBlockEntity> implem
 
                     itemRenderer.render(itemStack, ItemDisplayContext.FIXED, false, poseStack, buffer, packedLight, packedOverlay, bakedmodel);
                     poseStack.popPose();
-                    slot++;
                 }
+                slot++;
             }
         }
     }

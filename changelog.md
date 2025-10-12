@@ -1,6 +1,7 @@
 # 0.1.3
 
 * Fixed hand animations when interacting with furniture
+* Fixed items on shelves only rendering when no empty slots inbetween
 
 # 0.1.2
 
