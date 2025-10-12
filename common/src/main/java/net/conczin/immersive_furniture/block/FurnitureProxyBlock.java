@@ -3,6 +3,7 @@ package net.conczin.immersive_furniture.block;
 import net.conczin.immersive_furniture.data.FurnitureData;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.SectionPos;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -17,9 +18,15 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.chunk.status.ChunkStatus;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * A proxy block used for multi-block furniture structures.
@@ -63,26 +70,24 @@ public class FurnitureProxyBlock extends Block {
     }
 
     /**
-     * Get the base furniture block if it exists
+     * Get the block state without loading a chunk
      */
-    protected BaseFurnitureBlock getBaseBlock(LevelAccessor level, BlockState state, BlockPos pos) {
-        BlockPos basePos = getBasePos(state, pos);
-        BlockState baseState = level.getBlockState(basePos);
-        if (baseState.getBlock() instanceof BaseFurnitureBlock baseBlock) {
-            return baseBlock;
-        }
-        return null;
+    @Nullable
+    protected BlockState getLoadedBlockState(LevelReader level, BlockPos pos) {
+        ChunkAccess chunk = level.getChunk(SectionPos.blockToSectionCoord(pos.getX()), SectionPos.blockToSectionCoord(pos.getZ()), ChunkStatus.FULL, false);
+        if (chunk == null) return null;
+        return chunk.getBlockState(pos);
     }
 
     @Override
-    public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-        if (level instanceof Level) {
+    public VoxelShape getShape(BlockState state, BlockGetter blockGetter, BlockPos pos, CollisionContext context) {
+        if (blockGetter instanceof LevelReader level) {
             BlockPos basePos = getBasePos(state, pos);
-            BlockState baseState = level.getBlockState(basePos);
-            if (baseState.getBlock() instanceof BaseFurnitureBlock baseBlock) {
+            BlockState baseState = getLoadedBlockState(level, basePos);
+            if (baseState != null && baseState.getBlock() instanceof BaseFurnitureBlock baseBlock) {
                 FurnitureData data = baseBlock.getData(baseState, level, basePos);
                 if (data != null) {
-                    return data.getShape(
+                    return data.getShape( // TODO: Lazy?
                             state.getValue(FACING),
                             baseState.getValue(BaseFurnitureBlock.ACTIVE) ? 1 : 0,
                             state.getValue(OFFSET_X),
@@ -98,13 +103,17 @@ public class FurnitureProxyBlock extends Block {
     }
 
     @Override
+    protected int getLightBlock(BlockState state, BlockGetter level, BlockPos pos) {
+        return 0;
+    }
+
+    @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         // Forward the interaction to the base block
-        BaseFurnitureBlock baseBlock = getBaseBlock(level, state, pos);
-        if (baseBlock != null) {
-            BlockPos basePos = getBasePos(state, pos);
-            BlockState baseState = level.getBlockState(basePos);
+        BlockPos basePos = getBasePos(state, pos);
+        BlockState baseState = getLoadedBlockState(level, basePos);
 
+        if (baseState != null) {
             // Adjust the hit position
             BlockHitResult adjustedHit = new BlockHitResult(
                     hit.getLocation(),
@@ -124,8 +133,8 @@ public class FurnitureProxyBlock extends Block {
         // When proxy is destroyed, destroy the base block too if it exists
         if (!level.isClientSide) {
             BlockPos basePos = getBasePos(state, pos);
-            BlockState baseState = level.getBlockState(basePos);
-            if (baseState.getBlock() instanceof BaseFurnitureBlock furnitureBlock) {
+            BlockState baseState = getLoadedBlockState(level, basePos);
+            if (baseState != null && baseState.getBlock() instanceof BaseFurnitureBlock furnitureBlock) {
                 furnitureBlock.playerWillDestroy(level, basePos, baseState, player);
                 level.destroyBlock(basePos, !player.isCreative());
             }
@@ -138,7 +147,9 @@ public class FurnitureProxyBlock extends Block {
     @Override
     public BlockState updateShape(BlockState state, Direction facing, BlockState facingState, LevelAccessor level, BlockPos currentPos, BlockPos facingPos) {
         // Check if the base block exists, if not, remove this proxy
-        if (getBaseBlock(level, state, currentPos) == null) {
+        BlockPos basePos = getBasePos(state, currentPos);
+        BlockState baseState = getLoadedBlockState(level, basePos);
+        if (baseState != null && !(baseState.getBlock() instanceof BaseFurnitureBlock)) {
             return Blocks.AIR.defaultBlockState();
         }
 
@@ -148,8 +159,8 @@ public class FurnitureProxyBlock extends Block {
     @Override
     public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state) {
         BlockPos basePos = getBasePos(state, pos);
-        BlockState baseState = level.getBlockState(basePos);
-        if (baseState.getBlock() instanceof BaseFurnitureBlock baseBlock) {
+        BlockState baseState = getLoadedBlockState(level, basePos);
+        if (baseState != null && baseState.getBlock() instanceof BaseFurnitureBlock baseBlock) {
             return baseBlock.getCloneItemStack(level, basePos, baseState);
         }
         return ItemStack.EMPTY;
