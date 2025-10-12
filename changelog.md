@@ -1,5 +1,6 @@
 # 0.1.2
 
+* Dragging multiple elements now moves in sync
 * Fixed deadlocks
 * Fixed a few lags-pikes when loading chunks
 * Fixed vanilla blocks being tagged as modded
