@@ -58,7 +58,8 @@ public class FurnitureData {
     private String hash;
     private final Map<Integer, VoxelShape> cachedFullShapes = new ConcurrentHashMap<>();
     private final Map<Integer, VoxelShape> cachedSubShapes = new ConcurrentHashMap<>();
-    private final Set<Integer> requestedShapes = new ConcurrentSkipListSet<>();
+    private final Set<Integer> requestedFullShapes = new ConcurrentSkipListSet<>();
+    private final Set<Integer> requestedSubShapes = new ConcurrentSkipListSet<>();
     public long lastTick = 0;
 
     public FurnitureData() {
@@ -221,7 +222,8 @@ public class FurnitureData {
         hash = null;
         cachedFullShapes.clear();
         cachedSubShapes.clear();
-        requestedShapes.clear();
+        requestedFullShapes.clear();
+        requestedSubShapes.clear();
         for (Element element : elements) {
             element.rotationAxes = null;
             element.bakedTextures.clear();
@@ -483,9 +485,21 @@ public class FurnitureData {
         if (cachedFullShapes.containsKey(id)) {
             return cachedFullShapes.get(id);
         }
-        if (!requestedShapes.contains(id)) {
-            requestedShapes.add(id);
+        if (!requestedFullShapes.contains(id)) {
+            requestedFullShapes.add(id);
             Common.EXECUTOR.execute(() -> getShape(rotation, 0));
+        }
+        return null;
+    }
+
+    public VoxelShape getShapeLazy(Direction rotation, int state, int offsetX, int offsetY, int offsetZ) {
+        int id = ((((rotation.ordinal() * 31) + offsetX) * 31 + offsetY) * 31 + offsetZ) * 31 + state;
+        if (cachedSubShapes.containsKey(id)) {
+            return cachedSubShapes.get(id);
+        }
+        if (!requestedSubShapes.contains(id)) {
+            requestedSubShapes.add(id);
+            Common.EXECUTOR.execute(() -> getShape(rotation, state, offsetX, offsetY, offsetZ));
         }
         return null;
     }

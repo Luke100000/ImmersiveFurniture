@@ -1,6 +1,7 @@
 # 0.1.2
 
 * Fixed deadlocks
+* Fixed a few lags-pikes when loading chunks
 * Fixed vanilla blocks being tagged as modded
 
 # 0.1.1
