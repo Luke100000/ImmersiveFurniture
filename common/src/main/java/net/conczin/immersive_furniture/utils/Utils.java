@@ -85,6 +85,9 @@ public class Utils {
         if (search.isEmpty()) return true;
         String lowerSearch = replaceUglyChars(search.toLowerCase());
         String lowerValue = replaceUglyChars(value.toLowerCase());
-        return lowerValue.contains(lowerSearch);
+        for (String s : lowerSearch.split(" ")) {
+            if (!lowerValue.contains(s)) return false;
+        }
+        return true;
     }
 }

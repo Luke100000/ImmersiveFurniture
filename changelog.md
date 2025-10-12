@@ -5,6 +5,7 @@
 * Fixed a few lags-pikes when loading chunks
 * Fixed vanilla blocks being tagged as modded
 * Axes now destroy furniture faster
+* Improved search
 
 # 0.1.1
 
