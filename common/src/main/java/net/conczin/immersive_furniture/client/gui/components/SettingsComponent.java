@@ -169,7 +169,10 @@ public class SettingsComponent extends ScreenComponent {
                         .ifPresent(resource -> data.sources.add(Utils.beatifyPackID(resource.sourcePackId())));
             }
         }
+
+        data.sources.remove("vanilla");
         data.sources.remove("minecraft");
+        data.sources.remove("mod_resources");
         data.sources.remove("mod resources");
 
         // Find and log dependencies

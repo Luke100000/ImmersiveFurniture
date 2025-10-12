@@ -1,3 +1,7 @@
+# 0.1.2
+
+* Fixed vanilla blocks being tagged as modded
+
 # 0.1.1
 
 * Fixed interactions blocked
