@@ -38,7 +38,7 @@ public class EntityFurnitureBlock extends BaseFurnitureBlock implements EntityBl
         if (!player.isCrouching()) {
             if (level.getBlockEntity(pos) instanceof FurnitureBlockEntity blockEntity && blockEntity.getContainerSize() > 0) {
                 player.openMenu(blockEntity);
-                return InteractionResult.CONSUME;
+                return InteractionResult.sidedSuccess(level.isClientSide);
             }
         }
         return super.use(state, level, pos, player, hand, hit);

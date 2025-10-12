@@ -1,3 +1,7 @@
+# 0.1.3
+
+* Fixed hand animations when interacting with furniture
+
 # 0.1.2
 
 * Dragging multiple elements now moves in sync
