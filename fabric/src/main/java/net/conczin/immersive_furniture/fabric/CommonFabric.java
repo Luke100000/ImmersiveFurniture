@@ -1,6 +1,7 @@
 package net.conczin.immersive_furniture.fabric;
 
 import net.conczin.immersive_furniture.Common;
+import net.conczin.immersive_furniture.recipe.Recipes;
 import net.conczin.immersive_furniture.Sounds;
 import net.conczin.immersive_furniture.block.Blocks;
 import net.conczin.immersive_furniture.block.entity.BlockEntityTypes;
@@ -56,6 +57,7 @@ public final class CommonFabric implements ModInitializer {
         registerHelper(BuiltInRegistries.BLOCK, Blocks::registerBlocks);
         registerHelper(BuiltInRegistries.SOUND_EVENT, Sounds::registerSounds);
         registerHelper(BuiltInRegistries.ENTITY_TYPE, Entities::registerEntities);
+        registerHelper(BuiltInRegistries.RECIPE_SERIALIZER, Recipes::registerRecipes);
 
         BlockEntityTypes.register((name, factory, block) ->
                 Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, name, BlockEntityType.Builder.of(factory::create, block).build(null)));
