@@ -1,3 +1,7 @@
+# 0.1.4
+
+* Added furniture recycling (shapeless crafting recipe)
+
 # 0.1.3
 
 * Fixed hand animations when interacting with furniture

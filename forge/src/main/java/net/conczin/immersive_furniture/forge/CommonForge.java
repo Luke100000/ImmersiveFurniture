@@ -4,20 +4,18 @@ import net.conczin.immersive_furniture.Common;
 import net.conczin.immersive_furniture.Sounds;
 import net.conczin.immersive_furniture.block.Blocks;
 import net.conczin.immersive_furniture.block.entity.BlockEntityTypes;
-import net.conczin.immersive_furniture.data.FurnitureDataManager;
 import net.conczin.immersive_furniture.entity.Entities;
 import net.conczin.immersive_furniture.item.Items;
 import net.conczin.immersive_furniture.network.ImmersivePayload;
 import net.conczin.immersive_furniture.network.Network;
+import net.conczin.immersive_furniture.recipe.Recipes;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.level.storage.LevelResource;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
-import net.minecraftforge.event.server.ServerAboutToStartEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
@@ -42,6 +40,7 @@ public final class CommonForge {
         registerHelper(event, BuiltInRegistries.BLOCK, Blocks::registerBlocks);
         registerHelper(event, BuiltInRegistries.SOUND_EVENT, Sounds::registerSounds);
         registerHelper(event, BuiltInRegistries.ENTITY_TYPE, Entities::registerEntities);
+        registerHelper(event, BuiltInRegistries.RECIPE_SERIALIZER, Recipes::registerRecipes);
 
         if (event.getRegistryKey() == Registries.BLOCK_ENTITY_TYPE) {
             event.register(Registries.BLOCK_ENTITY_TYPE, helper ->
