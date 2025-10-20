@@ -1,6 +1,7 @@
 package net.conczin.immersive_furniture.block;
 
 import net.conczin.immersive_furniture.InteractionManager;
+import net.conczin.immersive_furniture.block.entity.FurnitureOffsetHolder;
 import net.conczin.immersive_furniture.config.Config;
 import net.conczin.immersive_furniture.data.FurnitureData;
 import net.conczin.immersive_furniture.entity.SittingEntity;
@@ -182,12 +183,14 @@ public abstract class BaseFurnitureBlock extends Block implements SimpleWaterlog
 
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-        FurnitureData data = getData(state, level, pos);
-        if (data != null) {
-            VoxelShape shape = data.getShapeLazy(state.getValue(FACING), state.getValue(ACTIVE) ? 1 : 0, 0, 0, 0);
-            if (shape != null) return shape;
-        }
-        return Block.box(2, 2, 2, 14, 14, 14);
+        VoxelShape shape = getOffsetShape(state, level, pos);
+        return shape != null ? shape : Block.box(2, 2, 2, 14, 14, 14);
+    }
+
+    @Override
+    public VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+        VoxelShape shape = getOffsetShape(state, level, pos);
+        return shape != null ? shape : super.getCollisionShape(state, level, pos, context);
     }
 
     @Override
@@ -335,5 +338,24 @@ public abstract class BaseFurnitureBlock extends Block implements SimpleWaterlog
         }
 
         return basePos.offset(dx, offsetY, dz);
+    }
+
+    private VoxelShape getOffsetShape(BlockState state, BlockGetter level, BlockPos pos) {
+        FurnitureData data = getData(state, level, pos);
+        if (data == null) {
+            return null;
+        }
+        VoxelShape shape = data.getShapeLazy(state.getValue(FACING), state.getValue(ACTIVE) ? 1 : 0, 0, 0, 0);
+        if (shape == null) {
+            return null;
+        }
+        if (level.getBlockEntity(pos) instanceof FurnitureOffsetHolder holder) {
+            double offsetX = holder.getSubOffsetX() / 16.0D - 0.5D;
+            double offsetZ = holder.getSubOffsetZ() / 16.0D - 0.5D;
+            if (offsetX != 0.0D || offsetZ != 0.0D) {
+                shape = shape.move(offsetX, 0.0D, offsetZ);
+            }
+        }
+        return shape;
     }
 }
