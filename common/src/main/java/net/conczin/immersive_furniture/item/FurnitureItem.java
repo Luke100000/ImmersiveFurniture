@@ -1,6 +1,7 @@
 package net.conczin.immersive_furniture.item;
 
 import net.conczin.immersive_furniture.block.*;
+import net.conczin.immersive_furniture.block.entity.FurnitureOffsetHolder;
 import net.conczin.immersive_furniture.data.FurnitureData;
 import net.conczin.immersive_furniture.data.FurnitureDataManager;
 import net.conczin.immersive_furniture.data.ServerFurnitureRegistry;
@@ -19,6 +20,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.phys.Vec3;
+
+import net.conczin.immersive_furniture.utils.SubBlockGrid;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -117,6 +121,26 @@ public class FurnitureItem extends BlockItem {
         BlockPos basePos = context.getClickedPos();
         var facing = state.getValue(FurnitureBlock.FACING);
 
+        // Compute sub-block offset from click location and snap it to grid (only when sneaking for precision)
+        int subOffsetX = 8;
+        int subOffsetZ = 8;
+        var player = context.getPlayer();
+        if (player != null && player.isShiftKeyDown()) {
+            Vec3 click = context.getClickLocation();
+            if (click != null) {
+                double fracX = click.x - basePos.getX();
+                double fracZ = click.z - basePos.getZ();
+                subOffsetX = SubBlockGrid.getGridIndex(SubBlockGrid.snapCoordinateToGrid(fracX));
+                subOffsetZ = SubBlockGrid.getGridIndex(SubBlockGrid.snapCoordinateToGrid(fracZ));
+            }
+        }
+
+        // Apply offset to block entity for rendering
+        var blockEntity = level.getBlockEntity(basePos);
+        if (blockEntity instanceof FurnitureOffsetHolder holder) {
+            holder.setSubOffset(subOffsetX, subOffsetZ);
+        }
+
         // Create proxy blocks for each additional position
         for (int x = 0; x < data.size.x; x++) {
             for (int y = 0; y < data.size.y; y++) {
@@ -126,7 +150,6 @@ public class FurnitureItem extends BlockItem {
                     BlockPos proxyPos = BaseFurnitureBlock.getProxyPosition(basePos, facing, x, y, z);
                     FluidState fluidstate = context.getLevel().getFluidState(proxyPos);
                     boolean waterlogged = fluidstate.getType() == Fluids.WATER;
-
                     BlockState proxyState = Blocks.FURNITURE_PROXY.defaultBlockState()
                             .setValue(FurnitureProxyBlock.OFFSET_X, x)
                             .setValue(FurnitureProxyBlock.OFFSET_Y, y)
