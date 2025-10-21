@@ -40,6 +40,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.joml.Vector3f;
 
 import java.util.List;
 
@@ -128,8 +129,20 @@ public abstract class BaseFurnitureBlock extends Block implements SimpleWaterlog
     private static void startSleeping(BlockPos pos, Player player, FurnitureData.PoseOffset offset) {
         if (player.level().isClientSide) return;
 
+        // Get sub-offset from block entity and apply it to the pose offset
+        FurnitureData.PoseOffset adjustedOffset = offset;
+        if (player.level().getBlockEntity(pos) instanceof FurnitureOffsetHolder holder) {
+            Vec3 subOffset = new Vec3(holder.getSubOffsetX() / 16.0D - 0.5D, 0.0D, holder.getSubOffsetZ() / 16.0D - 0.5D);
+            Vector3f newOffset = new Vector3f(
+                    offset.offset().x + (float) subOffset.x,
+                    offset.offset().y + (float) subOffset.y,
+                    offset.offset().z + (float) subOffset.z
+            );
+            adjustedOffset = new FurnitureData.PoseOffset(newOffset, offset.pose(), offset.rotation());
+        }
+
         if (player instanceof ServerPlayer serverPlayer) {
-            PoseOffsetMessage message = new PoseOffsetMessage(pos, offset, serverPlayer);
+            PoseOffsetMessage message = new PoseOffsetMessage(pos, adjustedOffset, serverPlayer);
             Network.sendToAllPlayers(serverPlayer.serverLevel().getServer(), message);
         }
 
@@ -147,10 +160,16 @@ public abstract class BaseFurnitureBlock extends Block implements SimpleWaterlog
     private static void startSitting(FurnitureData data, Level level, BlockPos pos, Direction direction, Player player, FurnitureData.PoseOffset offset) {
         // Create an entity to fake sitting
         if (!level.isClientSide) {
+            // Get sub-offset from block entity
+            Vec3 subOffset = Vec3.ZERO;
+            if (level.getBlockEntity(pos) instanceof FurnitureOffsetHolder holder) {
+                subOffset = new Vec3(holder.getSubOffsetX() / 16.0D - 0.5D, 0.0D, holder.getSubOffsetZ() / 16.0D - 0.5D);
+            }
+            
             Vec3 position = new Vec3(
-                    pos.getX() + offset.offset().x,
-                    pos.getY() + offset.offset().y,
-                    pos.getZ() + offset.offset().z
+                    pos.getX() + offset.offset().x + subOffset.x,
+                    pos.getY() + offset.offset().y + subOffset.y,
+                    pos.getZ() + offset.offset().z + subOffset.z
             );
             SittingEntity sittingEntity = new SittingEntity(level, position, pos, data.size, direction, new Vec3(player.getX(), player.getY(), player.getZ()));
             sittingEntity.setYRot(offset.rotation());
