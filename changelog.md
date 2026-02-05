@@ -1,9 +1,7 @@
-# 0.1.4
-
-* Added furniture recycling (shapeless crafting recipe)
-
 # 0.1.3
 
+* Fixed worker thread preventing server shutdown
+* Added furniture recycling (shapeless crafting recipe)
 * Fixed hand animations when interacting with furniture
 * Fixed items on shelves only rendering when no empty slots inbetween
 

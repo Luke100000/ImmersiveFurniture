@@ -10,7 +10,14 @@ import java.util.concurrent.Executors;
 
 public final class Common {
     public static final String MOD_ID = "immersive_furniture";
-    public final static Executor EXECUTOR = Executors.newSingleThreadExecutor();
+
+    public static final Executor EXECUTOR =
+            Executors.newSingleThreadExecutor(r -> {
+                Thread t = new Thread(r);
+                t.setDaemon(true);
+                t.setPriority(Thread.MIN_PRIORITY);
+                return t;
+            });
 
     public static ClientHandler clientHandler = new ClientHandler() {
     };
