@@ -1,11 +1,10 @@
 package net.conczin.immersive_furniture.recipe;
 
 import net.conczin.immersive_furniture.item.FurnitureItem;
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.inventory.CraftingContainer;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingBookCategory;
+import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.CustomRecipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.Level;
@@ -14,23 +13,25 @@ import static net.conczin.immersive_furniture.item.Items.CRAFTING_MATERIAL;
 import static net.conczin.immersive_furniture.item.Items.FURNITURE;
 
 public class RecyclingRecipe extends CustomRecipe {
-    public RecyclingRecipe(ResourceLocation id, CraftingBookCategory category) {
-        super(id, category);
+    public RecyclingRecipe(CraftingBookCategory category) {
+        super(category);
     }
 
-    public boolean matches(CraftingContainer inv, Level level) {
-        for (int j = 0; j < inv.getContainerSize(); j++) {
-            if (inv.getItem(j).is(FURNITURE)) {
+    @Override
+    public boolean matches(CraftingInput input, Level level) {
+        for (int j = 0; j < input.size(); j++) {
+            if (input.getItem(j).is(FURNITURE)) {
                 return true;
             }
         }
         return false;
     }
 
-    public ItemStack assemble(CraftingContainer container, RegistryAccess registryAccess) {
+    @Override
+    public ItemStack assemble(CraftingInput input, HolderLookup.Provider provider) {
         int amount = 0;
-        for (int j = 0; j < container.getContainerSize(); j++) {
-            ItemStack itemstack = container.getItem(j);
+        for (int j = 0; j < input.size(); j++) {
+            ItemStack itemstack = input.getItem(j);
             if (itemstack.is(FURNITURE)) {
                 amount += FurnitureItem.getData(itemstack).getCost();
             }
