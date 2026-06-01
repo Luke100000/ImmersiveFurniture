@@ -13,13 +13,16 @@ import net.conczin.immersive_furniture.network.Network;
 import net.conczin.immersive_furniture.network.c2s.CraftRequest;
 import net.conczin.immersive_furniture.utils.Utils;
 import net.minecraft.ChatFormatting;
+import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.components.Tooltip;
+import net.minecraft.client.gui.screens.ConfirmLinkScreen;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
@@ -200,13 +203,14 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
                                     Auth.clearToken();
                                     authenticated = false;
                                     authenticating = false;
+                                    init();
                                 } else {
-                                    // Open a browser and start explicit authentication
-                                    Auth.authenticate(getPlayerName());
+                                    // URL popup
+                                    String authUrl = Auth.authenticate(getPlayerName());
                                     authenticating = true;
                                     isBrowserOpen = true;
+                                    Minecraft.getInstance().setScreen(new AuthLinkScreen(authUrl));
                                 }
-                                init();
                             })
                             .bounds(leftPos + windowWidth - 64 - 4, topPos + 4, 64, 20)
                             .tooltip(Tooltip.create(Component.translatable("gui.immersive_furniture.login.tooltip")))
@@ -504,6 +508,7 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
                     if (authResponse.authenticated()) {
                         authenticated = true;
                         authenticating = false;
+                        isBrowserOpen = false;
 
                         clearError();
                         Minecraft.getInstance().execute(this::init);
@@ -522,15 +527,66 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
                     }
                 } else {
                     // Connection or server error
+                    if (response instanceof ErrorResponse errorResponse) {
+                        Common.logger.warn("Failed to check authentication: {} {}", errorResponse.code(), errorResponse.message());
+                    } else {
+                        Common.logger.warn("Failed to check authentication: unexpected response {}", response);
+                    }
                     setError("gui.immersive_furniture.is_auth_failed");
                     authenticating = false;
+                    isBrowserOpen = false;
                 }
                 Thread.sleep(2000);
             } catch (Exception e) {
                 Common.logger.error("Failed to authenticate!", e);
+            } finally {
+                awaitingAuthentication = false;
             }
-            awaitingAuthentication = false;
         });
+    }
+
+    private class AuthLinkScreen extends ConfirmLinkScreen {
+        private final String authUrl;
+
+        private AuthLinkScreen(String authUrl) {
+            super(confirmed -> {
+                    }, Component.translatableWithFallback("gui.immersive_furniture.auth_link.title", "Open authentication link?"),
+                    Component.translatableWithFallback("gui.immersive_furniture.auth_link.message", "Open this link in your browser to log in."),
+                    authUrl,
+                    CommonComponents.GUI_CANCEL,
+                    true);
+            this.authUrl = authUrl;
+        }
+
+        @Override
+        protected void addButtons(int y) {
+            addRenderableWidget(Button.builder(Component.translatable("chat.link.open"), button -> {
+                Util.getPlatform().openUri(authUrl);
+                Minecraft.getInstance().setScreen(ArtisansWorkstationLibraryScreen.this);
+            }).bounds(width / 2 - 50 - 105, y, 100, 20).build());
+            addRenderableWidget(Button.builder(Component.translatable("chat.copy"), button -> {
+                copyToClipboard();
+                Minecraft.getInstance().setScreen(ArtisansWorkstationLibraryScreen.this);
+            }).bounds(width / 2 - 50, y, 100, 20).build());
+            addRenderableWidget(Button.builder(CommonComponents.GUI_CANCEL, button -> cancelAuthentication()).bounds(width / 2 - 50 + 105, y, 100, 20).build());
+        }
+
+        @Override
+        public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+            if (keyCode == 256) {
+                cancelAuthentication();
+                return true;
+            }
+            return super.keyPressed(keyCode, scanCode, modifiers);
+        }
+
+        private void cancelAuthentication() {
+            Auth.clearToken();
+            authenticated = false;
+            authenticating = false;
+            isBrowserOpen = false;
+            Minecraft.getInstance().setScreen(ArtisansWorkstationLibraryScreen.this);
+        }
     }
 
     @Override
