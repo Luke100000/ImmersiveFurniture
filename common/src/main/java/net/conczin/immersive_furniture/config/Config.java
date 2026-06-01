@@ -27,6 +27,9 @@ public final class Config extends JsonConfig {
     // Cost multiplier for furniture crafting costs.
     public float costMultiplier = 1.0f;
 
+    // Required server permission level for crafting furniture. 0 allows everyone.
+    public int requiredCraftingPermissionLevel = 0;
+
     // Interval in seconds between autosaves in the editor. Negative value disables autosave.
     public int autosaveInterval = 60;
 
