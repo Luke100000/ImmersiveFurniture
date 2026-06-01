@@ -19,12 +19,18 @@ public class RecyclingRecipe extends CustomRecipe {
     }
 
     public boolean matches(CraftingContainer inv, Level level) {
+        boolean hasFurniture = false;
         for (int j = 0; j < inv.getContainerSize(); j++) {
-            if (inv.getItem(j).is(FURNITURE)) {
-                return true;
+            ItemStack itemstack = inv.getItem(j);
+            if (itemstack.isEmpty()) {
+                continue;
             }
+            if (!itemstack.is(FURNITURE)) {
+                return false;
+            }
+            hasFurniture = true;
         }
-        return false;
+        return hasFurniture;
     }
 
     public ItemStack assemble(CraftingContainer container, RegistryAccess registryAccess) {
