@@ -79,7 +79,7 @@ public class FurnitureProxyBlock extends Block {
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter blockGetter, BlockPos pos, CollisionContext context) {
         VoxelShape shape = resolveShape(state, blockGetter, pos);
-        return shape != null ? shape : Block.box(4, 4, 4, 12, 12, 12);
+        return shape != null && !shape.isEmpty() ? shape : Block.box(4, 4, 4, 12, 12, 12);
     }
 
     @Override

@@ -209,7 +209,7 @@ public abstract class BaseFurnitureBlock extends Block implements SimpleWaterlog
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         VoxelShape shape = getOffsetShape(state, level, pos);
-        return shape != null ? shape : Block.box(2, 2, 2, 14, 14, 14);
+        return shape != null && !shape.isEmpty() ? shape : Block.box(2, 2, 2, 14, 14, 14);
     }
 
     @Override
