@@ -1,6 +1,7 @@
 # 0.2.0
 
 * Added pixel-perfect placement mode (Thanks GlobalHive!)
+* Added recipe to duplicate furniture with material
 * Fixed recycling recipe accepting any item
 
 # 0.1.3
