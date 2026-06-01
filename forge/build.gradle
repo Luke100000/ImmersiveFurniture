@@ -22,6 +22,7 @@ legacyForge {
     runs {
         client {
             client()
+            jvmArgument("-Xmx3G")
         }
         data {
             data()
