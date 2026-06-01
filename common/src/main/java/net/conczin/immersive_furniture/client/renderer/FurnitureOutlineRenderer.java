@@ -2,9 +2,12 @@ package net.conczin.immersive_furniture.client.renderer;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.conczin.immersive_furniture.block.BaseFurnitureBlock;
+import net.conczin.immersive_furniture.block.FurnitureProxyBlock;
 import net.conczin.immersive_furniture.data.FurnitureData;
 import net.conczin.immersive_furniture.item.FurnitureItem;
 import net.conczin.immersive_furniture.utils.SubBlockGrid;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
@@ -13,18 +16,17 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 
-public final class FurniturePlacementPreviewRenderer {
-    private FurniturePlacementPreviewRenderer() {
-    }
-
-    public static boolean render(PoseStack poseStack, VertexConsumer consumer, Entity entity, BlockHitResult blockHitResult,
-                                 double camX, double camY, double camZ, ShapeRenderer shapeRenderer) {
+public final class FurnitureOutlineRenderer {
+    public static boolean renderPlacementPreview(PoseStack poseStack, VertexConsumer consumer, Entity entity, BlockHitResult blockHitResult,
+                                                 double camX, double camY, double camZ) {
         if (!(entity instanceof Player player)) {
             return false;
         }
@@ -65,12 +67,33 @@ public final class FurniturePlacementPreviewRenderer {
             renderX = clickedPos.getX() + offsetX - camX;
             renderZ = clickedPos.getZ() + offsetZ - camZ;
 
-            shapeRenderer.render(poseStack, consumer, shape, renderX, renderY, renderZ, 0.0F, 1.0F, 0.0F, 0.4F);
+            CachedShapeRenderer.renderShape(poseStack, consumer, shape, renderX, renderY, renderZ, 0.0F, 1.0F, 0.0F, 0.4F);
             renderSubBlockGrid(poseStack, consumer, clickedPos, blockHitResult.getDirection().getOpposite(), camX, camY, camZ);
         } else {
-            shapeRenderer.render(poseStack, consumer, shape, renderX, renderY, renderZ, 0.0F, 0.0F, 0.0F, 0.4F);
+            CachedShapeRenderer.renderShape(poseStack, consumer, shape, renderX, renderY, renderZ, 0.0F, 0.0F, 0.0F, 0.4F);
         }
 
+        return true;
+    }
+
+    public static boolean renderPlacedOutline(PoseStack poseStack, VertexConsumer consumer, ClientLevel level, Entity entity, BlockPos pos, BlockState state,
+                                 double camX, double camY, double camZ) {
+        if (!(state.getBlock() instanceof BaseFurnitureBlock) && !(state.getBlock() instanceof FurnitureProxyBlock)) {
+            return false;
+        }
+
+        VoxelShape shape = state.getShape(level, pos, CollisionContext.of(entity));
+        CachedShapeRenderer.renderShape(
+                poseStack,
+                consumer,
+                shape,
+                (double) pos.getX() - camX,
+                (double) pos.getY() - camY,
+                (double) pos.getZ() - camZ,
+                0.0F,
+                0.0F,
+                0.0F,
+                0.4F);
         return true;
     }
 
@@ -117,12 +140,6 @@ public final class FurniturePlacementPreviewRenderer {
                 .color(red, green, blue, alpha)
                 .normal(normalMatrix, normalX, normalY, normalZ)
                 .endVertex();
-    }
-
-    @FunctionalInterface
-    public interface ShapeRenderer {
-        void render(PoseStack poseStack, VertexConsumer consumer, VoxelShape shape, double x, double y, double z,
-                    float red, float green, float blue, float alpha);
     }
 
     private record GridPlane(
