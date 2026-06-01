@@ -27,7 +27,8 @@ public class FurnitureBlock extends BaseFurnitureBlock implements EntityBlock {
                 .setValue(IDENTIFIER, 0)
                 .setValue(WATERLOGGED, false)
                 .setValue(FACING, Direction.NORTH)
-                .setValue(ACTIVE, false));
+                .setValue(ACTIVE, false)
+                .setValue(POWERED, false));
     }
 
     @Override
@@ -42,7 +43,7 @@ public class FurnitureBlock extends BaseFurnitureBlock implements EntityBlock {
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(IDENTIFIER, WATERLOGGED, FACING, ACTIVE);
+        builder.add(IDENTIFIER, WATERLOGGED, FACING, ACTIVE, POWERED);
     }
 
     @Override

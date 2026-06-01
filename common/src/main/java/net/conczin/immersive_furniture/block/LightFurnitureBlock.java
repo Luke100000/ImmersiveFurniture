@@ -29,7 +29,8 @@ public class LightFurnitureBlock extends BaseFurnitureBlock implements EntityBlo
                 .setValue(LIGHT, 0)
                 .setValue(WATERLOGGED, false)
                 .setValue(FACING, Direction.NORTH)
-                .setValue(ACTIVE, false));
+                .setValue(ACTIVE, false)
+                .setValue(POWERED, false));
     }
 
     @Override
@@ -44,7 +45,7 @@ public class LightFurnitureBlock extends BaseFurnitureBlock implements EntityBlo
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(IDENTIFIER, LIGHT, WATERLOGGED, FACING, ACTIVE);
+        builder.add(IDENTIFIER, LIGHT, WATERLOGGED, FACING, ACTIVE, POWERED);
     }
 
     @Override

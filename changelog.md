@@ -6,6 +6,8 @@
 * Added `requiredCraftingPermissionLevel` to config
 * Replaced vanilla’s ultra-slow outline renderer with a fast one
 * Particle/Sound Emitter now trigger hand animations
+* Added open URL popup instead of opening links directly
+* Furniture now have a powered flag, fixing some weird redstone interactions between them
 
 # 0.1.3
 

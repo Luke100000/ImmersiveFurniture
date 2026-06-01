@@ -48,6 +48,7 @@ public abstract class BaseFurnitureBlock extends Block implements SimpleWaterlog
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
     public static final BooleanProperty ACTIVE = BooleanProperty.create("active");
+    public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
 
     public BaseFurnitureBlock(Properties properties) {
         super(properties);
@@ -324,11 +325,14 @@ public abstract class BaseFurnitureBlock extends Block implements SimpleWaterlog
 
     public void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos fromPos, boolean isMoving) {
         if (!level.isClientSide) {
-            boolean flag = state.getValue(ACTIVE);
-            if (flag != level.hasNeighborSignal(pos)) {
+            boolean powered = level.hasNeighborSignal(pos);
+            if (powered != state.getValue(POWERED)) {
                 FurnitureData data = getData(state, level, pos);
                 if (data != null) {
-                    trigger(data, state, level, pos, true);
+                    state = state.setValue(POWERED, powered).setValue(ACTIVE, powered);
+                    state = toggleLight(data, state, level, pos);
+                    level.setBlock(pos, state, data.getUniqueSolidStates().size() > 1 ? 3 : 7);
+                    trigger(data, state, level, pos, false);
                 }
             }
         }
