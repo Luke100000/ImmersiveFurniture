@@ -17,7 +17,7 @@ public final class Config extends JsonConfig {
     // How many times the same furniture needs to be placed before low-memory mode is activated.
     // That mode is limited to 1024 unique furniture and cannot be cleaned up again.
     // All other furniture is more expensive since they require a block entity.
-    public int lowMemoryModeThreshold = 10;
+    public int lowMemoryModeThreshold = 16;
 
     // Furniture data is somewhat large and not deduplicated by default.
     // By only storing the hash and using a separate registry, this can be resolved.

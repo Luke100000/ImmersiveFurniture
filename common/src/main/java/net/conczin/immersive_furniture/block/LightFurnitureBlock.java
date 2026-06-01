@@ -18,7 +18,9 @@ import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.material.Fluids;
 
 public class LightFurnitureBlock extends BaseFurnitureBlock implements EntityBlock {
-    public static final IntegerProperty IDENTIFIER = IntegerProperty.create("identifier", 0, 255);
+    public static final int IDENTIFIER_OFFSET = 65536;
+    public static final int IDENTIFIER_COUNT = 256; // TODO: Lower in 26.x to 32
+    public static final IntegerProperty IDENTIFIER = IntegerProperty.create("identifier", 0, IDENTIFIER_COUNT - 1);
     public static final IntegerProperty LIGHT = IntegerProperty.create("light", 0, 5);
 
     public LightFurnitureBlock(Properties properties) {
@@ -55,7 +57,7 @@ public class LightFurnitureBlock extends BaseFurnitureBlock implements EntityBlo
 
     @Override
     public FurnitureData getData(BlockState state, BlockGetter level, BlockPos pos) {
-        int identifier = state.getValue(IDENTIFIER) + 65536;
+        int identifier = state.getValue(IDENTIFIER) + IDENTIFIER_OFFSET;
         String hash = FurnitureRegistry.resolve(identifier);
         return hash != null ? FurnitureDataManager.getData(hash) : null;
     }

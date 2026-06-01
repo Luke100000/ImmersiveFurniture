@@ -176,8 +176,8 @@ public class FurnitureItem extends BlockItem {
         ItemStack stack = context.getItemInHand();
         FurnitureData data = FurnitureItem.getData(stack);
         if (!data.requiresBlockEntity() && context.getLevel() instanceof ServerLevel level) {
-            int from = data.lightLevel > 0 ? 65536 : 0;
-            int size = data.lightLevel > 0 ? 256 : 1024;
+            int from = data.lightLevel > 0 ? LightFurnitureBlock.IDENTIFIER_OFFSET : 0;
+            int size = data.lightLevel > 0 ? LightFurnitureBlock.IDENTIFIER_COUNT : FurnitureBlock.IDENTIFIER_COUNT;
             identifier = ServerFurnitureRegistry.registerIdentifier(level, data, from, from + size - 1);
         }
 
@@ -187,7 +187,7 @@ public class FurnitureItem extends BlockItem {
                     .setValue(EntityFurnitureBlock.LIGHT, data.lightLevel);
         } else if (data.lightLevel > 0) {
             state = Objects.requireNonNull(Blocks.FURNITURE_LIGHT.getStateForPlacement(context))
-                    .setValue(LightFurnitureBlock.IDENTIFIER, identifier - 65536)
+                    .setValue(LightFurnitureBlock.IDENTIFIER, identifier - LightFurnitureBlock.IDENTIFIER_OFFSET)
                     .setValue(LightFurnitureBlock.LIGHT, (int) Math.ceil(data.lightLevel / 3.0f));
         } else {
             state = Objects.requireNonNull(Blocks.FURNITURE.getStateForPlacement(context))

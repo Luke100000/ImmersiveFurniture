@@ -29,7 +29,8 @@ public class ServerFurnitureRegistry {
 
         // Already registered
         if (saveData.registry.hashToIdentifier.containsKey(hash)) {
-            return saveData.registry.hashToIdentifier.get(hash);
+            int identifier = saveData.registry.hashToIdentifier.get(hash);
+            return identifier >= from && identifier <= to ? identifier : -1;
         }
 
         // Do not register if the hash is not used enough
