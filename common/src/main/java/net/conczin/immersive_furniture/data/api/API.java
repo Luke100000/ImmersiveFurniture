@@ -22,6 +22,7 @@ import java.util.zip.GZIPInputStream;
 
 public class API {
     private static final Gson gson = new GsonBuilder().create();
+    private static final int TIMEOUT_MS = 10000;
 
     public enum HttpMethod {
         POST, GET, DELETE, PUT
@@ -51,6 +52,8 @@ public class API {
             }
 
             HttpURLConnection con = (HttpURLConnection) (new URL(fullUrl)).openConnection();
+            con.setConnectTimeout(TIMEOUT_MS);
+            con.setReadTimeout(TIMEOUT_MS);
 
             // Set request method
             con.setRequestMethod(httpMethod.name());

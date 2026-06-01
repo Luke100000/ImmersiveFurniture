@@ -8,6 +8,7 @@
 * Particle/Sound Emitter now trigger hand animations
 * Added open URL popup instead of opening links directly
 * Furniture now have a powered flag, fixing some weird redstone interactions between them
+* Fixed local library blocked by network delays
 
 # 0.1.3
 

@@ -644,11 +644,11 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
     }
 
     private void search() {
-        if (awaitingSearch) return;
         if (!shouldSearch) return;
-        shouldSearch = false;
 
         if (tab == Tab.LOCAL) {
+            shouldSearch = false;
+
             // Fetch from local files
             furniture = localFiles.stream()
                     .filter(l -> Utils.search(lastSearch, l.toString()))
@@ -660,8 +660,12 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
                     .limit(ENTRIES_PER_PAGE)
                     .toList();
         } else {
+            if (awaitingSearch) return;
+            shouldSearch = false;
+
             // Fetch from the library
             awaitingSearch = true;
+            Tab requestTab = tab;
             CompletableFuture.runAsync(() -> {
                 Response response = request(API.HttpMethod.GET, ContentListResponse::new, "v2/content/furniture", Map.of(
                         "whitelist", lastSearch + (tagFilter.equals("miscellaneous") ? "" : "," + tagFilter),
@@ -674,10 +678,15 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
                 ));
 
                 if (response instanceof ContentListResponse contentListResponse) {
-                    furniture = Arrays.stream(contentListResponse.contents())
+                    List<ResourceLocation> foundFurniture = Arrays.stream(contentListResponse.contents())
                             .map(c -> new ResourceLocation("library", c.contentid() + "." + c.version()))
                             .collect(Collectors.toList());
-                    Minecraft.getInstance().execute(this::init);
+                    Minecraft.getInstance().execute(() -> {
+                        if (tab == requestTab) {
+                            furniture = foundFurniture;
+                            init();
+                        }
+                    });
                 } else {
                     setError("gui.immersive_furniture.list_fetch_failed");
                 }
