@@ -62,7 +62,12 @@ public abstract class BaseFurnitureBlock extends Block implements SimpleWaterlog
         FurnitureData data = getData(state, level, pos);
         if (data != null) {
             // Find closest pose element
-            Vec3 click = new Vec3(hit.getLocation().x - pos.getX(), hit.getLocation().y - pos.getY(), hit.getLocation().z - pos.getZ());
+            Vec3 subOffset = getSubOffset(level, pos);
+            Vec3 click = new Vec3(
+                    hit.getLocation().x - pos.getX() - subOffset.x,
+                    hit.getLocation().y - pos.getY(),
+                    hit.getLocation().z - pos.getZ() - subOffset.z
+            );
             FurnitureData.PoseOffset offset = data.getClosestPose(click, state.getValue(FACING));
 
             // Interact with the pose
@@ -131,8 +136,8 @@ public abstract class BaseFurnitureBlock extends Block implements SimpleWaterlog
 
         // Get sub-offset from block entity and apply it to the pose offset
         FurnitureData.PoseOffset adjustedOffset = offset;
-        if (player.level().getBlockEntity(pos) instanceof FurnitureOffsetHolder holder) {
-            Vec3 subOffset = new Vec3(holder.getSubOffsetX() / 16.0D - 0.5D, 0.0D, holder.getSubOffsetZ() / 16.0D - 0.5D);
+        Vec3 subOffset = getSubOffset(player.level(), pos);
+        if (subOffset != Vec3.ZERO) {
             Vector3f newOffset = new Vector3f(
                     offset.offset().x + (float) subOffset.x,
                     offset.offset().y + (float) subOffset.y,
@@ -161,11 +166,8 @@ public abstract class BaseFurnitureBlock extends Block implements SimpleWaterlog
         // Create an entity to fake sitting
         if (!level.isClientSide) {
             // Get sub-offset from block entity
-            Vec3 subOffset = Vec3.ZERO;
-            if (level.getBlockEntity(pos) instanceof FurnitureOffsetHolder holder) {
-                subOffset = new Vec3(holder.getSubOffsetX() / 16.0D - 0.5D, 0.0D, holder.getSubOffsetZ() / 16.0D - 0.5D);
-            }
-            
+            Vec3 subOffset = getSubOffset(level, pos);
+
             Vec3 position = new Vec3(
                     pos.getX() + offset.offset().x + subOffset.x,
                     pos.getY() + offset.offset().y + subOffset.y,
@@ -295,7 +297,6 @@ public abstract class BaseFurnitureBlock extends Block implements SimpleWaterlog
                 // Unmount all entities sitting on the furniture
                 AABB aabb = new AABB(pos, pos.offset(data.size.x, data.size.y, data.size.z)).inflate(1.0f);
                 level.getEntitiesOfClass(SittingEntity.class, aabb).forEach(Entity::ejectPassengers);
-                level.removeBlockEntity(pos);
             }
 
             if (!player.isCreative()) {
@@ -360,6 +361,13 @@ public abstract class BaseFurnitureBlock extends Block implements SimpleWaterlog
         return basePos.offset(dx, offsetY, dz);
     }
 
+    private static Vec3 getSubOffset(BlockGetter level, BlockPos pos) {
+        if (level.getBlockEntity(pos) instanceof FurnitureOffsetHolder holder) {
+            return new Vec3(holder.getSubOffsetX() / 16.0D - 0.5D, 0.0D, holder.getSubOffsetZ() / 16.0D - 0.5D);
+        }
+        return Vec3.ZERO;
+    }
+
     private VoxelShape getOffsetShape(BlockState state, BlockGetter level, BlockPos pos) {
         FurnitureData data = getData(state, level, pos);
         if (data == null) {
@@ -369,12 +377,9 @@ public abstract class BaseFurnitureBlock extends Block implements SimpleWaterlog
         if (shape == null) {
             return null;
         }
-        if (level.getBlockEntity(pos) instanceof FurnitureOffsetHolder holder) {
-            double offsetX = holder.getSubOffsetX() / 16.0D - 0.5D;
-            double offsetZ = holder.getSubOffsetZ() / 16.0D - 0.5D;
-            if (offsetX != 0.0D || offsetZ != 0.0D) {
-                shape = shape.move(offsetX, 0.0D, offsetZ);
-            }
+        Vec3 subOffset = getSubOffset(level, pos);
+        if (subOffset != Vec3.ZERO) {
+            shape = shape.move(subOffset.x, 0.0D, subOffset.z);
         }
         return shape;
     }

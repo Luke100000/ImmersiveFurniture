@@ -5,6 +5,7 @@ import net.conczin.immersive_furniture.block.entity.FurnitureOffsetHolder;
 import net.conczin.immersive_furniture.data.FurnitureData;
 import net.conczin.immersive_furniture.data.FurnitureDataManager;
 import net.conczin.immersive_furniture.data.ServerFurnitureRegistry;
+import net.conczin.immersive_furniture.utils.SubBlockGrid;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -21,8 +22,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.Vec3;
-
-import net.conczin.immersive_furniture.utils.SubBlockGrid;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -127,12 +126,10 @@ public class FurnitureItem extends BlockItem {
         var player = context.getPlayer();
         if (player != null && player.isShiftKeyDown()) {
             Vec3 click = context.getClickLocation();
-            if (click != null) {
-                double fracX = click.x - basePos.getX();
-                double fracZ = click.z - basePos.getZ();
-                subOffsetX = SubBlockGrid.getGridIndex(SubBlockGrid.snapCoordinateToGrid(fracX));
-                subOffsetZ = SubBlockGrid.getGridIndex(SubBlockGrid.snapCoordinateToGrid(fracZ));
-            }
+            double fracX = click.x - basePos.getX();
+            double fracZ = click.z - basePos.getZ();
+            subOffsetX = SubBlockGrid.getGridIndex(SubBlockGrid.snapCoordinateToGrid(fracX));
+            subOffsetZ = SubBlockGrid.getGridIndex(SubBlockGrid.snapCoordinateToGrid(fracZ));
         }
 
         // Apply offset to block entity for rendering

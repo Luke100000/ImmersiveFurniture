@@ -1,3 +1,7 @@
+# 0.2.0
+
+* Added pixel-perfect placement mode (Thanks GlobalHive!)
+
 # 0.1.3
 
 * Fixed worker thread preventing server shutdown
