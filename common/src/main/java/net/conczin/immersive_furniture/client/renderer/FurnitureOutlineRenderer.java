@@ -76,8 +76,10 @@ public final class FurnitureOutlineRenderer {
         return true;
     }
 
-    public static boolean renderPlacedOutline(PoseStack poseStack, VertexConsumer consumer, ClientLevel level, Entity entity, BlockPos pos, BlockState state,
-                                 double camX, double camY, double camZ) {
+    public static boolean renderPlacedOutline(PoseStack poseStack, VertexConsumer consumer, ClientLevel level,
+                                              Entity entity, BlockPos pos, BlockState state,
+                                              double camX, double camY, double camZ) {
+        // In theory, it works on all blocks, but let's not touch other blocks
         if (!(state.getBlock() instanceof BaseFurnitureBlock) && !(state.getBlock() instanceof FurnitureProxyBlock)) {
             return false;
         }
@@ -93,11 +95,13 @@ public final class FurnitureOutlineRenderer {
                 0.0F,
                 0.0F,
                 0.0F,
-                0.4F);
+                0.4F
+        );
         return true;
     }
 
-    private static void renderSubBlockGrid(PoseStack poseStack, VertexConsumer consumer, BlockPos blockPos, Direction face,
+    private static void renderSubBlockGrid(PoseStack poseStack, VertexConsumer consumer,
+                                           BlockPos blockPos, Direction face,
                                            double camX, double camY, double camZ) {
         PoseStack.Pose pose = poseStack.last();
         Matrix4f poseMatrix = pose.pose();

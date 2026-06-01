@@ -5,6 +5,7 @@
 * Fixed recycling recipe accepting any item
 * Added `requiredCraftingPermissionLevel` to config
 * Replaced vanilla’s ultra-slow outline renderer with a fast one
+* Particle/Sound Emitter now trigger hand animations
 
 # 0.1.3
 

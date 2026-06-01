@@ -249,6 +249,13 @@ public class FurnitureData {
         }
     }
 
+    public boolean hasInteractEffects(int state) {
+        return elements.stream().anyMatch(element ->
+                element.isMasked(state)
+                && ((element.type == ElementType.SOUND_EMITTER && element.soundEmitter.onInteract)
+                    || (element.type == ElementType.PARTICLE_EMITTER && element.particleEmitter.onInteract)));
+    }
+
     public boolean hasParticles() {
         return elements.stream().anyMatch(e -> e.type == ElementType.PARTICLE_EMITTER);
     }
@@ -444,15 +451,15 @@ public class FurnitureData {
             float vr = element.particleEmitter.velocityRandom / 16.0f;
             float vd = element.particleEmitter.velocityDirectional / 16.0f;
 
-        float baseX = inScreen ? 0.0f : (float) (pos.getX() + offset.x());
-        float baseY = inScreen ? 1024.0f : (float) (pos.getY() + offset.y());
-        float baseZ = inScreen ? 0.0f : (float) (pos.getZ() + offset.z());
+            float baseX = inScreen ? 0.0f : (float) (pos.getX() + offset.x());
+            float baseY = inScreen ? 1024.0f : (float) (pos.getY() + offset.y());
+            float baseZ = inScreen ? 0.0f : (float) (pos.getZ() + offset.z());
 
             particleConsumer.addParticle(
                     particle,
-            sampledPos.x() + baseX,
-            sampledPos.y() + baseY,
-            sampledPos.z() + baseZ,
+                    sampledPos.x() + baseX,
+                    sampledPos.y() + baseY,
+                    sampledPos.z() + baseZ,
                     (random.nextFloat() - 0.5f) * vr + up.x() * vd,
                     (random.nextFloat() - 0.5f) * vr + up.y() * vd,
                     (random.nextFloat() - 0.5f) * vr + up.z() * vd

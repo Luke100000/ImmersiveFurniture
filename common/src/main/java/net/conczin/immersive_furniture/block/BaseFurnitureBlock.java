@@ -103,14 +103,17 @@ public abstract class BaseFurnitureBlock extends Block implements SimpleWaterlog
         }
 
         // This furniture has sound or particle effects
-        if (level instanceof ServerLevel serverLevel && (data.hasSounds() || data.hasParticles())) {
-            Boolean active = state.getValue(ACTIVE);
+        boolean active = state.getValue(ACTIVE);
+        boolean hasInteractEffects = data.hasInteractEffects(active ? 1 : 0);
+        if (level instanceof ServerLevel serverLevel && hasInteractEffects) {
             FurnitureInteractMessage message = new FurnitureInteractMessage(pos, active);
             int maxDist = Config.getInstance().maximumInteractDistance;
             serverLevel.getServer().getPlayerList().getPlayers().forEach(p -> {
                 double dist = pos.distToCenterSqr(p.getX(), p.getY(), p.getZ());
                 if (maxDist <= 0 || dist < maxDist * maxDist) Network.sendToPlayer(message, p);
             });
+            consume = true;
+        } else if (level.isClientSide && hasInteractEffects) {
             consume = true;
         }
 
