@@ -1,6 +1,7 @@
 package net.conczin.immersive_furniture.block;
 
 import net.conczin.immersive_furniture.data.FurnitureData;
+import net.conczin.immersive_furniture.block.entity.FurnitureOffsetBlockEntity;
 import net.conczin.immersive_furniture.data.FurnitureDataManager;
 import net.conczin.immersive_furniture.data.FurnitureRegistry;
 import net.minecraft.core.BlockPos;
@@ -9,12 +10,14 @@ import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.material.Fluids;
 
-public class FurnitureBlock extends BaseFurnitureBlock {
+public class FurnitureBlock extends BaseFurnitureBlock implements EntityBlock {
     public static final IntegerProperty IDENTIFIER = IntegerProperty.create("identifier", 0, 1023);
 
     public FurnitureBlock(Properties properties) {
@@ -40,6 +43,11 @@ public class FurnitureBlock extends BaseFurnitureBlock {
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(IDENTIFIER, WATERLOGGED, FACING, ACTIVE);
+    }
+
+    @Override
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+        return new FurnitureOffsetBlockEntity(pos, state);
     }
 
     public FurnitureData getData(BlockState state, BlockGetter level, BlockPos pos) {

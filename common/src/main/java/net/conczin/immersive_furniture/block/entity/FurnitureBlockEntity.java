@@ -21,10 +21,9 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ChestMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
-public class FurnitureBlockEntity extends BlockEntity implements Container, MenuProvider {
+public class FurnitureBlockEntity extends AbstractFurnitureBlockEntity implements Container, MenuProvider {
     private String hash;
     private FurnitureData data;
 

@@ -1,7 +1,8 @@
 package net.conczin.immersive_furniture.fabric.client;
 
-import net.conczin.immersive_furniture.client.model.FurnitureBakedModelWrapper;
+import net.conczin.immersive_furniture.block.entity.FurnitureOffsetHolder;
 import net.conczin.immersive_furniture.client.model.CompositeBakedModel;
+import net.conczin.immersive_furniture.client.model.FurnitureBakedModelWrapper;
 import net.fabricmc.fabric.api.renderer.v1.Renderer;
 import net.fabricmc.fabric.api.renderer.v1.RendererAccess;
 import net.fabricmc.fabric.api.renderer.v1.material.BlendMode;
@@ -17,6 +18,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.List;
@@ -28,13 +30,22 @@ public class FabricFurnitureBakedModelWrapper extends FurnitureBakedModelWrapper
     public void emitBlockQuads(BlockAndTintGetter blockView, BlockState state, BlockPos pos, Supplier<RandomSource> randomSupplier, RenderContext context) {
         CompositeBakedModel model = getBakedModel(pos, state);
         if (model != null) {
+            float dx = 0.0f;
+            float dz = 0.0f;
+            if (blockView != null) {
+                BlockEntity blockEntity = blockView.getBlockEntity(pos);
+                if (blockEntity instanceof FurnitureOffsetHolder holder) {
+                    dx = holder.getSubOffsetX() / 16.0f - 0.5f;
+                    dz = holder.getSubOffsetZ() / 16.0f - 0.5f;
+                }
+            }
             for (Map.Entry<RenderType, BakedModel> entry : model.getModels().entrySet()) {
-                emitBlockQuads(entry.getValue(), BlendMode.fromRenderLayer(entry.getKey()), state, randomSupplier, context, context.getEmitter());
+                emitBlockQuads(entry.getValue(), BlendMode.fromRenderLayer(entry.getKey()), state, randomSupplier, context, context.getEmitter(), dx, dz);
             }
         }
     }
 
-    public static void emitBlockQuads(BakedModel model, BlendMode blendMode, BlockState state, Supplier<RandomSource> randomSupplier, RenderContext context, QuadEmitter emitter) {
+    public static void emitBlockQuads(BakedModel model, BlendMode blendMode, BlockState state, Supplier<RandomSource> randomSupplier, RenderContext context, QuadEmitter emitter, float dx, float dz) {
         Renderer renderer = RendererAccess.INSTANCE.getRenderer();
         if (renderer == null) return;
         final RenderMaterial material = renderer.materialFinder().blendMode(blendMode).find();
@@ -48,10 +59,22 @@ public class FabricFurnitureBakedModelWrapper extends FurnitureBakedModelWrapper
 
             final List<BakedQuad> quads = model.getQuads(state, cullFace, randomSupplier.get());
             for (final BakedQuad quad : quads) {
-                emitter.fromVanilla(quad, material, cullFace);
+                BakedQuad q = (dx != 0.0f || dz != 0.0f) ? translateQuad(quad, dx, dz) : quad;
+                emitter.fromVanilla(q, material, cullFace);
                 emitter.emit();
             }
         }
+    }
+
+    private static BakedQuad translateQuad(BakedQuad quad, float dx, float dz) {
+        int[] v = quad.getVertices().clone();
+        for (int i = 0; i < v.length; i += 8) {
+            float x = Float.intBitsToFloat(v[i]);
+            float z = Float.intBitsToFloat(v[i + 2]);
+            v[i] = Float.floatToIntBits(x + dx);
+            v[i + 2] = Float.floatToIntBits(z + dz);
+        }
+        return new BakedQuad(v, quad.getTintIndex(), quad.getDirection(), quad.getSprite(), quad.isShade());
     }
 
     @Override
