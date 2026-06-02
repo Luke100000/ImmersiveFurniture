@@ -1240,6 +1240,6 @@ public class FurnitureData {
 
     @Override
     public int hashCode() {
-        return System.identityHashCode(this);
+        return getHash().hashCode();
     }
 }
