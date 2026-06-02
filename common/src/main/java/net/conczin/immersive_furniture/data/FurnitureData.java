@@ -219,6 +219,10 @@ public class FurnitureData {
         return Utils.hashNbt(new FurnitureData(this).toTag());
     }
 
+    public void invalidateHash() {
+        hash = null;
+    }
+
     public void dirty() {
         hash = null;
         cachedFullShapes.clear();
