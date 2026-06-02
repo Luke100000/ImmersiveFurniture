@@ -1,5 +1,6 @@
 package net.conczin.immersive_furniture.block;
 
+import net.conczin.immersive_furniture.block.entity.FurnitureOffsetHolder;
 import net.conczin.immersive_furniture.data.FurnitureData;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -78,26 +79,14 @@ public class FurnitureProxyBlock extends Block {
 
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter blockGetter, BlockPos pos, CollisionContext context) {
-        if (blockGetter instanceof LevelReader level) {
-            BlockPos basePos = getBasePos(state, pos);
-            BlockState baseState = getLoadedBlockState(level, basePos);
-            if (baseState != null && baseState.getBlock() instanceof BaseFurnitureBlock baseBlock) {
-                FurnitureData data = baseBlock.getData(baseState, level, basePos);
-                if (data != null) {
-                    VoxelShape shape = data.getShapeLazy(
-                            state.getValue(FACING),
-                            baseState.getValue(BaseFurnitureBlock.ACTIVE) ? 1 : 0,
-                            state.getValue(OFFSET_X),
-                            state.getValue(OFFSET_Y),
-                            state.getValue(OFFSET_Z)
-                    );
-                    if (shape != null) return shape;
-                }
-            }
-        }
+        VoxelShape shape = resolveShape(state, blockGetter, pos);
+        return shape != null && !shape.isEmpty() ? shape : Block.box(4, 4, 4, 12, 12, 12);
+    }
 
-        // Fallback shape
-        return Block.box(4, 4, 4, 12, 12, 12);
+    @Override
+    public VoxelShape getCollisionShape(BlockState state, BlockGetter blockGetter, BlockPos pos, CollisionContext context) {
+        VoxelShape shape = resolveShape(state, blockGetter, pos);
+        return shape != null ? shape : super.getCollisionShape(state, blockGetter, pos, context);
     }
 
     @Override
@@ -162,5 +151,39 @@ public class FurnitureProxyBlock extends Block {
             return baseBlock.getCloneItemStack(level, basePos, baseState);
         }
         return ItemStack.EMPTY;
+    }
+
+    private VoxelShape resolveShape(BlockState state, BlockGetter blockGetter, BlockPos pos) {
+        if (!(blockGetter instanceof LevelReader level)) {
+            return null;
+        }
+        BlockPos basePos = getBasePos(state, pos);
+        BlockState baseState = getLoadedBlockState(level, basePos);
+        if (baseState == null || !(baseState.getBlock() instanceof BaseFurnitureBlock baseBlock)) {
+            return null;
+        }
+        FurnitureData data = baseBlock.getData(baseState, level, basePos);
+        if (data == null) {
+            return null;
+        }
+        VoxelShape shape = data.getShapeLazy(
+                state.getValue(FACING),
+                baseState.getValue(BaseFurnitureBlock.ACTIVE) ? 1 : 0,
+                state.getValue(OFFSET_X),
+                state.getValue(OFFSET_Y),
+                state.getValue(OFFSET_Z)
+        );
+        if (shape == null) {
+            return null;
+        }
+        if (level.getBlockEntity(basePos) instanceof FurnitureOffsetHolder holder) {
+            double offsetX = holder.getSubOffsetX() / 16.0D - 0.5D;
+            double offsetY = holder.getSubOffsetY() / 16.0D - 0.5D;
+            double offsetZ = holder.getSubOffsetZ() / 16.0D - 0.5D;
+            if (offsetX != 0.0D || offsetY != 0.0D || offsetZ != 0.0D) {
+                shape = shape.move(offsetX, offsetY, offsetZ);
+            }
+        }
+        return shape;
     }
 }

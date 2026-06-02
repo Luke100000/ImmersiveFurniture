@@ -2,6 +2,7 @@ package net.conczin.immersive_furniture.data;
 
 import com.mojang.serialization.Codec;
 import net.conczin.immersive_furniture.Common;
+import net.conczin.immersive_furniture.block.entity.FurnitureOffsetHolder;
 import net.conczin.immersive_furniture.client.model.DynamicAtlas;
 import net.conczin.immersive_furniture.config.Config;
 import net.conczin.immersive_furniture.utils.NBTHelper;
@@ -231,6 +232,10 @@ public class FurnitureData {
         return Utils.hashNbt(new FurnitureData(this).toTag());
     }
 
+    public void invalidateHash() {
+        hash = null;
+    }
+
     public void dirty() {
         hash = null;
         cachedFullShapes.clear();
@@ -244,19 +249,28 @@ public class FurnitureData {
     }
 
     public void playInteractSound(Level level, BlockPos pos, int state, Player player) {
+        Vec3 offset = resolveOffset(level, pos);
         for (Element element : elements) {
             if (element.isMasked(state) && element.type == ElementType.SOUND_EMITTER && element.soundEmitter.onInteract) {
-                playSound(level, pos, player.getRandom(), element);
+                playSound(level, pos, offset, player.getRandom(), element);
             }
         }
     }
 
     public void emitInteractParticles(BlockPos pos, Direction direction, int state, Player player, ParticleConsumer particleConsumer, boolean inScreen) {
+        Vec3 offset = resolveOffset(player.level(), pos);
         for (Element element : elements) {
             if (element.isMasked(state) && element.type == ElementType.PARTICLE_EMITTER && element.particleEmitter.onInteract) {
-                emitParticles(pos, direction, player.getRandom(), element, particleConsumer, inScreen, 10.0f);
+                emitParticles(pos, direction, player.getRandom(), element, particleConsumer, inScreen, 10.0f, offset);
             }
         }
+    }
+
+    public boolean hasInteractEffects(int state) {
+        return elements.stream().anyMatch(element ->
+                element.isMasked(state)
+                && ((element.type == ElementType.SOUND_EMITTER && element.soundEmitter.onInteract)
+                    || (element.type == ElementType.PARTICLE_EMITTER && element.particleEmitter.onInteract)));
     }
 
     public boolean hasParticles() {
@@ -430,7 +444,21 @@ public class FurnitureData {
         void addParticle(SimpleParticleType particle, float x, float y, float z, float vx, float vy, float vz);
     }
 
-    private void emitParticles(BlockPos pos, Direction direction, RandomSource random, Element element, ParticleConsumer particleConsumer, boolean inScreen, float amountMultiplier) {
+    private static Vec3 resolveOffset(Level level, BlockPos pos) {
+        if (level == null) {
+            return Vec3.ZERO;
+        }
+        if (level.getBlockEntity(pos) instanceof FurnitureOffsetHolder holder) {
+            return new Vec3(
+                    holder.getSubOffsetX() / 16.0D - 0.5D,
+                    holder.getSubOffsetY() / 16.0D - 0.5D,
+                    holder.getSubOffsetZ() / 16.0D - 0.5D
+            );
+        }
+        return Vec3.ZERO;
+    }
+
+    private void emitParticles(BlockPos pos, Direction direction, RandomSource random, Element element, ParticleConsumer particleConsumer, boolean inScreen, float amountMultiplier, Vec3 offset) {
         SimpleParticleType particle = element.particleEmitter.getParticle();
         if (particle == null) return;
 
@@ -444,11 +472,15 @@ public class FurnitureData {
             float vr = element.particleEmitter.velocityRandom / 16.0f;
             float vd = element.particleEmitter.velocityDirectional / 16.0f;
 
+            float baseX = inScreen ? 0.0f : (float) (pos.getX() + offset.x());
+            float baseY = inScreen ? 1024.0f : (float) (pos.getY() + offset.y());
+            float baseZ = inScreen ? 0.0f : (float) (pos.getZ() + offset.z());
+
             particleConsumer.addParticle(
                     particle,
-                    sampledPos.x() + (inScreen ? 0.0f : pos.getX()),
-                    sampledPos.y() + (inScreen ? 1024.0f : pos.getY()),
-                    sampledPos.z() + (inScreen ? 0.0f : pos.getZ()),
+                    sampledPos.x() + baseX,
+                    sampledPos.y() + baseY,
+                    sampledPos.z() + baseZ,
                     (random.nextFloat() - 0.5f) * vr + up.x() * vd,
                     (random.nextFloat() - 0.5f) * vr + up.y() * vd,
                     (random.nextFloat() - 0.5f) * vr + up.z() * vd
@@ -457,23 +489,27 @@ public class FurnitureData {
     }
 
     public void tick(Level level, BlockPos pos, int state, Direction direction, RandomSource random, ParticleConsumer particleConsumer, boolean inScreen, boolean inEditor) {
+        Vec3 offset = resolveOffset(level, pos);
         for (Element element : elements) {
             if (!element.isMasked(state)) continue;
             if (element.type == ElementType.PARTICLE_EMITTER && !element.particleEmitter.onInteract) {
-                emitParticles(pos, direction, random, element, particleConsumer, inScreen, 1.0f);
+                emitParticles(pos, direction, random, element, particleConsumer, inScreen, 1.0f, offset);
             } else if (element.type == ElementType.SOUND_EMITTER && (!inScreen || inEditor) && element.soundEmitter.frequency > 0 && random.nextFloat() < element.soundEmitter.frequency) {
-                playSound(level, pos, random, element);
+                playSound(level, pos, offset, random, element);
             }
         }
     }
 
-    private static void playSound(Level level, BlockPos pos, RandomSource random, Element element) {
+    private static void playSound(Level level, BlockPos pos, Vec3 offset, RandomSource random, Element element) {
         SoundEvent soundEvent = element.soundEmitter.getSoundEvent();
         if (soundEvent == null) return;
+        double baseX = pos.getX() + 0.5 + offset.x();
+        double baseY = pos.getY() + 0.5 + offset.y();
+        double baseZ = pos.getZ() + 0.5 + offset.z();
         level.playLocalSound(
-                (double) pos.getX() + 0.5,
-                (double) pos.getY() + 0.5,
-                (double) pos.getZ() + 0.5,
+                baseX,
+                baseY,
+                baseZ,
                 soundEvent,
                 SoundSource.BLOCKS,
                 (0.75f + random.nextFloat()) * element.soundEmitter.volume,

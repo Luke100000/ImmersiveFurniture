@@ -1,6 +1,7 @@
 package net.conczin.immersive_furniture.block;
 
 import net.conczin.immersive_furniture.InteractionManager;
+import net.conczin.immersive_furniture.block.entity.FurnitureOffsetHolder;
 import net.conczin.immersive_furniture.config.Config;
 import net.conczin.immersive_furniture.data.FurnitureData;
 import net.conczin.immersive_furniture.entity.SittingEntity;
@@ -39,6 +40,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.joml.Vector3f;
 
 import java.util.List;
 
@@ -46,6 +48,7 @@ public abstract class BaseFurnitureBlock extends Block implements SimpleWaterlog
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
     public static final BooleanProperty ACTIVE = BooleanProperty.create("active");
+    public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
 
     public BaseFurnitureBlock(Properties properties) {
         super(properties);
@@ -56,7 +59,12 @@ public abstract class BaseFurnitureBlock extends Block implements SimpleWaterlog
         FurnitureData data = getData(state, level, pos);
         if (data != null) {
             // Find closest pose element
-            Vec3 click = new Vec3(hit.getLocation().x - pos.getX(), hit.getLocation().y - pos.getY(), hit.getLocation().z - pos.getZ());
+            Vec3 subOffset = getSubOffset(level, pos);
+            Vec3 click = new Vec3(
+                    hit.getLocation().x - pos.getX() - subOffset.x,
+                    hit.getLocation().y - pos.getY() - subOffset.y,
+                    hit.getLocation().z - pos.getZ() - subOffset.z
+            );
             FurnitureData.PoseOffset offset = data.getClosestPose(click, state.getValue(FACING));
 
             // Interact with the pose
@@ -92,14 +100,17 @@ public abstract class BaseFurnitureBlock extends Block implements SimpleWaterlog
         }
 
         // This furniture has sound or particle effects
-        if (level instanceof ServerLevel serverLevel && (data.hasSounds() || data.hasParticles())) {
-            Boolean active = state.getValue(ACTIVE);
+        boolean active = state.getValue(ACTIVE);
+        boolean hasInteractEffects = data.hasInteractEffects(active ? 1 : 0);
+        if (level instanceof ServerLevel serverLevel && hasInteractEffects) {
             FurnitureInteractMessage message = new FurnitureInteractMessage(pos, active);
             int maxDist = Config.getInstance().maximumInteractDistance;
             serverLevel.getServer().getPlayerList().getPlayers().forEach(p -> {
                 double dist = pos.distToCenterSqr(p.getX(), p.getY(), p.getZ());
                 if (maxDist <= 0 || dist < maxDist * maxDist) Network.sendToPlayer(message, p);
             });
+            consume = true;
+        } else if (level.isClientSide && hasInteractEffects) {
             consume = true;
         }
 
@@ -123,8 +134,20 @@ public abstract class BaseFurnitureBlock extends Block implements SimpleWaterlog
     private static void startSleeping(BlockPos pos, Player player, FurnitureData.PoseOffset offset) {
         if (player.level().isClientSide) return;
 
+        // Get sub-offset from block entity and apply it to the pose offset
+        FurnitureData.PoseOffset adjustedOffset = offset;
+        Vec3 subOffset = getSubOffset(player.level(), pos);
+        if (subOffset != Vec3.ZERO) {
+            Vector3f newOffset = new Vector3f(
+                    offset.offset().x + (float) subOffset.x,
+                    offset.offset().y + (float) subOffset.y,
+                    offset.offset().z + (float) subOffset.z
+            );
+            adjustedOffset = new FurnitureData.PoseOffset(newOffset, offset.pose(), offset.rotation());
+        }
+
         if (player instanceof ServerPlayer serverPlayer) {
-            PoseOffsetMessage message = new PoseOffsetMessage(pos, offset, serverPlayer);
+            PoseOffsetMessage message = new PoseOffsetMessage(pos, adjustedOffset, serverPlayer);
             Network.sendToAllPlayers(serverPlayer.serverLevel().getServer(), message);
         }
 
@@ -142,10 +165,13 @@ public abstract class BaseFurnitureBlock extends Block implements SimpleWaterlog
     private static void startSitting(FurnitureData data, Level level, BlockPos pos, Direction direction, Player player, FurnitureData.PoseOffset offset) {
         // Create an entity to fake sitting
         if (!level.isClientSide) {
+            // Get sub-offset from block entity
+            Vec3 subOffset = getSubOffset(level, pos);
+
             Vec3 position = new Vec3(
-                    pos.getX() + offset.offset().x,
-                    pos.getY() + offset.offset().y,
-                    pos.getZ() + offset.offset().z
+                    pos.getX() + offset.offset().x + subOffset.x,
+                    pos.getY() + offset.offset().y + subOffset.y,
+                    pos.getZ() + offset.offset().z + subOffset.z
             );
             SittingEntity sittingEntity = new SittingEntity(level, position, pos, data.size, direction, new Vec3(player.getX(), player.getY(), player.getZ()));
             sittingEntity.setYRot(offset.rotation());
@@ -178,12 +204,14 @@ public abstract class BaseFurnitureBlock extends Block implements SimpleWaterlog
 
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-        FurnitureData data = getData(state, level, pos);
-        if (data != null) {
-            VoxelShape shape = data.getShapeLazy(state.getValue(FACING), state.getValue(ACTIVE) ? 1 : 0, 0, 0, 0);
-            if (shape != null) return shape;
-        }
-        return Block.box(2, 2, 2, 14, 14, 14);
+        VoxelShape shape = getOffsetShape(state, level, pos);
+        return shape != null && !shape.isEmpty() ? shape : Block.box(2, 2, 2, 14, 14, 14);
+    }
+
+    @Override
+    public VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+        VoxelShape shape = getOffsetShape(state, level, pos);
+        return shape != null ? shape : super.getCollisionShape(state, level, pos, context);
     }
 
     @Override
@@ -294,11 +322,14 @@ public abstract class BaseFurnitureBlock extends Block implements SimpleWaterlog
 
     public void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos fromPos, boolean isMoving) {
         if (!level.isClientSide) {
-            boolean flag = state.getValue(ACTIVE);
-            if (flag != level.hasNeighborSignal(pos)) {
+            boolean powered = level.hasNeighborSignal(pos);
+            if (powered != state.getValue(POWERED)) {
                 FurnitureData data = getData(state, level, pos);
                 if (data != null) {
-                    trigger(data, state, level, pos, true);
+                    state = state.setValue(POWERED, powered).setValue(ACTIVE, powered);
+                    state = toggleLight(data, state, level, pos);
+                    level.setBlock(pos, state, data.getUniqueSolidStates().size() > 1 ? 3 : 7);
+                    trigger(data, state, level, pos, false);
                 }
             }
         }
@@ -332,5 +363,32 @@ public abstract class BaseFurnitureBlock extends Block implements SimpleWaterlog
         }
 
         return basePos.offset(dx, offsetY, dz);
+    }
+
+    private static Vec3 getSubOffset(BlockGetter level, BlockPos pos) {
+        if (level.getBlockEntity(pos) instanceof FurnitureOffsetHolder holder) {
+            return new Vec3(
+                    holder.getSubOffsetX() / 16.0D - 0.5D,
+                    holder.getSubOffsetY() / 16.0D - 0.5D,
+                    holder.getSubOffsetZ() / 16.0D - 0.5D
+            );
+        }
+        return Vec3.ZERO;
+    }
+
+    private VoxelShape getOffsetShape(BlockState state, BlockGetter level, BlockPos pos) {
+        FurnitureData data = getData(state, level, pos);
+        if (data == null) {
+            return null;
+        }
+        VoxelShape shape = data.getShapeLazy(state.getValue(FACING), state.getValue(ACTIVE) ? 1 : 0, 0, 0, 0);
+        if (shape == null) {
+            return null;
+        }
+        Vec3 subOffset = getSubOffset(level, pos);
+        if (subOffset != Vec3.ZERO) {
+            shape = shape.move(subOffset.x, subOffset.y, subOffset.z);
+        }
+        return shape;
     }
 }

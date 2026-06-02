@@ -4,6 +4,7 @@
   "item.immersive_furniture.crafting_material": "Crafting Material",
 
   "immersive_furniture.not_enough_material": "Not enough crafting material!",
+  "immersive_furniture.no_permission": "You do not have permission to do that.",
   "immersive_furniture.indium_missing": "Immersive Furniture requires Indium to run properly with Sodium!",
   "immersive_furniture.ferritecore_missing": "Immersive Furniture highly recommends FerriteCore to reduce loading time!",
   "immersive_furniture.packetfixer_missing": "Immersive Furniture requires Packet Fixer!",

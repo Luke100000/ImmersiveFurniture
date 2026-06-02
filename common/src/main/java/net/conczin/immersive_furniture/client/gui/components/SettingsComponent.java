@@ -140,11 +140,6 @@ public class SettingsComponent extends ScreenComponent {
     }
 
     public void finish(FurnitureData data) {
-        // Bake
-        TransparencyManager.prepare(data);
-        DynamicAtlas.SCRATCH.clear();
-        FurnitureModelFactory.getModel(data, DynamicAtlas.SCRATCH);
-
         // Set author
         data.author = Minecraft.getInstance().getUser().getName();
 
@@ -188,5 +183,11 @@ public class SettingsComponent extends ScreenComponent {
         }
         data.dependencies.remove("minecraft");
         data.dependencies.remove("mod resources");
+
+        // Bake after all metadata changes so the preview cache uses the final saved hash.
+        data.invalidateHash();
+        TransparencyManager.prepare(data);
+        DynamicAtlas.SCRATCH.clear();
+        FurnitureModelFactory.getModel(data, DynamicAtlas.SCRATCH);
     }
 }

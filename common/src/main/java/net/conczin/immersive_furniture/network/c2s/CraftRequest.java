@@ -2,6 +2,7 @@ package net.conczin.immersive_furniture.network.c2s;
 
 import net.conczin.immersive_furniture.Common;
 import net.conczin.immersive_furniture.Sounds;
+import net.conczin.immersive_furniture.config.Config;
 import net.conczin.immersive_furniture.data.FurnitureData;
 import net.conczin.immersive_furniture.item.FurnitureItem;
 import net.conczin.immersive_furniture.network.ImmersivePayload;
@@ -31,6 +32,10 @@ public record CraftRequest(FurnitureData data, boolean shift) implements Immersi
     @Override
     public void handle(Player e) {
         if (!isValid(data)) return;
+        if (!e.hasPermissions(Config.getInstance().requiredCraftingPermissionLevel)) {
+            e.displayClientMessage(Component.translatable("immersive_furniture.no_permission"), true);
+            return;
+        }
 
         int cost = data.getCost();
         int available = getResources(e);

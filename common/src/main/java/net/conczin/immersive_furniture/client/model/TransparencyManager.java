@@ -1,6 +1,7 @@
 package net.conczin.immersive_furniture.client.model;
 
 import com.mojang.blaze3d.platform.NativeImage;
+import net.conczin.immersive_furniture.Common;
 import net.conczin.immersive_furniture.data.FurnitureData;
 import net.conczin.immersive_furniture.data.TransparencyType;
 import net.conczin.immersive_furniture.mixin.client.SpriteContentsAccessor;
@@ -28,28 +29,46 @@ public class TransparencyManager {
         return transparencyCache.computeIfAbsent(s.name(), location -> compute(s));
     }
 
+    public void clear() {
+        transparencyCache.clear();
+    }
+
     public boolean isCornerTransparent(SpriteContents s) {
-        NativeImage image = ((SpriteContentsAccessor) s).getMipLevelData()[0];
-        return (FastColor.ABGR32.alpha(image.getPixelRGBA(0, 0)) < 128)
-               && (FastColor.ABGR32.alpha(image.getPixelRGBA(image.getWidth() - 1, 0)) < 128)
-               && (FastColor.ABGR32.alpha(image.getPixelRGBA(image.getWidth() - 1, image.getHeight() - 1)) < 128)
-               && (FastColor.ABGR32.alpha(image.getPixelRGBA(0, image.getHeight() - 1)) < 128);
+        try {
+            NativeImage image = ((SpriteContentsAccessor) s).getMipLevelData()[0];
+            return (FastColor.ABGR32.alpha(image.getPixelRGBA(0, 0)) < 128)
+                   && (FastColor.ABGR32.alpha(image.getPixelRGBA(image.getWidth() - 1, 0)) < 128)
+                   && (FastColor.ABGR32.alpha(image.getPixelRGBA(image.getWidth() - 1, image.getHeight() - 1)) < 128)
+                   && (FastColor.ABGR32.alpha(image.getPixelRGBA(0, image.getHeight() - 1)) < 128);
+        } catch (IllegalStateException e) {
+            warnUnavailableImage(s.name(), e);
+            return false;
+        }
     }
 
     private TransparencyType compute(SpriteContents s) {
-        NativeImage image = ((SpriteContentsAccessor) s).getMipLevelData()[0];
-        boolean hasTransparency = false;
-        for (int y = 0; y < image.getHeight(); y++) {
-            for (int x = 0; x < image.getWidth(); x++) {
-                int alpha = FastColor.ABGR32.alpha(image.getPixelRGBA(x, y));
-                if (alpha == 0) {
-                    hasTransparency = true;
-                } else if (alpha < 255) {
-                    return TransparencyType.TRANSLUCENT;
+        try {
+            NativeImage image = ((SpriteContentsAccessor) s).getMipLevelData()[0];
+            boolean hasTransparency = false;
+            for (int y = 0; y < image.getHeight(); y++) {
+                for (int x = 0; x < image.getWidth(); x++) {
+                    int alpha = FastColor.ABGR32.alpha(image.getPixelRGBA(x, y));
+                    if (alpha == 0) {
+                        hasTransparency = true;
+                    } else if (alpha < 255) {
+                        return TransparencyType.TRANSLUCENT;
+                    }
                 }
             }
+            return hasTransparency ? TransparencyType.CUTOUT_MIPPED : TransparencyType.SOLID;
+        } catch (IllegalStateException e) {
+            warnUnavailableImage(s.name(), e);
+            return TransparencyType.TRANSLUCENT;
         }
-        return hasTransparency ? TransparencyType.CUTOUT_MIPPED : TransparencyType.SOLID;
+    }
+
+    private void warnUnavailableImage(ResourceLocation sprite, IllegalStateException e) {
+        Common.logger.warn("Sprite image '{}' is unavailable while checking transparency; using a safe fallback.", sprite, e);
     }
 
     public static void prepare(FurnitureData data) {

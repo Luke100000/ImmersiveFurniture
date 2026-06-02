@@ -3,7 +3,6 @@ package net.conczin.immersive_furniture.data.api;
 import com.google.gson.JsonObject;
 import net.conczin.immersive_furniture.Common;
 import net.conczin.immersive_furniture.config.Config;
-import net.minecraft.Util;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -59,6 +58,7 @@ public class Auth {
     }
 
     public static void clearToken() {
+        currentToken = null;
         //noinspection ResultOfMethodCallIgnored
         getTokenPath().toFile().delete();
     }
@@ -86,12 +86,9 @@ public class Auth {
         return Base64.getEncoder().encodeToString(json.toString().getBytes());
     }
 
-    public static void authenticate(String username) {
+    public static String authenticate(String username) {
         // The unique, private token used to authenticate once authorized
         currentToken = newToken();
-
-        // Open the authorization URL in the user's default web browser
-        String url = Config.getInstance().immersiveLibraryUrl + "/v1/login?state=" + createDataState(username, currentToken);
-        Util.getPlatform().openUri(url);
+        return Config.getInstance().immersiveLibraryUrl + "/v1/login?state=" + createDataState(username, currentToken);
     }
 }

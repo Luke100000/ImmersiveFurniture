@@ -1,7 +1,9 @@
 package net.conczin.immersive_furniture;
 
 import net.conczin.immersive_furniture.client.DelayedFurnitureRenderer;
+import net.conczin.immersive_furniture.client.AtlasSprite;
 import net.conczin.immersive_furniture.client.model.DynamicAtlas;
+import net.conczin.immersive_furniture.client.model.TransparencyManager;
 import net.conczin.immersive_furniture.data.FurnitureDataManager;
 import net.conczin.immersive_furniture.network.ClientHandlerImpl;
 import net.minecraft.network.chat.Component;
@@ -19,6 +21,7 @@ public class Client {
         DynamicAtlas.BAKED.clear();
         DynamicAtlas.SCRATCH.clear();
         DynamicAtlas.ENTITY.clear();
+        TransparencyManager.INSTANCE.clear();
 
         FurnitureDataManager.REQUESTED_DATA.clear();
         FurnitureDataManager.DATA.clear();
@@ -27,6 +30,7 @@ public class Client {
     }
 
     public static void tick() {
+        AtlasSprite.syncBakedAtlas();
         DelayedFurnitureRenderer.INSTANCE.tick();
     }
 

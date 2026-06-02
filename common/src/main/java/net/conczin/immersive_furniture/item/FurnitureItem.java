@@ -1,11 +1,14 @@
 package net.conczin.immersive_furniture.item;
 
 import net.conczin.immersive_furniture.block.*;
+import net.conczin.immersive_furniture.block.entity.FurnitureOffsetHolder;
 import net.conczin.immersive_furniture.data.FurnitureData;
 import net.conczin.immersive_furniture.data.FurnitureDataManager;
 import net.conczin.immersive_furniture.data.ServerFurnitureRegistry;
+import net.conczin.immersive_furniture.utils.SubBlockGrid;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -21,6 +24,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.List;
 import java.util.Objects;
@@ -104,6 +108,31 @@ public class FurnitureItem extends BlockItem {
         BlockPos basePos = context.getClickedPos();
         var facing = state.getValue(FurnitureBlock.FACING);
 
+        // Compute sub-block offset from click location and snap it to grid (only when sneaking for precision)
+        int subOffsetX = 8;
+        int subOffsetY = 8;
+        int subOffsetZ = 8;
+        var player = context.getPlayer();
+        if (player != null && player.isShiftKeyDown()) {
+            Vec3 click = context.getClickLocation();
+            Direction.Axis fixedAxis = context.getClickedFace().getAxis();
+            if (fixedAxis != Direction.Axis.X) {
+                subOffsetX = getSubOffset(click.x - basePos.getX());
+            }
+            if (fixedAxis != Direction.Axis.Y) {
+                subOffsetY = getSubOffset(click.y - basePos.getY());
+            }
+            if (fixedAxis != Direction.Axis.Z) {
+                subOffsetZ = getSubOffset(click.z - basePos.getZ());
+            }
+        }
+
+        // Apply offset to block entity for rendering
+        var blockEntity = level.getBlockEntity(basePos);
+        if (blockEntity instanceof FurnitureOffsetHolder holder) {
+            holder.setSubOffset(subOffsetX, subOffsetY, subOffsetZ);
+        }
+
         // Create proxy blocks for each additional position
         for (int x = 0; x < data.size.x; x++) {
             for (int y = 0; y < data.size.y; y++) {
@@ -113,7 +142,6 @@ public class FurnitureItem extends BlockItem {
                     BlockPos proxyPos = BaseFurnitureBlock.getProxyPosition(basePos, facing, x, y, z);
                     FluidState fluidstate = context.getLevel().getFluidState(proxyPos);
                     boolean waterlogged = fluidstate.getType() == Fluids.WATER;
-
                     BlockState proxyState = Blocks.FURNITURE_PROXY.defaultBlockState()
                             .setValue(FurnitureProxyBlock.OFFSET_X, x)
                             .setValue(FurnitureProxyBlock.OFFSET_Y, y)
@@ -136,6 +164,10 @@ public class FurnitureItem extends BlockItem {
         return true;
     }
 
+    private static int getSubOffset(double coordinate) {
+        return SubBlockGrid.getGridIndex(SubBlockGrid.snapCoordinateToGrid(coordinate));
+    }
+
     @Override
     protected BlockState getPlacementState(BlockPlaceContext context) {
         // If the block has been placed often enough, it will have an identifier.
@@ -143,8 +175,8 @@ public class FurnitureItem extends BlockItem {
         ItemStack stack = context.getItemInHand();
         FurnitureData data = FurnitureItem.getData(stack);
         if (!data.requiresBlockEntity() && context.getLevel() instanceof ServerLevel level) {
-            int from = data.lightLevel > 0 ? 65536 : 0;
-            int size = data.lightLevel > 0 ? 256 : 1024;
+            int from = data.lightLevel > 0 ? LightFurnitureBlock.IDENTIFIER_OFFSET : 0;
+            int size = data.lightLevel > 0 ? LightFurnitureBlock.IDENTIFIER_COUNT : FurnitureBlock.IDENTIFIER_COUNT;
             identifier = ServerFurnitureRegistry.registerIdentifier(level, data, from, from + size - 1);
         }
 
@@ -154,7 +186,7 @@ public class FurnitureItem extends BlockItem {
                     .setValue(EntityFurnitureBlock.LIGHT, data.lightLevel);
         } else if (data.lightLevel > 0) {
             state = Objects.requireNonNull(Blocks.FURNITURE_LIGHT.getStateForPlacement(context))
-                    .setValue(LightFurnitureBlock.IDENTIFIER, identifier - 65536)
+                    .setValue(LightFurnitureBlock.IDENTIFIER, identifier - LightFurnitureBlock.IDENTIFIER_OFFSET)
                     .setValue(LightFurnitureBlock.LIGHT, (int) Math.ceil(data.lightLevel / 3.0f));
         } else {
             state = Objects.requireNonNull(Blocks.FURNITURE.getStateForPlacement(context))

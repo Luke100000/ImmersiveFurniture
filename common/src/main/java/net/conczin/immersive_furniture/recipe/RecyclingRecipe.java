@@ -19,12 +19,18 @@ public class RecyclingRecipe extends CustomRecipe {
 
     @Override
     public boolean matches(CraftingInput input, Level level) {
+        boolean hasFurniture = false;
         for (int j = 0; j < input.size(); j++) {
-            if (input.getItem(j).is(FURNITURE)) {
-                return true;
+            ItemStack itemstack = input.getItem(j);
+            if (itemstack.isEmpty()) {
+                continue;
             }
+            if (!itemstack.is(FURNITURE)) {
+                return false;
+            }
+            hasFurniture = true;
         }
-        return false;
+        return hasFurniture;
     }
 
     @Override

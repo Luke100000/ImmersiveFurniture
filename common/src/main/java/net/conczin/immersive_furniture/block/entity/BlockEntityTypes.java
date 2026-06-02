@@ -11,9 +11,10 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class BlockEntityTypes {
     public static BlockEntityType<FurnitureBlockEntity> FURNITURE;
+    public static BlockEntityType<FurnitureOffsetBlockEntity> FURNITURE_OFFSET;
 
     public interface TriFunction<E extends BlockEntity> {
-        BlockEntityType<E> apply(ResourceLocation name, BlockEntitySupplier<E> constructor, Block block);
+        BlockEntityType<E> apply(ResourceLocation name, BlockEntitySupplier<E> constructor, Block... blocks);
     }
 
     public interface BlockEntitySupplier<T extends BlockEntity> {
@@ -26,6 +27,13 @@ public class BlockEntityTypes {
                 Common.locate("furniture"),
                 FurnitureBlockEntity::new,
                 Blocks.FURNITURE_ENTITY
+        );
+
+        FURNITURE_OFFSET = register.apply(
+                Common.locate("furniture_offset"),
+                FurnitureOffsetBlockEntity::new,
+                Blocks.FURNITURE,
+                Blocks.FURNITURE_LIGHT
         );
     }
 }
