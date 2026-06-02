@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "ხელოსნის სამუშაო ადგილი",
   "item.immersive_furniture.crafting_material": "მომზადების მასალა",
   "immersive_furniture.not_enough_material": "არ genug მომზადების მასალა!",
+  "immersive_furniture.no_permission": "თქვენ არ გაქვთ ამის ნებართვა.",
   "immersive_furniture.indium_missing": "ბუნებრივი ავეჯი საჭიროებს ინდიუმს უზრუნველყოს სწორი მუშაობა ნატრიუმთან!",
   "immersive_furniture.ferritecore_missing": "\"immersive_furniture.ferritecore_missing\" მცივანის ავეჯი თბილათიდენს FerriteCore-ის გამოყენებას ურჩევს დატვირთვის დროის შემცირებისთვის!",
   "immersive_furniture.packetfixer_missing": "დისლოკაციის ავეჯი მოითხოვს პაკეტის გამწმენდი!",
