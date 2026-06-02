@@ -4,6 +4,7 @@ import net.conczin.immersive_furniture.Common;
 import net.conczin.immersive_furniture.Sounds;
 import net.conczin.immersive_furniture.block.Blocks;
 import net.conczin.immersive_furniture.block.entity.BlockEntityTypes;
+import net.conczin.immersive_furniture.data.FurnitureDataManager;
 import net.conczin.immersive_furniture.entity.Entities;
 import net.conczin.immersive_furniture.item.Items;
 import net.conczin.immersive_furniture.network.ImmersivePayload;

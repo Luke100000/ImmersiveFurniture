@@ -4,7 +4,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 
 import java.util.ArrayList;
@@ -24,17 +23,14 @@ public final class CachedShapeRenderer {
                                    float red, float green, float blue, float alpha) {
         PoseStack.Pose pose = poseStack.last();
         Matrix4f poseMatrix = pose.pose();
-        Matrix3f normalMatrix = pose.normal();
 
         for (Edge edge : getEdges(shape)) {
-            consumer.vertex(poseMatrix, (float) (edge.startX + x), (float) (edge.startY + y), (float) (edge.startZ + z))
-                    .color(red, green, blue, alpha)
-                    .normal(normalMatrix, edge.normalX, edge.normalY, edge.normalZ)
-                    .endVertex();
-            consumer.vertex(poseMatrix, (float) (edge.endX + x), (float) (edge.endY + y), (float) (edge.endZ + z))
-                    .color(red, green, blue, alpha)
-                    .normal(normalMatrix, edge.normalX, edge.normalY, edge.normalZ)
-                    .endVertex();
+            consumer.addVertex(poseMatrix, (float) (edge.startX + x), (float) (edge.startY + y), (float) (edge.startZ + z))
+                    .setColor(red, green, blue, alpha)
+                    .setNormal(pose, edge.normalX, edge.normalY, edge.normalZ);
+            consumer.addVertex(poseMatrix, (float) (edge.endX + x), (float) (edge.endY + y), (float) (edge.endZ + z))
+                    .setColor(red, green, blue, alpha)
+                    .setNormal(pose, edge.normalX, edge.normalY, edge.normalZ);
         }
     }
 

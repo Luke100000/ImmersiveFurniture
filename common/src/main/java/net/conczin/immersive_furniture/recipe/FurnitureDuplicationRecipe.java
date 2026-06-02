@@ -2,12 +2,11 @@ package net.conczin.immersive_furniture.recipe;
 
 import net.conczin.immersive_furniture.data.FurnitureData;
 import net.conczin.immersive_furniture.item.FurnitureItem;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingBookCategory;
+import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.CustomRecipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.Level;
@@ -16,17 +15,17 @@ import static net.conczin.immersive_furniture.item.Items.CRAFTING_MATERIAL;
 import static net.conczin.immersive_furniture.item.Items.FURNITURE;
 
 public class FurnitureDuplicationRecipe extends CustomRecipe {
-    public FurnitureDuplicationRecipe(ResourceLocation id, CraftingBookCategory category) {
-        super(id, category);
+    public FurnitureDuplicationRecipe(CraftingBookCategory category) {
+        super(category);
     }
 
     @Override
-    public boolean matches(CraftingContainer container, Level level) {
+    public boolean matches(CraftingInput input, Level level) {
         ItemStack template = ItemStack.EMPTY;
         int materials = 0;
 
-        for (int i = 0; i < container.getContainerSize(); i++) {
-            ItemStack stack = container.getItem(i);
+        for (int i = 0; i < input.size(); i++) {
+            ItemStack stack = input.getItem(i);
             if (stack.isEmpty()) {
                 continue;
             }
@@ -52,8 +51,8 @@ public class FurnitureDuplicationRecipe extends CustomRecipe {
     }
 
     @Override
-    public ItemStack assemble(CraftingContainer container, RegistryAccess registryAccess) {
-        ItemStack template = findTemplate(container);
+    public ItemStack assemble(CraftingInput input, HolderLookup.Provider provider) {
+        ItemStack template = findTemplate(input);
         if (template.isEmpty()) {
             return ItemStack.EMPTY;
         }
@@ -64,11 +63,11 @@ public class FurnitureDuplicationRecipe extends CustomRecipe {
     }
 
     @Override
-    public NonNullList<ItemStack> getRemainingItems(CraftingContainer container) {
-        NonNullList<ItemStack> remaining = NonNullList.withSize(container.getContainerSize(), ItemStack.EMPTY);
-        int materialsToConsume = getCost(container);
-        for (int i = 0; i < container.getContainerSize(); i++) {
-            ItemStack stack = container.getItem(i);
+    public NonNullList<ItemStack> getRemainingItems(CraftingInput input) {
+        NonNullList<ItemStack> remaining = NonNullList.withSize(input.size(), ItemStack.EMPTY);
+        int materialsToConsume = getCost(input);
+        for (int i = 0; i < input.size(); i++) {
+            ItemStack stack = input.getItem(i);
             if (stack.is(FURNITURE)) {
                 ItemStack template = stack.copy();
                 template.setCount(1);
@@ -99,9 +98,9 @@ public class FurnitureDuplicationRecipe extends CustomRecipe {
         return Recipes.FURNITURE_DUPLICATION;
     }
 
-    private static ItemStack findTemplate(CraftingContainer container) {
-        for (int i = 0; i < container.getContainerSize(); i++) {
-            ItemStack stack = container.getItem(i);
+    private static ItemStack findTemplate(CraftingInput input) {
+        for (int i = 0; i < input.size(); i++) {
+            ItemStack stack = input.getItem(i);
             if (stack.is(FURNITURE)) {
                 return stack;
             }
@@ -109,8 +108,8 @@ public class FurnitureDuplicationRecipe extends CustomRecipe {
         return ItemStack.EMPTY;
     }
 
-    private static int getCost(CraftingContainer container) {
-        ItemStack template = findTemplate(container);
+    private static int getCost(CraftingInput input) {
+        ItemStack template = findTemplate(input);
         if (template.isEmpty()) {
             return 0;
         }

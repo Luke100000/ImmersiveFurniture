@@ -1,12 +1,13 @@
 package net.conczin.immersive_furniture.block.entity;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.util.Mth;
 
 public abstract class AbstractFurnitureBlockEntity extends BlockEntity implements FurnitureOffsetHolder {
     private int subOffsetX = DEFAULT_OFFSET;
@@ -57,16 +58,16 @@ public abstract class AbstractFurnitureBlockEntity extends BlockEntity implement
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tag) {
-        super.saveAdditional(tag);
+    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.saveAdditional(tag, registries);
         tag.putInt("SubOffsetX", subOffsetX);
         tag.putInt("SubOffsetY", subOffsetY);
         tag.putInt("SubOffsetZ", subOffsetZ);
     }
 
     @Override
-    public void load(CompoundTag tag) {
-        super.load(tag);
+    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.loadAdditional(tag, registries);
         subOffsetX = loadOffset(tag, "SubOffsetX");
         subOffsetY = loadOffset(tag, "SubOffsetY");
         subOffsetZ = loadOffset(tag, "SubOffsetZ");
@@ -77,8 +78,8 @@ public abstract class AbstractFurnitureBlockEntity extends BlockEntity implement
     }
 
     @Override
-    public CompoundTag getUpdateTag() {
-        return saveWithoutMetadata();
+    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+        return saveWithoutMetadata(registries);
     }
 
     @Override

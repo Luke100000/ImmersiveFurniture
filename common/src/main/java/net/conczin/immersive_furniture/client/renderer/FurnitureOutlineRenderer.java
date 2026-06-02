@@ -21,7 +21,6 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 
 public final class FurnitureOutlineRenderer {
@@ -107,7 +106,6 @@ public final class FurnitureOutlineRenderer {
                                            double camX, double camY, double camZ) {
         PoseStack.Pose pose = poseStack.last();
         Matrix4f poseMatrix = pose.pose();
-        Matrix3f normalMatrix = pose.normal();
 
         float red = 0.0F;
         float green = 1.0F;
@@ -121,31 +119,29 @@ public final class FurnitureOutlineRenderer {
         for (int i = 0; i <= SubBlockGrid.GRID_RESOLUTION; i++) {
             double offset = i * SubBlockGrid.GRID_CELL_SIZE;
             double[] lineA = plane.lineAlongFirstAxis(offset);
-            emitGridLine(consumer, poseMatrix, normalMatrix, camX, camY, camZ,
+            emitGridLine(consumer, pose, poseMatrix, camX, camY, camZ,
                     lineA[0], lineA[1], lineA[2], lineA[3], lineA[4], lineA[5],
                     red, green, blue, alpha, normalX, normalY, normalZ);
 
             double[] lineB = plane.lineAlongSecondAxis(offset);
-            emitGridLine(consumer, poseMatrix, normalMatrix, camX, camY, camZ,
+            emitGridLine(consumer, pose, poseMatrix, camX, camY, camZ,
                     lineB[0], lineB[1], lineB[2], lineB[3], lineB[4], lineB[5],
                     red, green, blue, alpha, normalX, normalY, normalZ);
         }
     }
 
-    private static void emitGridLine(VertexConsumer consumer, Matrix4f poseMatrix, Matrix3f normalMatrix,
+    private static void emitGridLine(VertexConsumer consumer, PoseStack.Pose pose, Matrix4f poseMatrix,
                                      double camX, double camY, double camZ,
                                      double startX, double startY, double startZ,
                                      double endX, double endY, double endZ,
                                      float red, float green, float blue, float alpha,
                                      float normalX, float normalY, float normalZ) {
-        consumer.vertex(poseMatrix, (float) (startX - camX), (float) (startY - camY), (float) (startZ - camZ))
-                .color(red, green, blue, alpha)
-                .normal(normalMatrix, normalX, normalY, normalZ)
-                .endVertex();
-        consumer.vertex(poseMatrix, (float) (endX - camX), (float) (endY - camY), (float) (endZ - camZ))
-                .color(red, green, blue, alpha)
-                .normal(normalMatrix, normalX, normalY, normalZ)
-                .endVertex();
+        consumer.addVertex(poseMatrix, (float) (startX - camX), (float) (startY - camY), (float) (startZ - camZ))
+                .setColor(red, green, blue, alpha)
+                .setNormal(pose, normalX, normalY, normalZ);
+        consumer.addVertex(poseMatrix, (float) (endX - camX), (float) (endY - camY), (float) (endZ - camZ))
+                .setColor(red, green, blue, alpha)
+                .setNormal(pose, normalX, normalY, normalZ);
     }
 
     private record GridPlane(

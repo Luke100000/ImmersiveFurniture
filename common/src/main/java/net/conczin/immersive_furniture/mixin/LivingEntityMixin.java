@@ -77,11 +77,4 @@ public abstract class LivingEntityMixin extends Entity {
         }
     }
 
-    @Inject(method = "getBedOrientation()Lnet/minecraft/core/Direction;", at = @At("HEAD"), cancellable = true)
-    private void immersiveFurniture$getBedOrientation(CallbackInfoReturnable<net.minecraft.core.Direction> cir) {
-        InteractionManager.Interaction interaction = InteractionManager.INSTANCE.getInteraction((LivingEntity) (Object) this);
-        if (interaction != null) {
-            cir.setReturnValue(null);
-        }
-    }
 }
