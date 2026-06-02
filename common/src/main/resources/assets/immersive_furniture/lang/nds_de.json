@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "Handwarkers Werkbank",
   "item.immersive_furniture.crafting_material": "Handwarksmaterial",
   "immersive_furniture.not_enough_material": "Nich genoog Handwarksmaterial!",
+  "immersive_furniture.no_permission": "You do not have permission to do that.",
   "immersive_furniture.indium_missing": "Erschöpfende Möbel braucht Indium, um richtig mit Sodium zu funktionieren!",
   "immersive_furniture.ferritecore_missing": "Immersive Möbel empfehlt FerriteCore, um d' Ladezäit to verringern!",
   "immersive_furniture.packetfixer_missing": "Immersive Möbel nödig Packet Fixer!",
