@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "工匠台",
   "item.immersive_furniture.crafting_material": "制作材料",
   "immersive_furniture.not_enough_material": "没有足够的制作材料！",
+  "immersive_furniture.no_permission": "您没有这样做的权限。",
   "immersive_furniture.indium_missing": "你需要安装铟才能在安装了钠的情况下正常运行沉浸式家具！",
   "immersive_furniture.ferritecore_missing": "沉浸式家具强烈建议安装铁氧体磁芯以减少加载时间！",
   "immersive_furniture.packetfixer_missing": "沉浸式家具需求Packet Fixer！",
