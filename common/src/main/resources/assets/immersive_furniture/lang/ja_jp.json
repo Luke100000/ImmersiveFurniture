@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "職人の仕事机",
   "item.immersive_furniture.crafting_material": "クラフト素材",
   "immersive_furniture.not_enough_material": "クラフト素材が足りません！",
+  "immersive_furniture.no_permission": "それを行う権限がありません。",
   "immersive_furniture.indium_missing": "Sodium環境上でImmersive Furnitureを適切に動作するためにはIndiumが必要です！",
   "immersive_furniture.ferritecore_missing": "Immersive Furnitureでは、読み込み時間を短縮するためにFerriteCoreを強く推奨しています！",
   "immersive_furniture.packetfixer_missing": "Immersive FurnitureにはPacket Fixerが必要です！",
