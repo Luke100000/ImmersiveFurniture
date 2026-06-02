@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "Kunstniku töökoht",
   "item.immersive_furniture.crafting_material": "Crafting materjal",
   "immersive_furniture.not_enough_material": "Pole piisavalt käsitöömaterjali!",
+  "immersive_furniture.no_permission": "Teil ei ole selleks luba.",
   "immersive_furniture.indium_missing": "Immersive Furniture nõuab Indiumit, et see töötaks korralikult koos Sodiumiga!",
   "immersive_furniture.ferritecore_missing": "Immersive Furniture soovitab tungivalt FerriteCore'i, et vähendada laadimisaega!",
   "immersive_furniture.packetfixer_missing": "Immersive Furniture vajab Packet Fixer'i!",
