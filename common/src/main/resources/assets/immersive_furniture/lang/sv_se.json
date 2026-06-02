@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "Konstnärens arbetsstation",
   "item.immersive_furniture.crafting_material": "Tillverkningsmaterial",
   "immersive_furniture.not_enough_material": "Inte tillräckligt med tillverkningsmaterial!",
+  "immersive_furniture.no_permission": "Du har inte behörighet att göra det.",
   "immersive_furniture.indium_missing": "Omslutande möbler kräver Indium att köra ordentligt med natrium!",
   "immersive_furniture.ferritecore_missing": "Immersive Furniture rekommenderar starkt FerriteCore för att minska laddningstiden!",
   "immersive_furniture.packetfixer_missing": "Omslutande möbler kräver Packet Fixer!",
