@@ -1,6 +1,7 @@
 package net.conczin.immersive_furniture;
 
 import net.conczin.immersive_furniture.client.DelayedFurnitureRenderer;
+import net.conczin.immersive_furniture.client.AtlasSprite;
 import net.conczin.immersive_furniture.client.model.DynamicAtlas;
 import net.conczin.immersive_furniture.data.FurnitureDataManager;
 import net.conczin.immersive_furniture.network.ClientHandlerImpl;
@@ -27,6 +28,7 @@ public class Client {
     }
 
     public static void tick() {
+        AtlasSprite.syncBakedAtlas();
         DelayedFurnitureRenderer.INSTANCE.tick();
     }
 

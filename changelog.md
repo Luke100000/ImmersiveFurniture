@@ -5,10 +5,11 @@
 * Fixed recycling recipe accepting any item
 * Added `requiredCraftingPermissionLevel` to config
 * Replaced vanilla’s ultra-slow outline renderer with a fast one
-* Particle/Sound Emitter now trigger hand animations
+* Particle/Sound Emitter now triggers hand animations
 * Added open URL popup instead of opening links directly
-* Furniture now have a powered flag, fixing some weird redstone interactions between them
+* Furniture now has a powered flag, fixing some weird redstone interactions between them
 * Fixed local library blocked by network delays
+* Added compat with Sodium Extras
 
 # 0.1.3
 
