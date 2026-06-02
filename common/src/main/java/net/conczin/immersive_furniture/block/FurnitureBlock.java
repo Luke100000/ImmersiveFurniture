@@ -18,7 +18,7 @@ import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.material.Fluids;
 
 public class FurnitureBlock extends BaseFurnitureBlock implements EntityBlock {
-    public static final int IDENTIFIER_COUNT = 1024; // TODO: Lower in 26.x to 128
+    public static final int IDENTIFIER_COUNT = 128;
     public static final IntegerProperty IDENTIFIER = IntegerProperty.create("identifier", 0, IDENTIFIER_COUNT - 1);
 
     public FurnitureBlock(Properties properties) {

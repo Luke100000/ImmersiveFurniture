@@ -1,5 +1,8 @@
 # 0.2.0
 
+> Backup world, there is a small chance that some placed furniture is removed
+
+* Reduced memory usage when FerriteCore is not installed
 * Added pixel-perfect placement mode (Thanks GlobalHive!)
 * Added recipe to duplicate furniture with material
 * Fixed recycling recipe accepting any item

@@ -19,7 +19,7 @@ import net.minecraft.world.level.material.Fluids;
 
 public class LightFurnitureBlock extends BaseFurnitureBlock implements EntityBlock {
     public static final int IDENTIFIER_OFFSET = 65536;
-    public static final int IDENTIFIER_COUNT = 256; // TODO: Lower in 26.x to 32
+    public static final int IDENTIFIER_COUNT = 32;
     public static final IntegerProperty IDENTIFIER = IntegerProperty.create("identifier", 0, IDENTIFIER_COUNT - 1);
     public static final IntegerProperty LIGHT = IntegerProperty.create("light", 0, 5);
 
