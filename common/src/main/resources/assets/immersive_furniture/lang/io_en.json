@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "Artesana Laboratorio",
   "item.immersive_furniture.crafting_material": "Materiál por fabrikado",
   "immersive_furniture.not_enough_material": "Ne suficente materiál por fabrikado!",
+  "immersive_furniture.no_permission": "You do not have permission to do that.",
   "immersive_furniture.indium_missing": "Immersiva Meble postulas Indium por bon funkcione kun Sodium!",
   "immersive_furniture.ferritecore_missing": "Immersive Furniture alte rekomendas FerriteCore por redusir tempor de carga!",
   "immersive_furniture.packetfixer_missing": "Immersiva Meblo postulas Packet Fixer!",
