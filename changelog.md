@@ -13,6 +13,7 @@
 * Furniture now has a powered flag, fixing some weird redstone interactions between them
 * Fixed local library blocked by network delays
 * Added compat with Sodium Extras
+* Fixed bed alignment on Forge
 
 # 0.1.3
 

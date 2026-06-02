@@ -2,6 +2,7 @@ package net.conczin.immersive_furniture.mixin;
 
 import net.conczin.immersive_furniture.InteractionManager;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -33,6 +34,14 @@ public abstract class LivingEntityMixin extends Entity {
         Optional<BlockPos> sleepingPos = this.getSleepingPos();
         if (sleepingPos.isPresent() && InteractionManager.isFurnitureBed(this.level(), sleepingPos.get())) {
             cir.setReturnValue(true);
+        }
+    }
+
+    @Inject(method = "getBedOrientation()Lnet/minecraft/core/Direction;", at = @At("HEAD"), cancellable = true)
+    private void immersiveFurniture$getBedOrientation(CallbackInfoReturnable<Direction> cir) {
+        Optional<BlockPos> sleepingPos = this.getSleepingPos();
+        if (sleepingPos.isPresent() && InteractionManager.isFurnitureBed(this.level(), sleepingPos.get())) {
+            cir.setReturnValue(null);
         }
     }
 
