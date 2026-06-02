@@ -432,7 +432,11 @@ public class FurnitureData {
             return Vec3.ZERO;
         }
         if (level.getBlockEntity(pos) instanceof FurnitureOffsetHolder holder) {
-            return new Vec3(holder.getSubOffsetX() / 16.0D - 0.5D, 0.0D, holder.getSubOffsetZ() / 16.0D - 0.5D);
+            return new Vec3(
+                    holder.getSubOffsetX() / 16.0D - 0.5D,
+                    holder.getSubOffsetY() / 16.0D - 0.5D,
+                    holder.getSubOffsetZ() / 16.0D - 0.5D
+            );
         }
         return Vec3.ZERO;
     }

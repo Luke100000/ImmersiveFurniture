@@ -31,21 +31,23 @@ public class FabricFurnitureBakedModelWrapper extends FurnitureBakedModelWrapper
         CompositeBakedModel model = getBakedModel(pos, state);
         if (model != null) {
             float dx = 0.0f;
+            float dy = 0.0f;
             float dz = 0.0f;
             if (blockView != null) {
                 BlockEntity blockEntity = blockView.getBlockEntity(pos);
                 if (blockEntity instanceof FurnitureOffsetHolder holder) {
                     dx = holder.getSubOffsetX() / 16.0f - 0.5f;
+                    dy = holder.getSubOffsetY() / 16.0f - 0.5f;
                     dz = holder.getSubOffsetZ() / 16.0f - 0.5f;
                 }
             }
             for (Map.Entry<RenderType, BakedModel> entry : model.getModels().entrySet()) {
-                emitBlockQuads(entry.getValue(), BlendMode.fromRenderLayer(entry.getKey()), state, randomSupplier, context, context.getEmitter(), dx, dz);
+                emitBlockQuads(entry.getValue(), BlendMode.fromRenderLayer(entry.getKey()), state, randomSupplier, context, context.getEmitter(), dx, dy, dz);
             }
         }
     }
 
-    public static void emitBlockQuads(BakedModel model, BlendMode blendMode, BlockState state, Supplier<RandomSource> randomSupplier, RenderContext context, QuadEmitter emitter, float dx, float dz) {
+    public static void emitBlockQuads(BakedModel model, BlendMode blendMode, BlockState state, Supplier<RandomSource> randomSupplier, RenderContext context, QuadEmitter emitter, float dx, float dy, float dz) {
         Renderer renderer = RendererAccess.INSTANCE.getRenderer();
         if (renderer == null) return;
         final RenderMaterial material = renderer.materialFinder().blendMode(blendMode).find();
@@ -59,19 +61,21 @@ public class FabricFurnitureBakedModelWrapper extends FurnitureBakedModelWrapper
 
             final List<BakedQuad> quads = model.getQuads(state, cullFace, randomSupplier.get());
             for (final BakedQuad quad : quads) {
-                BakedQuad q = (dx != 0.0f || dz != 0.0f) ? translateQuad(quad, dx, dz) : quad;
+                BakedQuad q = (dx != 0.0f || dy != 0.0f || dz != 0.0f) ? translateQuad(quad, dx, dy, dz) : quad;
                 emitter.fromVanilla(q, material, cullFace);
                 emitter.emit();
             }
         }
     }
 
-    private static BakedQuad translateQuad(BakedQuad quad, float dx, float dz) {
+    private static BakedQuad translateQuad(BakedQuad quad, float dx, float dy, float dz) {
         int[] v = quad.getVertices().clone();
         for (int i = 0; i < v.length; i += 8) {
             float x = Float.intBitsToFloat(v[i]);
+            float y = Float.intBitsToFloat(v[i + 1]);
             float z = Float.intBitsToFloat(v[i + 2]);
             v[i] = Float.floatToIntBits(x + dx);
+            v[i + 1] = Float.floatToIntBits(y + dy);
             v[i + 2] = Float.floatToIntBits(z + dz);
         }
         return new BakedQuad(v, quad.getTintIndex(), quad.getDirection(), quad.getSprite(), quad.isShade());

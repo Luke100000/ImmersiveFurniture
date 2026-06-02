@@ -176,9 +176,10 @@ public class FurnitureProxyBlock extends Block {
         }
         if (level.getBlockEntity(basePos) instanceof FurnitureOffsetHolder holder) {
             double offsetX = holder.getSubOffsetX() / 16.0D - 0.5D;
+            double offsetY = holder.getSubOffsetY() / 16.0D - 0.5D;
             double offsetZ = holder.getSubOffsetZ() / 16.0D - 0.5D;
-            if (offsetX != 0.0D || offsetZ != 0.0D) {
-                shape = shape.move(offsetX, 0.0D, offsetZ);
+            if (offsetX != 0.0D || offsetY != 0.0D || offsetZ != 0.0D) {
+                shape = shape.move(offsetX, offsetY, offsetZ);
             }
         }
         return shape;

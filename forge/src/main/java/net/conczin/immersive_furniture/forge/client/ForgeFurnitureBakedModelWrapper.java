@@ -36,8 +36,9 @@ public class ForgeFurnitureBakedModelWrapper extends FurnitureBakedModelWrapper 
             BlockEntity blockEntity = level.getBlockEntity(pos);
             if (blockEntity instanceof FurnitureOffsetHolder holder) {
                 float dx = holder.getSubOffsetX() / 16.0f - 0.5f;
+                float dy = holder.getSubOffsetY() / 16.0f - 0.5f;
                 float dz = holder.getSubOffsetZ() / 16.0f - 0.5f;
-                builder.with(OFFSET_PROPERTY, new Vec3(dx, 0.0D, dz));
+                builder.with(OFFSET_PROPERTY, new Vec3(dx, dy, dz));
             }
         }
         return builder.build();
@@ -53,20 +54,23 @@ public class ForgeFurnitureBakedModelWrapper extends FurnitureBakedModelWrapper 
         Vec3 offset = data.get(OFFSET_PROPERTY);
         if (offset != null) {
             double dx = offset.x;
+            double dy = offset.y;
             double dz = offset.z;
-            if (dx != 0.0D || dz != 0.0D) {
-                return quads.stream().map(q -> translateQuad(q, (float) dx, (float) dz)).toList();
+            if (dx != 0.0D || dy != 0.0D || dz != 0.0D) {
+                return quads.stream().map(q -> translateQuad(q, (float) dx, (float) dy, (float) dz)).toList();
             }
         }
         return quads;
     }
 
-    private static BakedQuad translateQuad(BakedQuad quad, float dx, float dz) {
+    private static BakedQuad translateQuad(BakedQuad quad, float dx, float dy, float dz) {
         int[] v = quad.getVertices().clone();
         for (int i = 0; i < v.length; i += 8) {
             float x = Float.intBitsToFloat(v[i]);
+            float y = Float.intBitsToFloat(v[i + 1]);
             float z = Float.intBitsToFloat(v[i + 2]);
             v[i] = Float.floatToIntBits(x + dx);
+            v[i + 1] = Float.floatToIntBits(y + dy);
             v[i + 2] = Float.floatToIntBits(z + dz);
         }
         return new BakedQuad(v, quad.getTintIndex(), quad.getDirection(), quad.getSprite(), quad.isShade());

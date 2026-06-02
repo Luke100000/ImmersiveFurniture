@@ -10,6 +10,7 @@ import net.minecraft.util.Mth;
 
 public abstract class AbstractFurnitureBlockEntity extends BlockEntity implements FurnitureOffsetHolder {
     private int subOffsetX = DEFAULT_OFFSET;
+    private int subOffsetY = DEFAULT_OFFSET;
     private int subOffsetZ = DEFAULT_OFFSET;
 
     protected AbstractFurnitureBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
@@ -22,18 +23,25 @@ public abstract class AbstractFurnitureBlockEntity extends BlockEntity implement
     }
 
     @Override
+    public int getSubOffsetY() {
+        return subOffsetY;
+    }
+
+    @Override
     public int getSubOffsetZ() {
         return subOffsetZ;
     }
 
     @Override
-    public void setSubOffset(int subOffsetX, int subOffsetZ, boolean sync) {
+    public void setSubOffset(int subOffsetX, int subOffsetY, int subOffsetZ, boolean sync) {
         int clampedX = clamp(subOffsetX);
+        int clampedY = clamp(subOffsetY);
         int clampedZ = clamp(subOffsetZ);
-        if (clampedX == this.subOffsetX && clampedZ == this.subOffsetZ) {
+        if (clampedX == this.subOffsetX && clampedY == this.subOffsetY && clampedZ == this.subOffsetZ) {
             return;
         }
         this.subOffsetX = clampedX;
+        this.subOffsetY = clampedY;
         this.subOffsetZ = clampedZ;
         if (sync) {
             setChanged();
@@ -52,14 +60,20 @@ public abstract class AbstractFurnitureBlockEntity extends BlockEntity implement
     protected void saveAdditional(CompoundTag tag) {
         super.saveAdditional(tag);
         tag.putInt("SubOffsetX", subOffsetX);
+        tag.putInt("SubOffsetY", subOffsetY);
         tag.putInt("SubOffsetZ", subOffsetZ);
     }
 
     @Override
     public void load(CompoundTag tag) {
         super.load(tag);
-        subOffsetX = clamp(tag.getInt("SubOffsetX"));
-        subOffsetZ = clamp(tag.getInt("SubOffsetZ"));
+        subOffsetX = loadOffset(tag, "SubOffsetX");
+        subOffsetY = loadOffset(tag, "SubOffsetY");
+        subOffsetZ = loadOffset(tag, "SubOffsetZ");
+    }
+
+    private static int loadOffset(CompoundTag tag, String key) {
+        return tag.contains(key) ? clamp(tag.getInt(key)) : DEFAULT_OFFSET;
     }
 
     @Override

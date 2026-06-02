@@ -5,11 +5,13 @@ public interface FurnitureOffsetHolder {
 
     int getSubOffsetX();
 
+    int getSubOffsetY();
+
     int getSubOffsetZ();
 
-    default void setSubOffset(int subOffsetX, int subOffsetZ) {
-        setSubOffset(subOffsetX, subOffsetZ, true);
+    default void setSubOffset(int subOffsetX, int subOffsetY, int subOffsetZ) {
+        setSubOffset(subOffsetX, subOffsetY, subOffsetZ, true);
     }
 
-    void setSubOffset(int subOffsetX, int subOffsetZ, boolean sync);
+    void setSubOffset(int subOffsetX, int subOffsetY, int subOffsetZ, boolean sync);
 }

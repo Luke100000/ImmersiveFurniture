@@ -8,6 +8,7 @@ import net.conczin.immersive_furniture.data.ServerFurnitureRegistry;
 import net.conczin.immersive_furniture.utils.SubBlockGrid;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -122,20 +123,27 @@ public class FurnitureItem extends BlockItem {
 
         // Compute sub-block offset from click location and snap it to grid (only when sneaking for precision)
         int subOffsetX = 8;
+        int subOffsetY = 8;
         int subOffsetZ = 8;
         var player = context.getPlayer();
         if (player != null && player.isShiftKeyDown()) {
             Vec3 click = context.getClickLocation();
-            double fracX = click.x - basePos.getX();
-            double fracZ = click.z - basePos.getZ();
-            subOffsetX = SubBlockGrid.getGridIndex(SubBlockGrid.snapCoordinateToGrid(fracX));
-            subOffsetZ = SubBlockGrid.getGridIndex(SubBlockGrid.snapCoordinateToGrid(fracZ));
+            Direction.Axis fixedAxis = context.getClickedFace().getAxis();
+            if (fixedAxis != Direction.Axis.X) {
+                subOffsetX = getSubOffset(click.x - basePos.getX());
+            }
+            if (fixedAxis != Direction.Axis.Y) {
+                subOffsetY = getSubOffset(click.y - basePos.getY());
+            }
+            if (fixedAxis != Direction.Axis.Z) {
+                subOffsetZ = getSubOffset(click.z - basePos.getZ());
+            }
         }
 
         // Apply offset to block entity for rendering
         var blockEntity = level.getBlockEntity(basePos);
         if (blockEntity instanceof FurnitureOffsetHolder holder) {
-            holder.setSubOffset(subOffsetX, subOffsetZ);
+            holder.setSubOffset(subOffsetX, subOffsetY, subOffsetZ);
         }
 
         // Create proxy blocks for each additional position
@@ -167,6 +175,10 @@ public class FurnitureItem extends BlockItem {
         FurnitureDataManager.saveHashData(data);
 
         return true;
+    }
+
+    private static int getSubOffset(double coordinate) {
+        return SubBlockGrid.getGridIndex(SubBlockGrid.snapCoordinateToGrid(coordinate));
     }
 
     @Override

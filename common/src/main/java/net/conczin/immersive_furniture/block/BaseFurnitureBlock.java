@@ -66,7 +66,7 @@ public abstract class BaseFurnitureBlock extends Block implements SimpleWaterlog
             Vec3 subOffset = getSubOffset(level, pos);
             Vec3 click = new Vec3(
                     hit.getLocation().x - pos.getX() - subOffset.x,
-                    hit.getLocation().y - pos.getY(),
+                    hit.getLocation().y - pos.getY() - subOffset.y,
                     hit.getLocation().z - pos.getZ() - subOffset.z
             );
             FurnitureData.PoseOffset offset = data.getClosestPose(click, state.getValue(FACING));
@@ -370,7 +370,11 @@ public abstract class BaseFurnitureBlock extends Block implements SimpleWaterlog
 
     private static Vec3 getSubOffset(BlockGetter level, BlockPos pos) {
         if (level.getBlockEntity(pos) instanceof FurnitureOffsetHolder holder) {
-            return new Vec3(holder.getSubOffsetX() / 16.0D - 0.5D, 0.0D, holder.getSubOffsetZ() / 16.0D - 0.5D);
+            return new Vec3(
+                    holder.getSubOffsetX() / 16.0D - 0.5D,
+                    holder.getSubOffsetY() / 16.0D - 0.5D,
+                    holder.getSubOffsetZ() / 16.0D - 0.5D
+            );
         }
         return Vec3.ZERO;
     }
@@ -386,7 +390,7 @@ public abstract class BaseFurnitureBlock extends Block implements SimpleWaterlog
         }
         Vec3 subOffset = getSubOffset(level, pos);
         if (subOffset != Vec3.ZERO) {
-            shape = shape.move(subOffset.x, 0.0D, subOffset.z);
+            shape = shape.move(subOffset.x, subOffset.y, subOffset.z);
         }
         return shape;
     }

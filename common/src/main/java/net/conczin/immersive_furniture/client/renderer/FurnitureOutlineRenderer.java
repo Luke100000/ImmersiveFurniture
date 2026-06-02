@@ -56,15 +56,13 @@ public final class FurnitureOutlineRenderer {
 
         if (player.isShiftKeyDown()) {
             Vec3 hitLocation = blockHitResult.getLocation();
-            double blockX = hitLocation.x - clickedPos.getX();
-            double blockZ = hitLocation.z - clickedPos.getZ();
-            double offsetX = SubBlockGrid.snapCoordinateToGrid(blockX) - 0.5;
-            double offsetZ = SubBlockGrid.snapCoordinateToGrid(blockZ) - 0.5;
-
-            offsetX = Math.max(-0.5, Math.min(0.5, offsetX));
-            offsetZ = Math.max(-0.5, Math.min(0.5, offsetZ));
+            Direction.Axis fixedAxis = blockHitResult.getDirection().getAxis();
+            double offsetX = fixedAxis == Direction.Axis.X ? 0.0D : getRenderOffset(hitLocation.x - clickedPos.getX());
+            double offsetY = fixedAxis == Direction.Axis.Y ? 0.0D : getRenderOffset(hitLocation.y - clickedPos.getY());
+            double offsetZ = fixedAxis == Direction.Axis.Z ? 0.0D : getRenderOffset(hitLocation.z - clickedPos.getZ());
 
             renderX = clickedPos.getX() + offsetX - camX;
+            renderY = clickedPos.getY() + offsetY - camY;
             renderZ = clickedPos.getZ() + offsetZ - camZ;
 
             CachedShapeRenderer.renderShape(poseStack, consumer, shape, renderX, renderY, renderZ, 0.0F, 1.0F, 0.0F, 0.4F);
@@ -74,6 +72,10 @@ public final class FurnitureOutlineRenderer {
         }
 
         return true;
+    }
+
+    private static double getRenderOffset(double coordinate) {
+        return Math.max(-0.5D, Math.min(0.5D, SubBlockGrid.snapCoordinateToGrid(coordinate) - 0.5D));
     }
 
     public static boolean renderPlacedOutline(PoseStack poseStack, VertexConsumer consumer, ClientLevel level,
