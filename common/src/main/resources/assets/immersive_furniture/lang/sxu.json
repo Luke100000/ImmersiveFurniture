@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "Handwerker-Arbeitsplatz",
   "item.immersive_furniture.crafting_material": "Handwerksmaterial",
   "immersive_furniture.not_enough_material": "Nich genuch Handwerksmaterial!",
+  "immersive_furniture.no_permission": "You do not have permission to do that.",
   "immersive_furniture.indium_missing": "Immersiv Möbel brucht Indium, um mit Sodium richtig z'laafen!",
   "immersive_furniture.ferritecore_missing": "Immersive Möbel empfielt FerriteCore dringen, um die Ladezeit zu verringern!",
   "immersive_furniture.packetfixer_missing": "Immersive Möbel benötigt den Packet Fixer!",
