@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "Майстерна робоча станція",
   "item.immersive_furniture.crafting_material": "Створення матеріалу",
   "immersive_furniture.not_enough_material": "Не достатньо матеріалу для створення!",
+  "immersive_furniture.no_permission": "У тебе немає дозволу на те, щоб це зробити.",
   "immersive_furniture.indium_missing": "Захоплюючий меблі вимагає щоб Індій працював належним чином з Содюмом!",
   "immersive_furniture.ferritecore_missing": "Захоплюючий меблі дуже рекомендує FerriteCore для зменшення часу завантаження!",
   "immersive_furniture.packetfixer_missing": "Імерсивна меблі вимагає Fixer!",

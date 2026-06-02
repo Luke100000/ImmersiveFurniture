@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "Artisan's Workstation",
   "item.immersive_furniture.crafting_material": "Crafting Material",
   "immersive_furniture.not_enough_material": "Verily, thou hast not sufficient crafting material!",
+  "immersive_furniture.no_permission": "You do not have permission to do that.",
   "immersive_furniture.indium_missing": "Immersive Furniture doth require Indium for proper functioning with Sodium!",
   "immersive_furniture.ferritecore_missing": "The immersive furnishings doth greatly commend FerriteCore to lessen the loading time!",
   "immersive_furniture.packetfixer_missing": "Immersive Furniture doth require the Packet Fixer!",

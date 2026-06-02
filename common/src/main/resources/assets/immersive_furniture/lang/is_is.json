@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "Fagmannsins Vinnustöð",
   "item.immersive_furniture.crafting_material": "Hönnunarefni",
   "immersive_furniture.not_enough_material": "Ekki nógu mikið hönnunar efni!",
+  "immersive_furniture.no_permission": "Þú hefur ekki leyfi til að gera það.",
   "immersive_furniture.indium_missing": "Dýrmæt húsgögn krafst Indium til að virka rétt með Sodium!",
   "immersive_furniture.ferritecore_missing": "Immersive Furniture mælir mjög með FerriteCore til að draga úr hleðslutíma!",
   "immersive_furniture.packetfixer_missing": "Dýrmæt húsgögn krefjast pakka viðgerðar!",

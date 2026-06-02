@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "Pagsasangkapan ng Artisan",
   "item.immersive_furniture.crafting_material": "Materyal na Gawa",
   "immersive_furniture.not_enough_material": "Hindi sapat ang materyal na gawa!",
+  "immersive_furniture.no_permission": "Wala kang pahintulot na gawin iyon.",
   "immersive_furniture.indium_missing": "Kailangan ng Immersive Furniture ang Indium upang gumana nang tama gamit ang Sodium!",
   "immersive_furniture.ferritecore_missing": "Inirerekomenda nang lubos ng Immersive Furniture ang FerriteCore upang mabawasan ang oras ng pag-load!",
   "immersive_furniture.packetfixer_missing": "Kailangan ng Immersive Furniture ang Packet Fixer!",

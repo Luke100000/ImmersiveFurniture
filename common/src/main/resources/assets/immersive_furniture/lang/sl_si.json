@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "Obrtnikovo delovno mesto",
   "item.immersive_furniture.crafting_material": "Material za izdelavo",
   "immersive_furniture.not_enough_material": "Premalo materiala za izdelavo!",
+  "immersive_furniture.no_permission": "Za to nimate dovoljenja.",
   "immersive_furniture.indium_missing": "Immersive Furniture zahteva Indij za pravilno delovanje z natrijem!",
   "immersive_furniture.ferritecore_missing": "Podjetje Immersive Furniture priporoča program FerriteCore za skrajšanje časa nalaganja!",
   "immersive_furniture.packetfixer_missing": "Za Immersive Furniture je potreben Packet Fixer!",

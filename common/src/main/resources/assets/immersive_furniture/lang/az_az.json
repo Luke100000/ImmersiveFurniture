@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "Sənətkarın İş Stansiyası",
   "item.immersive_furniture.crafting_material": "İstehsal Materialı",
   "immersive_furniture.not_enough_material": "Yeterli istehsal materialı yoxdur!",
+  "immersive_furniture.no_permission": "Siz buna icazə almamısınız.",
   "immersive_furniture.indium_missing": "İmmersiv Mebel düzgün işləmək üçün İndium tələb edir!",
   "immersive_furniture.ferritecore_missing": "Immersiv Mebel yüklenmə vaxtını azaltmaq üçün FerriteCore-u tövsiyə edir!",
   "immersive_furniture.packetfixer_missing": "Daldırıcı Mebel Paket Düzəldici tələb edir!",

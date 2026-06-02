@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "محطة عمل الحرفي",
   "item.immersive_furniture.crafting_material": "مادة حرفية",
   "immersive_furniture.not_enough_material": "لا يوجد ما يكفي من المواد الحرفية!",
+  "immersive_furniture.no_permission": "You do not have permission to do that.",
   "immersive_furniture.indium_missing": "يتطلب الأثاث الغامر إنديوم لكي يعمل بشكل صحيح مع صوديوم!",
   "immersive_furniture.ferritecore_missing": "يُوصى بشدة باستخدام FerriteCore لتقليل وقت التحميل!",
   "immersive_furniture.packetfixer_missing": "تتطلب الأثاث الغامر إصلاح الحزمة!",

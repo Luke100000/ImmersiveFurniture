@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "Gorsaf Grefftwr",
   "item.immersive_furniture.crafting_material": "Deunydd Grefft",
   "immersive_furniture.not_enough_material": "Nid yw digon o ddeunydd grefft!",
+  "immersive_furniture.no_permission": "Nid oes gennych ganiatâd i wneud hynny.",
   "immersive_furniture.indium_missing": "Mae angen Indium ar Fefan Foddhaus i weithio'n iawn gyda Sodium!",
   "immersive_furniture.ferritecore_missing": "Mae Cymorth Dyddiol yn argymell FerriteCore yn gref i leihau amser llwytho!",
   "immersive_furniture.packetfixer_missing": "Mae gan Furnitwr Dwyfol angen i'w Feddyginiaeth Paced!",

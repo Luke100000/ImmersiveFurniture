@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "Gwasanaeth Kynsa Llavar",
   "item.immersive_furniture.crafting_material": "Deunys Crafth",
   "immersive_furniture.not_enough_material": "Dhe wor an deunys crafth!",
+  "immersive_furniture.no_permission": "You do not have permission to do that.",
   "immersive_furniture.indium_missing": "Mebydhans gath an Indium rag kodha'n sodh!",
   "immersive_furniture.ferritecore_missing": "Re omlieg a dhra, goulweth FerriteCore rag yskynna an tregas a-dro!",
   "immersive_furniture.packetfixer_missing": "An Gader Gweres a require Packet Fixer!",

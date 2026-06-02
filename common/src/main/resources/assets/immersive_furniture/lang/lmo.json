@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "Postaziù del Artisiàn",
   "item.immersive_furniture.crafting_material": "Material de Crafting",
   "immersive_furniture.not_enough_material": "Minga basta material de crafting!",
+  "immersive_furniture.no_permission": "You do not have permission to do that.",
   "immersive_furniture.indium_missing": "L'arredament immersiv el ghe vole Indium per funzionà ben con Sodium!",
   "immersive_furniture.ferritecore_missing": "Immersive Furniture al raccomanda fort FerriteCore per reduc i tempi de carregament!",
   "immersive_furniture.packetfixer_missing": "El Mobili Immersiv l'ha bisogn de 'l Packet Fixer!",

@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "Opus Artificis",
   "item.immersive_furniture.crafting_material": "Materia Ad Fabricandum",
   "immersive_furniture.not_enough_material": "Non satis materiae ad fabricandum!",
+  "immersive_furniture.no_permission": "Non licet tibi hoc facere.",
   "immersive_furniture.indium_missing": "Res ipsa vivens Indium ad functionem recte cum Sodium!",
   "immersive_furniture.ferritecore_missing": "Furniture Immersivum alta commendat FerriteCore ad minuendum tempus oneris!",
   "immersive_furniture.packetfixer_missing": "Mobilium Immersivorum Packet Fixer requirit!",

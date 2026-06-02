@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "कारिगर का कार्यस्थल",
   "item.immersive_furniture.crafting_material": "क्राफ्टिंग सामग्री",
   "immersive_furniture.not_enough_material": "पर्याप्त क्राफ्टिंग सामग्री नहीं है!",
+  "immersive_furniture.no_permission": "आपको ऐसा करने की अनुमति नहीं है।",
   "immersive_furniture.indium_missing": "इमर्सिव फर्नीचर को सही ढंग से चलाने के लिए इंडियम की आवश्यकता है!",
   "immersive_furniture.ferritecore_missing": "इमर्सिव फर्नीचर लोडिंग समय को कम करने के लिए फ़ैराइटकोर की अत्यधिक सिफारिश करता है!",
   "immersive_furniture.packetfixer_missing": "इमर्सिव फर्नीचर को पैकेट फिक्सर की आवश्यकता है!",
