@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "Rzemieślnicza Stacja Robocza",
   "item.immersive_furniture.crafting_material": "Materiał Rzemieślniczy",
   "immersive_furniture.not_enough_material": "Za mało materiału rzemieślniczego!",
+  "immersive_furniture.no_permission": "You do not have permission to do that.",
   "immersive_furniture.indium_missing": "Furnitura Immersywna potrzebuje Indium, żeby prawidłowo działać z Sodium!",
   "immersive_furniture.ferritecore_missing": "Immersyjne Meble špěšoń FerrytCore do zredukovońo czasu ładowońo!",
   "immersive_furniture.packetfixer_missing": "Mebelni elementy wymagają Naprawy Pakietu!",

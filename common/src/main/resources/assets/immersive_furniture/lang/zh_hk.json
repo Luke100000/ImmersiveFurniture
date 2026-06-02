@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "工匠工作站",
   "item.immersive_furniture.crafting_material": "工藝材料",
   "immersive_furniture.not_enough_material": "沒有足夠的工藝材料！",
+  "immersive_furniture.no_permission": "您無權這樣做。",
   "immersive_furniture.indium_missing": "Immersive Furniture 需要 「铟 」與 「鈉 」一起正常運行！",
   "immersive_furniture.ferritecore_missing": "Immersive Furniture 強烈建議使用 FerriteCore 來縮短載入時間！",
   "immersive_furniture.packetfixer_missing": "Immersive Furniture 需要 Packet Fixer！",

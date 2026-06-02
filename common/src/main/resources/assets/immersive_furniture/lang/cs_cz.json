@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "Pracovní stanice řemeslníka",
   "item.immersive_furniture.crafting_material": "Výrobní materiál",
   "immersive_furniture.not_enough_material": "Nedostatek výrobních materiálů!",
+  "immersive_furniture.no_permission": "K tomu nemáte oprávnění.",
   "immersive_furniture.indium_missing": "Pohlcující nábytek vyžaduje, aby Indie správně pracovala se Sodi!",
   "immersive_furniture.ferritecore_missing": "Immerzivní Nábytek důrazně doporučuje FerriteCore pro snížení doby načítání!",
   "immersive_furniture.packetfixer_missing": "Pohlcující nábytek vyžaduje fixer paketů!",

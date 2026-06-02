@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "Sraith Oibre na nUslóireacht",
   "item.immersive_furniture.crafting_material": "Ábhair Ceardaíochta",
   "immersive_furniture.not_enough_material": "Níl go leor ábhar ceardaíochta!",
+  "immersive_furniture.no_permission": "Níl cead agat é sin a dhéanamh.",
   "immersive_furniture.indium_missing": "Teastaíonn Indium ó Furniture Immersive chun a reáchtáil i gceart le Sodium!",
   "immersive_furniture.ferritecore_missing": "Mholfaidh Troscán Uxá na FerriteCore chun an t-am luchtaithe a laghdú!",
   "immersive_furniture.packetfixer_missing": "Teastaíonn Packet Fixer ón tSraith Uachtarach!",

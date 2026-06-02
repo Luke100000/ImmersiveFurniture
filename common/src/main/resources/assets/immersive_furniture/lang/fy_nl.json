@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "Artisán's Werkstasjon",
   "item.immersive_furniture.crafting_material": "Hânskermateriaal",
   "immersive_furniture.not_enough_material": "Net genôch hânskermateriaal!",
+  "immersive_furniture.no_permission": "You do not have permission to do that.",
   "immersive_furniture.indium_missing": "Immersive meubels fereasket Indium om goed te funksjonearjen mei Sodium!",
   "immersive_furniture.ferritecore_missing": "Immersive Meubele beveelje FerriteCore om de laadtiden te ferleegjen!",
   "immersive_furniture.packetfixer_missing": "Immersive Furniture hat Packet Fixer nedich!",

@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "Estació del Artesà",
   "item.immersive_furniture.crafting_material": "Material de Fabricació",
   "immersive_furniture.not_enough_material": "No hi ha prou material de fabricació!",
+  "immersive_furniture.no_permission": "No tens permís per fer això.",
   "immersive_furniture.indium_missing": "Els mobles immersius necessiten índium per funcionar correctament amb sodi!",
   "immersive_furniture.ferritecore_missing": "Els mobles immersius recomanen molt FerriteCore per reduir el temps de càrrega!",
   "immersive_furniture.packetfixer_missing": "El moble immersiu necessita el Packet Fixer!",

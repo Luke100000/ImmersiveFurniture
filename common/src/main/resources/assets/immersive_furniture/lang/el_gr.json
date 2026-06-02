@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "Σταθμός Εργασίας Του Artisan",
   "item.immersive_furniture.crafting_material": "Υλικό Κατασκευής",
   "immersive_furniture.not_enough_material": "Δεν υπάρχει αρκετό υλικό κατασκευής!",
+  "immersive_furniture.no_permission": "Δεν έχετε άδεια να το κάνετε αυτό.",
   "immersive_furniture.indium_missing": "Immersive έπιπλα απαιτεί Indium για να τρέξει σωστά με νάτριο!",
   "immersive_furniture.ferritecore_missing": "Immersive έπιπλα συστήνει ιδιαίτερα FerriteCore για τη μείωση του χρόνου φόρτωσης!",
   "immersive_furniture.packetfixer_missing": "Immersive έπιπλα απαιτεί Fixer πακέτο!",

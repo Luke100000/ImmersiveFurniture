@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "Håndværkers Arbejdsstation",
   "item.immersive_furniture.crafting_material": "Fremstil Materiale",
   "immersive_furniture.not_enough_material": "Ikke nok fremstillingsmateriale!",
+  "immersive_furniture.no_permission": "Du har ikke tilladelse til at gøre det.",
   "immersive_furniture.indium_missing": "Immersive Møbler kræver Indium til at køre ordentligt med Sodium!",
   "immersive_furniture.ferritecore_missing": "Immersive Møbler anbefaler stærkt FerriteCore at reducere lastningstiden!",
   "immersive_furniture.packetfixer_missing": "Imponerende møbler kræver Packet Fixer!",

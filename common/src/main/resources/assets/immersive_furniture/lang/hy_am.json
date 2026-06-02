@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "Արտիստի Աշխատանքային Հարթակ",
   "item.immersive_furniture.crafting_material": "Արտադրության Պաշտոն",
   "immersive_furniture.not_enough_material": "Չափը բավարար չէ!",
+  "immersive_furniture.no_permission": "Դուք չունեք դրա թույլտվություն։",
   "immersive_furniture.indium_missing": "Իմերսիվ կահույքը պահանջում է Ինդիում՝ Աղիայի հետ ճիշտ աշխատելու համար!",
   "immersive_furniture.ferritecore_missing": "Ավելի լավն է օգտագործել FerriteCore-ն բեռնումի ժամանակը կրճատելու համար!",
   "immersive_furniture.packetfixer_missing": "Էմերսիվ կահույքը պահանջում է Packet Fixer!",

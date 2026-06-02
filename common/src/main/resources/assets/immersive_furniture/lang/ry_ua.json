@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "Кустарське Рабоче Місце",
   "item.immersive_furniture.crafting_material": "Матеріал для Виготовлення",
   "immersive_furniture.not_enough_material": "Недосить матеріалу для виготовлення!",
+  "immersive_furniture.no_permission": "You do not have permission to do that.",
   "immersive_furniture.indium_missing": "Занурювальне меблі потребує Індію для правильного функціонування з Натрієм!",
   "immersive_furniture.ferritecore_missing": "Занурювальнa меблі велику рекомендую FerriteCore для зменшення часу завантаження!",
   "immersive_furniture.packetfixer_missing": "Інтерактивні меблі потребують Packet Fixer!",

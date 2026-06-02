@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "Amatininko darbo vieta",
   "item.immersive_furniture.crafting_material": "Amatų medžiaga",
   "immersive_furniture.not_enough_material": "Nepakanka medžiagos amatams!",
+  "immersive_furniture.no_permission": "Jūs neturite leidimo tai daryti.",
   "immersive_furniture.indium_missing": "Kad \"Immersive Furniture\" tinkamai veiktų su \"Sodium\", reikia indžio!",
   "immersive_furniture.ferritecore_missing": "\"Immersive Furniture\" primygtinai rekomenduoja \"FerriteCore\", kad sutrumpintumėte krovimo laiką!",
   "immersive_furniture.packetfixer_missing": "\"Immersive Furniture\" reikia \"Packet Fixer\"!",

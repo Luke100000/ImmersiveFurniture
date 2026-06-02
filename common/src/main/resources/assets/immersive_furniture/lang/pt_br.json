@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "Estação do Artesão",
   "item.immersive_furniture.crafting_material": "Material de Criação",
   "immersive_furniture.not_enough_material": "Sem materiais de criação suficientes!",
+  "immersive_furniture.no_permission": "Você não tem permissão para fazer isso.",
   "immersive_furniture.indium_missing": "Móveis imersivas requerem que o Índio funcione corretamente com o Sodium!",
   "immersive_furniture.ferritecore_missing": "Móveis imersivos recomendam FerriteCore para reduzir o tempo de carregamento!",
   "immersive_furniture.packetfixer_missing": "Móveis imersivos precisam ser empacotados por pacotes!",

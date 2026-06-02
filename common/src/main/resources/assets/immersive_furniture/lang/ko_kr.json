@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "장인의 워크스테이션",
   "item.immersive_furniture.crafting_material": "제작 재료",
   "immersive_furniture.not_enough_material": "제작 재료가 부족합니다!",
+  "immersive_furniture.no_permission": "귀하는 그렇게 할 권한이 없습니다.",
   "immersive_furniture.indium_missing": "몰입형 가구는 나트륨과 함께 제대로 작동하려면 인듐이 필요합니다!",
   "immersive_furniture.ferritecore_missing": "몰입형 가구는 로딩 시간을 줄이기 위해 페라이트코어를 적극 권장합니다!",
   "immersive_furniture.packetfixer_missing": "몰입형 가구에는 패킷 픽서가 필요합니다!",

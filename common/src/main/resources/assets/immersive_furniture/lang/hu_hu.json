@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "Kézműves munkaállomás",
   "item.immersive_furniture.crafting_material": "Kézműves anyag",
   "immersive_furniture.not_enough_material": "Nincs elég kézműves anyag!",
+  "immersive_furniture.no_permission": "Erre nincs engedélye.",
   "immersive_furniture.indium_missing": "Az Immersive Furniture-nek Indiumra van szüksége a megfelelő működéshez a Sodiummal együtt!",
   "immersive_furniture.ferritecore_missing": "Az Immersive Furniture erősen ajánlja a FerriteCore-t a betöltési idő csökkentése érdekében!",
   "immersive_furniture.packetfixer_missing": "Az Immersive Furniture csomagjavítót igényel!",

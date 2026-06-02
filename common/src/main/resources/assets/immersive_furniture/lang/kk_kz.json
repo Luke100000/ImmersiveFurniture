@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "Шебердің Жұмыс Отырысы",
   "item.immersive_furniture.crafting_material": "Жасаушы Материал",
   "immersive_furniture.not_enough_material": "Жасаушы материал жеткіліксіз!",
+  "immersive_furniture.no_permission": "Сізде мұны істеуге рұқсат жоқ.",
   "immersive_furniture.indium_missing": "Индий натриймен дұрыс жұмыс істеу үшін Immersive Furniture қажет!",
   "immersive_furniture.ferritecore_missing": "Immersive Furniture жоғары загрузка уақытын азайту үшін FerriteCore-ды қатты ұсынамыз!",
   "immersive_furniture.packetfixer_missing": "\"Суға батырылатын жиһаз\" үшін Пакет жөндеуші қажет!",

@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "匠人之作坊",
   "item.immersive_furniture.crafting_material": "工艺材料",
   "immersive_furniture.not_enough_material": "工艺材料不足！",
+  "immersive_furniture.no_permission": "You do not have permission to do that.",
   "immersive_furniture.indium_missing": "此沉浸家具需銦以與鈉協作之正常運行！",
   "immersive_furniture.ferritecore_missing": "沉浸式家具高度推荐使用铁磁内核以减少加载时间！",
   "immersive_furniture.packetfixer_missing": "沉浸式家具需安裝封包修復器！",
