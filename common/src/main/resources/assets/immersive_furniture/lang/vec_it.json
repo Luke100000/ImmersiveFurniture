@@ -3,6 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "Postazione de l'Artigian",
   "item.immersive_furniture.crafting_material": "Material de Creazion",
   "immersive_furniture.not_enough_material": "No gh'è abbastanza material de creazion!",
+  "immersive_furniture.no_permission": "You do not have permission to do that.",
   "immersive_furniture.indium_missing": "El mobilio immersivo el gà bisogno de Indium par funsionar ben co Sodium!",
   "immersive_furniture.ferritecore_missing": "Immersive Furniture raccomanda vivamente FerriteCore par ridurre i tempi de caricamento!",
   "immersive_furniture.packetfixer_missing": "El Mobiliero Immersivo al ga bisogno de Packet Fixer!",
