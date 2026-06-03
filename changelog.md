@@ -14,7 +14,7 @@
 * Fixed local library blocked by network delays
 * Added compat with Sodium Extras
 * Fixed bed alignment on Forge
-* Fixed some rare crashes
+* Fixed some rare crashes and incompatibilities
 
 # 0.1.3
 
