@@ -1,3 +1,7 @@
+# 0.2.1
+
+* Fixed login not working
+
 # 0.2.0
 
 > Backup world, there is a small chance that some placed furniture is removed
