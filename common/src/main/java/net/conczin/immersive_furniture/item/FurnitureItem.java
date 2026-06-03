@@ -1,7 +1,6 @@
 package net.conczin.immersive_furniture.item;
 
 import net.conczin.immersive_furniture.block.*;
-import net.conczin.immersive_furniture.block.entity.FurnitureBlockEntity;
 import net.conczin.immersive_furniture.block.entity.FurnitureOffsetHolder;
 import net.conczin.immersive_furniture.data.FurnitureData;
 import net.conczin.immersive_furniture.data.FurnitureDataManager;
@@ -11,17 +10,14 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
@@ -56,24 +52,7 @@ public class FurnitureItem extends BlockItem {
     }
 
     public static FurnitureData getData(ItemStack stack) {
-        FurnitureData data = stack.get(FURNITURE);
-        if (data != null) {
-            return data;
-        }
-
-        // 1.20.1 items migration
-        CustomData legacyData = stack.get(DataComponents.BLOCK_ENTITY_DATA);
-        if (legacyData != null) {
-            CompoundTag tag = legacyData.copyTag();
-            if (tag.contains(FurnitureBlockEntity.FURNITURE)) {
-                data = new FurnitureData(tag.getCompound(FurnitureBlockEntity.FURNITURE));
-                stack.set(FURNITURE, data);
-                stack.remove(DataComponents.BLOCK_ENTITY_DATA);
-                return data;
-            }
-        }
-
-        return FurnitureData.EMPTY;
+        return stack.getOrDefault(FURNITURE, FurnitureData.EMPTY);
     }
 
     public static void setData(ItemStack stack, FurnitureData data) {
