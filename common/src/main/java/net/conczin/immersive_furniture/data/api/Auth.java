@@ -58,7 +58,6 @@ public class Auth {
     }
 
     public static void clearToken() {
-        currentToken = null;
         //noinspection ResultOfMethodCallIgnored
         getTokenPath().toFile().delete();
     }
