@@ -10,9 +10,7 @@ import net.minecraft.world.level.material.PushReaction;
 public interface Blocks {
     Block ARTISANS_WORKSTATION = new ArtisansWorkstationBlock(baseProps()
             .mapColor(MapColor.WOOD)
-            .strength(2.5f)
             .sound(SoundType.WOOD)
-            .noOcclusion()
     );
 
     Block FURNITURE = new FurnitureBlock(baseFurnitureProps());
@@ -25,9 +23,7 @@ public interface Blocks {
             .lightLevel((blockState) -> blockState.getValue(LightFurnitureBlock.LIGHT) * 3)
     );
 
-    Block FURNITURE_PROXY = new FurnitureProxyBlock(baseFurnitureProps()
-            .noOcclusion()
-    );
+    Block FURNITURE_PROXY = new FurnitureProxyBlock(baseFurnitureProps());
 
     static BlockBehaviour.Properties baseProps() {
         return BlockBehaviour.Properties.of();
@@ -40,6 +36,7 @@ public interface Blocks {
                 .noLootTable()
                 .sound(SoundType.WOOD)
                 .pushReaction(PushReaction.BLOCK)
+                .noOcclusion()
                 .dynamicShape();
     }
 

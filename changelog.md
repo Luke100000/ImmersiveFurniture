@@ -1,3 +1,7 @@
+# 0.2.2
+
+* Disabled culling
+
 # 0.2.1
 
 * Fixed login not working
@@ -11,7 +15,7 @@
 * Added recipe to duplicate furniture with material
 * Fixed recycling recipe accepting any item
 * Added `requiredCraftingPermissionLevel` to config
-* Replaced vanilla's ultra-slow outline renderer with a fast one
+* Replaced vanilla’s ultra-slow outline renderer with a fast one
 * Particle/Sound Emitter now triggers hand animations
 * Added open URL popup instead of opening links directly
 * Furniture now has a powered flag, fixing some weird redstone interactions between them
