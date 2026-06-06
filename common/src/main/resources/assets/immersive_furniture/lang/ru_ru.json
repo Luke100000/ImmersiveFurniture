@@ -3,7 +3,7 @@
   "item.immersive_furniture.artisans_workstation": "Станция ремесленника",
   "item.immersive_furniture.crafting_material": "Материал создания",
   "immersive_furniture.not_enough_material": "Не хватает материала создания!",
-  "immersive_furniture.no_permission": "У вас нет разрешения на это.",
+  "immersive_furniture.no_permission": "У вас нет на это разрешения.",
   "immersive_furniture.indium_missing": "Immersive Furniture требует Indium для корректной работы с Sodium!",
   "immersive_furniture.ferritecore_missing": "Immersive Furniture настоятельно рекомендует FerriteCore для уменьшения времени загрузки!",
   "immersive_furniture.packetfixer_missing": "Immersive Furniture требует Packet Fixer для работы!",
