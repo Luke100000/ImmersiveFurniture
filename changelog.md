@@ -1,3 +1,7 @@
+# 0.2.2
+
+* Disabled culling
+
 # 0.2.1
 
 * Fixed login not working
