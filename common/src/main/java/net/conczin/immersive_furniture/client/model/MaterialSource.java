@@ -158,7 +158,9 @@ public record MaterialSource(
                 material.source,
                 MaterialSource.DEFAULT
         );
-        NativeImage texture = source.get(rotatedDirection);
+        RotatedMaterial rotatedMaterial = source.getMaterial(rotatedDirection);
+        TextureAtlasSprite sprite = rotatedMaterial.sprite();
+        NativeImage texture = getImage(sprite);
 
         if (direction == Direction.EAST || direction == Direction.NORTH) x = w - x - 1;
         if (direction == Direction.DOWN) y = h - y - 1;
@@ -168,8 +170,9 @@ public record MaterialSource(
             y += (int) (center.z += center.y);
         }
 
-        int tw = texture.getWidth();
-        int th = texture.getHeight();
+        // The backing image contains every animation frame, while these are the dimensions of one frame.
+        int tw = sprite.contents().width();
+        int th = sprite.contents().height();
         if (material.wrap == FurnitureData.WrapMode.EXPAND) {
             x = smartWrap(x, w, tw, material.margin);
             y = smartWrap(y, h, th, material.margin);
@@ -189,7 +192,7 @@ public record MaterialSource(
         }
 
         // Rotate uv as well
-        int rotation = source.getMaterial(rotatedDirection).getRotation();
+        int rotation = rotatedMaterial.getRotation();
         if (material.axis == FurnitureData.MaterialAxis.Y) {
             switch (direction) {
                 case DOWN, UP, SOUTH -> rotation += 1;

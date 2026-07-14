@@ -29,12 +29,6 @@ forge*changelog.txt
 /mcmodsrepo
 /local.properties
 
-# Files from architectury
-.architectury-transformer
-/logs
-/.vscode
-/curseforge
-
 *.kra
 *.kra~
 *.blend1
@@ -44,10 +38,5 @@ forge*changelog.txt
 *.aup3-wal
 .xdp-*
 *.kate-swp
-/models/custom_model.java
-/models/custom_model_yarn.java
-/page/
 
-
-# Temporary
-blimp.*
+.*

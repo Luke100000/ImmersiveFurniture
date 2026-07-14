@@ -1,3 +1,7 @@
+# 0.2.3
+
+* Fixed a crash on some rotated animated textures
+
 # 0.2.2
 
 * Disabled culling
