@@ -19,7 +19,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.player.Player;
@@ -503,19 +502,16 @@ public class FurnitureData {
     private static void playSound(Level level, BlockPos pos, Vec3 offset, RandomSource random, Element element) {
         SoundEvent soundEvent = element.soundEmitter.getSoundEvent();
         if (soundEvent == null) return;
-        double baseX = pos.getX() + 0.5 + offset.x();
-        double baseY = pos.getY() + 0.5 + offset.y();
-        double baseZ = pos.getZ() + 0.5 + offset.z();
-        level.playLocalSound(
-                baseX,
-                baseY,
-                baseZ,
-                soundEvent,
-                SoundSource.BLOCKS,
-                (0.75f + random.nextFloat()) * element.soundEmitter.volume,
-                (0.75f + random.nextFloat()) * element.soundEmitter.pitch,
-                false
+        Vec3 soundPos = new Vec3(
+                pos.getX() + 0.5 + offset.x(),
+                pos.getY() + 0.5 + offset.y(),
+                pos.getZ() + 0.5 + offset.z()
         );
+        float volume = (0.75f + random.nextFloat()) * element.soundEmitter.volume;
+        float pitch = (0.75f + random.nextFloat()) * element.soundEmitter.pitch;
+        if (level.isClientSide) {
+            Common.clientHandler.playFurnitureSound(pos, soundPos, soundEvent, volume, pitch, random);
+        }
     }
 
     public VoxelShape getShape(Direction rotation, int state) {

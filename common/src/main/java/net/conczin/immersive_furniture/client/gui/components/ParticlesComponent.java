@@ -13,7 +13,10 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class ParticlesComponent extends ListComponent {
-    static final int PAGE_SIZE = 7;
+    private static final int PARTICLE_BUTTON_HEIGHT = 18;
+    private static final int PARTICLE_BUTTON_SPACING = 19;
+    private static final int PARTICLE_START_Y = 23;
+    private static final int PARTICLE_BOTTOM_MARGIN = 25;
 
     List<ResourceLocation> allLocations = new LinkedList<>();
     List<ResourceLocation> locations = new LinkedList<>();
@@ -31,19 +34,19 @@ public class ParticlesComponent extends ListComponent {
 
         // Buttons
         buttons.clear();
-        int y = topPos + 23;
-        for (int i = 0; i < PAGE_SIZE; i++) {
+        int y = topPos + PARTICLE_START_Y;
+        for (int i = 0; i < getParticleRows(height); i++) {
             int finalI = i;
             Button button = Button.builder(Component.literal(""), b -> {
                         if (finalI >= locations.size()) return;
                         screen.selectedElements.forEach(e -> e.particleEmitter.particle = locations.get(finalI));
                     })
-                    .bounds(leftPos + 5, y, width - 10, 18)
+                    .bounds(leftPos + 5, y, width - 10, PARTICLE_BUTTON_HEIGHT)
                     .build();
             screen.addRenderableWidget(button);
             buttons.add(button);
 
-            y += 19;
+            y += PARTICLE_BUTTON_SPACING;
         }
 
         super.init(leftPos, topPos, width, height);
@@ -51,7 +54,11 @@ public class ParticlesComponent extends ListComponent {
 
     @Override
     int getPages() {
-        return Math.max(0, (allLocations.size() - 1) / PAGE_SIZE + 1);
+        return Math.max(1, (allLocations.size() - 1) / buttons.size() + 1);
+    }
+
+    private int getParticleRows(int height) {
+        return Math.max(1, (height - PARTICLE_START_Y - PARTICLE_BOTTOM_MARGIN) / PARTICLE_BUTTON_SPACING);
     }
 
     @Override
@@ -62,14 +69,9 @@ public class ParticlesComponent extends ListComponent {
                 .toList();
 
         page = Math.min(page, getPages() - 1);
-        locations = allLocations.subList(
-                page * PAGE_SIZE,
-                Math.min((page * PAGE_SIZE + PAGE_SIZE), allLocations.size())
-        );
-
         locations = allLocations.stream()
-                .skip((long) page * PAGE_SIZE)
-                .limit(PAGE_SIZE)
+                .skip((long) page * buttons.size())
+                .limit(buttons.size())
                 .toList();
 
         for (int i = 0; i < buttons.size(); i++) {

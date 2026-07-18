@@ -2,11 +2,13 @@ package net.conczin.immersive_furniture.client.gui.components;
 
 import net.conczin.immersive_furniture.client.gui.ArtisansWorkstationEditorScreen;
 import net.conczin.immersive_furniture.client.gui.widgets.LegacyImageButton;
+import net.conczin.immersive_furniture.Common;
 import net.conczin.immersive_furniture.utils.Utils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -19,11 +21,15 @@ import static net.conczin.immersive_furniture.client.gui.ArtisansWorkstationScre
 import static net.conczin.immersive_furniture.client.gui.ArtisansWorkstationScreen.TEXTURE_SIZE;
 
 public class SoundsComponent extends ListComponent {
-    static final int PAGE_SIZE = 7;
+    private static final int SOUND_BUTTON_HEIGHT = 18;
+    private static final int SOUND_BUTTON_SPACING = 19;
+    private static final int SOUND_START_Y = 23;
+    private static final int SOUND_BOTTOM_MARGIN = 25;
 
     List<ResourceLocation> allLocations = new LinkedList<>();
     List<ResourceLocation> locations = new LinkedList<>();
     List<Button> buttons = new LinkedList<>();
+    SoundInstance previewSound;
 
     public SoundsComponent(ArtisansWorkstationEditorScreen screen) {
         super(screen);
@@ -37,14 +43,15 @@ public class SoundsComponent extends ListComponent {
 
         // Buttons
         buttons.clear();
-        int y = topPos + 23;
-        for (int i = 0; i < PAGE_SIZE; i++) {
+        int y = topPos + SOUND_START_Y;
+        for (int i = 0; i < getSoundRows(height); i++) {
             int finalI = i;
             Button button = Button.builder(Component.literal(""), b -> {
                         if (finalI >= locations.size()) return;
+                        Common.clientHandler.stopAllFurnitureSounds();
                         screen.selectedElements.forEach(e -> e.soundEmitter.sound = locations.get(finalI));
                     })
-                    .bounds(leftPos + 5, y, width - 29, 18)
+                    .bounds(leftPos + 5, y, width - 29, SOUND_BUTTON_HEIGHT)
                     .build();
             screen.addRenderableWidget(button);
             buttons.add(button);
@@ -56,12 +63,16 @@ public class SoundsComponent extends ListComponent {
                         if (finalI >= locations.size()) return;
                         SoundEvent soundEvent = BuiltInRegistries.SOUND_EVENT.get(locations.get(finalI));
                         if (soundEvent == null) return;
-                        minecraft.getSoundManager().play(SimpleSoundInstance.forUI(soundEvent, 1.0f, 1.0f));
+                        if (previewSound != null) {
+                            minecraft.getSoundManager().stop(previewSound);
+                        }
+                        previewSound = SimpleSoundInstance.forUI(soundEvent, 1.0f, 1.0f);
+                        minecraft.getSoundManager().play(previewSound);
                     },
                     Component.translatable("gui.immersive_furniture.play_sound")
             ));
 
-            y += 19;
+            y += SOUND_BUTTON_SPACING;
         }
 
         super.init(leftPos, topPos, width, height);
@@ -69,7 +80,11 @@ public class SoundsComponent extends ListComponent {
 
     @Override
     int getPages() {
-        return Math.max(0, (allLocations.size() - 1) / PAGE_SIZE + 1);
+        return Math.max(1, (allLocations.size() - 1) / buttons.size() + 1);
+    }
+
+    private int getSoundRows(int height) {
+        return Math.max(1, (height - SOUND_START_Y - SOUND_BOTTOM_MARGIN) / SOUND_BUTTON_SPACING);
     }
 
     @Override
@@ -81,8 +96,8 @@ public class SoundsComponent extends ListComponent {
 
         page = Math.min(page, getPages() - 1);
         locations = allLocations.subList(
-                page * PAGE_SIZE,
-                Math.min((page * PAGE_SIZE + PAGE_SIZE), allLocations.size())
+                page * buttons.size(),
+                Math.min((page * buttons.size() + buttons.size()), allLocations.size())
         );
 
         for (int i = 0; i < buttons.size(); i++) {

@@ -18,6 +18,8 @@ public class Client {
     }
 
     public static void onLevelLoad() {
+        Common.clientHandler.stopAllFurnitureSounds();
+
         DynamicAtlas.BAKED.clear();
         DynamicAtlas.SCRATCH.clear();
         DynamicAtlas.ENTITY.clear();

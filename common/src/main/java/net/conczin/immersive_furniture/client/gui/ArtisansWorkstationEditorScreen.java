@@ -104,7 +104,7 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
         // Close
         MutableComponent text = Component.translatable("gui.immersive_furniture.tab.cancel");
         StateImageButton button = new StateImageButton(
-                leftPos + 4, topPos - 24, 26, 28,
+                leftPos + 4, getTopControlY(), 26, 28,
                 130, 56, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE,
                 b -> cancel(), text);
         button.setTooltip(Tooltip.create(text));
@@ -137,7 +137,7 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
         // Help button
         MutableComponent helpText = Component.translatable("gui.immersive_furniture.tab.help");
         StateImageButton helpButton = new StateImageButton(
-                leftPos + 240, topPos - 24, 26, 28,
+                leftPos + windowWidth - 30, getTopControlY(), 26, 28,
                 8 * 26, 56, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE,
                 b -> openHelp(),
                 helpText
@@ -146,23 +146,30 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
         helpButton.setTooltip(Tooltip.create(helpText));
         addRenderableWidget(helpButton);
 
+        // Window size button
+        sideButton(getWindowSizeTooltip(),
+                topPos + windowHeight - 19, 160 + windowSize.ordinal() * 16, 224, false, b -> {
+                    cycleWindowSize();
+                    init();
+                });
+
         // Night-mode button
         sideButton(nightMode ? "gui.immersive_furniture.nightmode" : "gui.immersive_furniture.daymode",
-                topPos + windowHeight - 19, 208, 160, nightMode, b -> {
+                topPos + windowHeight - 36, 208, 160, nightMode, b -> {
                     nightMode = !nightMode;
                     init();
                 });
 
         // Backwards checker plane button
         sideButton("gui.immersive_furniture.backwards_checkerplane",
-                topPos + windowHeight - 36, 224, 160, backwardsCheckerPlane, b -> {
+                topPos + windowHeight - 53, 224, 160, backwardsCheckerPlane, b -> {
                     backwardsCheckerPlane = !backwardsCheckerPlane;
                     init();
                 });
 
         // Current state toggle button
         sideButton("gui.immersive_furniture.current_state",
-                topPos + windowHeight - 53, 208 + currentState * 16, 224, false, b -> {
+                topPos + windowHeight - 70, 208 + currentState * 16, 224, false, b -> {
                     currentState = (currentState == 0) ? 1 : 0;
                     init();
                 });
@@ -171,9 +178,12 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
     }
 
     private void sideButton(String tooltip, int y, int u, int v, boolean enabled, Button.OnPress action) {
-        MutableComponent text = Component.translatable(tooltip);
+        sideButton(Component.translatable(tooltip), y, u, v, enabled, action);
+    }
+
+    private void sideButton(Component text, int y, int u, int v, boolean enabled, Button.OnPress action) {
         StateImageButton state = new StateImageButton(
-                leftPos + windowWidth + 1, y, 16, 16,
+                getWindowSizeButtonX(), y, 16, 16,
                 u, v, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE,
                 action,
                 text
@@ -181,6 +191,10 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
         state.setTooltip(Tooltip.create(text));
         state.setEnabled(enabled);
         addRenderableWidget(state);
+    }
+
+    private int getTopControlY() {
+        return topPos - 24;
     }
 
     private void cancel() {
@@ -196,7 +210,7 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
     private StateImageButton pagePageButton(Page page, int x, int u) {
         MutableComponent text = Component.translatable("gui.immersive_furniture.tab." + page.name().toLowerCase(Locale.ROOT));
         StateImageButton button = new StateImageButton(
-                TOOLS_WIDTH + (windowWidth - TOOLS_WIDTH - 26 * Page.values().length) / 2 + leftPos + x, topPos - 24, 26, 28,
+                TOOLS_WIDTH + (windowWidth - TOOLS_WIDTH - 26 * Page.values().length) / 2 + leftPos + x, getTopControlY(), 26, 28,
                 u, 56, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE,
                 b -> {
                     currentPage = page;
@@ -233,7 +247,7 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
 
         // Model
         graphics.enableScissor(leftPos + TOOLS_WIDTH + 3, topPos + 3, leftPos + windowWidth - 3, topPos + windowHeight - 3);
-        drawModel(graphics, data, leftPos + TOOLS_WIDTH + (windowWidth - TOOLS_WIDTH) / 2, topPos + windowHeight / 2, camZoom, camYaw, camPitch, mouseX, mouseY);
+        drawModel(graphics, data, getRightPaneCenterX(), topPos + windowHeight / 2, getPreviewZoom(), camYaw, camPitch, mouseX, mouseY);
         graphics.disableScissor();
 
         graphics.pose().translate(0, 0, 2048.0f);
@@ -394,6 +408,16 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
         return mouseX > leftPos + TOOLS_WIDTH && mouseX < leftPos + windowWidth && mouseY > topPos && mouseY < topPos + windowHeight;
     }
 
+    public int getRightPaneCenterX() {
+        return leftPos + TOOLS_WIDTH + (windowWidth - TOOLS_WIDTH) / 2;
+    }
+
+    private float getPreviewZoom() {
+        float widthScale = (windowWidth - TOOLS_WIDTH) / 180.0f;
+        float heightScale = windowHeight / 180.0f;
+        return camZoom * Math.min(widthScale, heightScale);
+    }
+
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         if (isCopy(keyCode)) {
@@ -543,7 +567,7 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
             }
 
             float viewDot = (float) Math.sqrt(1.0f - normal.z * normal.z);
-            return proj / camZoom * 16.0f / viewDot;
+            return proj / getPreviewZoom() * 16.0f / viewDot;
         }
 
         private Vector3f getNormal() {

@@ -1,5 +1,6 @@
 package net.conczin.immersive_furniture.block;
 
+import net.conczin.immersive_furniture.Common;
 import net.conczin.immersive_furniture.InteractionManager;
 import net.conczin.immersive_furniture.block.entity.FurnitureOffsetHolder;
 import net.conczin.immersive_furniture.config.Config;
@@ -274,7 +275,9 @@ public abstract class BaseFurnitureBlock extends Block implements SimpleWaterlog
 
     @Override
     public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
-        if (!level.isClientSide) {
+        if (level.isClientSide) {
+            Common.clientHandler.stopFurnitureSounds(pos);
+        } else {
             // Remove all proxy blocks when the base block is destroyed
             FurnitureData data = getData(state, level, pos);
             if (data != null) {

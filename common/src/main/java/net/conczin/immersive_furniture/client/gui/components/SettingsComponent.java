@@ -118,7 +118,7 @@ public class SettingsComponent extends ScreenComponent {
             libraryScreen.setSelected(FurnitureDataManager.getSafeLocalLocation(screen.data));
             libraryScreen.setTab(ArtisansWorkstationLibraryScreen.Tab.LOCAL);
             Minecraft.getInstance().setScreen(libraryScreen);
-        }, leftPos + 6, topPos + 154, width - 12);
+        }, leftPos + 6, topPos + height - 26, width - 12);
     }
 
     public void render(GuiGraphics graphics) {
@@ -126,7 +126,7 @@ public class SettingsComponent extends ScreenComponent {
             graphics.drawCenteredString(
                     minecraft.font,
                     Component.translatable("gui.immersive_furniture.overwrite_file"),
-                    leftPos + width + (280 - width) / 2, topPos + height - 16, 0xFFFFFF
+                    screen.getRightPaneCenterX(), topPos + height - 16, 0xFFFFFF
             );
         }
     }

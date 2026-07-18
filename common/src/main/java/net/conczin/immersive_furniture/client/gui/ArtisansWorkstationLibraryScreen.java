@@ -127,6 +127,8 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
     protected void init() {
         super.init();
 
+        addWindowSizeButton();
+
         if (selected == null) {
             // Tabs
             int w = (windowWidth - 4) / 4;
@@ -325,6 +327,21 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
         }
     }
 
+    private void addWindowSizeButton() {
+        Component text = getWindowSizeTooltip();
+        StateImageButton button = new StateImageButton(
+                leftPos + windowWidth - 86, topPos + windowHeight - 22, 16, 16,
+                160 + windowSize.ordinal() * 16, 224, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE,
+                b -> {
+                    cycleWindowSize();
+                    init();
+                }, text
+        );
+        button.setEnabled(false);
+        button.setTooltip(Tooltip.create(text));
+        addRenderableWidget(button);
+    }
+
     private void delete() {
         if (lastCriticalActionAttempt + 5000 > System.currentTimeMillis()) {
             clearError();
@@ -374,21 +391,22 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
         if (selected == null) {
             search();
 
-            int w = windowWidth / 4;
-            int h = (windowHeight - 38 - 28) / 2;
-
             // Background
             for (int x = 0; x < 4; x++) {
                 for (int y = 0; y < 2; y++) {
                     int i = x + y * 4;
+                    int tileLeft = getTileLeft(x);
+                    int tileTop = getTileTop(y);
+                    int tileWidth = getTileRight(x) - tileLeft;
+                    int tileHeight = getTileBottom(y) - tileTop;
                     boolean hovered = isTileHovered(x, y) && i < furniture.size();
-                    drawRectangle(graphics, leftPos + x * w, topPos + 38 + y * h, w, h, 0, hovered ? 96 : 48);
+                    drawRectangle(graphics, tileLeft, tileTop, tileWidth, tileHeight, 0, hovered ? 96 : 48);
 
                     if (i < furniture.size()) {
                         FurnitureData data = FurnitureDataManager.getData(furniture.get(i));
                         if (data != null) {
                             float rot = (float) (hovered ? (System.currentTimeMillis() % 10000) / 10000.0f * Math.PI * 2.0f : -Math.PI / 4 * 3);
-                            renderModel(graphics, data, leftPos + (x + 0.5) * w, topPos + 38 + (y + 0.5) * h, h, rot, (float) (-Math.PI / 4));
+                            renderModel(graphics, data, tileLeft + tileWidth / 2.0, tileTop + tileHeight / 2.0, Math.min(tileWidth, tileHeight), rot, (float) (-Math.PI / 4));
 
                             if (hovered) {
                                 tooltip = data.getTooltip(Screen.hasShiftDown());
@@ -456,11 +474,28 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
     }
 
     private boolean isTileHovered(int x, int y) {
-        int w = windowWidth / 4;
-        int h = (windowHeight - 32 - 28) / 2;
+        return lastMouseX >= getTileLeft(x) && lastMouseX < getTileRight(x) &&
+               lastMouseY >= getTileTop(y) && lastMouseY < getTileBottom(y);
+    }
 
-        return lastMouseX >= leftPos + x * w && lastMouseX < leftPos + (x + 1) * w &&
-               lastMouseY >= topPos + 38 + y * h && lastMouseY < topPos + 38 + (y + 1) * h;
+    private int getTileLeft(int x) {
+        return leftPos + x * windowWidth / 4;
+    }
+
+    private int getTileRight(int x) {
+        return leftPos + (x + 1) * windowWidth / 4;
+    }
+
+    private int getTileTop(int y) {
+        return topPos + 38 + y * getGridHeight() / 2;
+    }
+
+    private int getTileBottom(int y) {
+        return topPos + 38 + (y + 1) * getGridHeight() / 2;
+    }
+
+    private int getGridHeight() {
+        return windowHeight - 38 - 28;
     }
 
     private boolean holdingShift() {
