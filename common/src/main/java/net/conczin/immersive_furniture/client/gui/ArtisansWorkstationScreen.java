@@ -25,6 +25,7 @@ import org.joml.Quaternionf;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.Locale;
 import java.util.Map;
 
 
@@ -40,9 +41,21 @@ public abstract class ArtisansWorkstationScreen extends Screen {
 
     private static final int MIN_WINDOW_WIDTH = 280;
     private static final int MIN_WINDOW_HEIGHT = 180;
-    private static final int HORIZONTAL_MARGIN = 48;
-    private static final int VERTICAL_MARGIN = 40;
+    private static final int HORIZONTAL_MARGIN = 64;
+    private static final int VERTICAL_MARGIN = 48;
+    private static final int TAB_SPACE = 24;
 
+    protected enum WindowSize {
+        ORIGINAL,
+        LARGE,
+        FULLSCREEN;
+
+        WindowSize cycle() {
+            return values()[(ordinal() + 1) % values().length];
+        }
+    }
+
+    protected static WindowSize windowSize = WindowSize.LARGE;
     int windowWidth = MIN_WINDOW_WIDTH;
     int windowHeight = MIN_WINDOW_HEIGHT;
     int leftPos;
@@ -58,6 +71,23 @@ public abstract class ArtisansWorkstationScreen extends Screen {
         if (MaterialRegistry.INSTANCE.materials.isEmpty()) {
             new Thread(MaterialRegistry.INSTANCE::sync).start();
         }
+    }
+
+    protected void cycleWindowSize() {
+        windowSize = windowSize.cycle();
+    }
+
+    protected int getWindowSizeButtonX() {
+        return windowSize == WindowSize.FULLSCREEN ? leftPos + windowWidth - 19 : leftPos + windowWidth + 1;
+    }
+
+    protected Component getWindowSizeTooltip() {
+        String name = switch (windowSize) {
+            case ORIGINAL -> "Original size";
+            case LARGE -> "Large";
+            case FULLSCREEN -> "Fullscreen";
+        };
+        return Component.translatableWithFallback("gui.immersive_furniture.window_size." + windowSize.name().toLowerCase(Locale.ROOT), name);
     }
 
     protected void drawRectangle(GuiGraphics graphics, int x, int y, int w, int h) {
@@ -180,8 +210,23 @@ public abstract class ArtisansWorkstationScreen extends Screen {
 
         super.init();
 
-        this.windowWidth = Math.max(MIN_WINDOW_WIDTH, this.width - HORIZONTAL_MARGIN * 2);
-        this.windowHeight = Math.max(MIN_WINDOW_HEIGHT, this.height - VERTICAL_MARGIN * 2);
+        switch (windowSize) {
+            case ORIGINAL -> {
+                this.windowWidth = MIN_WINDOW_WIDTH;
+                this.windowHeight = MIN_WINDOW_HEIGHT;
+            }
+            case LARGE -> {
+                this.windowWidth = Math.max(MIN_WINDOW_WIDTH, this.width - HORIZONTAL_MARGIN * 2);
+                this.windowHeight = Math.max(MIN_WINDOW_HEIGHT, this.height - VERTICAL_MARGIN * 2);
+            }
+            case FULLSCREEN -> {
+                this.windowWidth = this.width;
+                this.windowHeight = this.height - TAB_SPACE;
+                this.leftPos = 0;
+                this.topPos = TAB_SPACE;
+                return;
+            }
+        }
         this.leftPos = (this.width - this.windowWidth) / 2;
         this.topPos = (this.height - this.windowHeight) / 2;
     }

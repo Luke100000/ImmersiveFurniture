@@ -124,6 +124,8 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
     protected void init() {
         super.init();
 
+        addWindowSizeButton();
+
         if (selected == null) {
             // Tabs
             int w = (windowWidth - 4) / 4;
@@ -320,6 +322,21 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
                             .build()
             );
         }
+    }
+
+    private void addWindowSizeButton() {
+        Component text = getWindowSizeTooltip();
+        StateImageButton button = new StateImageButton(
+                leftPos + windowWidth - 86, topPos + windowHeight - 22, 16, 16,
+                160 + windowSize.ordinal() * 16, 224, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE,
+                b -> {
+                    cycleWindowSize();
+                    init();
+                }, text
+        );
+        button.setEnabled(false);
+        button.setTooltip(Tooltip.create(text));
+        addRenderableWidget(button);
     }
 
     private void delete() {
