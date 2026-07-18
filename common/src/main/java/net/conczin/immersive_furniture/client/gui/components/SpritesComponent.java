@@ -22,6 +22,11 @@ import java.util.List;
 import java.util.Locale;
 
 public class SpritesComponent extends ListComponent {
+    private static final int SPRITE_COLUMNS = 4;
+    private static final int SPRITE_BUTTON_SIZE = 22;
+    private static final int SPRITE_START_Y = 44;
+    private static final int SPRITE_BOTTOM_MARGIN = 25;
+
     private final List<SpriteContents> allSprites;
     private List<ResourceLocation> filteredSprites = new LinkedList<>();
 
@@ -87,11 +92,11 @@ public class SpritesComponent extends ListComponent {
 
         // Sprite buttons
         spriteButtons.clear();
-        for (int y = 0; y < 5; y++) {
-            for (int x = 0; x < 4; x++) {
+        for (int y = 0; y < getSpriteRows(height); y++) {
+            for (int x = 0; x < SPRITE_COLUMNS; x++) {
                 SpriteButton button = new SpriteButton(
-                        leftPos + 6 + x * 22, topPos + 44 + y * 22,
-                        22, 22, 146, 0,
+                        leftPos + 6 + x * SPRITE_BUTTON_SIZE, topPos + SPRITE_START_Y + y * SPRITE_BUTTON_SIZE,
+                        SPRITE_BUTTON_SIZE, SPRITE_BUTTON_SIZE, 146, 0,
                         b -> {
                             ResourceLocation spriteLocation = ((SpriteButton) b).getSpriteLocation();
                             if (spriteLocation != null) {
@@ -114,7 +119,11 @@ public class SpritesComponent extends ListComponent {
 
     @Override
     int getPages() {
-        return Math.max(0, (filteredSprites.size() - 1) / 20 + 1);
+        return Math.max(1, (filteredSprites.size() - 1) / spriteButtons.size() + 1);
+    }
+
+    private int getSpriteRows(int height) {
+        return Math.max(1, (height - SPRITE_START_Y - SPRITE_BOTTOM_MARGIN) / SPRITE_BUTTON_SIZE);
     }
 
     private boolean filter(SpriteContents s) {
