@@ -38,8 +38,13 @@ public abstract class ArtisansWorkstationScreen extends Screen {
     protected long lastErrorTime = 0;
     protected long lastCriticalActionAttempt = 0;
 
-    int windowWidth = 280;
-    int windowHeight = 180;
+    private static final int MIN_WINDOW_WIDTH = 280;
+    private static final int MIN_WINDOW_HEIGHT = 180;
+    private static final int HORIZONTAL_MARGIN = 48;
+    private static final int VERTICAL_MARGIN = 40;
+
+    int windowWidth = MIN_WINDOW_WIDTH;
+    int windowHeight = MIN_WINDOW_HEIGHT;
     int leftPos;
     int topPos;
 
@@ -175,6 +180,8 @@ public abstract class ArtisansWorkstationScreen extends Screen {
 
         super.init();
 
+        this.windowWidth = Math.max(MIN_WINDOW_WIDTH, this.width - HORIZONTAL_MARGIN * 2);
+        this.windowHeight = Math.max(MIN_WINDOW_HEIGHT, this.height - VERTICAL_MARGIN * 2);
         this.leftPos = (this.width - this.windowWidth) / 2;
         this.topPos = (this.height - this.windowHeight) / 2;
     }

@@ -13,6 +13,11 @@ import net.minecraft.resources.ResourceLocation;
 import java.util.*;
 
 public class MaterialsComponent extends ListComponent {
+    private static final int MATERIAL_COLUMNS = 4;
+    private static final int MATERIAL_BUTTON_SIZE = 22;
+    private static final int MATERIAL_START_Y = 44;
+    private static final int MATERIAL_BOTTOM_MARGIN = 25;
+
     private final List<Map.Entry<ResourceLocation, MaterialSource>> filteredMaterials = new LinkedList<>();
 
     final List<MaterialButton> materialButtons = new ArrayList<>();
@@ -69,11 +74,11 @@ public class MaterialsComponent extends ListComponent {
 
         // Material buttons
         materialButtons.clear();
-        for (int y = 0; y < 5; y++) {
-            for (int x = 0; x < 4; x++) {
+        for (int y = 0; y < getMaterialRows(height); y++) {
+            for (int x = 0; x < MATERIAL_COLUMNS; x++) {
                 MaterialButton button = new MaterialButton(
-                        leftPos + 6 + x * 22, topPos + 44 + y * 22,
-                        22, 22, 146, 0,
+                        leftPos + 6 + x * MATERIAL_BUTTON_SIZE, topPos + MATERIAL_START_Y + y * MATERIAL_BUTTON_SIZE,
+                        MATERIAL_BUTTON_SIZE, MATERIAL_BUTTON_SIZE, 146, 0,
                         b -> {
                             MaterialSource material = ((MaterialButton) b).getMaterial();
                             if (material != null) {
@@ -93,7 +98,11 @@ public class MaterialsComponent extends ListComponent {
 
     @Override
     int getPages() {
-        return Math.max(0, (filteredMaterials.size() - 1) / 20 + 1);
+        return Math.max(1, (filteredMaterials.size() + materialButtons.size() - 1) / materialButtons.size());
+    }
+
+    private int getMaterialRows(int height) {
+        return Math.max(1, (height - MATERIAL_START_Y - MATERIAL_BOTTOM_MARGIN) / MATERIAL_BUTTON_SIZE);
     }
 
     @Override

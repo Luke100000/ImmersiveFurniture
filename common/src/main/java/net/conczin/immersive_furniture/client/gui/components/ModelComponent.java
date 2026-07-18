@@ -528,7 +528,7 @@ public class ModelComponent extends ScreenComponent {
             renderSmoothOutline(graphics, leftPos + 4, topPos + 92, width - 8, height - 117, 0x44000000);
         }
 
-        renderSmoothOutline(graphics, leftPos + 4, topPos + 156, width - 8, 20, 0x44000000);
+        renderSmoothOutline(graphics, leftPos + 4, topPos + height - 24, width - 8, 20, 0x44000000);
     }
 
     public void renderSmoothOutline(GuiGraphics graphics, int x, int y, int width, int height, int color) {

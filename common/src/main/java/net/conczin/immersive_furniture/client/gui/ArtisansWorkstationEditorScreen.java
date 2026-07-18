@@ -137,7 +137,7 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
         // Help button
         MutableComponent helpText = Component.translatable("gui.immersive_furniture.tab.help");
         StateImageButton helpButton = new StateImageButton(
-                leftPos + 240, topPos - 24, 26, 28,
+                leftPos + windowWidth - 30, topPos - 24, 26, 28,
                 8 * 26, 56, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE,
                 b -> openHelp(),
                 helpText
@@ -233,7 +233,7 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
 
         // Model
         graphics.enableScissor(leftPos + TOOLS_WIDTH + 3, topPos + 3, leftPos + windowWidth - 3, topPos + windowHeight - 3);
-        drawModel(graphics, data, leftPos + TOOLS_WIDTH + (windowWidth - TOOLS_WIDTH) / 2, topPos + windowHeight / 2, camZoom, camYaw, camPitch, mouseX, mouseY);
+        drawModel(graphics, data, getRightPaneCenterX(), topPos + windowHeight / 2, getPreviewZoom(), camYaw, camPitch, mouseX, mouseY);
         graphics.disableScissor();
 
         graphics.pose().translate(0, 0, 2048.0f);
@@ -394,6 +394,16 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
         return mouseX > leftPos + TOOLS_WIDTH && mouseX < leftPos + windowWidth && mouseY > topPos && mouseY < topPos + windowHeight;
     }
 
+    public int getRightPaneCenterX() {
+        return leftPos + TOOLS_WIDTH + (windowWidth - TOOLS_WIDTH) / 2;
+    }
+
+    private float getPreviewZoom() {
+        float widthScale = (windowWidth - TOOLS_WIDTH) / 180.0f;
+        float heightScale = windowHeight / 180.0f;
+        return camZoom * Math.min(widthScale, heightScale);
+    }
+
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         if (isCopy(keyCode)) {
@@ -543,7 +553,7 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
             }
 
             float viewDot = (float) Math.sqrt(1.0f - normal.z * normal.z);
-            return proj / camZoom * 16.0f / viewDot;
+            return proj / getPreviewZoom() * 16.0f / viewDot;
         }
 
         private Vector3f getNormal() {
