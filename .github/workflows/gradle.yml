@@ -38,7 +38,7 @@ jobs:
           separator: "+"
           msg: ${{steps.tag.outputs.tag}}
       - name: "Upload Fabric"
-        uses: Kir-Antipov/mc-publish@v3.3.0
+        uses: Kira-NT/mc-publish@v3.3.1
         if: ${{ success() && startsWith(github.ref, 'refs/tags/') }}
         with:
           modrinth-id: ${{ env.MODRINTH_ID }}
@@ -52,6 +52,7 @@ jobs:
           files: "fabric/build/libs/immersive_furniture-fabric-${{steps.tag.outputs.tag}}.jar"
           loaders: |
             fabric
+          environment: client | server
           game-versions: |
             ${{steps.split.outputs._1}}
           java: |
@@ -59,7 +60,7 @@ jobs:
 
           fail-mode: skip
       - name: "Upload Forge"
-        uses: Kir-Antipov/mc-publish@v3.3.0
+        uses: Kira-NT/mc-publish@v3.3.1
         if: ${{ success() && startsWith(github.ref, 'refs/tags/') }}
         with:
           modrinth-id: ${{ env.MODRINTH_ID }}
@@ -73,6 +74,7 @@ jobs:
           files: "forge/build/libs/immersive_furniture-forge-${{steps.tag.outputs.tag}}.jar"
           loaders: |
             forge
+          environment: client | server
           game-versions: |
             ${{steps.split.outputs._1}}
           java: |
