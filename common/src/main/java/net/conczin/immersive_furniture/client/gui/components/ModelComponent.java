@@ -1,5 +1,6 @@
 package net.conczin.immersive_furniture.client.gui.components;
 
+import net.conczin.immersive_furniture.Common;
 import net.conczin.immersive_furniture.client.gui.ArtisansWorkstationEditorScreen;
 import net.conczin.immersive_furniture.client.gui.widgets.BoundedDoubleSlider;
 import net.conczin.immersive_furniture.client.gui.widgets.StateImageButton;
@@ -281,14 +282,20 @@ public class ModelComponent extends ScreenComponent {
             BoundedDoubleSlider volumeSlider = new BoundedDoubleSlider(leftPos + 6, topPos + 112, (width - 14) / 2, 20,
                     "gui.immersive_furniture.volume",
                     firstElement.soundEmitter.volume, 0, 2.0);
-            volumeSlider.setCallback(v -> screen.selectedElements.forEach(e -> e.soundEmitter.volume = v.floatValue()));
+            volumeSlider.setCallback(v -> {
+                Common.clientHandler.stopAllFurnitureSounds();
+                screen.selectedElements.forEach(e -> e.soundEmitter.volume = v.floatValue());
+            });
             screen.addRenderableWidget(volumeSlider);
 
             // Pitch
             BoundedDoubleSlider velocityRandomSlider = new BoundedDoubleSlider(leftPos + 8 + (width - 14) / 2, topPos + 112, (width - 14) / 2, 20,
                     "gui.immersive_furniture.pitch",
                     firstElement.soundEmitter.pitch, 0.5, 2.0);
-            velocityRandomSlider.setCallback(v -> screen.selectedElements.forEach(e -> e.soundEmitter.pitch = v.floatValue()));
+            velocityRandomSlider.setCallback(v -> {
+                Common.clientHandler.stopAllFurnitureSounds();
+                screen.selectedElements.forEach(e -> e.soundEmitter.pitch = v.floatValue());
+            });
             screen.addRenderableWidget(velocityRandomSlider);
 
             // Frequency
@@ -296,12 +303,16 @@ public class ModelComponent extends ScreenComponent {
                 BoundedDoubleSlider frequencySlider = new BoundedDoubleSlider(leftPos + 6, topPos + 134, width - 32, 20,
                         "gui.immersive_furniture.frequency",
                         firstElement.soundEmitter.frequency, 0.0, 1.0);
-                frequencySlider.setCallback(v -> screen.selectedElements.forEach(e -> e.soundEmitter.frequency = v.floatValue()));
+                frequencySlider.setCallback(v -> {
+                    Common.clientHandler.stopAllFurnitureSounds();
+                    screen.selectedElements.forEach(e -> e.soundEmitter.frequency = v.floatValue());
+                });
                 screen.addRenderableWidget(frequencySlider);
             }
 
             // Sound settings
             addToggleButton(leftPos + width - 23, topPos + 136, 16, 192, 160, "gui.immersive_furniture.on_interact", () -> {
+                Common.clientHandler.stopAllFurnitureSounds();
                 screen.selectedElements.forEach(e -> {
                     e.soundEmitter.onInteract = !e.soundEmitter.onInteract;
                     e.soundEmitter.frequency = e.soundEmitter.onInteract ? 0.0f : 0.1f;

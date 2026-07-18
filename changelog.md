@@ -1,6 +1,8 @@
-# 0.2.3
+# 0.3.0
 
+* GUI is now larger by default
 * Fixed a crash on some rotated animated textures
+* Sounds now stop when playing the next preview or destroying the block
 
 # 0.2.2
 

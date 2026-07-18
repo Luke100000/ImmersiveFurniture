@@ -7,6 +7,7 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -24,6 +25,7 @@ public class SoundsComponent extends ListComponent {
     List<ResourceLocation> allLocations = new LinkedList<>();
     List<ResourceLocation> locations = new LinkedList<>();
     List<Button> buttons = new LinkedList<>();
+    SoundInstance previewSound;
 
     public SoundsComponent(ArtisansWorkstationEditorScreen screen) {
         super(screen);
@@ -56,7 +58,11 @@ public class SoundsComponent extends ListComponent {
                         if (finalI >= locations.size()) return;
                         SoundEvent soundEvent = BuiltInRegistries.SOUND_EVENT.get(locations.get(finalI));
                         if (soundEvent == null) return;
-                        minecraft.getSoundManager().play(SimpleSoundInstance.forUI(soundEvent, 1.0f, 1.0f));
+                        if (previewSound != null) {
+                            minecraft.getSoundManager().stop(previewSound);
+                        }
+                        previewSound = SimpleSoundInstance.forUI(soundEvent, 1.0f, 1.0f);
+                        minecraft.getSoundManager().play(previewSound);
                     },
                     Component.translatable("gui.immersive_furniture.play_sound")
             ));
