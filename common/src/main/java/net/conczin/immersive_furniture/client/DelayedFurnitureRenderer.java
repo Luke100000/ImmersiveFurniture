@@ -13,12 +13,17 @@ import net.minecraft.world.level.block.state.BlockState;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 public class DelayedFurnitureRenderer {
     public static final DelayedFurnitureRenderer INSTANCE = new DelayedFurnitureRenderer();
 
+    private static final int MAX_ENTITY_ATLAS_SIZE = 8192;
+    private static final long ENTITY_ATLAS_RESET_COOLDOWN = TimeUnit.SECONDS.toNanos(10);
+
     private boolean quickCheck = false;
+    private long lastEntityAtlasReset = System.nanoTime() - ENTITY_ATLAS_RESET_COOLDOWN;
 
     private final Map<Long, Integer> attempts = new ConcurrentHashMap<>();
     private final Map<Long, Function<BlockPos, Status>> delayedRendering = new ConcurrentHashMap<>();
@@ -33,9 +38,8 @@ public class DelayedFurnitureRenderer {
         if (DynamicAtlas.SCRATCH.isFull() || DynamicAtlas.SCRATCH.getUsage() > 0.9f) {
             DynamicAtlas.SCRATCH.clear();
         }
-        if (DynamicAtlas.ENTITY.isFull() || DynamicAtlas.ENTITY.getUsage() > 0.9f) {
-            DynamicAtlas.ENTITY.clear();
-        }
+
+        resetEntityAtlasIfNeeded();
 
         // Re-render chunks where furniture failed to render
         Minecraft client = Minecraft.getInstance();
@@ -73,6 +77,26 @@ public class DelayedFurnitureRenderer {
     public void clear() {
         attempts.clear();
         delayedRendering.clear();
+        lastEntityAtlasReset = System.nanoTime() - ENTITY_ATLAS_RESET_COOLDOWN;
+    }
+
+    private void resetEntityAtlasIfNeeded() {
+        DynamicAtlas atlas = DynamicAtlas.ENTITY;
+        if (!atlas.isFull() && atlas.getUsage() <= 0.9f) return;
+
+        long now = System.nanoTime();
+        if (atlas.isFull() && now - lastEntityAtlasReset < ENTITY_ATLAS_RESET_COOLDOWN) {
+            if (atlas.getSize() < MAX_ENTITY_ATLAS_SIZE) {
+                int size = Math.min(atlas.getSize() * 2, MAX_ENTITY_ATLAS_SIZE);
+                DynamicAtlas.resizeEntity(size);
+                lastEntityAtlasReset = now;
+                Common.logger.info("Resized entity atlas to {}x{}", size, size);
+            }
+            return;
+        }
+
+        atlas.clear();
+        lastEntityAtlasReset = now;
     }
 
     public record Status(boolean done, FurnitureData data) {

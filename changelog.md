@@ -2,6 +2,7 @@
 
 * Added `bakedAtlasSize` config
 * Added atlas refresh notification for long game sessions
+* Fixed gigalags when having too many furniture around
 
 # 0.3.0
 

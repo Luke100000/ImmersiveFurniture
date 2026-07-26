@@ -16,7 +16,7 @@ import java.util.concurrent.ConcurrentSkipListSet;
 
 public class DynamicAtlas extends DynamicTexture {
     public static final DynamicAtlas BAKED = new DynamicAtlas(Config.getInstance().getBakedAtlasSize(), "baked");
-    public static final DynamicAtlas ENTITY = new DynamicAtlas(512, "entity");
+    public static DynamicAtlas ENTITY = new DynamicAtlas(512, "entity");
     public static final DynamicAtlas SCRATCH = new DynamicAtlas(512, "scratch");
 
     int lastStateId;
@@ -49,6 +49,10 @@ public class DynamicAtlas extends DynamicTexture {
 
     public static void boostrap() {
         // No-op
+    }
+
+    public static void resizeEntity(int size) {
+        ENTITY = new DynamicAtlas(size, "entity");
     }
 
     synchronized public Quad allocate(int w, int h) {
