@@ -1,3 +1,7 @@
+# 0.3.1
+
+* Added `bakedAtlasSize` config
+
 # 0.3.0
 
 * GUI is now larger by default

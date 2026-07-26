@@ -2,6 +2,7 @@ package net.conczin.immersive_furniture.client.model;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.conczin.immersive_furniture.Common;
+import net.conczin.immersive_furniture.config.Config;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.renderer.texture.SpriteContents;
@@ -14,7 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 
 public class DynamicAtlas extends DynamicTexture {
-    public static final DynamicAtlas BAKED = new DynamicAtlas(1024, "baked");
+    public static final DynamicAtlas BAKED = new DynamicAtlas(Config.getInstance().getBakedAtlasSize(), "baked");
     public static final DynamicAtlas ENTITY = new DynamicAtlas(512, "entity");
     public static final DynamicAtlas SCRATCH = new DynamicAtlas(512, "scratch");
 
