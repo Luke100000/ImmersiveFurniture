@@ -7,7 +7,7 @@
   "injectors": {
     "defaultRequire": 1
   },
-  "mixins": ["LivingEntityMixin"],
+  "mixins": ["ItemStackMixin", "LivingEntityMixin"],
   "client": [
     "client.BlockModelShaperMixin", "client.CameraMixin", "client.DebugScreenOverlayMixin",
     "client.ItemModelShaperMixin", "client.ItemRendererMixin", "client.LevelRendererMixin",
