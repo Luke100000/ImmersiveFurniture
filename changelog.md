@@ -1,6 +1,7 @@
 # 0.3.1
 
 * Added `bakedAtlasSize` config
+* Added atlas refresh notification for long game sessions
 
 # 0.3.0
 

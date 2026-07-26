@@ -8,6 +8,9 @@
   "immersive_furniture.indium_missing": "Immersive Furniture requires Indium to run properly with Sodium!",
   "immersive_furniture.ferritecore_missing": "Immersive Furniture highly recommends FerriteCore to reduce loading time!",
   "immersive_furniture.packetfixer_missing": "Immersive Furniture requires Packet Fixer!",
+  "immersive_furniture.atlas_full": "Furniture texture cache is full. %s",
+  "immersive_furniture.atlas_refresh": "[Refresh]",
+  "immersive_furniture.atlas_refresh.tooltip": "Reduce quality and refresh resources to make space for more.",
 
   "gui.immersive_furniture.furniture": "Furniture",
 

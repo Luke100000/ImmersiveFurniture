@@ -10,12 +10,14 @@ import net.minecraft.client.resources.metadata.animation.FrameSize;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(SpriteLoader.class)
 public class SpriteLoaderMixin {
+    @Unique
     private static final ResourceLocation FURNITURE_TEXTURE = Common.locate("block/furniture");
 
     @Inject(method = "loadSprite", at = @At("HEAD"), cancellable = true)
