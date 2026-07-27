@@ -19,6 +19,9 @@ public class ScreenMixin {
         if (click != null && click.getAction() == ClickEvent.Action.RUN_COMMAND && Client.ATLAS_REFRESH_COMMAND.equals(click.getValue())) {
             Client.refreshAtlas();
             cir.setReturnValue(true);
+        } else if (click != null && click.getAction() == ClickEvent.Action.RUN_COMMAND && Client.ATLAS_INCREASE_COMMAND.equals(click.getValue())) {
+            Client.increaseAtlasSize();
+            cir.setReturnValue(true);
         }
     }
 }
