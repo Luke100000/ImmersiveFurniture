@@ -4,32 +4,29 @@ import com.mojang.blaze3d.platform.NativeImage;
 import net.conczin.immersive_furniture.Common;
 import net.conczin.immersive_furniture.config.Config;
 import net.minecraft.client.renderer.texture.SpriteContents;
-import net.minecraft.client.renderer.texture.SpriteLoader;
+import net.minecraft.client.renderer.texture.atlas.SpriteSource;
 import net.minecraft.client.resources.metadata.animation.FrameSize;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceMetadata;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(SpriteLoader.class)
-public class SpriteLoaderMixin {
-    @Unique
-    private static final ResourceLocation FURNITURE_TEXTURE = Common.locate("block/furniture");
-
-    @Inject(method = "loadSprite", at = @At("HEAD"), cancellable = true)
-    private static void immersiveFurniture$loadSprite(ResourceLocation location, Resource resource, CallbackInfoReturnable<SpriteContents> cir) {
-        if (location.equals(FURNITURE_TEXTURE)) {
+@Mixin(SpriteSource.Output.class)
+public interface SpriteLoaderMixin {
+    @Inject(method = "add(Lnet/minecraft/resources/ResourceLocation;Lnet/minecraft/server/packs/resources/Resource;)V", at = @At("HEAD"), cancellable = true)
+    private void immersiveFurniture$addFurnitureSprite(ResourceLocation location, Resource resource, CallbackInfo ci) {
+        if (location.equals(Common.locate("block/furniture"))) {
             int size = Config.getInstance().getBakedAtlasSize();
-            cir.setReturnValue(new SpriteContents(
+            ((SpriteSource.Output) this).add(location, loader -> new SpriteContents(
                     location,
                     new FrameSize(size, size),
                     new NativeImage(size, size, true),
                     ResourceMetadata.EMPTY
             ));
+            ci.cancel();
         }
     }
 }
