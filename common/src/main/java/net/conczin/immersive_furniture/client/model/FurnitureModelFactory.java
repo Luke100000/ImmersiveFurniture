@@ -40,6 +40,7 @@ public class FurnitureModelFactory {
     private final Map<FurnitureData.Element, Map<Direction, Vector3f[]>> faceVertices = new IdentityHashMap<>();
     private final Map<FurnitureData.Element, Map<Direction, Bounds>> faceBounds = new IdentityHashMap<>();
     private final Map<FurnitureData.Element, Bounds> elementBounds = new IdentityHashMap<>();
+    private final SpatialIndex spatialIndex;
     private final Map<String, Either<Material, String>> textures = new HashMap<>();
     private final Map<FurnitureData.Element, Integer> elementToIndex = new HashMap<>();
     private final Map<Integer, FurnitureData.Element> indexToElement = new HashMap<>();
@@ -51,6 +52,7 @@ public class FurnitureModelFactory {
 
         splitSprites();
         cacheFaceVertices();
+        spatialIndex = new SpatialIndex(elements, elementBounds);
 
         // Fetch all textures
         textures.put("0", Either.left(new Material(InventoryMenu.BLOCK_ATLAS, Common.locate("block/furniture"))));
@@ -74,13 +76,14 @@ public class FurnitureModelFactory {
     private BlockElementFace getFace(FurnitureData.Element element, Direction direction, int state) {
         // Cull fully invisible faces
         Vector3f[] vertices = getFaceVertices(element, direction);
-        for (FurnitureData.Element otherElement : elements) {
+        Bounds bounds = getFaceBounds(element, direction);
+        for (FurnitureData.Element otherElement : spatialIndex.query(bounds, 0.0f)) {
             if (otherElement == element) continue;
             if (!otherElement.isMasked(state)) continue;
             if (otherElement.material.transparency != TransparencyType.SOLID) continue;
             if (otherElement.type != FurnitureData.ElementType.ELEMENT) continue;
             if (theSame(element, otherElement) && otherElement.hashCode() < element.hashCode()) continue;
-            if (!elementBounds.get(otherElement).contains(getFaceBounds(element, direction))) continue;
+            if (!elementBounds.get(otherElement).contains(bounds)) continue;
             if (fullyContained(otherElement, vertices)) return null;
         }
 
@@ -260,16 +263,17 @@ public class FurnitureModelFactory {
     private boolean mightZFight(FurnitureData.Element element, Map<Direction, BlockElementFace> faces, int state) {
         for (Direction direction : faces.keySet()) {
             Vector3f[] vertices = getFaceVertices(element, direction);
+            Bounds bounds = getFaceBounds(element, direction);
             Vector3f firstVertex = new Vector3f();
             Vector3f oppositeVertex = new Vector3f();
 
-            for (FurnitureData.Element otherElement : elements) {
+            for (FurnitureData.Element otherElement : spatialIndex.query(bounds, 0.01f)) {
                 if (otherElement == element) continue;
                 if (otherElement.getVolume() < element.getVolume()) continue;
                 if (!hasFaces(otherElement)) continue;
 
                 Map<Direction, BlockElementFace> otherFaces = this.faces.get(state).getOrDefault(otherElement, Collections.emptyMap());
-                if (otherFaces.isEmpty() || !elementBounds.get(otherElement).intersects(getFaceBounds(element, direction), 0.01f)) continue;
+                if (otherFaces.isEmpty() || !elementBounds.get(otherElement).intersects(bounds, 0.01f)) continue;
 
                 // Convert to another element's local space
                 ElementRotation rotation = otherElement.getRotation();
@@ -390,6 +394,66 @@ public class FurnitureModelFactory {
                    maxY + margin >= other.minY && minY - margin <= other.maxY &&
                    maxZ + margin >= other.minZ && minZ - margin <= other.maxZ;
         }
+    }
+
+    private static class SpatialIndex {
+        private static final float BUCKET_SIZE = 0.25f;
+
+        private final Map<BucketKey, List<FurnitureData.Element>> buckets = new HashMap<>();
+        private final Set<FurnitureData.Element> seen = Collections.newSetFromMap(new IdentityHashMap<>());
+        private final List<FurnitureData.Element> queryResult = new ArrayList<>();
+
+        private SpatialIndex(List<FurnitureData.Element> elements, Map<FurnitureData.Element, Bounds> bounds) {
+            for (FurnitureData.Element element : elements) {
+                Bounds elementBounds = bounds.get(element);
+                if (elementBounds == null) continue;
+
+                int minX = bucket(elementBounds.minX);
+                int minY = bucket(elementBounds.minY);
+                int minZ = bucket(elementBounds.minZ);
+                int maxX = bucket(elementBounds.maxX);
+                int maxY = bucket(elementBounds.maxY);
+                int maxZ = bucket(elementBounds.maxZ);
+                for (int x = minX; x <= maxX; x++) {
+                    for (int y = minY; y <= maxY; y++) {
+                        for (int z = minZ; z <= maxZ; z++) {
+                            buckets.computeIfAbsent(new BucketKey(x, y, z), ignored -> new ArrayList<>()).add(element);
+                        }
+                    }
+                }
+            }
+        }
+
+        private List<FurnitureData.Element> query(Bounds bounds, float margin) {
+            seen.clear();
+            queryResult.clear();
+            int minX = bucket(bounds.minX - margin);
+            int minY = bucket(bounds.minY - margin);
+            int minZ = bucket(bounds.minZ - margin);
+            int maxX = bucket(bounds.maxX + margin);
+            int maxY = bucket(bounds.maxY + margin);
+            int maxZ = bucket(bounds.maxZ + margin);
+            for (int x = minX; x <= maxX; x++) {
+                for (int y = minY; y <= maxY; y++) {
+                    for (int z = minZ; z <= maxZ; z++) {
+                        List<FurnitureData.Element> candidates = buckets.get(new BucketKey(x, y, z));
+                        if (candidates != null) {
+                            for (FurnitureData.Element candidate : candidates) {
+                                if (seen.add(candidate)) queryResult.add(candidate);
+                            }
+                        }
+                    }
+                }
+            }
+            return queryResult;
+        }
+
+        private static int bucket(float coordinate) {
+            return (int) Math.floor(coordinate / BUCKET_SIZE);
+        }
+    }
+
+    private record BucketKey(int x, int y, int z) {
     }
 
     private static float getLight(int x, int y, Vector2i dimensions) {
