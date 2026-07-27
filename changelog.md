@@ -1,5 +1,6 @@
 # 0.3.1
 
+* Overall performance improvements for furniture items, editor, and furniture entities
 * Added `bakedAtlasSize` config
 * Added atlas refresh notification for long game sessions
 * Fixed gigalags when having too many furniture around
