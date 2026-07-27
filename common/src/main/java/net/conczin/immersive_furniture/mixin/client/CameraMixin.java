@@ -38,9 +38,9 @@ public abstract class CameraMixin {
                 Vector3f offset = interaction.offset().offset();
                 BlockPos pos = interaction.pos();
                 setPosition(
-                        pos.getX() + offset.x,
-                        pos.getY() + offset.y + 0.4,
-                        pos.getZ() + offset.z
+                        pos.getX() + (double) offset.x,
+                        pos.getY() + (double) offset.y + 0.4,
+                        pos.getZ() + (double) offset.z
                 );
             }
         }

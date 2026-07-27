@@ -19,7 +19,7 @@ public class LivingEntityRendererMixin<T extends LivingEntity> {
     )
     private void immersiveFurniture$render(T entity, float entityYaw, float partialTicks, PoseStack poseStack, MultiBufferSource buffer, int packedLight, CallbackInfo ci) {
         InteractionManager.Interaction interaction = InteractionManager.INSTANCE.getInteraction(entity);
-        if (interaction != null) {
+        if (entity.isSleeping() && interaction != null) {
             float yaw = interaction.offset().rotation();
             double stepX = Math.cos(yaw * Math.PI / 180F + Math.PI / 2F);
             double stepZ = Math.sin(yaw * Math.PI / 180F + Math.PI / 2F);

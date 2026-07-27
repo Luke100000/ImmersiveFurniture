@@ -440,7 +440,7 @@ public class FurnitureData {
     }
 
     public interface ParticleConsumer {
-        void addParticle(SimpleParticleType particle, float x, float y, float z, float vx, float vy, float vz);
+        void addParticle(SimpleParticleType particle, double x, double y, double z, double vx, double vy, double vz);
     }
 
     private static Vec3 resolveOffset(Level level, BlockPos pos) {
@@ -471,15 +471,15 @@ public class FurnitureData {
             float vr = element.particleEmitter.velocityRandom / 16.0f;
             float vd = element.particleEmitter.velocityDirectional / 16.0f;
 
-            float baseX = inScreen ? 0.0f : (float) (pos.getX() + offset.x());
-            float baseY = inScreen ? 1024.0f : (float) (pos.getY() + offset.y());
-            float baseZ = inScreen ? 0.0f : (float) (pos.getZ() + offset.z());
+            double baseX = inScreen ? 0.0D : pos.getX() + offset.x();
+            double baseY = inScreen ? 1024.0D : pos.getY() + offset.y();
+            double baseZ = inScreen ? 0.0D : pos.getZ() + offset.z();
 
             particleConsumer.addParticle(
                     particle,
-                    sampledPos.x() + baseX,
-                    sampledPos.y() + baseY,
-                    sampledPos.z() + baseZ,
+                    (double) sampledPos.x() + baseX,
+                    (double) sampledPos.y() + baseY,
+                    (double) sampledPos.z() + baseZ,
                     (random.nextFloat() - 0.5f) * vr + up.x() * vd,
                     (random.nextFloat() - 0.5f) * vr + up.y() * vd,
                     (random.nextFloat() - 0.5f) * vr + up.z() * vd

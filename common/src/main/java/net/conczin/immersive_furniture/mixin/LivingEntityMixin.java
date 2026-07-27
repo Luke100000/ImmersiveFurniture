@@ -70,9 +70,9 @@ public abstract class LivingEntityMixin extends Entity {
             setYHeadRot(-rotation - 90f);
 
             setPos(
-                    interaction.pos().getX() + interaction.offset().offset().x(),
-                    interaction.pos().getY() + interaction.offset().offset().y(),
-                    interaction.pos().getZ() + interaction.offset().offset().z()
+                    interaction.pos().getX() + (double) interaction.offset().offset().x(),
+                    interaction.pos().getY() + (double) interaction.offset().offset().y(),
+                    interaction.pos().getZ() + (double) interaction.offset().offset().z()
             );
         }
     }

@@ -142,11 +142,6 @@ public class SittingEntity extends Entity {
     }
 
     @Override
-    public Vec3 getPassengerRidingPosition(Entity entity) {
-        return super.getPassengerRidingPosition(entity);
-    }
-
-    @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
 
     }

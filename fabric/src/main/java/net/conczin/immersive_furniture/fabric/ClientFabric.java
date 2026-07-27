@@ -2,6 +2,7 @@ package net.conczin.immersive_furniture.fabric;
 
 import net.conczin.immersive_furniture.Client;
 import net.conczin.immersive_furniture.Common;
+import net.conczin.immersive_furniture.block.Blocks;
 import net.conczin.immersive_furniture.block.entity.BlockEntityTypes;
 import net.conczin.immersive_furniture.client.model.FurnitureBakedModelWrapper;
 import net.conczin.immersive_furniture.client.renderer.FurnitureBlockEntityRenderer;
@@ -11,6 +12,7 @@ import net.conczin.immersive_furniture.entity.Entities;
 import net.conczin.immersive_furniture.fabric.client.FabricFurnitureBakedModelWrapper;
 import net.conczin.immersive_furniture.network.Network;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
@@ -19,6 +21,7 @@ import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
@@ -79,6 +82,13 @@ public final class ClientFabric implements ClientModInitializer {
 
         BlockEntityRenderers.register(BlockEntityTypes.FURNITURE, FurnitureBlockEntityRenderer::new);
         EntityRendererRegistry.register(Entities.SITTING, SittingEntityRenderer::new);
+
+        // Sable's sub-level renderer selects a single chunk layer per block and
+        // cannot preserve the per-quad Fabric rendering materials.
+        BlockRenderLayerMap.INSTANCE.putBlock(Blocks.FURNITURE, RenderType.cutout());
+        BlockRenderLayerMap.INSTANCE.putBlock(Blocks.FURNITURE_ENTITY, RenderType.cutout());
+        BlockRenderLayerMap.INSTANCE.putBlock(Blocks.FURNITURE_LIGHT, RenderType.cutout());
+        BlockRenderLayerMap.INSTANCE.putBlock(Blocks.FURNITURE_PROXY, RenderType.cutout());
     }
 
     static {

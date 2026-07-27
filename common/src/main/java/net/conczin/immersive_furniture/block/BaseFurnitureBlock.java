@@ -170,15 +170,15 @@ public abstract class BaseFurnitureBlock extends Block implements SimpleWaterlog
             Vec3 subOffset = getSubOffset(level, pos);
 
             Vec3 position = new Vec3(
-                    pos.getX() + offset.offset().x + subOffset.x,
-                    pos.getY() + offset.offset().y + subOffset.y,
-                    pos.getZ() + offset.offset().z + subOffset.z
+                    pos.getX() + (double) offset.offset().x + subOffset.x,
+                    pos.getY() + (double) offset.offset().y + subOffset.y,
+                    pos.getZ() + (double) offset.offset().z + subOffset.z
             );
             SittingEntity sittingEntity = new SittingEntity(level, position, pos, data.size, direction, new Vec3(player.getX(), player.getY(), player.getZ()));
             sittingEntity.setYRot(offset.rotation());
+            level.addFreshEntity(sittingEntity);
             player.startRiding(sittingEntity);
             sittingEntity.clampRotation(player);
-            level.addFreshEntity(sittingEntity);
         }
         player.hasImpulse = true;
     }

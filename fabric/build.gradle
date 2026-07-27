@@ -5,6 +5,22 @@ plugins {
 
 repositories {
     maven {
+        name = "Fuzs Mod Resources"
+        url = "https://raw.githubusercontent.com/Fuzss/modresources/main/maven/"
+    }
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = "RyanHCode Maven"
+                url = "https://maven.ryanhcode.dev/releases"
+            }
+        }
+        filter {
+            includeGroup("dev.ryanhcode.sable")
+            includeGroup("dev.ryanhcode.sable-companion")
+        }
+    }
+    maven {
         name = "Modrinth"
         url = "https://api.modrinth.com/maven"
     }
@@ -24,10 +40,14 @@ dependencies {
     modLocalRuntime "maven.modrinth:indium:${indium_version}"
     modLocalRuntime "maven.modrinth:ferrite-core:${ferritecore_version}"
     modLocalRuntime "maven.modrinth:packet-fixer:${packetfixer_version}"
+
+    modLocalRuntime "dev.ryanhcode.sable:sable-fabric-${minecraft_version}:${sable_fabric_version}"
+    include(modImplementation("dev.ryanhcode.sable-companion:sable-companion-common-${minecraft_version}:${sable_companion_common_version}"))
 }
 
 loom {
     mixin {
+        useLegacyMixinAp = true
         defaultRefmapName.set("${mod_id}.refmap.json")
     }
     runs {
