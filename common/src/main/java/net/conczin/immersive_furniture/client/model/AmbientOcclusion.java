@@ -1,6 +1,7 @@
 package net.conczin.immersive_furniture.client.model;
 
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.conczin.immersive_furniture.data.ElementRotation;
 import net.conczin.immersive_furniture.data.FurnitureData;
@@ -10,19 +11,77 @@ import org.joml.Vector3i;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import static net.conczin.immersive_furniture.data.ModelUtils.getElementRotation;
 
 public class AmbientOcclusion {
     private static final double SAMPLE_RESOLUTION = Math.sqrt(3);
     private static final float RESOLUTION = 0.25f;
+    private static final float BOUNDS_EPSILON = 0.0001f;
+    private static final long COORDINATE_MASK = (1L << 20) - 1L;
 
-    record PrecomputedElement(FurnitureData.Element element, Quaternionf rotation, Vector3f origin, float opacity) {
+    private static final class PrecomputedElement {
+        private final float originX;
+        private final float originY;
+        private final float originZ;
+        private final float m00;
+        private final float m01;
+        private final float m02;
+        private final float m10;
+        private final float m11;
+        private final float m12;
+        private final float m20;
+        private final float m21;
+        private final float m22;
+        private final float minX;
+        private final float minY;
+        private final float minZ;
+        private final float maxX;
+        private final float maxY;
+        private final float maxZ;
+        private final float opacity;
+
+        private PrecomputedElement(FurnitureData.Element element, Quaternionf rotation, Vector3f origin, float opacity) {
+            originX = origin.x;
+            originY = origin.y;
+            originZ = origin.z;
+
+            float xx = rotation.x * rotation.x;
+            float yy = rotation.y * rotation.y;
+            float zz = rotation.z * rotation.z;
+            float ww = rotation.w * rotation.w;
+            float xy = rotation.x * rotation.y;
+            float xz = rotation.x * rotation.z;
+            float yz = rotation.y * rotation.z;
+            float xw = rotation.x * rotation.w;
+            float zw = rotation.z * rotation.w;
+            float yw = rotation.y * rotation.w;
+            float k = 1.0f / (xx + yy + zz + ww);
+
+            m00 = (xx - yy - zz + ww) * k;
+            m01 = 2.0f * (xy - zw) * k;
+            m02 = 2.0f * (xz + yw) * k;
+            m10 = 2.0f * (xy + zw) * k;
+            m11 = (yy - xx - zz + ww) * k;
+            m12 = 2.0f * (yz - xw) * k;
+            m20 = 2.0f * (xz - yw) * k;
+            m21 = 2.0f * (yz + xw) * k;
+            m22 = (zz - xx - yy + ww) * k;
+
+            minX = element.from.x + BOUNDS_EPSILON;
+            minY = element.from.y + BOUNDS_EPSILON;
+            minZ = element.from.z + BOUNDS_EPSILON;
+            maxX = element.to.x - BOUNDS_EPSILON;
+            maxY = element.to.y - BOUNDS_EPSILON;
+            maxZ = element.to.z - BOUNDS_EPSILON;
+            this.opacity = opacity;
+        }
 
     }
 
-    private final Long2ObjectOpenHashMap<ObjectOpenHashSet<PrecomputedElement>> elementCache = new Long2ObjectOpenHashMap<>();
+    private final Long2ObjectOpenHashMap<ObjectOpenHashSet<PrecomputedElement>> placementCache = new Long2ObjectOpenHashMap<>();
+    private final Long2ObjectOpenHashMap<PrecomputedElement[]> elementCache = new Long2ObjectOpenHashMap<>();
+    private boolean prepared;
 
     final static List<Vector3f> kernel = new ArrayList<>();
 
@@ -40,15 +99,32 @@ public class AmbientOcclusion {
         }
     }
 
-    private Set<PrecomputedElement> getElements(float x, float y, float z) {
+    private static long getKey(float x, float y, float z) {
         int gx = Math.round(x * RESOLUTION);
         int gy = Math.round(y * RESOLUTION);
         int gz = Math.round(z * RESOLUTION);
-        long key = (long) gx << 40 | (long) gy << 20 | (long) gz;
-        return elementCache.computeIfAbsent(key, k -> new ObjectOpenHashSet<>());
+        return ((long) gx & COORDINATE_MASK) << 40 |
+               ((long) gy & COORDINATE_MASK) << 20 |
+               ((long) gz & COORDINATE_MASK);
+    }
+
+    private ObjectOpenHashSet<PrecomputedElement> getElementsForPlacement(float x, float y, float z) {
+        return placementCache.computeIfAbsent(getKey(x, y, z), ignored -> new ObjectOpenHashSet<>());
+    }
+
+    private void prepare() {
+        if (prepared) return;
+
+        for (Long2ObjectMap.Entry<ObjectOpenHashSet<PrecomputedElement>> entry : placementCache.long2ObjectEntrySet()) {
+            elementCache.put(entry.getLongKey(), entry.getValue().toArray(new PrecomputedElement[0]));
+        }
+        placementCache.clear();
+        prepared = true;
     }
 
     public void place(FurnitureData.Element element, float opacity) {
+        if (prepared) throw new IllegalStateException("Cannot place elements after AO sampling has started");
+
         Vector3f center = element.getCenter();
         Vector3i size = element.getSize();
 
@@ -80,38 +156,58 @@ public class AmbientOcclusion {
                     float y = nx.y * sx + ny.y * sy + nz.y * sz + center.y;
                     float z = nx.z * sx + ny.z * sy + nz.z * sz + center.z;
 
-                    getElements(x, y, z).add(precomputed);
+                    getElementsForPlacement(x, y, z).add(precomputed);
                 }
             }
         }
     }
 
     private float is(float x, float y, float z) {
-        float e = 0.0001f;
-        Vector3f pos = new Vector3f();
-        for (PrecomputedElement p : getElements(x, y, z)) {
-            pos.set(x - p.origin.x, y - p.origin.y, z - p.origin.z);
-            p.rotation.transform(pos);
-            pos.add(p.origin);
+        PrecomputedElement[] elements = elementCache.get(getKey(x, y, z));
+        if (elements == null) return 0.0f;
 
-            if (pos.x > p.element.from.x + e && pos.x < p.element.to.x - e &&
-                pos.y > p.element.from.y + e && pos.y < p.element.to.y - e &&
-                pos.z > p.element.from.z + e && pos.z < p.element.to.z - e) {
-                return p.opacity;
-            }
+        for (PrecomputedElement p : elements) {
+            float localX = x - p.originX;
+            float localY = y - p.originY;
+            float localZ = z - p.originZ;
+
+            float transformedX = p.m00 * localX + (p.m01 * localY + p.m02 * localZ) + p.originX;
+            if (!(transformedX > p.minX && transformedX < p.maxX)) continue;
+
+            float transformedY = p.m10 * localX + (p.m11 * localY + p.m12 * localZ) + p.originY;
+            if (!(transformedY > p.minY && transformedY < p.maxY)) continue;
+
+            float transformedZ = p.m20 * localX + (p.m21 * localY + p.m22 * localZ) + p.originZ;
+            if (transformedZ > p.minZ && transformedZ < p.maxZ) return p.opacity;
         }
         return 0.0f;
     }
 
-    public float sample(Vector3f pos, Vector3f normal) {
-        float value = 0.0f;
-        float totalWeight = 0.0f;
+    Sampler createSampler(Vector3f normal) {
+        prepare();
+
+        List<Vector3f> offsets = new ArrayList<>();
         for (Vector3f offset : kernel) {
             float dot = normal.x * offset.x + normal.y * offset.y + normal.z * offset.z;
             if (dot <= 0) continue;
-            value += is(pos.x + offset.x, pos.y + offset.y, pos.z + offset.z);
-            totalWeight += 1.0f;
+            offsets.add(offset);
         }
-        return value / totalWeight;
+        return new Sampler(offsets.toArray(new Vector3f[0]));
+    }
+
+    final class Sampler {
+        private final Vector3f[] offsets;
+
+        private Sampler(Vector3f[] offsets) {
+            this.offsets = offsets;
+        }
+
+        float sample(Vector3f pos) {
+            float value = 0.0f;
+            for (Vector3f offset : offsets) {
+                value += is(pos.x + offset.x, pos.y + offset.y, pos.z + offset.z);
+            }
+            return value / offsets.length;
+        }
     }
 }

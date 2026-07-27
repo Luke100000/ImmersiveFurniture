@@ -33,45 +33,45 @@ public class ClientModelUtils {
         }
     }
 
-    public static Vector3i to3D(FurnitureData.Element element, Direction direction, int x, int y) {
+    static Vector3i to3D(FurnitureData.Element element, Direction direction, int x, int y, Vector3i target) {
         switch (direction) {
             case UP -> {
-                return new Vector3i(
+                return target.set(
                         (int) element.from.x + x,
                         (int) element.to.y,
                         (int) element.from.z + y
                 );
             }
             case DOWN -> {
-                return new Vector3i(
+                return target.set(
                         (int) element.from.x + x,
                         (int) element.from.y,
                         (int) element.to.z - y
                 );
             }
             case NORTH -> {
-                return new Vector3i(
+                return target.set(
                         (int) element.to.x - x,
                         (int) element.to.y - y,
                         (int) element.from.z
                 );
             }
             case SOUTH -> {
-                return new Vector3i(
+                return target.set(
                         (int) element.from.x + x,
                         (int) element.to.y - y,
                         (int) element.to.z
                 );
             }
             case WEST -> {
-                return new Vector3i(
+                return target.set(
                         (int) element.from.x,
                         (int) element.to.y - y,
                         (int) element.from.z + x
                 );
             }
             case EAST -> {
-                return new Vector3i(
+                return target.set(
                         (int) element.to.x,
                         (int) element.to.y - y,
                         (int) element.to.z - x

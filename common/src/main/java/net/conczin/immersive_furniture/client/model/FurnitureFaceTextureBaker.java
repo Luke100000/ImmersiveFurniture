@@ -13,6 +13,7 @@ import net.minecraft.client.renderer.block.model.BlockFaceUV;
 import net.minecraft.core.Direction;
 import org.joml.Vector2i;
 import org.joml.Vector3f;
+import org.joml.Vector3i;
 
 import java.util.HashMap;
 import java.util.List;
@@ -84,10 +85,13 @@ final class FurnitureFaceTextureBaker {
         boolean useBaked = baked != null && baked.length == dimensions.x * dimensions.y;
         if (!useBaked) baked = new int[dimensions.x * dimensions.y];
 
-        AmbientOcclusion ao = useBaked ? null : getAmbientOcclusion(state);
+        boolean useAmbientOcclusion = !useBaked && element.emission != 15;
         ElementRotation rotation = element.getRotation();
-        Vector3f normal = useBaked ? null : ModelUtils.getElementRotation(rotation).transform(direction.step());
+        Vector3f normal = useAmbientOcclusion ? ModelUtils.getElementRotation(rotation).transform(direction.step()) : null;
+        AmbientOcclusion.Sampler aoSampler = useAmbientOcclusion ? getAmbientOcclusion(state).createSampler(normal) : null;
         Vector3f center = useBaked ? null : element.getCenter();
+        Vector3f position = useAmbientOcclusion ? new Vector3f() : null;
+        Vector3i integerPosition = useAmbientOcclusion ? new Vector3i() : null;
         FurnitureData.LightMaterialEffect lightEffect = element.material.lightEffect;
 
         for (int x = 0; x < dimensions.x; x++) {
@@ -95,7 +99,8 @@ final class FurnitureFaceTextureBaker {
                 int index = x + y * dimensions.x;
                 int color = useBaked
                         ? baked[index]
-                        : shadePixel(element, direction, dimensions, x, y, rotation, normal, center, lightEffect, ao);
+                        : shadePixel(element, direction, dimensions, x, y, rotation, center, lightEffect,
+                        aoSampler, position, integerPosition);
                 baked[index] = color;
                 pixels.setPixelRGBA(quad.x() + x, quad.y() + y, color);
             }
@@ -113,10 +118,11 @@ final class FurnitureFaceTextureBaker {
             int x,
             int y,
             ElementRotation rotation,
-            Vector3f normal,
             Vector3f center,
             FurnitureData.LightMaterialEffect effect,
-            AmbientOcclusion ao
+            AmbientOcclusion.Sampler aoSampler,
+            Vector3f position,
+            Vector3i integerPosition
     ) {
         int sourceColor = MaterialSource.fromCube(element.material, direction, center, x, y, dimensions.x, dimensions.y);
         int r = sourceColor >> 16 & 0xFF;
@@ -141,11 +147,13 @@ final class FurnitureFaceTextureBaker {
         }
         light += effect.brightness / 100.0f;
 
-        Vector3f position = new Vector3f(ClientModelUtils.to3D(element, direction, x, y));
-        ModelUtils.applyElementRotation(position, rotation);
-        float ambientLight = Math.min(1.0f, Math.max(0.0f, 1.0f - ao.sample(position, normal) * 1.5f));
-        float emission = element.emission / 15.0f;
-        light *= ambientLight * (1.0f - emission) + emission;
+        if (aoSampler != null) {
+            position.set(ClientModelUtils.to3D(element, direction, x, y, integerPosition));
+            ModelUtils.applyElementRotation(position, rotation);
+            float ambientLight = Math.min(1.0f, Math.max(0.0f, 1.0f - aoSampler.sample(position) * 1.5f));
+            float emission = element.emission / 15.0f;
+            light *= ambientLight * (1.0f - emission) + emission;
+        }
 
         float contrast = effect.contrast / 100.0f;
         r = applyContrast(r, contrast, light);
