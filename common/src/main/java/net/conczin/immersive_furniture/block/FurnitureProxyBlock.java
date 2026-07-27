@@ -5,6 +5,8 @@ import net.conczin.immersive_furniture.data.FurnitureData;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.SectionPos;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -109,10 +111,23 @@ public class FurnitureProxyBlock extends Block {
                     hit.isInside()
             );
 
-            baseState.useWithoutItem(level, player, adjustedHit);
+            if (canRedispatch(player, pos, basePos, baseState)) {
+                ServerPlayer serverPlayer = (ServerPlayer) player;
+                serverPlayer.gameMode.useItemOn(
+                        serverPlayer, level, ItemStack.EMPTY, InteractionHand.MAIN_HAND, adjustedHit
+                );
+            } else {
+                baseState.useWithoutItem(level, player, adjustedHit);
+            }
         }
 
         return InteractionResult.PASS;
+    }
+
+    private boolean canRedispatch(Player player, BlockPos pos, BlockPos basePos, BlockState baseState) {
+        return player instanceof ServerPlayer
+                && !basePos.equals(pos)
+                && !(baseState.getBlock() instanceof FurnitureProxyBlock);
     }
 
     @Override
