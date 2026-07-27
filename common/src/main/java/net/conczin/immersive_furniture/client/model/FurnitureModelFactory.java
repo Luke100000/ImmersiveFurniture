@@ -38,6 +38,8 @@ public class FurnitureModelFactory {
     private final Map<Integer, Map<FurnitureData.Element, Map<Direction, BlockElementFace>>> faces = new HashMap<>();
     private final List<FurnitureData.Element> elements = new LinkedList<>();
     private final Map<FurnitureData.Element, Map<Direction, Vector3f[]>> faceVertices = new IdentityHashMap<>();
+    private final Map<FurnitureData.Element, Map<Direction, Bounds>> faceBounds = new IdentityHashMap<>();
+    private final Map<FurnitureData.Element, Bounds> elementBounds = new IdentityHashMap<>();
     private final Map<String, Either<Material, String>> textures = new HashMap<>();
     private final Map<FurnitureData.Element, Integer> elementToIndex = new HashMap<>();
     private final Map<Integer, FurnitureData.Element> indexToElement = new HashMap<>();
@@ -78,6 +80,7 @@ public class FurnitureModelFactory {
             if (otherElement.material.transparency != TransparencyType.SOLID) continue;
             if (otherElement.type != FurnitureData.ElementType.ELEMENT) continue;
             if (theSame(element, otherElement) && otherElement.hashCode() < element.hashCode()) continue;
+            if (!elementBounds.get(otherElement).contains(getFaceBounds(element, direction))) continue;
             if (fullyContained(otherElement, vertices)) return null;
         }
 
@@ -265,6 +268,9 @@ public class FurnitureModelFactory {
                 if (otherElement.getVolume() < element.getVolume()) continue;
                 if (!hasFaces(otherElement)) continue;
 
+                Map<Direction, BlockElementFace> otherFaces = this.faces.get(state).getOrDefault(otherElement, Collections.emptyMap());
+                if (otherFaces.isEmpty() || !elementBounds.get(otherElement).intersects(getFaceBounds(element, direction), 0.01f)) continue;
+
                 // Convert to another element's local space
                 ElementRotation rotation = otherElement.getRotation();
                 Quaternionf inverseRotation = ModelUtils.getElementRotation(rotation).conjugate();
@@ -276,8 +282,6 @@ public class FurnitureModelFactory {
                 float toY = Math.max(firstVertex.y, oppositeVertex.y);
                 float fromZ = Math.min(firstVertex.z, oppositeVertex.z);
                 float toZ = Math.max(firstVertex.z, oppositeVertex.z);
-
-                Map<Direction, BlockElementFace> otherFaces = this.faces.get(state).getOrDefault(otherElement, Collections.emptyMap());
 
                 float m = 0.01f;
 
@@ -312,15 +316,24 @@ public class FurnitureModelFactory {
 
             float[] shape = ClientModelUtils.getShapeData(element);
             Map<Direction, Vector3f[]> vertices = new EnumMap<>(Direction.class);
+            Map<Direction, Bounds> bounds = new EnumMap<>(Direction.class);
             for (Direction direction : Direction.values()) {
-                vertices.put(direction, ClientModelUtils.getVertices(element, direction, shape, null));
+                Vector3f[] face = ClientModelUtils.getVertices(element, direction, shape, null);
+                vertices.put(direction, face);
+                bounds.put(direction, Bounds.of(face));
             }
             faceVertices.put(element, vertices);
+            faceBounds.put(element, bounds);
+            elementBounds.put(element, Bounds.ofVoxelSpace(ModelUtils.getCorners(element)));
         }
     }
 
     private Vector3f[] getFaceVertices(FurnitureData.Element element, Direction direction) {
         return faceVertices.get(element).get(direction);
+    }
+
+    private Bounds getFaceBounds(FurnitureData.Element element, Direction direction) {
+        return faceBounds.get(element).get(direction);
     }
 
     private AmbientOcclusion getAmbientOcclusion(int state) {
@@ -339,6 +352,44 @@ public class FurnitureModelFactory {
         target.set(source).sub(rotation.origin());
         inverseRotation.transform(target);
         return target.add(rotation.origin()).mul(16.0f);
+    }
+
+    private record Bounds(float minX, float minY, float minZ, float maxX, float maxY, float maxZ) {
+        private static Bounds of(Vector3f[] vertices) {
+            float minX = Float.POSITIVE_INFINITY;
+            float minY = Float.POSITIVE_INFINITY;
+            float minZ = Float.POSITIVE_INFINITY;
+            float maxX = Float.NEGATIVE_INFINITY;
+            float maxY = Float.NEGATIVE_INFINITY;
+            float maxZ = Float.NEGATIVE_INFINITY;
+            for (Vector3f vertex : vertices) {
+                minX = Math.min(minX, vertex.x);
+                minY = Math.min(minY, vertex.y);
+                minZ = Math.min(minZ, vertex.z);
+                maxX = Math.max(maxX, vertex.x);
+                maxY = Math.max(maxY, vertex.y);
+                maxZ = Math.max(maxZ, vertex.z);
+            }
+            return new Bounds(minX, minY, minZ, maxX, maxY, maxZ);
+        }
+
+        private static Bounds ofVoxelSpace(Vector3f[] vertices) {
+            Bounds bounds = of(vertices);
+            return new Bounds(bounds.minX / 16.0f, bounds.minY / 16.0f, bounds.minZ / 16.0f,
+                    bounds.maxX / 16.0f, bounds.maxY / 16.0f, bounds.maxZ / 16.0f);
+        }
+
+        private boolean contains(Bounds other) {
+            float epsilon = 0.0001f;
+            return minX <= other.minX + epsilon && minY <= other.minY + epsilon && minZ <= other.minZ + epsilon &&
+                   maxX >= other.maxX - epsilon && maxY >= other.maxY - epsilon && maxZ >= other.maxZ - epsilon;
+        }
+
+        private boolean intersects(Bounds other, float margin) {
+            return maxX + margin >= other.minX && minX - margin <= other.maxX &&
+                   maxY + margin >= other.minY && minY - margin <= other.maxY &&
+                   maxZ + margin >= other.minZ && minZ - margin <= other.maxZ;
+        }
     }
 
     private static float getLight(int x, int y, Vector2i dimensions) {
