@@ -10,13 +10,13 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 final class FurnitureGeometryAnalyzer {
     private static final float Z_FIGHT_MARGIN = 0.01f;
@@ -223,19 +223,24 @@ final class FurnitureGeometryAnalyzer {
     private static final class SpatialIndex {
         private static final float BUCKET_SIZE = 0.25f;
 
-        private final Map<BucketKey, List<FurnitureData.Element>> buckets = new HashMap<>();
-        private final Set<FurnitureData.Element> seen = Collections.newSetFromMap(new IdentityHashMap<>());
+        private final Map<BucketKey, List<IndexedElement>> buckets = new HashMap<>();
         private final List<FurnitureData.Element> queryResult = new ArrayList<>();
+        private final int[] visitStamp;
+        private int queryStamp;
 
         private SpatialIndex(List<FurnitureData.Element> elements, Map<FurnitureData.Element, Bounds> bounds) {
+            visitStamp = new int[elements.size()];
+            int index = 0;
             for (FurnitureData.Element element : elements) {
                 Bounds elementBounds = bounds.get(element);
+                int elementIndex = index++;
                 if (elementBounds == null) continue;
+                IndexedElement indexedElement = new IndexedElement(elementIndex, element);
 
                 for (int x = bucket(elementBounds.minX); x <= bucket(elementBounds.maxX); x++) {
                     for (int y = bucket(elementBounds.minY); y <= bucket(elementBounds.maxY); y++) {
                         for (int z = bucket(elementBounds.minZ); z <= bucket(elementBounds.maxZ); z++) {
-                            buckets.computeIfAbsent(new BucketKey(x, y, z), ignored -> new ArrayList<>()).add(element);
+                            buckets.computeIfAbsent(new BucketKey(x, y, z), ignored -> new ArrayList<>()).add(indexedElement);
                         }
                     }
                 }
@@ -243,15 +248,21 @@ final class FurnitureGeometryAnalyzer {
         }
 
         private List<FurnitureData.Element> query(Bounds bounds, float margin) {
-            seen.clear();
             queryResult.clear();
+            if (++queryStamp == 0) {
+                Arrays.fill(visitStamp, 0);
+                queryStamp = 1;
+            }
             for (int x = bucket(bounds.minX - margin); x <= bucket(bounds.maxX + margin); x++) {
                 for (int y = bucket(bounds.minY - margin); y <= bucket(bounds.maxY + margin); y++) {
                     for (int z = bucket(bounds.minZ - margin); z <= bucket(bounds.maxZ + margin); z++) {
-                        List<FurnitureData.Element> candidates = buckets.get(new BucketKey(x, y, z));
+                        List<IndexedElement> candidates = buckets.get(new BucketKey(x, y, z));
                         if (candidates == null) continue;
-                        for (FurnitureData.Element candidate : candidates) {
-                            if (seen.add(candidate)) queryResult.add(candidate);
+                        for (IndexedElement candidate : candidates) {
+                            if (visitStamp[candidate.index] != queryStamp) {
+                                visitStamp[candidate.index] = queryStamp;
+                                queryResult.add(candidate.element);
+                            }
                         }
                     }
                 }
@@ -265,5 +276,8 @@ final class FurnitureGeometryAnalyzer {
     }
 
     private record BucketKey(int x, int y, int z) {
+    }
+
+    private record IndexedElement(int index, FurnitureData.Element element) {
     }
 }
