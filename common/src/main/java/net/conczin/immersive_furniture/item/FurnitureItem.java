@@ -28,6 +28,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 public class FurnitureItem extends BlockItem {
     public static final String FURNITURE = "Furniture";
@@ -49,10 +50,13 @@ public class FurnitureItem extends BlockItem {
         super.appendHoverText(stack, world, tooltip, context);
     }
 
-    private final static Map<Integer, FurnitureData> cache = new LinkedHashMap<>(100, 0.75f, true) {
+    private static final int CACHE_SIZE = 256;
+    private static final long CACHE_ENTRY_MIN_AGE_NANOS = TimeUnit.SECONDS.toNanos(5);
+
+    private static final Map<Integer, CacheEntry> cache = new LinkedHashMap<>(CACHE_SIZE, 0.75f, true) {
         @Override
-        protected boolean removeEldestEntry(Map.Entry<Integer, FurnitureData> eldest) {
-            return size() > 100;
+        protected boolean removeEldestEntry(Map.Entry<Integer, CacheEntry> eldest) {
+            return size() > CACHE_SIZE && System.nanoTime() - eldest.getValue().lastAccessNanos > CACHE_ENTRY_MIN_AGE_NANOS;
         }
     };
 
@@ -61,10 +65,25 @@ public class FurnitureItem extends BlockItem {
         if (tag == null) return FurnitureData.EMPTY;
         tag = tag.getCompound(FURNITURE);
         int hash = System.identityHashCode(tag); // Use identity hash since it's way faster
-        if (!cache.containsKey(hash)) {
-            cache.put(hash, new FurnitureData(tag));
+        CacheEntry entry = cache.get(hash);
+        if (entry == null) {
+            entry = new CacheEntry(new FurnitureData(tag), System.nanoTime());
+            cache.put(hash, entry);
+            System.out.println("Loaded");
+        } else {
+            entry.lastAccessNanos = System.nanoTime();
         }
-        return cache.get(hash);
+        return entry.data;
+    }
+
+    private static class CacheEntry {
+        private final FurnitureData data;
+        private long lastAccessNanos;
+
+        private CacheEntry(FurnitureData data, long lastAccessNanos) {
+            this.data = data;
+            this.lastAccessNanos = lastAccessNanos;
+        }
     }
 
     public static void setData(ItemStack stack, FurnitureData data) {
