@@ -1,7 +1,9 @@
 package net.conczin.immersive_furniture.client.gui;
 
 import com.mojang.blaze3d.platform.Lighting;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Axis;
 import net.conczin.immersive_furniture.Common;
 import net.conczin.immersive_furniture.client.PreviewParticleEngine;
 import net.conczin.immersive_furniture.client.model.*;
@@ -23,6 +25,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
+import org.joml.Vector3f;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -115,12 +118,14 @@ public abstract class ArtisansWorkstationScreen extends Screen {
     void renderModel(GuiGraphics graphics, FurnitureData data, double x, double y, double size, float yaw, float pitch) {
         graphics.pose().pushPose();
         graphics.pose().translate(x, y, 100.0);
-        graphics.pose().mulPose(new Matrix4f().scaling((float) (size / Math.max(1.0, data.getSize() / 16.0) * 0.4)));
+        graphics.pose().last().pose().mul(new Matrix4f().scaling((float) (size / Math.max(1.0, data.getSize() / 16.0) * 0.4)));
         graphics.pose().mulPose(new Quaternionf().rotateX(pitch).rotateY(yaw));
-        graphics.pose().mulPose(new Matrix4f().scaling(1, -1, 1));
+        graphics.pose().last().pose().mul(new Matrix4f().scaling(1, -1, 1));
         Vec3 center = data.boundingBox().getCenter();
         graphics.pose().translate(-center.x / 16.0f, -center.y / 16.0f, -center.z / 16.0f);
+        Lighting.setupForEntityInInventory(Axis.XP.rotationDegrees(180));
         renderModel(graphics, data, yaw, pitch, false);
+        Lighting.setupFor3DItems();
         graphics.pose().popPose();
     }
 

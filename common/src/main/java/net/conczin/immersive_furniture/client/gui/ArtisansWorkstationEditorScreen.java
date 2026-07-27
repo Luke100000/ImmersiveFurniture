@@ -4,6 +4,7 @@ import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
+import com.mojang.math.Axis;
 import net.conczin.immersive_furniture.Common;
 import net.conczin.immersive_furniture.client.Utils;
 import net.conczin.immersive_furniture.client.gui.components.*;
@@ -581,12 +582,12 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
     protected void drawModel(GuiGraphics graphics, FurnitureData data, int x, int y, float size, float yaw, float pitch, int mouseX, int mouseY) {
         graphics.pose().pushPose();
         graphics.pose().translate(x, y, 1024.0);
-        graphics.pose().mulPose(new Matrix4f().scaling(size));
+        graphics.pose().last().pose().mul(new Matrix4f().scaling(size));
         graphics.pose().mulPose(new Quaternionf().rotateX(pitch).rotateY(yaw));
         graphics.pose().translate(-data.size.x / 2.0f, data.size.y / 2.0f, -data.size.z / 2.0f);
-        graphics.pose().mulPose(new Matrix4f().scaling(1, -1, 1));
+        graphics.pose().last().pose().mul(new Matrix4f().scaling(1, -1, 1));
 
-        Lighting.setupForEntityInInventory();
+        Lighting.setupForEntityInInventory(Axis.XP.rotationDegrees(180));
 
         // Render the model
         renderModel(graphics, data, yaw, pitch, true);
