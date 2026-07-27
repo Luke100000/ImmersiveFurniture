@@ -1,14 +1,9 @@
 package net.conczin.immersive_furniture.client.model;
 
-import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.datafixers.util.Either;
 import net.conczin.immersive_furniture.Common;
-import net.conczin.immersive_furniture.client.Utils;
 import net.conczin.immersive_furniture.client.gui.ArtisansWorkstationEditorScreen;
-import net.conczin.immersive_furniture.config.Config;
-import net.conczin.immersive_furniture.data.ElementRotation;
 import net.conczin.immersive_furniture.data.FurnitureData;
-import net.conczin.immersive_furniture.data.ModelUtils;
 import net.conczin.immersive_furniture.data.TransparencyType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderType;
@@ -20,471 +15,75 @@ import net.minecraft.client.resources.model.Material;
 import net.minecraft.core.Direction;
 import net.minecraft.world.inventory.InventoryMenu;
 import org.joml.Quaternionf;
-import org.joml.Vector2i;
 import org.joml.Vector3f;
 import org.joml.Vector3i;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class FurnitureModelFactory {
     private final boolean inEditor;
 
     private final FurnitureData data;
-    private final DynamicAtlas atlas;
-    private final Map<Integer, AmbientOcclusion> aos = new HashMap<>();
-    private int zFightingCounter = 0;
-
+    private final Set<Integer> solidStates;
     private final Map<Integer, Map<FurnitureData.Element, Map<Direction, BlockElementFace>>> faces = new HashMap<>();
     private final List<FurnitureData.Element> elements = new LinkedList<>();
-    private final Map<FurnitureData.Element, Map<Direction, Vector3f[]>> faceVertices = new IdentityHashMap<>();
-    private final Map<FurnitureData.Element, Map<Direction, Bounds>> faceBounds = new IdentityHashMap<>();
-    private final Map<FurnitureData.Element, Bounds> elementBounds = new IdentityHashMap<>();
-    private final SpatialIndex spatialIndex;
+    private final FurnitureGeometryAnalyzer geometry;
+    private final FurnitureFaceTextureBaker faceTextureBaker;
     private final Map<String, Either<Material, String>> textures = new HashMap<>();
     private final Map<FurnitureData.Element, Integer> elementToIndex = new HashMap<>();
     private final Map<Integer, FurnitureData.Element> indexToElement = new HashMap<>();
 
+    private int zFightingCounter = 0;
+
     private FurnitureModelFactory(FurnitureData data, DynamicAtlas atlas) {
         this.inEditor = Minecraft.getInstance().screen instanceof ArtisansWorkstationEditorScreen;
         this.data = data;
-        this.atlas = atlas;
+        this.solidStates = data.getUniqueSolidStates();
 
         splitSprites();
-        cacheFaceVertices();
-        spatialIndex = new SpatialIndex(elements, elementBounds);
+        geometry = new FurnitureGeometryAnalyzer(elements);
+        faceTextureBaker = new FurnitureFaceTextureBaker(atlas, inEditor, elements);
 
         // Fetch all textures
         textures.put("0", Either.left(new Material(InventoryMenu.BLOCK_ATLAS, Common.locate("block/furniture"))));
-        elements.stream().filter(e -> e.type == FurnitureData.ElementType.SPRITE)
-                .map(e -> e.sprite.sprite).distinct().forEach(source ->
-                        textures.put(source.toString(), Either.left(new Material(InventoryMenu.BLOCK_ATLAS, source))));
+        for (FurnitureData.Element element : elements) {
+            if (element.type == FurnitureData.ElementType.SPRITE) {
+                textures.put(element.sprite.sprite.toString(), Either.left(new Material(InventoryMenu.BLOCK_ATLAS, element.sprite.sprite)));
+            }
+        }
 
         // Fetch all faces
-        for (int state : data.getUniqueSolidStates()) {
-            faces.put(state, elements.stream()
-                    .filter(FurnitureModelFactory::hasFaces)
-                    .filter(e -> e.isMasked(state))
-                    .collect(Collectors.toMap(e -> e, e -> getFaces(e, state))));
+        for (int state : solidStates) {
+            Map<FurnitureData.Element, Map<Direction, BlockElementFace>> stateFaces = new HashMap<>();
+            for (FurnitureData.Element element : elements) {
+                if (FurnitureGeometryAnalyzer.hasFaces(element) && element.isMasked(state)) {
+                    stateFaces.put(element, getFaces(element, state));
+                }
+            }
+            faces.put(state, stateFaces);
         }
-    }
-
-    float mod(float a, float b) {
-        return (a % b + b) % b;
     }
 
     private BlockElementFace getFace(FurnitureData.Element element, Direction direction, int state) {
-        // Cull fully invisible faces
-        Vector3f[] vertices = getFaceVertices(element, direction);
-        Bounds bounds = getFaceBounds(element, direction);
-        for (FurnitureData.Element otherElement : spatialIndex.query(bounds, 0.0f)) {
-            if (otherElement == element) continue;
-            if (!otherElement.isMasked(state)) continue;
-            if (otherElement.material.transparency != TransparencyType.SOLID) continue;
-            if (otherElement.type != FurnitureData.ElementType.ELEMENT) continue;
-            if (theSame(element, otherElement) && otherElement.hashCode() < element.hashCode()) continue;
-            if (!elementBounds.get(otherElement).contains(bounds)) continue;
-            if (fullyContained(otherElement, vertices)) return null;
-        }
-
-        // Allocate pixels
-        Vector2i dimensions = ClientModelUtils.getFaceDimensions(element, direction);
-
-        // Padding
-        int level = 1;
-        if (atlas == DynamicAtlas.BAKED) {
-            int i = Minecraft.getInstance().options.mipmapLevels().get();
-            int panic = atlas.getUsage() > 0.5 ? (atlas.getUsage() > 0.75 ? 2 : 1) : 0;
-            level = (int) Math.pow(2, Math.max(0, Math.min(i - panic, Config.getInstance().maxMipLevel)));
-        }
-        DynamicAtlas.Quad quad = atlas.allocate(
-                (int) (Math.ceil(dimensions.x / (double) level) * level),
-                (int) (Math.ceil(dimensions.y / (double) level) * level)
+        if (geometry.isFaceFullyContained(element, direction, state)) return null;
+        return faceTextureBaker.bake(
+                element,
+                direction,
+                state,
+                geometry.getCullDirection(element, direction),
+                elementToIndex.get(element)
         );
-
-        if (quad.w() > 0 && quad.h() > 0) {
-            // Render
-            NativeImage pixels = atlas.getPixels();
-            assert pixels != null;
-
-            // Use baked texture if available
-            boolean useBaked = true;
-            int[] baked = inEditor ? null : element.bakedTextures.get(direction, state);
-            if (baked == null || baked.length != dimensions.x * dimensions.y) {
-                baked = new int[dimensions.x * dimensions.y];
-                useBaked = false;
-            }
-            AmbientOcclusion ambientOcclusion = useBaked ? null : getAmbientOcclusion(state);
-
-            for (int x = 0; x < dimensions.x; x++) {
-                for (int y = 0; y < dimensions.y; y++) {
-                    int color;
-                    if (!useBaked) {
-                        color = MaterialSource.fromCube(element.material, direction, element.getCenter(), x, y, dimensions.x, dimensions.y);
-                        int r = color >> 16 & 0xFF;
-                        int g = color >> 8 & 0xFF;
-                        int b = color & 0xFF;
-                        int a = color >> 24 & 0xFF;
-
-                        ElementRotation rotation = element.getRotation();
-                        Vector3f pos = new Vector3f(ClientModelUtils.to3D(element, direction, x, y));
-                        ModelUtils.applyElementRotation(pos, rotation);
-
-                        Vector3f normal = ModelUtils.getElementRotation(rotation).transform(direction.step());
-
-                        FurnitureData.LightMaterialEffect lightEffect = element.material.lightEffect;
-
-                        // Apply HSV
-                        float[] hsv = Utils.rgbToHsv(r / 255.0f, g / 255.0f, b / 255.0f);
-                        if (Math.abs(element.material.lightEffect.hue) >= 1.0f) {
-                            hsv[0] = mod(element.material.lightEffect.hue * 1.8f, 360f);
-                        }
-                        hsv[1] = Math.max(0.0f, Math.min(1.0f, hsv[1] + element.material.lightEffect.saturation * 0.01f));
-                        hsv[2] = Math.max(0.0f, Math.min(1.0f, hsv[2] + element.material.lightEffect.value * 0.01f));
-                        float[] rgb = Utils.hsvToRgbRaw(hsv[0], hsv[1], hsv[2]);
-                        r = (int) (rgb[0] * 255);
-                        g = (int) (rgb[1] * 255);
-                        b = (int) (rgb[2] * 255);
-
-                        // Smooth light
-                        float light = 1.0f;
-                        float roundness = lightEffect.roundness / 75.0f;
-                        if (roundness != 0.0f) {
-                            light = getLight(x, y, dimensions);
-                            light = quantize(x, y, light);
-                            light = light * roundness + (1.0f - roundness * 0.5f);
-                        }
-
-                        // Brightness
-                        light += lightEffect.brightness / 100.0f;
-
-                        // Ambient Occlusion
-                        float ao = Math.min(1.0f, Math.max(0.0f, 1.0f - ambientOcclusion.sample(pos, normal) * 1.5f));
-                        float emission = element.emission / 15.0f;
-                        light *= (ao * (1.0f - emission) + emission);
-
-                        // Contrast
-                        float contrast = lightEffect.contrast / 100.0f;
-                        r = (int) Math.max(0.0, Math.min(255.0, ((r - 128) * (1.0f + contrast) + 128) * light));
-                        g = (int) Math.max(0.0, Math.min(255.0, ((g - 128) * (1.0f + contrast) + 128) * light));
-                        b = (int) Math.max(0.0, Math.min(255.0, ((b - 128) * (1.0f + contrast) + 128) * light));
-
-                        color = a << 24 | r << 16 | g << 8 | b;
-                        baked[x + y * dimensions.x] = color;
-                    } else {
-                        color = baked[x + y * dimensions.x];
-                    }
-                    pixels.setPixelRGBA(quad.x() + x, quad.y() + y, color);
-                }
-            }
-
-            // Padding
-            for (int x = dimensions.x(); x < quad.w(); x++) {
-                for (int y = 0; y < dimensions.y(); y++) {
-                    int color = pixels.getPixelRGBA(quad.x() + x - 1, quad.y() + y);
-                    pixels.setPixelRGBA(quad.x() + x, quad.y() + y, color);
-                }
-            }
-            for (int y = dimensions.y(); y < quad.h(); y++) {
-                for (int x = 0; x < quad.w(); x++) {
-                    int color = pixels.getPixelRGBA(quad.x() + x, quad.y() + y - 1);
-                    pixels.setPixelRGBA(quad.x() + x, quad.y() + y, color);
-                }
-            }
-
-            atlas.setDirty();
-
-            // Save baked texture
-            if (inEditor) {
-                element.bakedTextures.put(direction, state, baked);
-            }
-        }
-
-        float uvScale = 16.0f / atlas.size;
-        return new BlockElementFace(
-                getCulledDirection(vertices),
-                elementToIndex.get(element),
-                "0",
-                new BlockFaceUV(
-                        new float[]{
-                                quad.x() * uvScale,
-                                quad.y() * uvScale,
-                                (quad.x() + dimensions.x()) * uvScale,
-                                (quad.y() + dimensions.y()) * uvScale
-                        },
-                        0
-                )
-        );
-    }
-
-    private Direction getCulledDirection(Vector3f[] vertices) {
-        if (vertices[0].x() == 0.0f && vertices[1].x() == 0.0f &&
-            vertices[2].x() == 0.0f && vertices[3].x() == 0.0f) {
-            return Direction.WEST;
-        } else if (vertices[0].x() == 1.0f && vertices[1].x() == 1.0f &&
-                   vertices[2].x() == 1.0f && vertices[3].x() == 1.0f) {
-            return Direction.EAST;
-        } else if (vertices[0].y() == 0.0f && vertices[1].y() == 0.0f &&
-                   vertices[2].y() == 0.0f && vertices[3].y() == 0.0f) {
-            return Direction.DOWN;
-        } else if (vertices[0].y() == 1.0f && vertices[1].y() == 1.0f &&
-                   vertices[2].y() == 1.0f && vertices[3].y() == 1.0f) {
-            return Direction.UP;
-        } else if (vertices[0].z() == 0.0f && vertices[1].z() == 0.0f &&
-                   vertices[2].z() == 0.0f && vertices[3].z() == 0.0f) {
-            return Direction.NORTH;
-        } else if (vertices[0].z() == 1.0f && vertices[1].z() == 1.0f &&
-                   vertices[2].z() == 1.0f && vertices[3].z() == 1.0f) {
-            return Direction.SOUTH;
-        } else {
-            return null;
-        }
-    }
-
-    private static boolean theSame(FurnitureData.Element element, FurnitureData.Element otherElement) {
-        return element.from.equals(otherElement.from) &&
-               element.to.equals(otherElement.to) &&
-               element.getRotation().equals(otherElement.getRotation());
-    }
-
-    private static boolean fullyContained(FurnitureData.Element otherElement, Vector3f[] vertices) {
-        ElementRotation rotation = otherElement.getRotation();
-        Quaternionf inverseRotation = ModelUtils.getElementRotation(rotation).conjugate();
-        Vector3f localVertex = new Vector3f();
-        for (Vector3f vertex : vertices) {
-            toLocalVoxelSpace(localVertex, vertex, rotation, inverseRotation);
-            if (!otherElement.contains(localVertex)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private boolean mightZFight(FurnitureData.Element element, Map<Direction, BlockElementFace> faces, int state) {
-        for (Direction direction : faces.keySet()) {
-            Vector3f[] vertices = getFaceVertices(element, direction);
-            Bounds bounds = getFaceBounds(element, direction);
-            Vector3f firstVertex = new Vector3f();
-            Vector3f oppositeVertex = new Vector3f();
-
-            for (FurnitureData.Element otherElement : spatialIndex.query(bounds, 0.01f)) {
-                if (otherElement == element) continue;
-                if (otherElement.getVolume() < element.getVolume()) continue;
-                if (!hasFaces(otherElement)) continue;
-
-                Map<Direction, BlockElementFace> otherFaces = this.faces.get(state).getOrDefault(otherElement, Collections.emptyMap());
-                if (otherFaces.isEmpty() || !elementBounds.get(otherElement).intersects(bounds, 0.01f)) continue;
-
-                // Convert to another element's local space
-                ElementRotation rotation = otherElement.getRotation();
-                Quaternionf inverseRotation = ModelUtils.getElementRotation(rotation).conjugate();
-                toLocalVoxelSpace(firstVertex, vertices[0], rotation, inverseRotation);
-                toLocalVoxelSpace(oppositeVertex, vertices[2], rotation, inverseRotation);
-                float fromX = Math.min(firstVertex.x, oppositeVertex.x);
-                float toX = Math.max(firstVertex.x, oppositeVertex.x);
-                float fromY = Math.min(firstVertex.y, oppositeVertex.y);
-                float toY = Math.max(firstVertex.y, oppositeVertex.y);
-                float fromZ = Math.min(firstVertex.z, oppositeVertex.z);
-                float toZ = Math.max(firstVertex.z, oppositeVertex.z);
-
-                float m = 0.01f;
-
-                if (Math.abs(fromX - toX) < m && fromY < otherElement.to.y - m && toY > otherElement.from.y + m && fromZ < otherElement.to.z - m && toZ > otherElement.from.z + m) {
-                    if (otherFaces.containsKey(Direction.WEST) && Math.abs(fromX - otherElement.from.x) < m)
-                        return true;
-                    if (otherFaces.containsKey(Direction.EAST) && Math.abs(toX - otherElement.to.x) < m)
-                        return true;
-                }
-
-                if (Math.abs(fromY - toY) < m && fromX < otherElement.to.x - m && toX > otherElement.from.x + m && fromZ < otherElement.to.z - m && toZ > otherElement.from.z + m) {
-                    if (otherFaces.containsKey(Direction.DOWN) && Math.abs(fromY - otherElement.from.y) < m)
-                        return true;
-                    if (otherFaces.containsKey(Direction.UP) && Math.abs(toY - otherElement.to.y) < m)
-                        return true;
-                }
-
-                if (Math.abs(fromZ - toZ) < m && fromX < otherElement.to.x - m && toX > otherElement.from.x + m && fromY < otherElement.to.y - m && toY > otherElement.from.y + m) {
-                    if (otherFaces.containsKey(Direction.NORTH) && Math.abs(fromZ - otherElement.from.z) < m)
-                        return true;
-                    if (otherFaces.containsKey(Direction.SOUTH) && Math.abs(toZ - otherElement.to.z) < m)
-                        return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    private void cacheFaceVertices() {
-        for (FurnitureData.Element element : elements) {
-            if (!hasFaces(element)) continue;
-
-            float[] shape = ClientModelUtils.getShapeData(element);
-            Map<Direction, Vector3f[]> vertices = new EnumMap<>(Direction.class);
-            Map<Direction, Bounds> bounds = new EnumMap<>(Direction.class);
-            for (Direction direction : Direction.values()) {
-                Vector3f[] face = ClientModelUtils.getVertices(element, direction, shape, null);
-                vertices.put(direction, face);
-                bounds.put(direction, Bounds.of(face));
-            }
-            faceVertices.put(element, vertices);
-            faceBounds.put(element, bounds);
-            elementBounds.put(element, Bounds.ofVoxelSpace(ModelUtils.getCorners(element)));
-        }
-    }
-
-    private Vector3f[] getFaceVertices(FurnitureData.Element element, Direction direction) {
-        return faceVertices.get(element).get(direction);
-    }
-
-    private Bounds getFaceBounds(FurnitureData.Element element, Direction direction) {
-        return faceBounds.get(element).get(direction);
-    }
-
-    private AmbientOcclusion getAmbientOcclusion(int state) {
-        return aos.computeIfAbsent(state, ignored -> {
-            AmbientOcclusion ao = new AmbientOcclusion();
-            for (FurnitureData.Element element : elements) {
-                if (element.type == FurnitureData.ElementType.ELEMENT && element.isMasked(state)) {
-                    ao.place(element, element.material.transparency == TransparencyType.SOLID ? 1.0f : 0.25f);
-                }
-            }
-            return ao;
-        });
-    }
-
-    private static Vector3f toLocalVoxelSpace(Vector3f target, Vector3f source, ElementRotation rotation, Quaternionf inverseRotation) {
-        target.set(source).sub(rotation.origin());
-        inverseRotation.transform(target);
-        return target.add(rotation.origin()).mul(16.0f);
-    }
-
-    private record Bounds(float minX, float minY, float minZ, float maxX, float maxY, float maxZ) {
-        private static Bounds of(Vector3f[] vertices) {
-            float minX = Float.POSITIVE_INFINITY;
-            float minY = Float.POSITIVE_INFINITY;
-            float minZ = Float.POSITIVE_INFINITY;
-            float maxX = Float.NEGATIVE_INFINITY;
-            float maxY = Float.NEGATIVE_INFINITY;
-            float maxZ = Float.NEGATIVE_INFINITY;
-            for (Vector3f vertex : vertices) {
-                minX = Math.min(minX, vertex.x);
-                minY = Math.min(minY, vertex.y);
-                minZ = Math.min(minZ, vertex.z);
-                maxX = Math.max(maxX, vertex.x);
-                maxY = Math.max(maxY, vertex.y);
-                maxZ = Math.max(maxZ, vertex.z);
-            }
-            return new Bounds(minX, minY, minZ, maxX, maxY, maxZ);
-        }
-
-        private static Bounds ofVoxelSpace(Vector3f[] vertices) {
-            Bounds bounds = of(vertices);
-            return new Bounds(bounds.minX / 16.0f, bounds.minY / 16.0f, bounds.minZ / 16.0f,
-                    bounds.maxX / 16.0f, bounds.maxY / 16.0f, bounds.maxZ / 16.0f);
-        }
-
-        private boolean contains(Bounds other) {
-            float epsilon = 0.0001f;
-            return minX <= other.minX + epsilon && minY <= other.minY + epsilon && minZ <= other.minZ + epsilon &&
-                   maxX >= other.maxX - epsilon && maxY >= other.maxY - epsilon && maxZ >= other.maxZ - epsilon;
-        }
-
-        private boolean intersects(Bounds other, float margin) {
-            return maxX + margin >= other.minX && minX - margin <= other.maxX &&
-                   maxY + margin >= other.minY && minY - margin <= other.maxY &&
-                   maxZ + margin >= other.minZ && minZ - margin <= other.maxZ;
-        }
-    }
-
-    private static class SpatialIndex {
-        private static final float BUCKET_SIZE = 0.25f;
-
-        private final Map<BucketKey, List<FurnitureData.Element>> buckets = new HashMap<>();
-        private final Set<FurnitureData.Element> seen = Collections.newSetFromMap(new IdentityHashMap<>());
-        private final List<FurnitureData.Element> queryResult = new ArrayList<>();
-
-        private SpatialIndex(List<FurnitureData.Element> elements, Map<FurnitureData.Element, Bounds> bounds) {
-            for (FurnitureData.Element element : elements) {
-                Bounds elementBounds = bounds.get(element);
-                if (elementBounds == null) continue;
-
-                int minX = bucket(elementBounds.minX);
-                int minY = bucket(elementBounds.minY);
-                int minZ = bucket(elementBounds.minZ);
-                int maxX = bucket(elementBounds.maxX);
-                int maxY = bucket(elementBounds.maxY);
-                int maxZ = bucket(elementBounds.maxZ);
-                for (int x = minX; x <= maxX; x++) {
-                    for (int y = minY; y <= maxY; y++) {
-                        for (int z = minZ; z <= maxZ; z++) {
-                            buckets.computeIfAbsent(new BucketKey(x, y, z), ignored -> new ArrayList<>()).add(element);
-                        }
-                    }
-                }
-            }
-        }
-
-        private List<FurnitureData.Element> query(Bounds bounds, float margin) {
-            seen.clear();
-            queryResult.clear();
-            int minX = bucket(bounds.minX - margin);
-            int minY = bucket(bounds.minY - margin);
-            int minZ = bucket(bounds.minZ - margin);
-            int maxX = bucket(bounds.maxX + margin);
-            int maxY = bucket(bounds.maxY + margin);
-            int maxZ = bucket(bounds.maxZ + margin);
-            for (int x = minX; x <= maxX; x++) {
-                for (int y = minY; y <= maxY; y++) {
-                    for (int z = minZ; z <= maxZ; z++) {
-                        List<FurnitureData.Element> candidates = buckets.get(new BucketKey(x, y, z));
-                        if (candidates != null) {
-                            for (FurnitureData.Element candidate : candidates) {
-                                if (seen.add(candidate)) queryResult.add(candidate);
-                            }
-                        }
-                    }
-                }
-            }
-            return queryResult;
-        }
-
-        private static int bucket(float coordinate) {
-            return (int) Math.floor(coordinate / BUCKET_SIZE);
-        }
-    }
-
-    private record BucketKey(int x, int y, int z) {
-    }
-
-    private static float getLight(int x, int y, Vector2i dimensions) {
-        float rx = x / (dimensions.x - 1.0f) * 2.0f - 1.0f;
-        float ry = y / (dimensions.y - 1.0f) * 2.0f - 1.0f;
-        float r = 1.0f - Math.max(Math.abs(rx), Math.abs(ry)) * 0.95f;
-        float dist = Math.max(0.0f, 1.0f - (float) Math.sqrt(rx * rx + ry * ry) / 1.42f);
-        return (float) Math.sqrt(r * (1.0f - r) + dist * r);
-    }
-
-    private static float quantize(int x, int y, float light) {
-        int levels = 8;
-        int hash = x * 0x27d4eb2d ^ y * 0x85ebca6b;
-        hash ^= hash >>> 16;
-        hash *= 0x85ebca6b;
-        hash ^= hash >>> 13;
-        hash *= 0xc2b2ae35;
-        hash ^= hash >>> 16;
-        float n = (hash & 0xFFFFFFFFL) / (float) (1L << 32);
-        light = (float) Math.round(light * levels + n) / levels;
-        return light;
     }
 
     private BlockElement getElement(FurnitureData.Element element, int state) {
         Vector3f from = new Vector3f(element.from);
         Vector3f to = new Vector3f(element.to);
 
-        Map<Direction, BlockElementFace> faces = this.faces.get(state).getOrDefault(element, Collections.emptyMap());
+        Map<FurnitureData.Element, Map<Direction, BlockElementFace>> stateFaces = faces.get(state);
+        Map<Direction, BlockElementFace> elementFaces = stateFaces.getOrDefault(element, Collections.emptyMap());
 
         // If that element causes Z-fighting with another element, offset it slightly
-        if (!inEditor && mightZFight(element, faces, state)) {
+        if (!inEditor && geometry.mightZFight(element, elementFaces, stateFaces)) {
             zFightingCounter++;
             float offset = 0.01f * (zFightingCounter % 7);
             from.sub(offset, offset, offset);
@@ -492,7 +91,7 @@ public class FurnitureModelFactory {
         }
 
         BlockElementRotation rotation = ClientModelUtils.toBlockElementRotation(element.getRotation());
-        return new BlockElement(from, to, faces, rotation, true);
+        return new BlockElement(from, to, elementFaces, rotation, true);
     }
 
     private Map<Direction, BlockElementFace> getFaces(FurnitureData.Element element, int state) {
@@ -507,11 +106,12 @@ public class FurnitureModelFactory {
                     Direction.SOUTH, getSpriteFace(element, false)
             );
         } else {
-            return EnumSet.allOf(Direction.class).stream()
-                    .map(dir -> Optional.ofNullable(getFace(element, dir, state))
-                            .map(face -> Map.entry(dir, face)))
-                    .flatMap(Optional::stream)
-                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+            Map<Direction, BlockElementFace> elementFaces = new EnumMap<>(Direction.class);
+            for (Direction direction : Direction.values()) {
+                BlockElementFace face = getFace(element, direction, state);
+                if (face != null) elementFaces.put(direction, face);
+            }
+            return elementFaces;
         }
     }
 
@@ -540,7 +140,7 @@ public class FurnitureModelFactory {
         return new BlockModel(
                 null,
                 elements.stream()
-                        .filter(FurnitureModelFactory::hasFaces)
+                        .filter(FurnitureGeometryAnalyzer::hasFaces)
                         .filter(e -> e.isMasked(state))
                         .filter(e -> type == null || getTransparencyType(e) == type)
                         .map(e -> getElement(e, state))
@@ -558,7 +158,7 @@ public class FurnitureModelFactory {
      */
     private Map<Integer, BlockModel> getModels(TransparencyType type) {
         Map<Integer, BlockModel> models = new HashMap<>();
-        for (Integer state : data.getUniqueSolidStates()) {
+        for (Integer state : solidStates) {
             models.put(state, getModel(type, state));
         }
         return models;
@@ -609,10 +209,6 @@ public class FurnitureModelFactory {
 
     private TransparencyType getTransparencyType(FurnitureData.Element e) {
         return e.type == FurnitureData.ElementType.SPRITE ? TransparencyManager.fromSprite(e) : e.material.transparency;
-    }
-
-    private static boolean hasFaces(FurnitureData.Element e) {
-        return e.type == FurnitureData.ElementType.ELEMENT || e.type == FurnitureData.ElementType.SPRITE;
     }
 
     private ItemTransforms getTransforms() {
