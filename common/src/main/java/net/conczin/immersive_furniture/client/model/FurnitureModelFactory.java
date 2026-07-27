@@ -37,6 +37,7 @@ public class FurnitureModelFactory {
 
     private final Map<Integer, Map<FurnitureData.Element, Map<Direction, BlockElementFace>>> faces = new HashMap<>();
     private final List<FurnitureData.Element> elements = new LinkedList<>();
+    private final Map<FurnitureData.Element, Map<Direction, Vector3f[]>> faceVertices = new IdentityHashMap<>();
     private final Map<String, Either<Material, String>> textures = new HashMap<>();
     private final Map<FurnitureData.Element, Integer> elementToIndex = new HashMap<>();
     private final Map<Integer, FurnitureData.Element> indexToElement = new HashMap<>();
@@ -47,6 +48,7 @@ public class FurnitureModelFactory {
         this.atlas = atlas;
 
         splitSprites();
+        cacheFaceVertices();
 
         // Populate AO lookup
         aos = new HashMap<>();
@@ -81,8 +83,7 @@ public class FurnitureModelFactory {
 
     private BlockElementFace getFace(FurnitureData.Element element, Direction direction, int state) {
         // Cull fully invisible faces
-        float[] fs = ClientModelUtils.getShapeData(element);
-        Vector3f[] vertices = ClientModelUtils.getVertices(element, direction, fs, null);
+        Vector3f[] vertices = getFaceVertices(element, direction);
         for (FurnitureData.Element otherElement : elements) {
             if (otherElement == element) continue;
             if (!otherElement.isMasked(state)) continue;
@@ -252,10 +253,12 @@ public class FurnitureModelFactory {
     }
 
     private static boolean fullyContained(FurnitureData.Element otherElement, Vector3f[] vertices) {
+        ElementRotation rotation = otherElement.getRotation();
+        Quaternionf inverseRotation = ModelUtils.getElementRotation(rotation).conjugate();
+        Vector3f localVertex = new Vector3f();
         for (Vector3f vertex : vertices) {
-            Vector3f localVertex = new Vector3f(vertex);
-            ModelUtils.applyInverseElementRotation(localVertex, otherElement.getRotation());
-            if (!otherElement.contains(localVertex.mul(16.0f))) {
+            toLocalVoxelSpace(localVertex, vertex, rotation, inverseRotation);
+            if (!otherElement.contains(localVertex)) {
                 return false;
             }
         }
@@ -264,8 +267,9 @@ public class FurnitureModelFactory {
 
     private boolean mightZFight(FurnitureData.Element element, Map<Direction, BlockElementFace> faces, int state) {
         for (Direction direction : faces.keySet()) {
-            float[] fs = ClientModelUtils.getShapeData(element);
-            Vector3f[] vertices = ClientModelUtils.getVertices(element, direction, fs, null);
+            Vector3f[] vertices = getFaceVertices(element, direction);
+            Vector3f firstVertex = new Vector3f();
+            Vector3f oppositeVertex = new Vector3f();
 
             for (FurnitureData.Element otherElement : elements) {
                 if (otherElement == element) continue;
@@ -273,23 +277,18 @@ public class FurnitureModelFactory {
                 if (!hasFaces(otherElement)) continue;
 
                 // Convert to another element's local space
-                Vector3f[] localVerts = new Vector3f[vertices.length];
-                for (int i = 0; i < vertices.length; i++) {
-                    Vector3f v = vertices[i];
-                    Vector3f lv = new Vector3f(v);
-                    ModelUtils.applyInverseElementRotation(lv, otherElement.getRotation());
-                    lv.mul(16.0f);
-                    localVerts[i] = lv;
-                }
+                ElementRotation rotation = otherElement.getRotation();
+                Quaternionf inverseRotation = ModelUtils.getElementRotation(rotation).conjugate();
+                toLocalVoxelSpace(firstVertex, vertices[0], rotation, inverseRotation);
+                toLocalVoxelSpace(oppositeVertex, vertices[2], rotation, inverseRotation);
+                float fromX = Math.min(firstVertex.x, oppositeVertex.x);
+                float toX = Math.max(firstVertex.x, oppositeVertex.x);
+                float fromY = Math.min(firstVertex.y, oppositeVertex.y);
+                float toY = Math.max(firstVertex.y, oppositeVertex.y);
+                float fromZ = Math.min(firstVertex.z, oppositeVertex.z);
+                float toZ = Math.max(firstVertex.z, oppositeVertex.z);
 
                 Map<Direction, BlockElementFace> otherFaces = this.faces.get(state).getOrDefault(otherElement, Collections.emptyMap());
-
-                float fromX = Math.min(localVerts[0].x, localVerts[2].x);
-                float toX = Math.max(localVerts[0].x, localVerts[2].x);
-                float fromY = Math.min(localVerts[0].y, localVerts[2].y);
-                float toY = Math.max(localVerts[0].y, localVerts[2].y);
-                float fromZ = Math.min(localVerts[0].z, localVerts[2].z);
-                float toZ = Math.max(localVerts[0].z, localVerts[2].z);
 
                 float m = 0.01f;
 
@@ -316,6 +315,29 @@ public class FurnitureModelFactory {
             }
         }
         return false;
+    }
+
+    private void cacheFaceVertices() {
+        for (FurnitureData.Element element : elements) {
+            if (!hasFaces(element)) continue;
+
+            float[] shape = ClientModelUtils.getShapeData(element);
+            Map<Direction, Vector3f[]> vertices = new EnumMap<>(Direction.class);
+            for (Direction direction : Direction.values()) {
+                vertices.put(direction, ClientModelUtils.getVertices(element, direction, shape, null));
+            }
+            faceVertices.put(element, vertices);
+        }
+    }
+
+    private Vector3f[] getFaceVertices(FurnitureData.Element element, Direction direction) {
+        return faceVertices.get(element).get(direction);
+    }
+
+    private static Vector3f toLocalVoxelSpace(Vector3f target, Vector3f source, ElementRotation rotation, Quaternionf inverseRotation) {
+        target.set(source).sub(rotation.origin());
+        inverseRotation.transform(target);
+        return target.add(rotation.origin()).mul(16.0f);
     }
 
     private static float getLight(int x, int y, Vector2i dimensions) {
