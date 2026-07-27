@@ -32,7 +32,7 @@ public class FurnitureModelFactory {
 
     private final FurnitureData data;
     private final DynamicAtlas atlas;
-    private final Map<Integer, AmbientOcclusion> aos;
+    private final Map<Integer, AmbientOcclusion> aos = new HashMap<>();
     private int zFightingCounter = 0;
 
     private final Map<Integer, Map<FurnitureData.Element, Map<Direction, BlockElementFace>>> faces = new HashMap<>();
@@ -49,18 +49,6 @@ public class FurnitureModelFactory {
 
         splitSprites();
         cacheFaceVertices();
-
-        // Populate AO lookup
-        aos = new HashMap<>();
-        for (int state : data.getUniqueSolidStates()) {
-            AmbientOcclusion ao = new AmbientOcclusion();
-            for (FurnitureData.Element element : elements) {
-                if (element.type == FurnitureData.ElementType.ELEMENT && element.isMasked(state)) {
-                    ao.place(element, element.material.transparency == TransparencyType.SOLID ? 1.0f : 0.25f);
-                }
-            }
-            aos.put(state, ao);
-        }
 
         // Fetch all textures
         textures.put("0", Either.left(new Material(InventoryMenu.BLOCK_ATLAS, Common.locate("block/furniture"))));
@@ -120,6 +108,7 @@ public class FurnitureModelFactory {
                 baked = new int[dimensions.x * dimensions.y];
                 useBaked = false;
             }
+            AmbientOcclusion ambientOcclusion = useBaked ? null : getAmbientOcclusion(state);
 
             for (int x = 0; x < dimensions.x; x++) {
                 for (int y = 0; y < dimensions.y; y++) {
@@ -164,7 +153,7 @@ public class FurnitureModelFactory {
                         light += lightEffect.brightness / 100.0f;
 
                         // Ambient Occlusion
-                        float ao = Math.min(1.0f, Math.max(0.0f, 1.0f - this.aos.get(state).sample(pos, normal) * 1.5f));
+                        float ao = Math.min(1.0f, Math.max(0.0f, 1.0f - ambientOcclusion.sample(pos, normal) * 1.5f));
                         float emission = element.emission / 15.0f;
                         light *= (ao * (1.0f - emission) + emission);
 
@@ -332,6 +321,18 @@ public class FurnitureModelFactory {
 
     private Vector3f[] getFaceVertices(FurnitureData.Element element, Direction direction) {
         return faceVertices.get(element).get(direction);
+    }
+
+    private AmbientOcclusion getAmbientOcclusion(int state) {
+        return aos.computeIfAbsent(state, ignored -> {
+            AmbientOcclusion ao = new AmbientOcclusion();
+            for (FurnitureData.Element element : elements) {
+                if (element.type == FurnitureData.ElementType.ELEMENT && element.isMasked(state)) {
+                    ao.place(element, element.material.transparency == TransparencyType.SOLID ? 1.0f : 0.25f);
+                }
+            }
+            return ao;
+        });
     }
 
     private static Vector3f toLocalVoxelSpace(Vector3f target, Vector3f source, ElementRotation rotation, Quaternionf inverseRotation) {
