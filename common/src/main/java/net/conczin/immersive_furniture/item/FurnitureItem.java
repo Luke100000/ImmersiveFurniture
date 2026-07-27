@@ -6,10 +6,12 @@ import net.conczin.immersive_furniture.data.FurnitureData;
 import net.conczin.immersive_furniture.data.FurnitureDataManager;
 import net.conczin.immersive_furniture.data.ServerFurnitureRegistry;
 import net.conczin.immersive_furniture.utils.SubBlockGrid;
+import net.conczin.immersive_furniture.utils.TimedLruCache;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionResult;
@@ -24,9 +26,7 @@ import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.Vec3;
 
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
@@ -53,37 +53,45 @@ public class FurnitureItem extends BlockItem {
     private static final int CACHE_SIZE = 256;
     private static final long CACHE_ENTRY_MIN_AGE_NANOS = TimeUnit.SECONDS.toNanos(5);
 
-    private static final Map<Integer, CacheEntry> cache = new LinkedHashMap<>(CACHE_SIZE, 0.75f, true) {
-        @Override
-        protected boolean removeEldestEntry(Map.Entry<Integer, CacheEntry> eldest) {
-            return size() > CACHE_SIZE && System.nanoTime() - eldest.getValue().lastAccessNanos > CACHE_ENTRY_MIN_AGE_NANOS;
-        }
-    };
+    private static final TimedLruCache<Integer, FurnitureData> cache = new TimedLruCache<>(CACHE_SIZE, CACHE_ENTRY_MIN_AGE_NANOS);
 
     public static FurnitureData getData(ItemStack stack) {
         CompoundTag tag = stack.getTagElement(BLOCK_ENTITY_TAG);
         if (tag == null) return FurnitureData.EMPTY;
-        tag = tag.getCompound(FURNITURE);
-        int hash = System.identityHashCode(tag); // Use identity hash since it's way faster
-        CacheEntry entry = cache.get(hash);
-        if (entry == null) {
-            entry = new CacheEntry(new FurnitureData(tag), System.nanoTime());
-            cache.put(hash, entry);
-            System.out.println("Loaded");
-        } else {
-            entry.lastAccessNanos = System.nanoTime();
-        }
-        return entry.data;
+        CompoundTag furnitureTag = tag.getCompound(FURNITURE);
+        int hash = System.identityHashCode(furnitureTag); // Use identity hash since it's way faster
+        return cache.computeIfAbsent(hash, () -> new FurnitureData(furnitureTag));
     }
 
-    private static class CacheEntry {
-        private final FurnitureData data;
-        private long lastAccessNanos;
+    public static boolean isEqual(ItemStack first, ItemStack second) {
+        if (first == second) return true;
+        if (!getData(first).getHash().equals(getData(second).getHash())) return false;
+        return isSameTagExceptFurniture(first.getTag(), second.getTag());
+    }
 
-        private CacheEntry(FurnitureData data, long lastAccessNanos) {
-            this.data = data;
-            this.lastAccessNanos = lastAccessNanos;
+    private static boolean isSameTagExceptFurniture(CompoundTag first, CompoundTag second) {
+        if (first == second) return true;
+        if (first == null || second == null || !first.getAllKeys().equals(second.getAllKeys())) return false;
+
+        for (String key : first.getAllKeys()) {
+            Tag firstValue = first.get(key);
+            Tag secondValue = second.get(key);
+            if (BLOCK_ENTITY_TAG.equals(key) && firstValue instanceof CompoundTag firstBlockEntityTag && secondValue instanceof CompoundTag secondBlockEntityTag) {
+                if (!isSameBlockEntityTagExceptFurniture(firstBlockEntityTag, secondBlockEntityTag)) return false;
+            } else if (!Objects.equals(firstValue, secondValue)) {
+                return false;
+            }
         }
+        return true;
+    }
+
+    private static boolean isSameBlockEntityTagExceptFurniture(CompoundTag first, CompoundTag second) {
+        if (!first.getAllKeys().equals(second.getAllKeys())) return false;
+
+        for (String key : first.getAllKeys()) {
+            if (!FURNITURE.equals(key) && !Objects.equals(first.get(key), second.get(key))) return false;
+        }
+        return true;
     }
 
     public static void setData(ItemStack stack, FurnitureData data) {

@@ -12,7 +12,7 @@ public class ItemStackMixin {
     @Inject(method = "isSameItemSameTags", at = @At("HEAD"), cancellable = true)
     private static void immersiveFurniture$compareFurnitureHash(ItemStack stack, ItemStack other, CallbackInfoReturnable<Boolean> cir) {
         if (stack.is(other.getItem()) && stack.getItem() instanceof FurnitureItem) {
-            cir.setReturnValue(FurnitureItem.getData(stack).getHash().equals(FurnitureItem.getData(other).getHash()));
+            cir.setReturnValue(FurnitureItem.isEqual(stack, other));
         }
     }
 }
