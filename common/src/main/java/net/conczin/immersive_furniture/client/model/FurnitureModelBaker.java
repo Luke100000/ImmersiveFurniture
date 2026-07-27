@@ -48,7 +48,18 @@ public class FurnitureModelBaker {
     }
 
     private static final ModelBakerImpl modelBaker = new ModelBakerImpl();
-    private final static RandomSource random = RandomSource.create();
+    private static final RandomSource random = RandomSource.create();
+
+    private static final Object scratchBakeLock = new Object();
+    private static ScratchBake pendingScratchBake;
+    private static String runningScratchHash;
+
+    static {
+        Thread worker = new Thread(FurnitureModelBaker::runScratchBakeWorker, "Immersive Furniture scratch model baker");
+        worker.setDaemon(true);
+        worker.setPriority(Thread.MIN_PRIORITY);
+        worker.start();
+    }
 
     private static CompositeBakedModel bakeModel(DynamicAtlas atlas, CompositeBlockModel model, int yRot, int state) {
         Map<RenderType, BakedModel> bakedModels = new LinkedHashMap<>();
@@ -107,14 +118,55 @@ public class FurnitureModelBaker {
         String hash = data.getHash();
         if (atlas.knownFurniture.containsKey(hash)) {
             return getModel(data, hash, atlas, 0, state, false);
-        } else if (!atlas.asyncRequestedFurniture.contains(hash)) {
-            atlas.asyncRequestedFurniture.add(hash);
+        } else if (atlas == DynamicAtlas.SCRATCH) {
+            requestScratchBake(data, hash, state);
+        } else if (atlas.asyncRequestedFurniture.add(hash)) {
             Common.EXECUTOR.execute(() -> {
-                getModel(data, hash, atlas, 0, state, false);
-                atlas.asyncRequestedFurniture.remove(hash);
+                try {
+                    getModel(data, hash, atlas, 0, state, false);
+                } finally {
+                    atlas.asyncRequestedFurniture.remove(hash);
+                }
             });
         }
         return null;
+    }
+
+    private static void requestScratchBake(FurnitureData data, String hash, int state) {
+        synchronized (scratchBakeLock) {
+            if (hash.equals(runningScratchHash) || (pendingScratchBake != null && hash.equals(pendingScratchBake.hash()))) return;
+            pendingScratchBake = new ScratchBake(data, hash, state);
+            scratchBakeLock.notify();
+        }
+    }
+
+    private static void runScratchBakeWorker() {
+        while (true) {
+            ScratchBake bake;
+            synchronized (scratchBakeLock) {
+                while (pendingScratchBake == null) {
+                    try {
+                        scratchBakeLock.wait();
+                    } catch (InterruptedException ignored) {
+                    }
+                }
+                bake = pendingScratchBake;
+                pendingScratchBake = null;
+                runningScratchHash = bake.hash();
+            }
+            try {
+                getModel(bake.data(), bake.hash(), DynamicAtlas.SCRATCH, 0, bake.state(), false);
+            } catch (RuntimeException exception) {
+                Common.logger.error("Failed to bake scratch model", exception);
+            } finally {
+                synchronized (scratchBakeLock) {
+                    if (bake.hash().equals(runningScratchHash)) runningScratchHash = null;
+                }
+            }
+        }
+    }
+
+    private record ScratchBake(FurnitureData data, String hash, int state) {
     }
 
     /**
