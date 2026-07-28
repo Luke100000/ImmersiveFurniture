@@ -55,6 +55,17 @@ public class FurnitureItem extends BlockItem {
         return stack.getOrDefault(FURNITURE, FurnitureData.EMPTY);
     }
 
+    public static boolean isEqual(ItemStack first, ItemStack second) {
+        if (first == second) return true;
+        if (!getData(first).getHash().equals(getData(second).getHash())) return false;
+        if (!first.getComponents().keySet().equals(second.getComponents().keySet())) return false;
+
+        for (DataComponentType<?> type : first.getComponents().keySet()) {
+            if (type != FURNITURE && !Objects.equals(first.getComponents().get(type), second.getComponents().get(type))) return false;
+        }
+        return true;
+    }
+
     public static void setData(ItemStack stack, FurnitureData data) {
         stack.set(FURNITURE, data);
     }

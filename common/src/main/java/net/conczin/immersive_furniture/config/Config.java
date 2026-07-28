@@ -38,11 +38,27 @@ public final class Config extends JsonConfig {
     // Lower values may lead to artifacts on steep view angles.
     public int maxMipLevel = 2;
 
+    // Atlas size for baked furniture; must be a multiple of 2, between 512 and 8192
+    public int bakedAtlasSize = 1024;
+    public boolean disableAtlasRefreshes = false;
+
     public Config(String name) {
         super(name);
     }
 
     public static Config getInstance() {
         return INSTANCE;
+    }
+
+    public int getBakedAtlasSize() {
+        return switch (bakedAtlasSize) {
+            case 256, 512, 1024, 2048, 4096, 8192 -> bakedAtlasSize;
+            default -> 1024;
+        };
+    }
+
+    @Override
+    int getVersion() {
+        return 2;
     }
 }
