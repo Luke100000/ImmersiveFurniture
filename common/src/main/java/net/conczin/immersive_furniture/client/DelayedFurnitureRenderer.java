@@ -67,6 +67,7 @@ public class DelayedFurnitureRenderer {
 
                 if (status.done() || a >= 10) {
                     it.remove();
+                    attempts.remove(entry.getKey());
                 } else {
                     attempts.put(entry.getKey(), a + 1);
                 }

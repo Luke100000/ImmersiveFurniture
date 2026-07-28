@@ -6,6 +6,7 @@
 * Fixed gigalags when having too many furniture around
 * Fixed items in inventory being quite slow
 * Fixed furniture being a bit dark in the GUI on 1.21.1
+* Fixed artisans table not having any durability
 
 # 0.3.0
 
