@@ -10,6 +10,7 @@ import net.minecraft.world.level.material.PushReaction;
 public interface Blocks {
     Block ARTISANS_WORKSTATION = new ArtisansWorkstationBlock(baseProps()
             .mapColor(MapColor.WOOD)
+            .strength(2.5f)
             .sound(SoundType.WOOD)
     );
 
