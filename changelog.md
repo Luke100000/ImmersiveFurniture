@@ -1,3 +1,7 @@
+# 0.3.2
+
+* Fixed crashing crashes caused by crashing Sable support
+
 # 0.3.1
 
 * Overall performance improvements for furniture items, editor, and furniture entities

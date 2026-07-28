@@ -42,7 +42,7 @@ dependencies {
     modLocalRuntime "maven.modrinth:packet-fixer:${packetfixer_version}"
 
     modLocalRuntime "dev.ryanhcode.sable:sable-fabric-${minecraft_version}:${sable_fabric_version}"
-    include(modImplementation("dev.ryanhcode.sable-companion:sable-companion-common-${minecraft_version}:${sable_companion_common_version}"))
+    include(modImplementation("dev.ryanhcode.sable-companion:sable-companion-fabric-${minecraft_version}:${sable_companion_common_version}"))
 }
 
 loom {
