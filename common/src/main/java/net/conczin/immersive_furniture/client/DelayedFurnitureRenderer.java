@@ -3,6 +3,7 @@ package net.conczin.immersive_furniture.client;
 import net.conczin.immersive_furniture.Common;
 import net.conczin.immersive_furniture.block.BaseFurnitureBlock;
 import net.conczin.immersive_furniture.client.model.DynamicAtlas;
+import net.conczin.immersive_furniture.config.Config;
 import net.conczin.immersive_furniture.data.FurnitureData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -19,7 +20,6 @@ import java.util.function.Function;
 public class DelayedFurnitureRenderer {
     public static final DelayedFurnitureRenderer INSTANCE = new DelayedFurnitureRenderer();
 
-    private static final int MAX_ENTITY_ATLAS_SIZE = 8192;
     private static final long ENTITY_ATLAS_RESET_COOLDOWN = TimeUnit.SECONDS.toNanos(10);
 
     private boolean quickCheck = false;
@@ -87,8 +87,9 @@ public class DelayedFurnitureRenderer {
 
         long now = System.nanoTime();
         if (atlas.isFull() && now - lastEntityAtlasReset < ENTITY_ATLAS_RESET_COOLDOWN) {
-            if (atlas.getSize() < MAX_ENTITY_ATLAS_SIZE) {
-                int size = Math.min(atlas.getSize() * 2, MAX_ENTITY_ATLAS_SIZE);
+            int max = Config.getInstance().getMaxAtlasSize();
+            if (atlas.getSize() < max) {
+                int size = Math.min(atlas.getSize() * 2, max);
                 DynamicAtlas.resizeEntity(size);
                 lastEntityAtlasReset = now;
                 Common.logger.info("Resized entity atlas to {}x{}", size, size);
