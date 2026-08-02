@@ -1,6 +1,10 @@
-# 0.3.2
+# 0.3.3
 
 * Fixed crashing crashes caused by crashing Sable support
+
+# 0.3.2
+
+* Fixed particle emitter not respecting block rotation
 
 # 0.3.1
 
