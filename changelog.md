@@ -1,3 +1,7 @@
+# 0.3.2
+
+* Fixed particle emitter not respecting block rotation
+
 # 0.3.1
 
 * Overall performance improvements for furniture items, editor, and furniture entities

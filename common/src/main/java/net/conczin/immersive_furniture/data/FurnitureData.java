@@ -453,7 +453,8 @@ public class FurnitureData {
             c--;
 
             Vector3f sampledPos = element.sampleRandomPosition(random, direction).mul(1.0f / 16.0f);
-            Vector3f up = new Vector3f(element.getRotationAxes().up()).div(Math.abs(element.to.y - element.from.y) + 0.001f);
+            Vector3f up = rotateVector(element.getRotationAxes().up(), direction)
+                    .div(Math.abs(element.to.y - element.from.y) + 0.001f);
 
             float vr = element.particleEmitter.velocityRandom / 16.0f;
             float vd = element.particleEmitter.velocityDirectional / 16.0f;
@@ -606,6 +607,9 @@ public class FurnitureData {
     }
 
     private static Vector3f rotateVector(Vector3f vec, Direction direction) {
+        if (direction == null) {
+            return new Vector3f(vec);
+        }
         return switch (direction) {
             case SOUTH -> new Vector3f(-vec.x, vec.y, -vec.z);
             case EAST -> new Vector3f(-vec.z, vec.y, vec.x);
