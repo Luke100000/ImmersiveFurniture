@@ -1,3 +1,7 @@
+# TDP
+
+* Fixed crashes on a corrupted cache
+
 # 0.3.3
 
 * Fixed particle emitter not respecting block rotation

@@ -6,6 +6,7 @@ import net.conczin.immersive_furniture.data.api.responses.ContentResponse;
 import net.conczin.immersive_furniture.data.api.responses.Response;
 import net.conczin.immersive_furniture.network.Network;
 import net.conczin.immersive_furniture.network.c2s.FurnitureDataRequest;
+import net.minecraft.ReportedException;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.resources.ResourceLocation;
@@ -163,7 +164,7 @@ public class FurnitureDataManager {
                     CompoundTag tag = NbtIo.readCompressed(cache);
                     FurnitureData data = new FurnitureData(tag);
                     DATA.put(id, data);
-                } catch (IOException e) {
+                } catch (IOException | ReportedException e) {
                     delete(cache);
                     Common.logger.error("Failed to read file: {}", cache, e);
                 }
