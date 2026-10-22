@@ -1,5 +1,7 @@
 package net.conczin.immersive_furniture.mixin.client;
 
+import dev.ryanhcode.sable.companion.ClientSubLevelAccess;
+import dev.ryanhcode.sable.companion.SableCompanion;
 import net.conczin.immersive_furniture.InteractionManager;
 import net.minecraft.client.Camera;
 import net.minecraft.core.BlockPos;
@@ -37,11 +39,16 @@ public abstract class CameraMixin {
                 setRotation(interaction.offset().rotation(), 0f);
                 Vector3f offset = interaction.offset().offset();
                 BlockPos pos = interaction.pos();
-                setPosition(
+                Vec3 position = new Vec3(
                         pos.getX() + (double) offset.x,
                         pos.getY() + (double) offset.y + 0.4,
                         pos.getZ() + (double) offset.z
                 );
+                ClientSubLevelAccess subLevel = SableCompanion.INSTANCE.getContainingClient(pos);
+                if (subLevel != null) {
+                    position = subLevel.renderPose(partialTick).transformPosition(position);
+                }
+                setPosition(position.x, position.y, position.z);
             }
         }
     }

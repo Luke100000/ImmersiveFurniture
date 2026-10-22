@@ -1,5 +1,6 @@
 package net.conczin.immersive_furniture.mixin;
 
+import dev.ryanhcode.sable.companion.SableCompanion;
 import net.conczin.immersive_furniture.InteractionManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -7,6 +8,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
+import org.joml.Vector3d;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -69,11 +71,13 @@ public abstract class LivingEntityMixin extends Entity {
             setYBodyRot(-rotation - 90f);
             setYHeadRot(-rotation - 90f);
 
-            setPos(
+            Vector3d position = new Vector3d(
                     interaction.pos().getX() + (double) interaction.offset().offset().x(),
                     interaction.pos().getY() + (double) interaction.offset().offset().y(),
                     interaction.pos().getZ() + (double) interaction.offset().offset().z()
             );
+            SableCompanion.INSTANCE.projectOutOfSubLevel(level(), position);
+            setPos(position.x, position.y, position.z);
         }
     }
 

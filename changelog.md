@@ -4,6 +4,7 @@
 * Fixed failed library downloads not retrying
 * Fixed concurrent random access errors
 * Fixed a crash with Dynamic Trees
+* Fixed sleeping in furniture beds on Sable sublevels
 
 # 0.3.3
 
