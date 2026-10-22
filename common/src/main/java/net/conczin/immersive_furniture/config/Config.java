@@ -38,8 +38,11 @@ public final class Config extends JsonConfig {
     // Lower values may lead to artifacts on steep view angles.
     public int maxMipLevel = 2;
 
-    // Atlas size for baked furniture; must be a multiple of 2, between 512 and 8192
+    // Atlas sizes must be powers of two; invalid values fall back to their default
     public int bakedAtlasSize = 1024;
+    public int entityAtlasSize = 512;
+    public int scratchAtlasSize = 512;
+    public int maxAtlasSize = 8192;
     public boolean disableAtlasRefreshes = false;
 
     public Config(String name) {
@@ -51,10 +54,23 @@ public final class Config extends JsonConfig {
     }
 
     public int getBakedAtlasSize() {
-        return switch (bakedAtlasSize) {
-            case 256, 512, 1024, 2048, 4096, 8192 -> bakedAtlasSize;
-            default -> 1024;
-        };
+        return validAtlasSize(bakedAtlasSize, 1024);
+    }
+
+    public int getEntityAtlasSize() {
+        return validAtlasSize(entityAtlasSize, 512);
+    }
+
+    public int getScratchAtlasSize() {
+        return validAtlasSize(scratchAtlasSize, 512);
+    }
+
+    public int getMaxAtlasSize() {
+        return validAtlasSize(maxAtlasSize, 8192);
+    }
+
+    private static int validAtlasSize(int size, int fallback) {
+        return size > 0 && (size & (size - 1)) == 0 ? size : fallback;
     }
 
     @Override

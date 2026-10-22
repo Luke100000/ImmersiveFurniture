@@ -16,8 +16,6 @@ import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.world.entity.player.Player;
 
 public class Client {
-    private static final int MAX_ATLAS_SIZE = 8192;
-
     public static final String ATLAS_REFRESH_COMMAND = "/immersive_furniture_refresh_atlas";
     public static final String ATLAS_INCREASE_COMMAND = "/immersive_furniture_increase_atlas";
 
@@ -98,12 +96,13 @@ public class Client {
 
         Config config = Config.getInstance();
         int size = config.getBakedAtlasSize();
-        if (size >= MAX_ATLAS_SIZE) {
+        int max = config.getMaxAtlasSize();
+        if (size >= max) {
             player.sendSystemMessage(Component.translatable("immersive_furniture.atlas_increase.maximum"));
             return;
         }
 
-        config.bakedAtlasSize = Math.min(size * 2, MAX_ATLAS_SIZE);
+        config.bakedAtlasSize = Math.min(size * 2, max);
         config.save();
         player.sendSystemMessage(Component.translatable("immersive_furniture.atlas_increase.restart", config.bakedAtlasSize, config.bakedAtlasSize));
     }
