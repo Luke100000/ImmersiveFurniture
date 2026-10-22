@@ -2,6 +2,8 @@
 
 * Fixed crashes on a corrupted cache
 * Fixed failed library downloads not retrying
+* Fixed concurrent random access errors
+* Fixed a crash with Dynamic Trees
 
 # 0.3.3
 
