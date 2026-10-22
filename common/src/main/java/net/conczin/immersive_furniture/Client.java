@@ -14,6 +14,7 @@ import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.InventoryMenu;
 
 public class Client {
     public static final String ATLAS_REFRESH_COMMAND = "/immersive_furniture_refresh_atlas";
@@ -90,13 +91,32 @@ public class Client {
         atlasRefreshPromptShown = false;
     }
 
+    private static int getHardwareAtlasSize() {
+        // Vanilla caches this GL limit on the render thread before loading sprites asynchronously.
+        return Integer.highestOneBit(Minecraft.getInstance().getModelManager()
+                .getAtlas(InventoryMenu.BLOCK_ATLAS).maxSupportedTextureSize());
+    }
+
+    public static int getMaxAtlasSize() {
+        return Math.min(Config.getInstance().getMaxAtlasSize(), getHardwareAtlasSize());
+    }
+
+    public static int getMaxBakedAtlasSize() {
+        // Leave room for the other sprites in Minecraft's shared block atlas.
+        return Math.min(getMaxAtlasSize(), getHardwareAtlasSize() / 2);
+    }
+
+    public static int getBakedAtlasSize() {
+        return Math.min(Config.getInstance().getBakedAtlasSize(), getMaxBakedAtlasSize());
+    }
+
     public static void increaseAtlasSize() {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null) return;
 
         Config config = Config.getInstance();
-        int size = config.getBakedAtlasSize();
-        int max = config.getMaxAtlasSize();
+        int size = getBakedAtlasSize();
+        int max = getMaxBakedAtlasSize();
         if (size >= max) {
             player.sendSystemMessage(Component.translatable("immersive_furniture.atlas_increase.maximum"));
             return;

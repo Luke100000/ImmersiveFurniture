@@ -1,6 +1,7 @@
 package net.conczin.immersive_furniture.client.model;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.conczin.immersive_furniture.Client;
 import net.conczin.immersive_furniture.Common;
 import net.conczin.immersive_furniture.config.Config;
 import net.minecraft.client.Minecraft;
@@ -15,7 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 
 public class DynamicAtlas extends DynamicTexture {
-    public static final DynamicAtlas BAKED = new DynamicAtlas(Config.getInstance().getBakedAtlasSize(), "baked");
+    public static final DynamicAtlas BAKED = new DynamicAtlas(Client.getBakedAtlasSize(), "baked");
     public static DynamicAtlas ENTITY = new DynamicAtlas(Config.getInstance().getEntityAtlasSize(), "entity");
     public static final DynamicAtlas SCRATCH = new DynamicAtlas(Config.getInstance().getScratchAtlasSize(), "scratch");
 
@@ -33,16 +34,16 @@ public class DynamicAtlas extends DynamicTexture {
     private boolean dirty = false;
 
     public DynamicAtlas(int size, String name) {
-        super(size, size, false);
+        super(Math.min(size, Client.getMaxAtlasSize()), Math.min(size, Client.getMaxAtlasSize()), false);
 
-        this.size = size;
+        this.size = Objects.requireNonNull(getPixels()).getWidth();
 
         // Register the texture with the Minecraft texture manager
         location = Common.locate("immersive_furniture_atlas/" + name);
         Minecraft.getInstance().getTextureManager().register(location, this);
 
-        SpriteContents contents = new SpriteContents(location, new FrameSize(size, size), Objects.requireNonNull(getPixels()), AnimationMetadataSection.EMPTY);
-        sprite = new TextureAtlasSpriteAccessor(location, contents, size, size, 0, 0);
+        SpriteContents contents = new SpriteContents(location, new FrameSize(this.size, this.size), Objects.requireNonNull(getPixels()), AnimationMetadataSection.EMPTY);
+        sprite = new TextureAtlasSpriteAccessor(location, contents, this.size, this.size, 0, 0);
 
         clear();
     }

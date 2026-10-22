@@ -1,8 +1,8 @@
 package net.conczin.immersive_furniture.mixin.client;
 
 import com.mojang.blaze3d.platform.NativeImage;
+import net.conczin.immersive_furniture.Client;
 import net.conczin.immersive_furniture.Common;
-import net.conczin.immersive_furniture.config.Config;
 import net.minecraft.client.renderer.texture.SpriteContents;
 import net.minecraft.client.renderer.texture.SpriteLoader;
 import net.minecraft.client.resources.metadata.animation.AnimationMetadataSection;
@@ -23,7 +23,7 @@ public class SpriteLoaderMixin {
     @Inject(method = "loadSprite", at = @At("HEAD"), cancellable = true)
     private static void immersiveFurniture$loadSprite(ResourceLocation location, Resource resource, CallbackInfoReturnable<SpriteContents> cir) {
         if (location.equals(FURNITURE_TEXTURE)) {
-            int size = Config.getInstance().getBakedAtlasSize();
+            int size = Client.getBakedAtlasSize();
             cir.setReturnValue(new SpriteContents(
                     location,
                     new FrameSize(size, size),

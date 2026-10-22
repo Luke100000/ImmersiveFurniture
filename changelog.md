@@ -4,6 +4,8 @@
 * Fixed failed library downloads not retrying
 * Fixed concurrent random access errors
 * Fixed a crash with Dynamic Trees
+* Added configurable entity and scratch atlas sizes
+* Fixed atlas size limits to respect configuration and graphics hardware
 
 # 0.3.3
 
