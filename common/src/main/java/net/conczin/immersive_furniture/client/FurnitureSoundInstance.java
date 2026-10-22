@@ -8,7 +8,8 @@ import net.minecraft.world.phys.Vec3;
 
 public class FurnitureSoundInstance extends AbstractTickableSoundInstance {
     public FurnitureSoundInstance(SoundEvent sound, float volume, float pitch, RandomSource random, Vec3 pos) {
-        super(sound, SoundSource.BLOCKS, random);
+        super(sound, SoundSource.BLOCKS, random.fork());
+
         this.volume = volume;
         this.pitch = pitch;
         this.x = pos.x;

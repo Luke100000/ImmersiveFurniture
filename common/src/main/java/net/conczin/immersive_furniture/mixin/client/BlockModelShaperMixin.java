@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class BlockModelShaperMixin {
     @Inject(method = "getBlockModel(Lnet/minecraft/world/level/block/state/BlockState;)Lnet/minecraft/client/resources/model/BakedModel;", at = @At("HEAD"), cancellable = true)
     private void onGetBlockModel(BlockState state, CallbackInfoReturnable<BakedModel> cir) {
-        if (state.getBlock() instanceof BaseFurnitureBlock) {
+        if (state != null && state.getBlock() instanceof BaseFurnitureBlock) {
             cir.setReturnValue(FurnitureBakedModelWrapper.model);
         }
     }
