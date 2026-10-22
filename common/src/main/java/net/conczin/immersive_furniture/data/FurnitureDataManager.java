@@ -21,6 +21,7 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.TimeUnit;
 
 import static net.conczin.immersive_furniture.data.api.API.request;
 
@@ -29,7 +30,7 @@ public class FurnitureDataManager {
     public static Path worldRoot = Path.of("./immersive_furniture");
 
     public static final Map<ResourceLocation, FurnitureData> DATA = new ConcurrentHashMap<>();
-    public static final Set<ResourceLocation> REQUESTED_DATA = ConcurrentHashMap.newKeySet();
+    public static final Map<ResourceLocation, Object> REQUESTED_DATA = new ConcurrentHashMap<>();
 
     private static final Set<String> alreadySaved = new ConcurrentSkipListSet<>();
 
@@ -112,10 +113,12 @@ public class FurnitureDataManager {
         File cache = getFile(id);
         try {
             NbtIo.writeCompressed(data.toTag(), cache);
-            DATA.put(id, data);
         } catch (IOException e) {
             Common.logger.error("Failed to save local file: {}", cache.getPath(), e);
         }
+
+        // Keep the model available even if caching fails.
+        DATA.put(id, data);
     }
 
     /**
@@ -154,8 +157,11 @@ public class FurnitureDataManager {
     }
 
     public static FurnitureData getData(ResourceLocation id) {
-        if (!DATA.containsKey(id) && !REQUESTED_DATA.contains(id)) {
-            REQUESTED_DATA.add(id);
+        if (!DATA.containsKey(id) && !REQUESTED_DATA.containsKey(id)) {
+            Object request = new Object();
+            if (REQUESTED_DATA.putIfAbsent(id, request) != null) {
+                return DATA.get(id);
+            }
 
             // Load if it exists
             File cache = getFile(id);
@@ -184,17 +190,23 @@ public class FurnitureDataManager {
 
                 // Download assets when versions mismatch
                 CompletableFuture.runAsync(() -> {
-                    Response response = request(API.HttpMethod.GET, ContentResponse::new, "content/furniture/" + contentid, Map.of("version", String.valueOf(version)));
-                    if (response instanceof ContentResponse contentResponse) {
-                        ByteArrayInputStream in = new ByteArrayInputStream(Base64.getDecoder().decode(contentResponse.content().data()));
-                        try {
+                    try {
+                        Response response = request(API.HttpMethod.GET, ContentResponse::new, "content/furniture/" + contentid, Map.of("version", String.valueOf(version)));
+                        if (response instanceof ContentResponse contentResponse) {
+                            ByteArrayInputStream in = new ByteArrayInputStream(Base64.getDecoder().decode(contentResponse.content().data()));
                             FurnitureData data = new FurnitureData(NbtIo.readCompressed(in));
                             data.contentid = contentid;
                             data.author = contentResponse.content().username();
-                            NbtIo.writeCompressed(data.toTag(), getFile(id));
-                            DATA.put(id, data);
-                        } catch (Exception e) {
-                            Common.logger.error("Failed to read content response: {}", contentResponse, e);
+                            save(data, id);
+                        }
+                    } catch (Exception e) {
+                        Common.logger.error("Failed to load furniture: {}", id, e);
+                    } finally {
+                        if (DATA.containsKey(id)) {
+                            REQUESTED_DATA.remove(id, request);
+                        } else {
+                            // Delay retries without letting an old download clear a newer request.
+                            CompletableFuture.delayedExecutor(5, TimeUnit.SECONDS).execute(() -> REQUESTED_DATA.remove(id, request));
                         }
                     }
                 });

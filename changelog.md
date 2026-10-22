@@ -1,6 +1,7 @@
 # TDP
 
 * Fixed crashes on a corrupted cache
+* Fixed failed library downloads not retrying
 
 # 0.3.3
 
