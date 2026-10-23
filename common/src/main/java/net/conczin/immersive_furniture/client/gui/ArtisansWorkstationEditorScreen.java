@@ -10,6 +10,7 @@ import net.conczin.immersive_furniture.client.Utils;
 import net.conczin.immersive_furniture.client.gui.components.*;
 import net.conczin.immersive_furniture.client.gui.widgets.StateImageButton;
 import net.conczin.immersive_furniture.client.model.ClientModelUtils;
+import net.conczin.immersive_furniture.client.model.DynamicAtlas;
 import net.conczin.immersive_furniture.config.Config;
 import net.conczin.immersive_furniture.data.FurnitureData;
 import net.conczin.immersive_furniture.data.FurnitureDataManager;
@@ -709,7 +710,12 @@ public class ArtisansWorkstationEditorScreen extends ArtisansWorkstationScreen {
             if (autosaveInterval >= 0) {
                 long currentTime = System.currentTimeMillis();
                 if (currentTime - lastAutosaveTime > autosaveInterval * 1000L) {
-                    FurnitureDataManager.save(data, ResourceLocation.fromNamespaceAndPath("local", "autosave"));
+                    FurnitureData snapshot;
+                    try (var ignored = DynamicAtlas.SCRATCH.bakeLock.acquire()) {
+                        snapshot = new FurnitureData(data.toTag());
+                    }
+                    settingsComponent.finish(snapshot);
+                    FurnitureDataManager.save(snapshot, ResourceLocation.fromNamespaceAndPath("local", "autosave"));
                     lastAutosaveTime = currentTime;
                 }
             }

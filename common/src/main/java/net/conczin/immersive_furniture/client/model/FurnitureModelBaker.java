@@ -124,8 +124,19 @@ public class FurnitureModelBaker {
     public static CompositeBakedModel getAsyncModel(FurnitureData data, DynamicAtlas atlas, int state) {
         String hash = data.getHash();
         if (atlas.knownFurniture.containsKey(hash)) {
-            return getModel(data, hash, atlas, 0, state, false);
-        } else if (atlas == DynamicAtlas.SCRATCH) {
+            if (!atlas.bakeLock.tryLock()) return null;
+            try {
+                CachedBakedModelSet cached = atlas.knownFurniture.get(hash);
+                if (cached != null) {
+                    atlas.uploadIfDirty();
+                    return cached.get(0, state);
+                }
+            } finally {
+                atlas.bakeLock.unlock();
+            }
+        }
+
+        if (atlas == DynamicAtlas.SCRATCH) {
             requestScratchBake(data, hash, state);
         } else if (atlas.asyncRequestedFurniture.add(hash)) {
             Common.EXECUTOR.execute(() -> {
@@ -141,7 +152,8 @@ public class FurnitureModelBaker {
 
     private static void requestScratchBake(FurnitureData data, String hash, int state) {
         synchronized (scratchBakeLock) {
-            if (hash.equals(runningScratchHash) || (pendingScratchBake != null && hash.equals(pendingScratchBake.hash()))) return;
+            if (hash.equals(runningScratchHash) || (pendingScratchBake != null && hash.equals(pendingScratchBake.hash())))
+                return;
             pendingScratchBake = new ScratchBake(data, hash, state);
             scratchBakeLock.notify();
         }
@@ -188,35 +200,38 @@ public class FurnitureModelBaker {
      * Can return null if atlas is full unless forced.
      */
     public static CompositeBakedModel getModel(FurnitureData data, String hash, DynamicAtlas atlas, int yRot, int state, boolean force) {
-        CachedBakedModelSet cachedBakedModelSet = atlas.knownFurniture.get(hash);
-        boolean exist = cachedBakedModelSet != null;
+        // Clearing the atlas during a bake would invalidate its texture coordinates.
+        try (var ignored = atlas.bakeLock.acquire()) {
+            CachedBakedModelSet cachedBakedModelSet = atlas.knownFurniture.get(hash);
+            boolean exist = cachedBakedModelSet != null;
 
-        // The atlas is full, cannot continue
-        if (!force && !exist && atlas.isFull()) {
+            // The atlas is full, cannot continue
+            if (!force && !exist && atlas.isFull()) {
+                return null;
+            }
+
+            if (exist) {
+                atlas.uploadIfDirty();
+                return cachedBakedModelSet.get(yRot, state);
+            } else {
+                float previousUsage = atlas.getUsage();
+                CompositeBlockModel model = FurnitureModelFactory.getModel(data, atlas);
+                atlas.uploadIfDirty();
+
+                // Only cache if the hash is still the same
+                CachedBakedModelSet modelSet = new CachedBakedModelSet(atlas, model);
+                if (hash.equals(data.computeHash())) {
+                    atlas.knownFurniture.put(hash, modelSet);
+                }
+
+                // Only add when forced or the atlas had space
+                if (force || !atlas.isFull() && atlas.getUsage() >= previousUsage) {
+                    return modelSet.get(yRot, state);
+                } else {
+                    atlas.knownFurniture.remove(hash);
+                }
+            }
             return null;
         }
-
-        if (exist) {
-            atlas.uploadIfDirty();
-            return cachedBakedModelSet.get(yRot, state);
-        } else {
-            float previousUsage = atlas.getUsage();
-            CompositeBlockModel model = FurnitureModelFactory.getModel(data, atlas);
-            atlas.uploadIfDirty();
-
-            // Only cache if the hash is still the same
-            CachedBakedModelSet modelSet = new CachedBakedModelSet(atlas, model);
-            if (hash.equals(data.computeHash())) {
-                atlas.knownFurniture.put(hash, modelSet);
-            }
-
-            // Only add when forced or the atlas had space
-            if (force || !atlas.isFull() && atlas.getUsage() >= previousUsage) {
-                return modelSet.get(yRot, state);
-            } else {
-                atlas.knownFurniture.remove(hash);
-            }
-        }
-        return null;
     }
 }

@@ -71,10 +71,6 @@ public abstract class ArtisansWorkstationScreen extends Screen {
 
     public ArtisansWorkstationScreen() {
         super(TITLE);
-
-        if (MaterialRegistry.INSTANCE.materials.isEmpty()) {
-            new Thread(MaterialRegistry.INSTANCE::sync).start();
-        }
     }
 
     protected void cycleWindowSize() {

@@ -1,5 +1,6 @@
 package net.conczin.immersive_furniture.client;
 
+import net.conczin.immersive_furniture.Client;
 import net.conczin.immersive_furniture.Common;
 import net.conczin.immersive_furniture.block.BaseFurnitureBlock;
 import net.conczin.immersive_furniture.client.model.DynamicAtlas;
@@ -87,7 +88,7 @@ public class DelayedFurnitureRenderer {
 
         long now = System.nanoTime();
         if (atlas.isFull() && now - lastEntityAtlasReset < ENTITY_ATLAS_RESET_COOLDOWN) {
-            int max = Config.getInstance().getMaxAtlasSize();
+            int max = Client.getMaxAtlasSize();
             if (atlas.getSize() < max) {
                 int size = Math.min(atlas.getSize() * 2, max);
                 DynamicAtlas.resizeEntity(size);

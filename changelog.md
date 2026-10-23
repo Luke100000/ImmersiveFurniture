@@ -1,10 +1,13 @@
-# TDP
+# 0.3.4
 
 * Fixed crashes on a corrupted cache
 * Fixed failed library downloads not retrying
 * Fixed concurrent random access errors
 * Fixed a crash with Dynamic Trees
 * Fixed sleeping in furniture beds on Sable sublevels
+* Added configurable entity and scratch atlas sizes
+* Fixed atlas size limits to respect configuration and graphics hardware
+* Fixed autosaves losing baked textures
 
 # 0.3.3
 

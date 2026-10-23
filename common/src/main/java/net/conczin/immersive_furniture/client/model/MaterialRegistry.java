@@ -6,15 +6,16 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.state.BlockState;
 
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class MaterialRegistry {
     public static final MaterialRegistry INSTANCE = new MaterialRegistry();
 
-    public final Map<ResourceLocation, MaterialSource> materials = new ConcurrentHashMap<>();
+    public volatile Map<ResourceLocation, MaterialSource> materials = Map.of();
 
     public void sync() {
+        Map<ResourceLocation, MaterialSource> materials = new HashMap<>();
         for (Block block : BuiltInRegistries.BLOCK) {
             BlockState state = block.defaultBlockState();
             if (state.getRenderShape() == RenderShape.MODEL) {
@@ -28,8 +29,6 @@ public class MaterialRegistry {
                 }
             }
         }
-
-        // This enforces a render since at this point the renderer could have caught missing textures
-        DynamicAtlas.SCRATCH.clear();
+        this.materials = Map.copyOf(materials);
     }
 }

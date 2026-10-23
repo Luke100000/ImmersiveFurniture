@@ -49,7 +49,7 @@ public final class ClientNeoForge {
         event.registerReloadListener((preparationBarrier, resourceManager, profilerFiller, profilerFiller1, backgroundExecutor, gameExecutor)
                 -> CompletableFuture.supplyAsync(() -> null, backgroundExecutor)
                 .thenCompose(preparationBarrier::wait)
-                .thenRunAsync(Client::onLevelLoad, gameExecutor));
+                .thenRunAsync(Client::onResourceReload, gameExecutor));
     }
 
     static {

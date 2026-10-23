@@ -38,10 +38,12 @@ public final class Config extends JsonConfig {
     // Lower values may lead to artifacts on steep view angles.
     public int maxMipLevel = 2;
 
-    // Atlas sizes must be powers of two; invalid values fall back to their default
+    // Atlas sizes must be powers of two and at least 256; invalid values use their defaults.
     public int bakedAtlasSize = 1024;
     public int entityAtlasSize = 512;
     public int scratchAtlasSize = 512;
+
+    // Caps initial sizes and growth. Graphics limits may reduce sizes further.
     public int maxAtlasSize = 8192;
     public boolean disableAtlasRefreshes = false;
 
@@ -54,15 +56,15 @@ public final class Config extends JsonConfig {
     }
 
     public int getBakedAtlasSize() {
-        return validAtlasSize(bakedAtlasSize, 1024);
+        return Math.min(validAtlasSize(bakedAtlasSize, 1024), getMaxAtlasSize());
     }
 
     public int getEntityAtlasSize() {
-        return validAtlasSize(entityAtlasSize, 512);
+        return Math.min(validAtlasSize(entityAtlasSize, 512), getMaxAtlasSize());
     }
 
     public int getScratchAtlasSize() {
-        return validAtlasSize(scratchAtlasSize, 512);
+        return Math.min(validAtlasSize(scratchAtlasSize, 512), getMaxAtlasSize());
     }
 
     public int getMaxAtlasSize() {
@@ -70,7 +72,7 @@ public final class Config extends JsonConfig {
     }
 
     private static int validAtlasSize(int size, int fallback) {
-        return size > 0 && (size & (size - 1)) == 0 ? size : fallback;
+        return size >= 256 && (size & (size - 1)) == 0 ? size : fallback;
     }
 
     @Override
