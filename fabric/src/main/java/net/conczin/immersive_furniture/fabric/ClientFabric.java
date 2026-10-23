@@ -58,7 +58,7 @@ public final class ClientFabric implements ClientModInitializer {
             public CompletableFuture<Void> reload(PreparationBarrier preparationBarrier, ResourceManager resourceManager, ProfilerFiller preparationsProfiler, ProfilerFiller reloadProfiler, Executor backgroundExecutor, Executor gameExecutor) {
                 return CompletableFuture.supplyAsync(() -> null, backgroundExecutor)
                         .thenCompose(preparationBarrier::wait)
-                        .thenRunAsync(Client::onLevelLoad, gameExecutor);
+                        .thenRunAsync(Client::onResourceReload, gameExecutor);
             }
 
             @Override

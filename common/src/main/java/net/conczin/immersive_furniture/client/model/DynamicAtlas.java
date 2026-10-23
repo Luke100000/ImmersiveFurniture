@@ -4,6 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.conczin.immersive_furniture.Client;
 import net.conczin.immersive_furniture.Common;
 import net.conczin.immersive_furniture.config.Config;
+import net.conczin.immersive_furniture.utils.ScopedLock;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.renderer.texture.SpriteContents;
@@ -19,6 +20,8 @@ public class DynamicAtlas extends DynamicTexture {
     public static final DynamicAtlas BAKED = new DynamicAtlas(Client.getBakedAtlasSize(), "baked");
     public static DynamicAtlas ENTITY = new DynamicAtlas(Config.getInstance().getEntityAtlasSize(), "entity");
     public static final DynamicAtlas SCRATCH = new DynamicAtlas(Config.getInstance().getScratchAtlasSize(), "scratch");
+
+    public final ScopedLock bakeLock = new ScopedLock();
 
     int lastStateId;
     boolean full;
@@ -56,32 +59,34 @@ public class DynamicAtlas extends DynamicTexture {
         ENTITY = new DynamicAtlas(size, "entity");
     }
 
-    synchronized public Quad allocate(int w, int h) {
-        // Find the best fitting quad
-        Quad best = getBestQuad(w, h);
+    public Quad allocate(int w, int h) {
+        try (var ignored = bakeLock.acquire()) {
+            // Find the best fitting quad
+            Quad best = getBestQuad(w, h);
 
-        // And split it
-        if (best != null) {
-            quads.remove(best);
+            // And split it
+            if (best != null) {
+                quads.remove(best);
 
-            // Split
-            int dw = best.w - w;
-            int dh = best.h - h;
+                // Split
+                int dw = best.w - w;
+                int dh = best.h - h;
 
-            if (dw > dh) {
-                if (dw > 0) quads.add(new Quad(best.x + w, best.y, dw, best.h));
-                if (dh > 0) quads.add(new Quad(best.x, best.y + h, w, dh));
-            } else {
-                if (dw > 0) quads.add(new Quad(best.x + w, best.y, dw, h));
-                if (dh > 0) quads.add(new Quad(best.x, best.y + h, best.w, dh));
+                if (dw > dh) {
+                    if (dw > 0) quads.add(new Quad(best.x + w, best.y, dw, best.h));
+                    if (dh > 0) quads.add(new Quad(best.x, best.y + h, w, dh));
+                } else {
+                    if (dw > 0) quads.add(new Quad(best.x + w, best.y, dw, h));
+                    if (dh > 0) quads.add(new Quad(best.x, best.y + h, best.w, dh));
+                }
+
+                allocated += w * h;
+                return new Quad(best.x, best.y, w, h);
             }
 
-            allocated += w * h;
-            return new Quad(best.x, best.y, w, h);
+            full = true;
+            return new Quad(0, 0, 0, 0);
         }
-
-        full = true;
-        return new Quad(0, 0, 0, 0);
     }
 
     private Quad getBestQuad(int w, int h) {
@@ -102,13 +107,15 @@ public class DynamicAtlas extends DynamicTexture {
         return best;
     }
 
-    synchronized public void clear() {
-        quads.clear();
-        quads.add(new Quad(0, 0, size, size));
-        allocated = 0;
-        full = false;
-        knownFurniture.clear();
-        asyncRequestedFurniture.clear();
+    public void clear() {
+        try (var ignored = bakeLock.acquire()) {
+            quads.clear();
+            quads.add(new Quad(0, 0, size, size));
+            allocated = 0;
+            full = false;
+            knownFurniture.clear();
+            asyncRequestedFurniture.clear();
+        }
     }
 
     public boolean isFull() {

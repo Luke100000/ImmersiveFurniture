@@ -3,6 +3,7 @@ package net.conczin.immersive_furniture;
 import net.conczin.immersive_furniture.client.DelayedFurnitureRenderer;
 import net.conczin.immersive_furniture.client.AtlasSprite;
 import net.conczin.immersive_furniture.client.model.DynamicAtlas;
+import net.conczin.immersive_furniture.client.model.MaterialRegistry;
 import net.conczin.immersive_furniture.client.model.TransparencyManager;
 import net.conczin.immersive_furniture.config.Config;
 import net.conczin.immersive_furniture.data.FurnitureDataManager;
@@ -27,6 +28,11 @@ public class Client {
 
         // Load on the right thread
         DynamicAtlas.boostrap();
+    }
+
+    public static void onResourceReload() {
+        MaterialRegistry.INSTANCE.sync();
+        onLevelLoad();
     }
 
     public static void onLevelLoad() {

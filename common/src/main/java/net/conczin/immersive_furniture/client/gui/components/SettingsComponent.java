@@ -187,7 +187,9 @@ public class SettingsComponent extends ScreenComponent {
         // Bake after all metadata changes so the preview cache uses the final saved hash.
         data.invalidateHash();
         TransparencyManager.prepare(data);
-        DynamicAtlas.SCRATCH.clear();
-        FurnitureModelFactory.getModel(data, DynamicAtlas.SCRATCH);
+        try (var ignored = DynamicAtlas.SCRATCH.bakeLock.acquire()) {
+            DynamicAtlas.SCRATCH.clear();
+            FurnitureModelFactory.getModel(data, DynamicAtlas.SCRATCH);
+        }
     }
 }

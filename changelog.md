@@ -1,4 +1,4 @@
-# TDP
+# 0.3.4
 
 * Fixed crashes on a corrupted cache
 * Fixed failed library downloads not retrying
@@ -6,6 +6,7 @@
 * Fixed a crash with Dynamic Trees
 * Added configurable entity and scratch atlas sizes
 * Fixed atlas size limits to respect configuration and graphics hardware
+* Fixed autosaves losing baked textures
 
 # 0.3.3
 
