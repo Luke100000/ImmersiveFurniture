@@ -73,7 +73,8 @@ public class ServerFurnitureRegistry {
             if (subMap.size() >= chunkSize) {
                 FurnitureRegistryMessage message = new FurnitureRegistryMessage(subMap);
                 Network.sendToPlayer(message, player);
-                subMap.clear();
+                // The payload is encoded later on the network thread, so it must keep its own map
+                subMap = new HashMap<>();
             }
         }
 
