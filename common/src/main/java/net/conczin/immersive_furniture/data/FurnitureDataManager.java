@@ -191,7 +191,7 @@ public class FurnitureDataManager {
                 // Download assets when versions mismatch
                 CompletableFuture.runAsync(() -> {
                     try {
-                        Response response = request(API.HttpMethod.GET, ContentResponse::new, "content/furniture/" + contentid, Map.of("version", String.valueOf(version)));
+                        Response response = request(API.HttpMethod.GET, ContentResponse.class, "v3/content/furniture/" + contentid, Map.of("version", String.valueOf(version)));
                         if (response instanceof ContentResponse contentResponse) {
                             ByteArrayInputStream in = new ByteArrayInputStream(Base64.getDecoder().decode(contentResponse.content().data()));
                             FurnitureData data = new FurnitureData(NbtIo.readCompressed(in));

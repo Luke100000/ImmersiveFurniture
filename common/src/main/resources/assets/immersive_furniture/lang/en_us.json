@@ -151,6 +151,8 @@
   "gui.immersive_furniture.sort.date": "Sort by date",
   "gui.immersive_furniture.sort.likes": "Sort by favorites",
   "gui.immersive_furniture.sort.recommendations": "Recommended ordering",
+  "gui.immersive_furniture.sort.hot": "Hot right now",
+  "gui.immersive_furniture.sort.popular": "Popular lately",
 
   "gui.immersive_furniture.tab.cancel": "Cancel",
 

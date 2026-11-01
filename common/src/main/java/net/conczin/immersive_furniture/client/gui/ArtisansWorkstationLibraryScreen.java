@@ -7,6 +7,7 @@ import net.conczin.immersive_furniture.data.FurnitureData;
 import net.conczin.immersive_furniture.data.FurnitureDataManager;
 import net.conczin.immersive_furniture.data.api.API;
 import net.conczin.immersive_furniture.data.api.Auth;
+import net.conczin.immersive_furniture.data.api.types.LiteContent;
 import net.conczin.immersive_furniture.data.api.responses.*;
 import net.conczin.immersive_furniture.item.Items;
 import net.conczin.immersive_furniture.network.Network;
@@ -51,7 +52,9 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
     public enum SortingMode {
         DATE(88),
         LIKES(66),
-        RECOMMENDATIONS(154);
+        RECOMMENDATIONS(154),
+        HOT(176),
+        POPULAR(198);
 
         private final int u;
 
@@ -63,7 +66,9 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
             return switch (this) {
                 case DATE -> LIKES;
                 case LIKES -> RECOMMENDATIONS;
-                case RECOMMENDATIONS -> DATE;
+                case RECOMMENDATIONS -> HOT;
+                case HOT -> POPULAR;
+                case POPULAR -> DATE;
             };
         }
 
@@ -94,6 +99,8 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
 
     List<ResourceLocation> furniture = new LinkedList<>();
     List<ResourceLocation> localFiles;
+
+    Map<ResourceLocation, LiteContent> libraryContents = new HashMap<>();
 
     ResourceLocation selected = null;
 
@@ -235,22 +242,23 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
             int x = leftPos + windowWidth / 2;
             int y = topPos + windowHeight - 25;
 
+            LiteContent content = libraryContents.get(selected);
             if (!selected.getNamespace().equals("local")) {
                 addToggleButton(x - 50 - 11, y, 22, 0, 114, "gui.immersive_furniture.favorite", b -> {
                     if (authenticated) {
                         FurnitureData model = FurnitureDataManager.getData(selected);
                         if (model != null) {
-                            if (!b.isEnabled()) {
-                                request(API.HttpMethod.DELETE, "like/furniture/" + model.contentid);
-                            } else {
-                                request(API.HttpMethod.POST, "like/furniture/" + model.contentid);
+                            boolean like = b.isEnabled();
+                            request(like ? API.HttpMethod.POST : API.HttpMethod.DELETE, "v1/like/furniture/" + model.contentid);
+                            if (content != null) {
+                                libraryContents.put(selected, withLiked(content, like));
                             }
-                            b.setEnabled(!b.isEnabled());
+                            b.setEnabled(!like);
                         }
                     } else {
                         setError("gui.immersive_furniture.login_required");
                     }
-                }).setEnabled(tab != Tab.FAVORITES);
+                }).setEnabled(content != null ? !content.is_liked() : tab != Tab.FAVORITES);
             }
 
             // Publish
@@ -286,17 +294,21 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
                     if (authenticated) {
                         FurnitureData model = FurnitureDataManager.getData(selected);
                         if (model != null) {
-                            if (b.isEnabled()) {
-                                request(API.HttpMethod.DELETE, "report/furniture/" + model.contentid + "/DEFAULT");
-                            } else {
-                                request(API.HttpMethod.POST, "report/furniture/" + model.contentid + "/DEFAULT");
+                            boolean report = !b.isEnabled();
+                            request(report ? API.HttpMethod.POST : API.HttpMethod.DELETE, "v1/report/furniture/" + model.contentid + "/DEFAULT");
+                            if (content != null) {
+                                if (report) {
+                                    content.reports().add("DEFAULT");
+                                } else {
+                                    content.reports().remove("DEFAULT");
+                                }
                             }
-                            b.setEnabled(!b.isEnabled());
+                            b.setEnabled(report);
                         }
                     } else {
                         setError("gui.immersive_furniture.login_required");
                     }
-                }).setEnabled(false);
+                }).setEnabled(content != null && content.reports().contains("DEFAULT"));
             }
 
             // Close
@@ -324,6 +336,10 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
         }
     }
 
+    private static LiteContent withLiked(LiteContent c, boolean liked) {
+        return new LiteContent(c.content_id(), c.user_id(), c.username(), c.likes() + Boolean.compare(liked, c.is_liked()), c.tags(), c.title(), c.version(), liked, c.reports());
+    }
+
     private void addWindowSizeButton() {
         Component text = getWindowSizeTooltip();
         StateImageButton button = new StateImageButton(
@@ -345,7 +361,7 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
             if (tab == Tab.SUBMISSIONS) {
                 FurnitureData model = FurnitureDataManager.getData(selected);
                 if (model != null) {
-                    request(API.HttpMethod.DELETE, "content/furniture/" + model.contentid);
+                    request(API.HttpMethod.DELETE, "v1/content/furniture/" + model.contentid);
                 } else {
                     setError("gui.immersive_furniture.delete_failed");
                 }
@@ -538,7 +554,7 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
         awaitingAuthentication = true;
         CompletableFuture.runAsync(() -> {
             try {
-                Response response = Auth.hasToken() ? request(API.HttpMethod.GET, IsAuthResponse::new, "auth") : null;
+                Response response = Auth.hasToken() ? request(API.HttpMethod.GET, IsAuthResponse.class, "v1/auth") : null;
                 if (response instanceof IsAuthResponse authResponse) {
                     if (authResponse.authenticated()) {
                         authenticated = true;
@@ -702,7 +718,7 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
             awaitingSearch = true;
             Tab requestTab = tab;
             CompletableFuture.runAsync(() -> {
-                Response response = request(API.HttpMethod.GET, ContentListResponse::new, "v2/content/furniture", Map.of(
+                Response response = request(API.HttpMethod.GET, ContentListResponse.class, "v3/content/furniture", Map.of(
                         "whitelist", lastSearch + (tagFilter.equals("miscellaneous") ? "" : "," + tagFilter),
                         "blacklist", "",
                         "order", order.key(),
@@ -713,11 +729,14 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
                 ));
 
                 if (response instanceof ContentListResponse contentListResponse) {
-                    List<ResourceLocation> foundFurniture = Arrays.stream(contentListResponse.contents())
-                            .map(c -> new ResourceLocation("library", c.contentid() + "." + c.version()))
-                            .collect(Collectors.toList());
+                    Map<ResourceLocation, LiteContent> found = new LinkedHashMap<>();
+                    for (LiteContent c : contentListResponse.contents()) {
+                        found.put(new ResourceLocation("library", c.content_id() + "." + c.version()), c);
+                    }
+                    List<ResourceLocation> foundFurniture = new LinkedList<>(found.keySet());
                     Minecraft.getInstance().execute(() -> {
                         if (tab == requestTab) {
+                            libraryContents.putAll(found);
                             furniture = foundFurniture;
                             init();
                         }
@@ -758,8 +777,8 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
             // Upload
             Response request = request(
                     data.contentid == -1 ? API.HttpMethod.POST : API.HttpMethod.PUT,
-                    data.contentid == -1 ? ContentIdResponse::new : SuccessResponse::new,
-                    data.contentid == -1 ? "content/furniture" : "content/furniture/" + data.contentid,
+                    data.contentid == -1 ? ContentIdResponse.class : SuccessResponse.class,
+                    data.contentid == -1 ? "v1/content/furniture" : "v1/content/furniture/" + data.contentid,
                     Map.of(
 
                     ), Map.of(

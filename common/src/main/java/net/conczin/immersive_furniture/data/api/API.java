@@ -1,7 +1,6 @@
 package net.conczin.immersive_furniture.data.api;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import net.conczin.immersive_furniture.Common;
 import net.conczin.immersive_furniture.config.Config;
@@ -16,12 +15,11 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
 
 public class API {
-    private static final Gson gson = new GsonBuilder().create();
+    private static final Gson gson = new Gson();
     private static final int TIMEOUT_MS = 10000;
 
     public enum HttpMethod {
@@ -29,20 +27,20 @@ public class API {
     }
 
     public static Response request(HttpMethod httpMethod, String url) {
-        return request(httpMethod, SuccessResponse::new, url, null, null);
+        return request(httpMethod, SuccessResponse.class, url, null, null);
     }
 
-    public static <T extends Response> Response request(HttpMethod httpMethod, Function<JsonObject, T> decoder, String url) {
-        return request(httpMethod, decoder, url, null, null);
+    public static Response request(HttpMethod httpMethod, Class<? extends Response> expectedAnswer, String url) {
+        return request(httpMethod, expectedAnswer, url, null, null);
     }
 
-    public static <T extends Response> Response request(HttpMethod httpMethod, Function<JsonObject, T> decoder, String url, Map<String, String> queryParams) {
-        return request(httpMethod, decoder, url, queryParams, null);
+    public static Response request(HttpMethod httpMethod, Class<? extends Response> expectedAnswer, String url, Map<String, String> queryParams) {
+        return request(httpMethod, expectedAnswer, url, queryParams, null);
     }
 
-    public static <T extends Response> Response request(HttpMethod httpMethod, Function<JsonObject, T> decoder, String url, Map<String, String> queryParams, Map<String, Object> body) {
+    public static Response request(HttpMethod httpMethod, Class<? extends Response> expectedAnswer, String url, Map<String, String> queryParams, Map<String, ?> body) {
         try {
-            String fullUrl = Config.getInstance().immersiveLibraryUrl + (url.contains("v2") ? "/" : "/v1/") + url;
+            String fullUrl = Config.getInstance().immersiveLibraryUrl + "/" + url;
 
             // Append query params
             if (queryParams != null) {
@@ -71,17 +69,17 @@ public class API {
             // Set request body
             if (body != null && !body.isEmpty()) {
                 con.setDoOutput(true);
-                Gson gson = new Gson();
                 String jsonBody = gson.toJson(body);
                 con.getOutputStream().write(jsonBody.getBytes(StandardCharsets.UTF_8));
             }
 
             // Send the request and read the response
-            if (con.getErrorStream() != null) {
-                int responseCode = con.getResponseCode();
-                String error = IOUtils.toString(con.getErrorStream(), StandardCharsets.UTF_8);
+            int responseCode = con.getResponseCode();
+            if (responseCode >= 400) {
+                String error = con.getErrorStream() == null ? "" : IOUtils.toString(con.getErrorStream(), StandardCharsets.UTF_8);
                 JsonObject object = gson.fromJson(error, JsonObject.class);
-                return new ErrorResponse(responseCode, object.get("message").getAsString());
+                boolean hasMessage = object != null && object.has("message");
+                return new ErrorResponse(responseCode, hasMessage ? object.get("message").getAsString() : error);
             }
 
             // Parse answer
@@ -92,8 +90,7 @@ public class API {
                 response = IOUtils.toString(con.getInputStream(), StandardCharsets.UTF_8);
             }
 
-            JsonObject object = gson.fromJson(response, JsonObject.class);
-            return decoder.apply(object);
+            return gson.fromJson(response, expectedAnswer);
         } catch (IOException e) {
             Common.logger.warn(e, e);
             return new ErrorResponse(-1, e.toString());

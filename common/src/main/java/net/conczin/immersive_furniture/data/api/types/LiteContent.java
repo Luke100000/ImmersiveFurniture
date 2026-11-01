@@ -1,31 +1,21 @@
 package net.conczin.immersive_furniture.data.api.types;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-
+import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public record LiteContent(
-        int contentid,
-        int userid,
+        int content_id,
+        int user_id,
         String username,
         int likes,
         Set<String> tags,
         String title,
-        int version
+        int version,
+        boolean is_liked,
+        Set<String> reports
 ) implements Tagged {
-    public LiteContent(JsonObject json) {
-        this(
-                json.get("contentid").getAsInt(),
-                json.get("userid").getAsInt(),
-                json.get("username").getAsString(),
-                json.get("likes").getAsInt(),
-                json.getAsJsonArray("tags").asList().stream()
-                        .map(JsonElement::getAsString)
-                        .collect(Collectors.toSet()),
-                json.get("title").getAsString(),
-                json.get("version").getAsInt()
-        );
+    public LiteContent {
+        tags = tags == null ? new HashSet<>() : new HashSet<>(tags);
+        reports = reports == null ? new HashSet<>() : new HashSet<>(reports);
     }
 }
