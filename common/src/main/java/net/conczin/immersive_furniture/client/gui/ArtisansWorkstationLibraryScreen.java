@@ -3,6 +3,7 @@ package net.conczin.immersive_furniture.client.gui;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.conczin.immersive_furniture.Common;
 import net.conczin.immersive_furniture.client.gui.widgets.StateImageButton;
+import net.conczin.immersive_furniture.client.model.FurnitureModelFactory;
 import net.conczin.immersive_furniture.data.FurnitureData;
 import net.conczin.immersive_furniture.data.FurnitureDataManager;
 import net.conczin.immersive_furniture.data.api.API;
@@ -755,6 +756,9 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
 
         CompletableFuture.runAsync(() -> {
             if (!Auth.hasToken()) return;
+
+            // The library relies on baked textures
+            FurnitureModelFactory.bakeMissingTextures(data);
 
             // Gather tags
             List<String> tags = new LinkedList<>();

@@ -22,12 +22,14 @@ import java.util.Map;
 final class FurnitureFaceTextureBaker {
     private final DynamicAtlas atlas;
     private final boolean inEditor;
+    private final boolean storeTextures;
     private final List<FurnitureData.Element> elements;
     private final Map<Integer, AmbientOcclusion> ambientOcclusion = new HashMap<>();
 
-    FurnitureFaceTextureBaker(DynamicAtlas atlas, boolean inEditor, List<FurnitureData.Element> elements) {
+    FurnitureFaceTextureBaker(DynamicAtlas atlas, boolean inEditor, boolean storeTextures, List<FurnitureData.Element> elements) {
         this.atlas = atlas;
         this.inEditor = inEditor;
+        this.storeTextures = inEditor || storeTextures;
         this.elements = elements;
     }
 
@@ -108,7 +110,7 @@ final class FurnitureFaceTextureBaker {
 
         padTexture(pixels, dimensions, quad);
         atlas.setDirty();
-        if (inEditor) element.bakedTextures.put(direction, state, baked);
+        if (storeTextures && !useBaked) element.bakedTextures.put(direction, state, baked);
     }
 
     private int shadePixel(
