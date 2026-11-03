@@ -239,13 +239,19 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
                             .build()
             );
         } else {
-            // Favorite
-            int x = leftPos + windowWidth / 2;
             int y = topPos + windowHeight - 25;
+            boolean local = selected.getNamespace().equals("local");
+            boolean canDelete = tab == Tab.SUBMISSIONS || tab == Tab.LOCAL;
+            boolean canReport = tab == Tab.GLOBAL;
 
+            // Center the visible buttons, 25 pixels apart
+            int buttons = 2 + (canDelete ? 1 : 0) + (canReport ? 1 : 0);
+            int x = leftPos + windowWidth / 2 - (buttons * 25 - 3) / 2;
+
+            // Favorite
             LiteContent content = libraryContents.get(selected);
-            if (!selected.getNamespace().equals("local")) {
-                addToggleButton(x - 50 - 11, y, 22, 0, 114, "gui.immersive_furniture.favorite", b -> {
+            if (!local) {
+                addToggleButton(x, y, 22, 0, 114, "gui.immersive_furniture.favorite", b -> {
                     if (authenticated) {
                         FurnitureData model = FurnitureDataManager.getData(selected);
                         if (model != null) {
@@ -263,8 +269,8 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
             }
 
             // Publish
-            if (selected.getNamespace().equals("local")) {
-                addButton(x - 25 - 11, y, 22, 22 * 6, 114, "gui.immersive_furniture.publish", () -> {
+            if (local) {
+                addButton(x, y, 22, 22 * 6, 114, "gui.immersive_furniture.publish", () -> {
                     if (authenticated) {
                         FurnitureData model = FurnitureDataManager.getData(selected);
                         if (model != null) {
@@ -275,23 +281,26 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
                     }
                 });
             }
+            x += 25;
 
             // Delete
-            if (tab == Tab.SUBMISSIONS || tab == Tab.LOCAL) {
-                addButton(x - 11, y, 22, 22 * 2, 114, "gui.immersive_furniture.delete", this::delete);
+            if (canDelete) {
+                addButton(x, y, 22, 22 * 2, 114, "gui.immersive_furniture.delete", this::delete);
+                x += 25;
             }
 
             // Modify
-            addButton(x + 25 - 11, y, 22, 22, 114, "gui.immersive_furniture.modify", () -> {
+            addButton(x, y, 22, 22, 114, "gui.immersive_furniture.modify", () -> {
                 FurnitureData data = FurnitureDataManager.getData(selected);
                 if (minecraft != null && data != null) {
                     minecraft.setScreen(new ArtisansWorkstationEditorScreen(new FurnitureData(data)));
                 }
             });
+            x += 25;
 
             // Report
-            if (tab == Tab.GLOBAL) {
-                addToggleButton(x + 50 - 11, y, 22, 22 * 5, 114, "gui.immersive_furniture.report", b -> {
+            if (canReport) {
+                addToggleButton(x, y, 22, 22 * 5, 114, "gui.immersive_furniture.report", b -> {
                     if (authenticated) {
                         FurnitureData model = FurnitureDataManager.getData(selected);
                         if (model != null) {
