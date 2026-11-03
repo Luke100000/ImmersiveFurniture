@@ -807,6 +807,11 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
                     setError("gui.immersive_furniture.upload_failed");
                 }
             }
+        }).whenComplete((result, throwable) -> {
+            if (throwable != null) {
+                Common.logger.error("Failed to publish furniture", throwable);
+                setError("gui.immersive_furniture.upload_failed");
+            }
             uploading = false;
         });
     }
