@@ -44,6 +44,8 @@ import static net.conczin.immersive_furniture.data.api.API.request;
 public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen {
     static final Component SEARCH_TITLE = Component.translatable("itemGroup.search");
     static final Component SEARCH_HINT = Component.translatable("gui.recipebook.search_hint").withStyle(ChatFormatting.ITALIC).withStyle(ChatFormatting.GRAY);
+    static final Component LIBRARY_SEARCH_HINT = Component.translatable("gui.immersive_furniture.search.hint").withStyle(ChatFormatting.ITALIC).withStyle(ChatFormatting.GRAY);
+    static final int SEARCH_DEBOUNCE_MS = 300;
     static final int ENTRIES_PER_PAGE = 8;
 
     public enum Tab {
@@ -90,6 +92,8 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
     private boolean awaitingSearch = false;
     private boolean shouldSearch = true;
     private String lastSearch = "";
+    private long searchDebounceUntil = 0;
+    private EditBox searchBox;
 
     private boolean authenticating;
     private boolean isBrowserOpen = false;
@@ -153,15 +157,17 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
             }
 
             // Search box
-            EditBox searchBox = new EditBox(font, leftPos + 5, topPos + 5, windowWidth - 64 - 12, font.lineHeight + 3, SEARCH_TITLE);
+            searchBox = new EditBox(font, leftPos + 5, topPos + 5, windowWidth - 64 - 12, font.lineHeight + 3, SEARCH_TITLE);
             searchBox.setMaxLength(50);
             searchBox.setVisible(true);
             searchBox.setValue(lastSearch);
-            searchBox.setHint(SEARCH_HINT);
+            searchBox.setHint(getSearchHint());
             searchBox.setResponder(s -> {
                 if (!s.equals(lastSearch)) {
                     lastSearch = s;
+                    page = 0;
                     shouldSearch = true;
+                    searchDebounceUntil = System.currentTimeMillis() + SEARCH_DEBOUNCE_MS;
                 }
             });
             addRenderableWidget(searchBox);
@@ -462,6 +468,18 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
             }
 
             graphics.drawCenteredString(font, String.valueOf(page + 1), leftPos + windowWidth / 2, topPos + windowHeight - 17, 0xFFFFFF);
+
+            // The edit box hides its hint while focused, but it's focused by default
+            if (searchBox.isFocused() && searchBox.getValue().isEmpty()) {
+                graphics.drawString(font, getSearchHint(), searchBox.getX() + 4, searchBox.getY() + (searchBox.getHeight() - 8) / 2, 0xFFFFFF);
+            }
+
+            // Search syntax cheat sheet, local files are only filtered by name
+            if (tooltip == null && tab != Tab.LOCAL && searchBox.isMouseOver(mouseX, mouseY)) {
+                tooltip = Arrays.stream(Component.translatable("gui.immersive_furniture.search.tooltip").getString().split("\n"))
+                        .map(line -> (Component) Component.literal(line))
+                        .toList();
+            }
         } else {
             FurnitureData data = FurnitureDataManager.getData(selected);
 
@@ -692,7 +710,14 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
             }
         }
 
-        return super.mouseClicked(mouseX, mouseY, button);
+        boolean handled = super.mouseClicked(mouseX, mouseY, button);
+
+        // Buttons that rebuild the screen would keep the focus on their removed widget
+        if (selected == null && getFocused() != null && !children().contains(getFocused())) {
+            setFocused(searchBox);
+        }
+
+        return handled;
     }
 
     @Override
@@ -712,6 +737,10 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
         this.selected = location;
         previewYaw = (float) (-Math.PI / 4 * 3);
         previewPitch = (float) (-Math.PI / 4);
+    }
+
+    private Component getSearchHint() {
+        return tab == Tab.LOCAL ? SEARCH_HINT : LIBRARY_SEARCH_HINT;
     }
 
     public void setTab(Tab tab) {
@@ -748,7 +777,7 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
                     .limit(ENTRIES_PER_PAGE)
                     .toList();
         } else {
-            if (awaitingSearch) return;
+            if (awaitingSearch || System.currentTimeMillis() < searchDebounceUntil) return;
             shouldSearch = false;
 
             // Fetch from the library
