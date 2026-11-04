@@ -117,18 +117,19 @@ public class FurnitureModelFactory {
 
     private BlockElementFace getSpriteFace(FurnitureData.Element element, boolean front) {
         Vector3i size = element.getSize();
+        boolean reversed = front == element.sprite.mirrored;
         return new BlockElementFace(
                 null,
                 elementToIndex.get(element),
                 element.sprite.sprite.toString(),
                 new BlockFaceUV(
                         new float[]{
-                                front ? 0 : size.x / element.sprite.size,
+                                reversed ? size.x / element.sprite.size : 0,
                                 0,
-                                front ? size.x / element.sprite.size : 0,
+                                reversed ? 0 : size.x / element.sprite.size,
                                 size.y / element.sprite.size
                         },
-                        element.sprite.rotation
+                        front ? element.sprite.rotation : (360 - element.sprite.rotation) % 360
                 )
         );
     }

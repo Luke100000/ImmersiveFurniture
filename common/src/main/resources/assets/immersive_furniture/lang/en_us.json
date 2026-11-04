@@ -118,6 +118,10 @@
   "gui.immersive_furniture.player_pose.sitting": "Sitting",
   "gui.immersive_furniture.player_pose.sleeping": "Sleeping",
 
+  "gui.immersive_furniture.flip": "Flip",
+  "gui.immersive_furniture.flip.x": "Flip along X",
+  "gui.immersive_furniture.flip.y": "Flip along Y",
+  "gui.immersive_furniture.flip.z": "Flip along Z",
   "gui.immersive_furniture.rotation.0": "0°",
   "gui.immersive_furniture.rotation.90": "90°",
   "gui.immersive_furniture.rotation.180": "180°",
@@ -126,6 +130,7 @@
   "gui.immersive_furniture.decrease_size": "Decrease Size",
   "gui.immersive_furniture.increase_size": "Increase Size",
   "gui.immersive_furniture.item": "Show inventory slot",
+  "gui.immersive_furniture.mirror": "Mirror",
   "gui.immersive_furniture.align": "Item alignment side",
   "gui.immersive_furniture.tiled": "Tiled Sprite (Liquids, ...)",
 

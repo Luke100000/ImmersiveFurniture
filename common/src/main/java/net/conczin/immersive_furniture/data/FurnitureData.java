@@ -862,9 +862,6 @@ public class FurnitureData {
         public void sanityCheck() {
             if (sprite.item) {
                 sprite.tiled = false;
-
-                // TODO: Remove this once most people ported to 0.1.0
-                sprite.sprite = new ResourceLocation("minecraft:item/bread");
             }
 
             // Pose anchors are the shape of the players' butt
@@ -1187,6 +1184,7 @@ public class FurnitureData {
         public boolean tiled = false;
         public boolean item = false;
         public boolean align = false;
+        public boolean mirrored = false;
 
         public Sprite() {
         }
@@ -1198,6 +1196,7 @@ public class FurnitureData {
             this.tiled = NBTHelper.getBoolean(tag, "Tiled", tiled);
             this.item = NBTHelper.getBoolean(tag, "Item", item);
             this.align = NBTHelper.getBoolean(tag, "Align", align);
+            this.mirrored = NBTHelper.getBoolean(tag, "Mirrored", mirrored);
         }
 
         public Sprite(Sprite sprite) {
@@ -1207,6 +1206,7 @@ public class FurnitureData {
             this.tiled = sprite.tiled;
             this.item = sprite.item;
             this.align = sprite.align;
+            this.mirrored = sprite.mirrored;
         }
 
         public CompoundTag toTag() {
@@ -1217,6 +1217,9 @@ public class FurnitureData {
             tag.putBoolean("Tiled", tiled);
             tag.putBoolean("Item", item);
             tag.putBoolean("Align", align);
+            if (mirrored) {
+                tag.putBoolean("Mirrored", true);
+            }
             return tag;
         }
     }
