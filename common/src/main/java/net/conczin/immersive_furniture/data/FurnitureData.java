@@ -40,6 +40,7 @@ public class FurnitureData {
 
     public String name = "Empty";
     public String tag = "miscellaneous";
+    public Set<String> tags = new LinkedHashSet<>();
     public int lightLevel;
     public int inventorySize;
     public boolean toggleWithRightClick;
@@ -69,6 +70,7 @@ public class FurnitureData {
     public FurnitureData(CompoundTag tag) {
         this.name = NBTHelper.getString(tag, "Name", name);
         this.tag = NBTHelper.getString(tag, "Tag", this.tag);
+        this.tags = NBTHelper.getStringSet(tag.getList("Tags", 8));
         this.lightLevel = NBTHelper.getInt(tag, "LightLevel", lightLevel);
         this.inventorySize = NBTHelper.getInt(tag, "InventorySize", inventorySize);
         this.toggleWithRightClick = NBTHelper.getBoolean(tag, "ToggleWithRightClick", toggleWithRightClick);
@@ -95,6 +97,7 @@ public class FurnitureData {
     public FurnitureData(FurnitureData data) {
         this.name = data.name;
         this.tag = data.tag;
+        this.tags.addAll(data.tags);
         this.lightLevel = data.lightLevel;
         this.inventorySize = data.inventorySize;
         this.toggleWithRightClick = data.toggleWithRightClick;
@@ -118,6 +121,10 @@ public class FurnitureData {
         CompoundTag tag = new CompoundTag();
         tag.putString("Name", name);
         tag.putString("Tag", this.tag);
+        if (!tags.isEmpty()) {
+            // Only written when present to keep the hash of existing furniture stable
+            tag.put("Tags", NBTHelper.getStringList(tags));
+        }
         tag.putInt("LightLevel", lightLevel);
         tag.putInt("InventorySize", inventorySize);
         tag.putBoolean("ToggleWithRightClick", toggleWithRightClick);
@@ -139,6 +146,10 @@ public class FurnitureData {
         tag.put("Elements", elementsTag);
 
         return tag;
+    }
+
+    public boolean hasCategory() {
+        return !tag.equals("miscellaneous");
     }
 
     public int getCost() {

@@ -13,16 +13,21 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 public class SettingsComponent extends ScreenComponent {
     static final Component SEARCH_TITLE = Component.translatable("gui.immersive_furniture.name");
     static final Component SEARCH_HINT = Component.translatable("gui.immersive_furniture.name.hint").withStyle(ChatFormatting.ITALIC).withStyle(ChatFormatting.GRAY);
+    static final Component TAGS_TITLE = Component.translatable("gui.immersive_furniture.tags");
+    static final Component TAGS_HINT = Component.translatable("gui.immersive_furniture.tags.hint").withStyle(ChatFormatting.ITALIC).withStyle(ChatFormatting.GRAY);
 
     public final static List<String> TAGS = List.of(
             "living_room",
@@ -59,7 +64,7 @@ public class SettingsComponent extends ScreenComponent {
         nameBox.setResponder(s -> {
             screen.data.name = s;
             this.localFileExists = FurnitureDataManager.localFileExists(screen.data);
-            saveButton.active = !s.isBlank();
+            updateSaveButton();
         });
         screen.addRenderableWidget(nameBox);
 
@@ -81,18 +86,30 @@ public class SettingsComponent extends ScreenComponent {
             }
         }
 
+        // Free tags
+        EditBox tagsBox = new EditBox(minecraft.font, leftPos + 6, topPos + 60, width - 12, minecraft.font.lineHeight + 3, TAGS_TITLE);
+        tagsBox.setMaxLength(200);
+        tagsBox.setValue(String.join(", ", screen.data.tags));
+        tagsBox.setHint(TAGS_HINT);
+        tagsBox.setTooltip(Tooltip.create(Component.translatable("gui.immersive_furniture.tags.tooltip")));
+        tagsBox.setResponder(s -> {
+            screen.data.tags = parseTags(s);
+            updateSaveButton();
+        });
+        screen.addRenderableWidget(tagsBox);
+
         // Light level
-        BoundedIntSliderButton lightLevelSlider = new BoundedIntSliderButton(leftPos + 6, topPos + 60, width - 12, 20, "gui.immersive_furniture.light_level", screen.data.lightLevel, 0, 15);
+        BoundedIntSliderButton lightLevelSlider = new BoundedIntSliderButton(leftPos + 6, topPos + 76, width - 12, 20, "gui.immersive_furniture.light_level", screen.data.lightLevel, 0, 15);
         lightLevelSlider.setCallback(c -> screen.data.lightLevel = c);
         screen.addRenderableWidget(lightLevelSlider);
 
         // Inventory space
-        BoundedIntSliderButton inventorySlider = new BoundedIntSliderButton(leftPos + 6, topPos + 82, width - 12, 20, "gui.immersive_furniture.inventory", screen.data.inventorySize, 0, 6);
+        BoundedIntSliderButton inventorySlider = new BoundedIntSliderButton(leftPos + 6, topPos + 98, width - 12, 20, "gui.immersive_furniture.inventory", screen.data.inventorySize, 0, 6);
         inventorySlider.setCallback(c -> screen.data.inventorySize = c);
         screen.addRenderableWidget(inventorySlider);
 
         // Allow toggle with right click
-        int togglesY = topPos + 106;
+        int togglesY = topPos + 122;
         StateImageButton rightClickToggle = addToggleButton(leftPos + 6, togglesY, 16, 192, 160, "gui.immersive_furniture.toggle_with_right_click", () -> {
             screen.data.toggleWithRightClick = !screen.data.toggleWithRightClick;
             screen.init();
@@ -121,14 +138,34 @@ public class SettingsComponent extends ScreenComponent {
             libraryScreen.setTab(ArtisansWorkstationLibraryScreen.Tab.LOCAL);
             Minecraft.getInstance().setScreen(libraryScreen);
         }, leftPos + 6, topPos + height - 26, width - 12);
-        saveButton.active = !screen.data.name.isBlank();
+        updateSaveButton();
+    }
+
+    private static Set<String> parseTags(String text) {
+        Set<String> tags = new LinkedHashSet<>();
+        for (String tag : text.split(",")) {
+            tag = tag.trim().toLowerCase(Locale.ROOT);
+            if (!tag.isEmpty()) tags.add(tag);
+        }
+        return tags;
+    }
+
+    private String getMissingRequirement() {
+        if (screen.data.name.isBlank()) return "gui.immersive_furniture.name_required";
+        if (!screen.data.hasCategory() && screen.data.tags.isEmpty()) return "gui.immersive_furniture.tag_required";
+        return null;
+    }
+
+    private void updateSaveButton() {
+        saveButton.active = getMissingRequirement() == null;
     }
 
     public void render(GuiGraphics graphics) {
-        if (screen.data.name.isBlank()) {
+        String missingRequirement = getMissingRequirement();
+        if (missingRequirement != null) {
             graphics.drawCenteredString(
                     minecraft.font,
-                    Component.translatable("gui.immersive_furniture.name_required"),
+                    Component.translatable(missingRequirement),
                     screen.getRightPaneCenterX(), topPos + height - 16, 0xFF5555
             );
         } else if (localFileExists) {

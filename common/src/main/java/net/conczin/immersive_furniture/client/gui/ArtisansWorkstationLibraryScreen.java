@@ -797,8 +797,8 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
             FurnitureModelFactory.bakeMissingTextures(data);
 
             // Gather tags
-            List<String> tags = new LinkedList<>();
-            tags.add(data.tag);
+            Set<String> tags = new LinkedHashSet<>(data.tags);
+            if (data.hasCategory()) tags.add(data.tag);
             if (data.hasParticles()) tags.add("has_particles");
             if (data.hasSounds()) tags.add("has_sounds");
             if (data.canSit()) tags.add("can_sit");
