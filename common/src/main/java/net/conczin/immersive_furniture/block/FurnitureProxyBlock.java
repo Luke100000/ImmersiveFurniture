@@ -5,6 +5,7 @@ import net.conczin.immersive_furniture.data.FurnitureData;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.SectionPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -68,10 +69,15 @@ public class FurnitureProxyBlock extends Block {
     }
 
     /**
-     * Get the block state without loading a chunk
+     * Get the block state without loading a chunk or waiting for one
      */
     protected BlockState getLoadedBlockState(LevelReader level, BlockPos pos) {
-        ChunkAccess chunk = level.getChunk(SectionPos.blockToSectionCoord(pos.getX()), SectionPos.blockToSectionCoord(pos.getZ()), ChunkStatus.FULL, false);
+        int chunkX = SectionPos.blockToSectionCoord(pos.getX());
+        int chunkZ = SectionPos.blockToSectionCoord(pos.getZ());
+        // getChunk blocks off-thread and waits for pending chunks, getChunkNow returns null instead
+        ChunkAccess chunk = level instanceof ServerLevel serverLevel
+                ? serverLevel.getChunkSource().getChunkNow(chunkX, chunkZ)
+                : level.getChunk(chunkX, chunkZ, ChunkStatus.FULL, false);
         if (chunk == null) return null;
         return chunk.getBlockState(pos);
     }
