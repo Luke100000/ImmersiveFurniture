@@ -3,6 +3,7 @@ package net.conczin.immersive_furniture.client.gui;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.conczin.immersive_furniture.Common;
 import net.conczin.immersive_furniture.client.gui.widgets.StateImageButton;
+import net.conczin.immersive_furniture.client.model.DynamicAtlas;
 import net.conczin.immersive_furniture.client.model.FurnitureModelFactory;
 import net.conczin.immersive_furniture.data.FurnitureData;
 import net.conczin.immersive_furniture.data.FurnitureDataManager;
@@ -821,6 +822,7 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
             shouldSearch = false;
 
             // Fetch from local files
+            DynamicAtlas.SCRATCH.clear();
             furniture = localFiles.stream()
                     .filter(l -> Utils.search(lastSearch, l.toString()))
                     .filter(l -> {
@@ -868,6 +870,7 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
                     Minecraft.getInstance().execute(() -> {
                         if (tab == requestTab) {
                             libraryContents.putAll(found);
+                            DynamicAtlas.SCRATCH.clear();
                             furniture = foundFurniture;
                             init();
                         }

@@ -24,6 +24,7 @@ public class DynamicAtlas extends DynamicTexture {
     public final ScopedLock bakeLock = new ScopedLock();
 
     int lastStateId;
+    int uploadedStateId;
     boolean full;
     int allocated;
     int size;
@@ -143,11 +144,16 @@ public class DynamicAtlas extends DynamicTexture {
         if (dirty && RenderSystem.isOnRenderThreadOrInit()) {
             this.upload();
             dirty = false;
+            uploadedStateId = lastStateId;
         }
     }
 
     public int getLastStateId() {
         return lastStateId;
+    }
+
+    public boolean isUploaded(int stateId) {
+        return stateId <= uploadedStateId;
     }
 
     public record Quad(int x, int y, int w, int h) {

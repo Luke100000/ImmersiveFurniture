@@ -96,8 +96,10 @@ public class FurnitureModelBaker {
         private static final Supplier<CompositeBakedModel> EMPTY = () -> new CompositeBakedModel(Map.of());
 
         public final Map<Integer, Supplier<CompositeBakedModel>> variations = new HashMap<>();
+        public final int stateId;
 
         public CachedBakedModelSet(DynamicAtlas atlas, CompositeBlockModel model) {
+            this.stateId = atlas.getLastStateId();
             for (int rot = 0; rot < 360; rot += 90) {
                 for (Integer state : model.models.keySet()) {
                     int finalRot = rot;
@@ -117,7 +119,11 @@ public class FurnitureModelBaker {
     public static CompositeBakedModel getAsyncModel(FurnitureData data, DynamicAtlas atlas, int state) {
         String hash = data.getHash();
         if (atlas.knownFurniture.containsKey(hash)) {
-            if (!atlas.bakeLock.tryLock()) return null;
+            if (!atlas.bakeLock.tryLock()) {
+                // A bake is running, but models whose textures are already uploaded remain valid
+                CachedBakedModelSet cached = atlas.knownFurniture.get(hash);
+                return cached != null && atlas.isUploaded(cached.stateId) ? cached.get(0, state) : null;
+            }
             try {
                 CachedBakedModelSet cached = atlas.knownFurniture.get(hash);
                 if (cached != null) {
