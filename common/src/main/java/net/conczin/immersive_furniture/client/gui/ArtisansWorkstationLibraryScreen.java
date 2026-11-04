@@ -8,8 +8,8 @@ import net.conczin.immersive_furniture.data.FurnitureData;
 import net.conczin.immersive_furniture.data.FurnitureDataManager;
 import net.conczin.immersive_furniture.data.api.API;
 import net.conczin.immersive_furniture.data.api.Auth;
-import net.conczin.immersive_furniture.data.api.types.LiteContent;
 import net.conczin.immersive_furniture.data.api.responses.*;
+import net.conczin.immersive_furniture.data.api.types.LiteContent;
 import net.conczin.immersive_furniture.item.Items;
 import net.conczin.immersive_furniture.network.Network;
 import net.conczin.immersive_furniture.network.c2s.CraftRequest;
@@ -30,10 +30,13 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.TooltipFlag;
 
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 import static net.conczin.immersive_furniture.client.gui.components.SettingsComponent.TAGS;
 import static net.conczin.immersive_furniture.data.api.API.request;
@@ -347,7 +350,15 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
     }
 
     private static LiteContent withLiked(LiteContent c, boolean liked) {
-        return new LiteContent(c.content_id(), c.user_id(), c.username(), c.likes() + Boolean.compare(liked, c.is_liked()), c.tags(), c.title(), c.version(), liked, c.reports());
+        return new LiteContent(c.content_id(), c.user_id(), c.username(), c.likes() + Boolean.compare(liked, c.is_liked()), c.tags(), c.title(), c.version(), c.created_at(), c.updated_at(), liked, c.reports());
+    }
+
+    private static Component getLikes(LiteContent c) {
+        return Component.literal("❤ %s".formatted(c.likes())).withStyle(ChatFormatting.GRAY);
+    }
+
+    private static String formatDate(long timestamp) {
+        return DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withZone(ZoneId.systemDefault()).format(Instant.ofEpochSecond(timestamp));
     }
 
     private void addWindowSizeButton() {
@@ -434,6 +445,14 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
                             if (hovered) {
                                 tooltip = data.getTooltip(Screen.hasShiftDown());
                                 tooltip.add(0, Component.literal(data.name).withStyle(ChatFormatting.BOLD));
+
+                                LiteContent content = libraryContents.get(furniture.get(i));
+                                if (content != null) {
+                                    tooltip.add(2, getLikes(content));
+                                    if (Screen.hasShiftDown()) {
+                                        tooltip.add(Component.translatable("gui.immersive_furniture.published", formatDate(content.created_at())).withStyle(ChatFormatting.DARK_GRAY));
+                                    }
+                                }
                             }
                         }
                     }
@@ -455,6 +474,12 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
                 // Title and author
                 graphics.drawString(font, data.name, leftPos + 8, topPos + 8, 0xFFFFFF);
                 graphics.drawString(font, Component.translatable("gui.immersive_furniture.author", data.author).withStyle(ChatFormatting.ITALIC).withStyle(ChatFormatting.GRAY), leftPos + 8, topPos + 18, 0xFFFFFF);
+
+                // Likes
+                LiteContent content = libraryContents.get(selected);
+                if (content != null) {
+                    graphics.drawString(font, getLikes(content), leftPos + 8, topPos + 28, 0xFFFFFF);
+                }
 
                 // Icon and cost
                 graphics.pose().translate(leftPos + windowWidth, topPos + windowHeight - 28, 0);

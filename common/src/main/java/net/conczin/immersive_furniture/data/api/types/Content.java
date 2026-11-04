@@ -11,6 +11,8 @@ public record Content(
         Set<String> tags,
         String title,
         int version,
+        long created_at,
+        long updated_at,
         boolean is_liked,
         Set<String> reports,
         String meta,

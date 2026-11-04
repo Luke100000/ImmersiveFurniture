@@ -92,6 +92,9 @@
   "gui.immersive_furniture.author": "By %s",
   "gui.immersive_furniture.atlas_usage": "Uses %s of the texture atlas",
   "gui.immersive_furniture.original_author": "Originally by %s",
+  "gui.immersive_furniture.content_details": "#%s, version %s",
+  "gui.immersive_furniture.published": "Published %s",
+  "gui.immersive_furniture.updated": "Updated %s",
 
   "gui.immersive_furniture.move_furniture": "Move furniture",
   "gui.immersive_furniture.move_furniture_up": "Move up",
