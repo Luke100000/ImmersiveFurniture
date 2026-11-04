@@ -636,8 +636,8 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
 
         private AuthLinkScreen(String authUrl) {
             super(confirmed -> {
-                    }, Component.translatableWithFallback("gui.immersive_furniture.auth_link.title", "Open authentication link?"),
-                    Component.translatableWithFallback("gui.immersive_furniture.auth_link.message", "Open this link in your browser to log in."),
+                    }, Component.translatable("gui.immersive_furniture.auth_link.title"),
+                    Component.translatable("gui.immersive_furniture.auth_link.message"),
                     authUrl,
                     CommonComponents.GUI_CANCEL,
                     true);
