@@ -754,16 +754,23 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
             // Fetch from the library
             awaitingSearch = true;
             Tab requestTab = tab;
+            Map<String, String> params = new HashMap<>(Map.of(
+                    "order", order.key(),
+                    "descending", "true",
+                    "offset", String.valueOf(page * ENTRIES_PER_PAGE),
+                    "limit", String.valueOf(ENTRIES_PER_PAGE)
+            ));
+            if (tab == Tab.FAVORITES) params.put("liked_by", "me");
+            if (tab == Tab.SUBMISSIONS) params.put("author_id", "me");
+
+            // Search terms and the category as an exact tag filter
+            List<String> terms = new LinkedList<>();
+            if (!lastSearch.isBlank()) terms.add(lastSearch);
+            if (!tagFilter.equals("miscellaneous")) terms.add("#" + tagFilter);
+            if (!terms.isEmpty()) params.put("q", String.join(",", terms));
+
             CompletableFuture.runAsync(() -> {
-                Response response = request(API.HttpMethod.GET, ContentListResponse.class, "v3/content/furniture", Map.of(
-                        "whitelist", lastSearch + (tagFilter.equals("miscellaneous") ? "" : "," + tagFilter),
-                        "blacklist", "",
-                        "order", order.key(),
-                        "track", tab == Tab.FAVORITES ? "likes" : tab == Tab.SUBMISSIONS ? "submissions" : "all",
-                        "descending", "true",
-                        "offset", String.valueOf(page * ENTRIES_PER_PAGE),
-                        "limit", String.valueOf(ENTRIES_PER_PAGE)
-                ));
+                Response response = request(API.HttpMethod.GET, ContentListResponse.class, "v3/content/furniture", params);
 
                 if (response instanceof ContentListResponse contentListResponse) {
                     Map<ResourceLocation, LiteContent> found = new LinkedHashMap<>();
@@ -778,6 +785,8 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
                             init();
                         }
                     });
+                } else if (response instanceof ErrorResponse e && e.code() == 401) {
+                    setError("gui.immersive_furniture.login_required");
                 } else {
                     setError("gui.immersive_furniture.list_fetch_failed");
                 }
