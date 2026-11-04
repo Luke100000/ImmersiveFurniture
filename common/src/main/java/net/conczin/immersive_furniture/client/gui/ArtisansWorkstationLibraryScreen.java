@@ -5,6 +5,7 @@ import net.conczin.immersive_furniture.Common;
 import net.conczin.immersive_furniture.client.gui.widgets.StateImageButton;
 import net.conczin.immersive_furniture.client.model.DynamicAtlas;
 import net.conczin.immersive_furniture.client.model.FurnitureModelFactory;
+import net.conczin.immersive_furniture.config.Config;
 import net.conczin.immersive_furniture.data.FurnitureData;
 import net.conczin.immersive_furniture.data.FurnitureDataManager;
 import net.conczin.immersive_furniture.data.api.API;
@@ -208,13 +209,27 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
             int y = topPos + windowHeight - 25;
 
             // Sort, similar furniture is always sorted by similarity
-            if (similarTo == -1) addRenderableWidget(
-                    new ImageButton(leftPos + 3, y, 22, 22, order.getU(), 114, 22, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE, b -> {
-                        order = order.cycle();
+            SortingMode[] modes = SortingMode.values();
+            boolean showAllModes = leftPos + 3 + modes.length * 23 + 4 <= leftPos + windowWidth / 2 - 24 - 6;
+            if (similarTo == -1 && showAllModes) {
+                int sx = leftPos + 3;
+                for (SortingMode mode : modes) {
+                    addToggleButton(sx, y, 22, mode.getU(), 114, "gui.immersive_furniture.sort." + mode.key(), b -> {
+                        order = mode;
                         shouldSearch = true;
                         init();
-                    })
-            ).setTooltip(Tooltip.create(Component.translatable("gui.immersive_furniture.sort." + order.key())));
+                    }).setEnabled(mode != order);
+                    sx += 23;
+                }
+            } else if (similarTo == -1) {
+                addRenderableWidget(
+                        new ImageButton(leftPos + 3, y, 22, 22, order.getU(), 114, 22, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE, b -> {
+                            order = order.cycle();
+                            shouldSearch = true;
+                            init();
+                        })
+                ).setTooltip(Tooltip.create(Component.translatable("gui.immersive_furniture.sort." + order.key())));
+            }
 
             // Page buttons
             addRenderableWidget(
@@ -231,6 +246,15 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
                         init();
                     })
             );
+
+            // Website
+            addButton(leftPos + windowWidth - 104, topPos + windowHeight - 22, 16, 48, 160, "gui.immersive_furniture.website", () -> {
+                try {
+                    Util.getPlatform().openUri(Config.getInstance().immersiveLibraryUrl + "/furniture");
+                } catch (Exception e) {
+                    Common.logger.error(e);
+                }
+            });
 
             // Login
             MutableComponent text = Component.translatable(authenticated || authenticating ? "gui.immersive_furniture.logout" : "gui.immersive_furniture.login");
