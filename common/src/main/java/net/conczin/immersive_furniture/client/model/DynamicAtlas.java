@@ -19,7 +19,7 @@ import java.util.concurrent.ConcurrentSkipListSet;
 public class DynamicAtlas extends DynamicTexture {
     public static final DynamicAtlas BAKED = new DynamicAtlas(Client.getBakedAtlasSize(), "baked");
     public static DynamicAtlas ENTITY = new DynamicAtlas(Config.getInstance().getEntityAtlasSize(), "entity");
-    public static final DynamicAtlas SCRATCH = new DynamicAtlas(Config.getInstance().getScratchAtlasSize(), "scratch");
+    public static DynamicAtlas SCRATCH = new DynamicAtlas(Config.getInstance().getScratchAtlasSize(), "scratch");
 
     public final ScopedLock bakeLock = new ScopedLock();
 
@@ -58,6 +58,17 @@ public class DynamicAtlas extends DynamicTexture {
 
     public static void resizeEntity(int size) {
         ENTITY = new DynamicAtlas(size, "entity");
+    }
+
+    public static boolean tryResizeScratch(int size) {
+        DynamicAtlas atlas = SCRATCH;
+        if (!atlas.bakeLock.tryLock()) return false;
+        try {
+            SCRATCH = new DynamicAtlas(size, "scratch");
+            return true;
+        } finally {
+            atlas.bakeLock.unlock();
+        }
     }
 
     public Quad allocate(int w, int h) {

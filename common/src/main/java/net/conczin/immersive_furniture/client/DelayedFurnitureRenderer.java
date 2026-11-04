@@ -34,11 +34,7 @@ public class DelayedFurnitureRenderer {
     }
 
     public void tick() {
-        // Clear the dynamic atlases if it is full or nearly full
-        if (DynamicAtlas.SCRATCH.isFull() || DynamicAtlas.SCRATCH.getUsage() > 0.9f) {
-            DynamicAtlas.SCRATCH.clear();
-        }
-
+        resetScratchAtlasIfNeeded();
         resetEntityAtlasIfNeeded();
 
         // Re-render chunks where furniture failed to render
@@ -79,6 +75,20 @@ public class DelayedFurnitureRenderer {
         attempts.clear();
         delayedRendering.clear();
         lastEntityAtlasReset = System.nanoTime() - ENTITY_ATLAS_RESET_COOLDOWN;
+    }
+
+    private void resetScratchAtlasIfNeeded() {
+        DynamicAtlas atlas = DynamicAtlas.SCRATCH;
+        if (!atlas.isFull() && atlas.getUsage() <= 0.9f) return;
+
+        int size = atlas.getSize();
+        if (size < Client.getMaxAtlasSize()) {
+            if (DynamicAtlas.tryResizeScratch(size * 2)) {
+                Common.logger.info("Resized scratch atlas to {}x{}", size * 2, size * 2);
+            }
+        } else {
+            atlas.clear();
+        }
     }
 
     private void resetEntityAtlasIfNeeded() {

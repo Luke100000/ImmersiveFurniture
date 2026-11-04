@@ -27,6 +27,7 @@ import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.joml.Quaternionf;
+import org.joml.Vector2i;
 import org.joml.Vector3f;
 import org.joml.Vector3i;
 
@@ -57,6 +58,8 @@ public class FurnitureData {
     public Vector3i size = new Vector3i(1, 1, 1);
 
     private String hash;
+    private String atlasPixelsHash;
+    private long atlasPixels;
     private final Map<Integer, VoxelShape> cachedFullShapes = new ConcurrentHashMap<>();
     private final Map<Integer, VoxelShape> cachedSubShapes = new ConcurrentHashMap<>();
     private final Set<Integer> requestedFullShapes = new ConcurrentSkipListSet<>();
@@ -146,6 +149,25 @@ public class FurnitureData {
         tag.put("Elements", elementsTag);
 
         return tag;
+    }
+
+    public long getAtlasPixels() {
+        String hash = getHash();
+        if (!hash.equals(atlasPixelsHash)) {
+            long pixels = 0;
+            for (int state : getUniqueSolidStates()) {
+                for (Element element : elements) {
+                    if (element.type != ElementType.ELEMENT || !element.isMasked(state)) continue;
+                    for (Direction direction : Direction.values()) {
+                        Vector2i dimensions = ModelUtils.getFaceDimensions(element, direction);
+                        pixels += (long) dimensions.x * dimensions.y;
+                    }
+                }
+            }
+            atlasPixels = pixels;
+            atlasPixelsHash = hash;
+        }
+        return atlasPixels;
     }
 
     public boolean hasCategory() {
@@ -367,15 +389,7 @@ public class FurnitureData {
             }
         }
         if (advanced) {
-            int pixels = 0;
-            for (Element element : elements) {
-                for (Map<Integer, int[]> texture : element.bakedTextures.textures.values()) {
-                    for (Map.Entry<Integer, int[]> states : texture.entrySet()) {
-                        pixels += states.getValue().length;
-                    }
-                }
-            }
-            double usage = pixels / Math.pow(DynamicAtlas.BAKED.getSize(), 2);
+            double usage = getAtlasPixels() / Math.pow(DynamicAtlas.BAKED.getSize(), 2);
             tooltip.add(Component.translatable("gui.immersive_furniture.atlas_usage", String.format("%.1f%%", usage * 100)).withStyle(ChatFormatting.DARK_GRAY));
         }
         if (hasAdvanced && !advanced) {

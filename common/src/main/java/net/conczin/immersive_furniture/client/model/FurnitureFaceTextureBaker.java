@@ -40,7 +40,7 @@ final class FurnitureFaceTextureBaker {
             Direction cullDirection,
             int tintIndex
     ) {
-        Vector2i dimensions = ClientModelUtils.getFaceDimensions(element, direction);
+        Vector2i dimensions = ModelUtils.getFaceDimensions(element, direction);
         int padding = getPadding();
         DynamicAtlas.Quad quad = atlas.allocate(
                 (int) (Math.ceil(dimensions.x / (double) padding) * padding),
@@ -150,7 +150,7 @@ final class FurnitureFaceTextureBaker {
         light += effect.brightness / 100.0f;
 
         if (aoSampler != null) {
-            position.set(ClientModelUtils.to3D(element, direction, x, y, integerPosition));
+            position.set(ModelUtils.to3D(element, direction, x, y, integerPosition));
             ModelUtils.applyElementRotation(position, rotation);
             float ambientLight = Math.min(1.0f, Math.max(0.0f, 1.0f - aoSampler.sample(position) * 1.5f));
             float emission = element.emission / 15.0f;

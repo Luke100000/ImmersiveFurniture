@@ -1,10 +1,12 @@
 package net.conczin.immersive_furniture.client.gui;
 
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.conczin.immersive_furniture.Client;
 import net.conczin.immersive_furniture.Common;
 import net.conczin.immersive_furniture.client.PreviewParticleEngine;
 import net.conczin.immersive_furniture.client.model.*;
 import net.conczin.immersive_furniture.client.renderer.FurnitureBlockEntityRenderer;
+import net.conczin.immersive_furniture.config.Config;
 import net.conczin.immersive_furniture.data.FurnitureData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -107,7 +109,19 @@ public abstract class ArtisansWorkstationScreen extends Screen {
         graphics.blit(TEXTURE, x + 16, y + 16, w - 32, h - 32, originX + 16, originY + 16, 16, 16, TEXTURE_SIZE, TEXTURE_SIZE);
     }
 
+    @Override
+    public void removed() {
+        super.removed();
+
+        // The scratch atlas only serves these screens, shrink it back and drop their previews
+        DynamicAtlas.tryResizeScratch(Config.getInstance().getScratchAtlasSize());
+    }
+
     void renderModel(GuiGraphics graphics, FurnitureData data, double x, double y, double size, float yaw, float pitch) {
+        // Library content is unchecked, refuse absurd models instead of growing the atlas for them
+        long maxPixels = (long) Client.getMaxAtlasSize() * Client.getMaxAtlasSize() / 10;
+        if (data.getAtlasPixels() > maxPixels) return;
+
         graphics.pose().pushPose();
         graphics.pose().translate(x, y, 100.0);
         graphics.pose().mulPoseMatrix(new Matrix4f().scaling((float) (size / Math.max(1.0, data.getSize() / 16.0) * 0.4)));
