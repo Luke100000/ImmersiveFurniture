@@ -1,3 +1,14 @@
+# 0.4.0
+
+* Added similar furniture search
+* Added hot and popular sorting
+* Added custom tags and requires you to name and tag content to improve search
+* Added like counts and upload dates to the library
+* Fixed preview flickering
+* Fixed overlapping buttons on small window sizes
+* Fixed a crash with some modded blocks (#73)
+* Fixed a possible server freeze near unloaded chunks (#75)
+
 # 0.3.4
 
 * Fixed crashes on a corrupted cache
