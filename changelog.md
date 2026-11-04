@@ -8,6 +8,7 @@
 * Fixed overlapping buttons on small window sizes
 * Fixed a crash with some modded blocks (#73)
 * Fixed a possible server freeze near unloaded chunks (#75)
+* Improved preview size and added a reference grid
 
 # 0.3.4
 

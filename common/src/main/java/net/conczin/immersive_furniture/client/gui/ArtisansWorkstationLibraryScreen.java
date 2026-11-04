@@ -508,7 +508,8 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
                         FurnitureData data = FurnitureDataManager.getData(furniture.get(i));
                         if (data != null) {
                             float rot = (float) (hovered ? (System.currentTimeMillis() % 10000) / 10000.0f * Math.PI * 2.0f : -Math.PI / 4 * 3);
-                            renderModel(graphics, data, tileLeft + tileWidth / 2.0, tileTop + tileHeight / 2.0, Math.min(tileWidth, tileHeight), rot, (float) (-Math.PI / 4));
+                            // Fit the inside of the tile, its frame is 6 pixels wide
+                            renderModel(graphics, data, tileLeft + tileWidth / 2.0, tileTop + tileHeight / 2.0, tileWidth - 12, tileHeight - 12, rot, (float) (-Math.PI / 4), false);
 
                             if (hovered) {
                                 tooltip = data.getTooltip(Screen.hasShiftDown());
@@ -552,7 +553,7 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
                 graphics.pose().pushPose();
                 graphics.pose().translate(0, 0, 1024);
                 graphics.enableScissor(leftPos + 6, topPos + 6, leftPos + windowWidth - 6, topPos + windowHeight - 28 - 6);
-                renderModel(graphics, data, leftPos + windowWidth / 2.0, topPos + windowHeight / 2.0, windowHeight - 28, previewYaw, previewPitch);
+                renderModel(graphics, data, leftPos + windowWidth / 2.0, topPos + (windowHeight - 28) / 2.0, windowWidth - 12, windowHeight - 28 - 12, previewYaw, previewPitch, true);
                 graphics.flush();
                 graphics.disableScissor();
 

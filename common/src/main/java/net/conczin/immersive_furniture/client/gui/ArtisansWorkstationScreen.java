@@ -4,7 +4,10 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.conczin.immersive_furniture.Client;
 import net.conczin.immersive_furniture.Common;
 import net.conczin.immersive_furniture.client.PreviewParticleEngine;
-import net.conczin.immersive_furniture.client.model.*;
+import net.conczin.immersive_furniture.client.model.CompositeBakedModel;
+import net.conczin.immersive_furniture.client.model.DynamicAtlas;
+import net.conczin.immersive_furniture.client.model.FurnitureModelBaker;
+import net.conczin.immersive_furniture.client.model.TransparencyManager;
 import net.conczin.immersive_furniture.client.renderer.FurnitureBlockEntityRenderer;
 import net.conczin.immersive_furniture.config.Config;
 import net.conczin.immersive_furniture.data.FurnitureData;
@@ -21,6 +24,7 @@ import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
@@ -117,20 +121,85 @@ public abstract class ArtisansWorkstationScreen extends Screen {
         DynamicAtlas.tryResizeScratch(Config.getInstance().getScratchAtlasSize());
     }
 
-    void renderModel(GuiGraphics graphics, FurnitureData data, double x, double y, double size, float yaw, float pitch) {
+    void renderModel(GuiGraphics graphics, FurnitureData data, double x, double y, double width, double height, float yaw, float pitch, boolean anyPitch) {
         // Library content is unchecked, refuse absurd models instead of growing the atlas for them
         long maxPixels = (long) Client.getMaxAtlasSize() * Client.getMaxAtlasSize() / 10;
         if (data.getAtlasPixels() > maxPixels) return;
 
+        // Fit the projected mesh into the frame, at any yaw since previews spin around the y-axis
+        AABB bounds = data.meshBoundingBox();
+        double footprintRadius = Math.hypot(bounds.getXsize(), bounds.getZsize()) / 32.0;
+        double halfMeshHeight = bounds.getYsize() / 32.0;
+        double halfHeight = anyPitch
+                ? Math.hypot(halfMeshHeight, footprintRadius)
+                : halfMeshHeight * Math.abs(Math.cos(pitch)) + footprintRadius * Math.abs(Math.sin(pitch));
+        float scale = (float) Math.min(
+                width * 0.45 / Math.max(1.0, footprintRadius),
+                height * 0.45 / Math.max(1.0, halfHeight)
+        );
+
         graphics.pose().pushPose();
         graphics.pose().translate(x, y, 100.0);
-        graphics.pose().mulPoseMatrix(new Matrix4f().scaling((float) (size / Math.max(1.0, data.getSize() / 16.0) * 0.4)));
+        graphics.pose().mulPoseMatrix(new Matrix4f().scaling(scale));
         graphics.pose().mulPose(new Quaternionf().rotateX(pitch).rotateY(yaw));
         graphics.pose().mulPoseMatrix(new Matrix4f().scaling(1, -1, 1));
-        Vec3 center = data.boundingBox().getCenter();
+        Vec3 center = bounds.getCenter();
         graphics.pose().translate(-center.x / 16.0f, -center.y / 16.0f, -center.z / 16.0f);
         renderModel(graphics, data, yaw, pitch, false);
+        renderFloorGrid(graphics, bounds, scale);
         graphics.pose().popPose();
+    }
+
+    private static final float GRID_MARGIN = 0.25f;
+    private static final float GRID_SPACING = 0.25f;
+    private static final float GRID_SEGMENT = 1 / 16.0f;
+
+    private void renderFloorGrid(GuiGraphics graphics, AABB bounds, float scale) {
+        float minX = (float) bounds.minX / 16.0f, maxX = (float) bounds.maxX / 16.0f;
+        float minZ = (float) bounds.minZ / 16.0f, maxZ = (float) bounds.maxZ / 16.0f;
+        float y = (float) bounds.minY / 16.0f - 0.002f;
+        float halfWidth = 0.5f / scale;
+
+        Matrix4f matrix = graphics.pose().last().pose();
+        VertexConsumer consumer = graphics.bufferSource().getBuffer(RenderType.gui());
+
+        // Lines along the z-axis, then along the x-axis
+        for (int axis = 0; axis < 2; axis++) {
+            float lineMin = axis == 0 ? minX : minZ, lineMax = axis == 0 ? maxX : maxZ;
+            float runMin = axis == 0 ? minZ : minX, runMax = axis == 0 ? maxZ : maxX;
+            float first = (float) Math.ceil((lineMin - GRID_MARGIN) / GRID_SPACING) * GRID_SPACING;
+            for (float line = first; line <= lineMax + GRID_MARGIN; line += GRID_SPACING) {
+                boolean blockLine = Math.abs(line - Math.round(line)) < 0.001f;
+                float alpha = blockLine ? 0.2f : 0.05f;
+                for (float run = runMin - GRID_MARGIN; run < runMax + GRID_MARGIN; run += GRID_SEGMENT) {
+                    float next = Math.min(run + GRID_SEGMENT, runMax + GRID_MARGIN);
+                    float a0 = alpha * getGridFade(line, lineMin, lineMax, run, runMin, runMax);
+                    float a1 = alpha * getGridFade(line, lineMin, lineMax, next, runMin, runMax);
+                    if (axis == 0) {
+                        gridQuad(consumer, matrix, line - halfWidth, line + halfWidth, run, next, y, a0, a1, false);
+                    } else {
+                        gridQuad(consumer, matrix, run, next, line - halfWidth, line + halfWidth, y, a0, a1, true);
+                    }
+                }
+            }
+        }
+    }
+
+    private static float getGridFade(float line, float lineMin, float lineMax, float run, float runMin, float runMax) {
+        float dx = Math.max(0, Math.max(lineMin - line, line - lineMax));
+        float dz = Math.max(0, Math.max(runMin - run, run - runMax));
+        return Math.max(0, 1 - (float) Math.sqrt(dx * dx + dz * dz) / GRID_MARGIN);
+    }
+
+    private static void gridQuad(VertexConsumer consumer, Matrix4f matrix, float x0, float x1, float z0, float z1, float y, float a0, float a1, boolean runAlongX) {
+        float[][] corners = {{x0, z0}, {x0, z1}, {x1, z1}, {x1, z0}};
+        float[] alphas = runAlongX ? new float[]{a0, a0, a1, a1} : new float[]{a0, a1, a1, a0};
+        for (int i = 0; i < 4; i++) {
+            consumer.vertex(matrix, corners[i][0], y, corners[i][1]).color(1.0f, 1.0f, 1.0f, alphas[i]).endVertex();
+        }
+        for (int i = 3; i >= 0; i--) {
+            consumer.vertex(matrix, corners[i][0], y, corners[i][1]).color(1.0f, 1.0f, 1.0f, alphas[i]).endVertex();
+        }
     }
 
     private static CompositeBakedModel lastBakedModel = null;

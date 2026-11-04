@@ -60,6 +60,8 @@ public class FurnitureData {
     private String hash;
     private String atlasPixelsHash;
     private long atlasPixels;
+    private String meshBoundsHash;
+    private AABB meshBounds;
     private final Map<Integer, VoxelShape> cachedFullShapes = new ConcurrentHashMap<>();
     private final Map<Integer, VoxelShape> cachedSubShapes = new ConcurrentHashMap<>();
     private final Set<Integer> requestedFullShapes = new ConcurrentSkipListSet<>();
@@ -203,6 +205,26 @@ public class FurnitureData {
         }
 
         return new AABB(minX, minY, minZ, maxX, maxY, maxZ);
+    }
+
+    /**
+     * The bounds of the rotated elements, in pixels.
+     */
+    public AABB meshBoundingBox() {
+        String hash = getHash();
+        if (!hash.equals(meshBoundsHash)) {
+            AABB bounds = null;
+            for (Element element : elements) {
+                if (element.type != ElementType.ELEMENT && element.type != ElementType.SPRITE) continue;
+                for (Vector3f corner : ModelUtils.getCorners(element)) {
+                    AABB point = new AABB(corner.x, corner.y, corner.z, corner.x, corner.y, corner.z);
+                    bounds = bounds == null ? point : bounds.minmax(point);
+                }
+            }
+            meshBounds = bounds == null ? new AABB(0, 0, 0, 16, 16, 16) : bounds;
+            meshBoundsHash = hash;
+        }
+        return meshBounds;
     }
 
     public int getVolume() {
