@@ -148,6 +148,7 @@
   "gui.immersive_furniture.delete_failed": "Failed to delete creation.",
   "gui.immersive_furniture.name": "Name",
   "gui.immersive_furniture.name.hint": "Furniture name",
+  "gui.immersive_furniture.name_required": "Name your furniture to save it",
   "gui.immersive_furniture.upload_duplicate": "That content already exists.",
   "gui.immersive_furniture.upload_failed": "Upload failed. Woops.",
   "gui.immersive_furniture.login_required": "Login required!",

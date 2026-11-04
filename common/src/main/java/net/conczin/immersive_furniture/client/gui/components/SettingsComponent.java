@@ -38,6 +38,7 @@ public class SettingsComponent extends ScreenComponent {
     );
 
     private boolean localFileExists;
+    private Button saveButton;
 
     public SettingsComponent(ArtisansWorkstationEditorScreen screen) {
         super(screen);
@@ -58,6 +59,7 @@ public class SettingsComponent extends ScreenComponent {
         nameBox.setResponder(s -> {
             screen.data.name = s;
             this.localFileExists = FurnitureDataManager.localFileExists(screen.data);
+            saveButton.active = !s.isBlank();
         });
         screen.addRenderableWidget(nameBox);
 
@@ -105,7 +107,7 @@ public class SettingsComponent extends ScreenComponent {
         lightToggle.setEnabled(!screen.data.toggleLight);
 
         // Save
-        addButton("gui.immersive_furniture.save", b -> {
+        saveButton = addButton("gui.immersive_furniture.save", b -> {
             // Finish and bake the model and save
             finish(screen.data);
             FurnitureDataManager.saveLocalFile(screen.data);
@@ -119,10 +121,17 @@ public class SettingsComponent extends ScreenComponent {
             libraryScreen.setTab(ArtisansWorkstationLibraryScreen.Tab.LOCAL);
             Minecraft.getInstance().setScreen(libraryScreen);
         }, leftPos + 6, topPos + height - 26, width - 12);
+        saveButton.active = !screen.data.name.isBlank();
     }
 
     public void render(GuiGraphics graphics) {
-        if (localFileExists) {
+        if (screen.data.name.isBlank()) {
+            graphics.drawCenteredString(
+                    minecraft.font,
+                    Component.translatable("gui.immersive_furniture.name_required"),
+                    screen.getRightPaneCenterX(), topPos + height - 16, 0xFF5555
+            );
+        } else if (localFileExists) {
             graphics.drawCenteredString(
                     minecraft.font,
                     Component.translatable("gui.immersive_furniture.overwrite_file"),
@@ -131,8 +140,8 @@ public class SettingsComponent extends ScreenComponent {
         }
     }
 
-    private void addButton(String message, Button.OnPress onPress, int x, int y, int w) {
-        screen.addRenderableWidget(
+    private Button addButton(String message, Button.OnPress onPress, int x, int y, int w) {
+        return screen.addRenderableWidget(
                 Button.builder(Component.translatable(message), onPress)
                         .bounds(x, y, w, 20)
                         .build()

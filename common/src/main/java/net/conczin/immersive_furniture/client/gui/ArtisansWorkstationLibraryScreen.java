@@ -234,7 +234,9 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
             addRenderableWidget(
                     Button.builder(Component.translatable("gui.immersive_furniture.create"), b -> {
                                 if (minecraft != null) {
-                                    minecraft.setScreen(new ArtisansWorkstationEditorScreen(new FurnitureData()));
+                                    FurnitureData data = new FurnitureData();
+                                    data.name = "";
+                                    minecraft.setScreen(new ArtisansWorkstationEditorScreen(data));
                                 }
                             })
                             .bounds(leftPos + windowWidth - 64 - 4, topPos + windowHeight - 24, 64, 20)
