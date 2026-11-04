@@ -94,6 +94,8 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
     private String lastSearch = "";
     private long searchDebounceUntil = 0;
     private EditBox searchBox;
+    private int similarTo = -1;
+    private String similarToName = "";
 
     private boolean authenticating;
     private boolean isBrowserOpen = false;
@@ -157,7 +159,8 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
             }
 
             // Search box
-            searchBox = new EditBox(font, leftPos + 5, topPos + 5, windowWidth - 64 - 12, font.lineHeight + 3, SEARCH_TITLE);
+            int searchWidth = windowWidth - 64 - 12 - (similarTo == -1 ? 0 : 14);
+            searchBox = new EditBox(font, leftPos + 5, topPos + 5, searchWidth, font.lineHeight + 3, SEARCH_TITLE);
             searchBox.setMaxLength(50);
             searchBox.setVisible(true);
             searchBox.setValue(lastSearch);
@@ -172,6 +175,21 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
             });
             addRenderableWidget(searchBox);
             setInitialFocus(searchBox);
+
+            // Leave the similar furniture view
+            if (similarTo != -1) {
+                addRenderableWidget(
+                        Button.builder(Component.literal("×"), b -> {
+                                    similarTo = -1;
+                                    page = 0;
+                                    shouldSearch = true;
+                                    init();
+                                })
+                                .bounds(leftPos + 5 + searchWidth + 2, topPos + 5, 12, 12)
+                                .tooltip(Tooltip.create(Component.translatable("gui.immersive_furniture.similar.clear")))
+                                .build()
+                );
+            }
 
             // Tags
             int i = 0;
@@ -188,8 +206,8 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
 
             int y = topPos + windowHeight - 25;
 
-            // Sort by date
-            addRenderableWidget(
+            // Sort, similar furniture is always sorted by similarity
+            if (similarTo == -1) addRenderableWidget(
                     new ImageButton(leftPos + 3, y, 22, 22, order.getU(), 114, 22, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE, b -> {
                         order = order.cycle();
                         shouldSearch = true;
@@ -256,7 +274,7 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
             boolean canReport = tab == Tab.GLOBAL;
 
             // Center the visible buttons, 25 pixels apart
-            int buttons = 2 + (canDelete ? 1 : 0) + (canReport ? 1 : 0);
+            int buttons = 2 + (canDelete ? 1 : 0) + (local ? 0 : 1) + (canReport ? 1 : 0);
             int x = leftPos + windowWidth / 2 - (buttons * 25 - 3) / 2;
 
             // Favorite
@@ -308,6 +326,23 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
                 }
             });
             x += 25;
+
+            // Similar
+            if (!local) {
+                addButton(x, y, 22, 22 * 10, 114, "gui.immersive_furniture.similar", () -> {
+                    FurnitureData data = FurnitureDataManager.getData(selected);
+                    if (data != null) {
+                        similarTo = data.contentid;
+                        similarToName = data.name;
+                        selected = null;
+                        tab = Tab.GLOBAL;
+                        page = 0;
+                        shouldSearch = true;
+                        init();
+                    }
+                });
+                x += 25;
+            }
 
             // Report
             if (canReport) {
@@ -468,6 +503,11 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
             }
 
             graphics.drawCenteredString(font, String.valueOf(page + 1), leftPos + windowWidth / 2, topPos + windowHeight - 17, 0xFFFFFF);
+
+            // Not every furniture has enough likes or a preview to find neighbours
+            if (similarTo != -1 && furniture.isEmpty() && !shouldSearch && !awaitingSearch) {
+                graphics.drawCenteredString(font, Component.translatable("gui.immersive_furniture.similar.empty"), leftPos + windowWidth / 2, topPos + windowHeight / 2, 0xAAAAAA);
+            }
 
             // The edit box hides its hint while focused, but it's focused by default
             if (searchBox.isFocused() && searchBox.getValue().isEmpty()) {
@@ -696,6 +736,16 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
     }
 
     @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        // Enter searches right away
+        if (selected == null && searchBox.isFocused() && (keyCode == InputConstants.KEY_RETURN || keyCode == InputConstants.KEY_NUMPADENTER)) {
+            searchDebounceUntil = 0;
+            return true;
+        }
+        return super.keyPressed(keyCode, scanCode, modifiers);
+    }
+
+    @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (selected == null) {
             for (int x = 0; x < 4; x++) {
@@ -740,12 +790,16 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
     }
 
     private Component getSearchHint() {
+        if (similarTo != -1) {
+            return Component.translatable("gui.immersive_furniture.similar_to", similarToName).withStyle(ChatFormatting.ITALIC).withStyle(ChatFormatting.GRAY);
+        }
         return tab == Tab.LOCAL ? SEARCH_HINT : LIBRARY_SEARCH_HINT;
     }
 
     public void setTab(Tab tab) {
         this.tab = tab;
         this.page = 0;
+        this.similarTo = -1;
         this.shouldSearch = true;
         init();
     }
@@ -791,6 +845,10 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
             ));
             if (tab == Tab.FAVORITES) params.put("liked_by", "me");
             if (tab == Tab.SUBMISSIONS) params.put("author_id", "me");
+            if (similarTo != -1) {
+                params.put("similar_to", String.valueOf(similarTo));
+                params.put("order", "relevance");
+            }
 
             // Search terms and the category as an exact tag filter
             List<String> terms = new LinkedList<>();
