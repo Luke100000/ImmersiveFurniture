@@ -32,6 +32,7 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.TooltipFlag;
 
+import java.nio.file.Path;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -39,6 +40,8 @@ import java.time.format.FormatStyle;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static net.conczin.immersive_furniture.client.gui.components.SettingsComponent.TAGS;
 import static net.conczin.immersive_furniture.data.api.API.request;
@@ -763,6 +766,11 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        // Pasting a furniture link opens it
+        if (Screen.isPaste(keyCode) && minecraft != null && openLink(minecraft.keyboardHandler.getClipboard())) {
+            return true;
+        }
+
         // Enter searches right away
         if (selected == null && searchBox.isFocused() && (keyCode == InputConstants.KEY_RETURN || keyCode == InputConstants.KEY_NUMPADENTER)) {
             searchDebounceUntil = 0;
@@ -807,6 +815,20 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
         }
 
         return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
+    }
+
+    private boolean openLink(String text) {
+        String host = Config.getInstance().immersiveLibraryUrl.replaceFirst("^\\w+://", "").replaceFirst("/+$", "");
+        Matcher matcher = Pattern.compile(Pattern.quote(host) + "/furniture/(\\d{1,9})\\b").matcher(text);
+        if (!matcher.find()) return false;
+
+        tab = Tab.GLOBAL;
+        page = 0;
+        similarTo = -1;
+        shouldSearch = true;
+        setSelected(new ResourceLocation("library", matcher.group(1)));
+        init();
+        return true;
     }
 
     public void setSelected(ResourceLocation location) {

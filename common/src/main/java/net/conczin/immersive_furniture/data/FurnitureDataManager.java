@@ -178,12 +178,14 @@ public class FurnitureDataManager {
 
             // Request it otherwise
             if (id.getNamespace().equals("library")) {
-                int contentid, version;
+                // The version is optional and only breaks the cache
+                int contentid;
+                Map<String, String> params;
                 try {
                     String[] split = id.getPath().split("\\.");
                     contentid = Integer.parseInt(split[0]);
-                    version = Integer.parseInt(split[1]);
-                } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
+                    params = split.length > 1 ? Map.of("version", String.valueOf(Integer.parseInt(split[1]))) : Map.of();
+                } catch (NumberFormatException e) {
                     Common.logger.error("Failed to parse content id and version from: {}", id, e);
                     return null;
                 }
@@ -191,7 +193,7 @@ public class FurnitureDataManager {
                 // Download assets when versions mismatch
                 CompletableFuture.runAsync(() -> {
                     try {
-                        Response response = request(API.HttpMethod.GET, ContentResponse.class, "v3/content/furniture/" + contentid, Map.of("version", String.valueOf(version)));
+                        Response response = request(API.HttpMethod.GET, ContentResponse.class, "v3/content/furniture/" + contentid, params);
                         if (response instanceof ContentResponse contentResponse) {
                             ByteArrayInputStream in = new ByteArrayInputStream(Base64.getDecoder().decode(contentResponse.content().data()));
                             FurnitureData data = new FurnitureData(NbtIo.readCompressed(in));

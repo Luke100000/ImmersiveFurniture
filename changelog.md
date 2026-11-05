@@ -10,6 +10,7 @@
 * Fixed a possible server freeze near unloaded chunks (#75)
 * Improved preview size and added a reference grid
 * Added flip XYZ button
+* Added opening library links by pasting them into the library
 
 # 0.3.4
 
