@@ -103,6 +103,11 @@ public class FurnitureProxyBlock extends Block {
     }
 
     @Override
+    protected boolean propagatesSkylightDown(BlockState state, BlockGetter level, BlockPos pos) {
+        return true;
+    }
+
+    @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         // Forward the interaction to the base block
         BlockPos basePos = getBasePos(state, pos);
