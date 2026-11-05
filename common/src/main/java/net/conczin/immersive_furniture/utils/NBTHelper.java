@@ -115,10 +115,14 @@ public class NBTHelper {
      * @param tag          The CompoundTag to get the value from
      * @param key          The key to look up
      * @param defaultValue The default value to return if the key doesn't exist
-     * @return The ResourceLocation, or the default value if the key doesn't exist
+     * @return The ResourceLocation, or the default value if the key doesn't exist or is invalid
      */
     public static ResourceLocation getResourceLocation(CompoundTag tag, String key, ResourceLocation defaultValue) {
-        return tag.contains(key) ? new ResourceLocation(tag.getString(key)) : defaultValue;
+        if (!tag.contains(key)) {
+            return defaultValue;
+        }
+        ResourceLocation location = ResourceLocation.tryParse(tag.getString(key));
+        return location == null ? defaultValue : location;
     }
 
     /**
