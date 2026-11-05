@@ -30,6 +30,7 @@ import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.joml.Quaternionf;
+import org.joml.Vector2i;
 import org.joml.Vector3f;
 import org.joml.Vector3i;
 
@@ -53,6 +54,7 @@ public class FurnitureData {
 
     public String name = "Empty";
     public String tag = "miscellaneous";
+    public Set<String> tags = new LinkedHashSet<>();
     public int lightLevel;
     public int inventorySize;
     public boolean toggleWithRightClick;
@@ -69,6 +71,10 @@ public class FurnitureData {
     public Vector3i size = new Vector3i(1, 1, 1);
 
     private String hash;
+    private String atlasPixelsHash;
+    private long atlasPixels;
+    private String meshBoundsHash;
+    private AABB meshBounds;
     private final Map<Integer, VoxelShape> cachedFullShapes = new ConcurrentHashMap<>();
     private final Map<Integer, VoxelShape> cachedSubShapes = new ConcurrentHashMap<>();
     private final Set<Integer> requestedFullShapes = new ConcurrentSkipListSet<>();
@@ -82,6 +88,7 @@ public class FurnitureData {
     public FurnitureData(CompoundTag tag) {
         this.name = NBTHelper.getString(tag, "Name", name);
         this.tag = NBTHelper.getString(tag, "Tag", this.tag);
+        this.tags = NBTHelper.getStringSet(tag.getList("Tags", 8));
         this.lightLevel = NBTHelper.getInt(tag, "LightLevel", lightLevel);
         this.inventorySize = NBTHelper.getInt(tag, "InventorySize", inventorySize);
         this.toggleWithRightClick = NBTHelper.getBoolean(tag, "ToggleWithRightClick", toggleWithRightClick);
@@ -108,6 +115,7 @@ public class FurnitureData {
     public FurnitureData(FurnitureData data) {
         this.name = data.name;
         this.tag = data.tag;
+        this.tags.addAll(data.tags);
         this.lightLevel = data.lightLevel;
         this.inventorySize = data.inventorySize;
         this.toggleWithRightClick = data.toggleWithRightClick;
@@ -131,6 +139,10 @@ public class FurnitureData {
         CompoundTag tag = new CompoundTag();
         tag.putString("Name", name);
         tag.putString("Tag", this.tag);
+        if (!tags.isEmpty()) {
+            // Only written when present to keep the hash of existing furniture stable
+            tag.put("Tags", NBTHelper.getStringList(tags));
+        }
         tag.putInt("LightLevel", lightLevel);
         tag.putInt("InventorySize", inventorySize);
         tag.putBoolean("ToggleWithRightClick", toggleWithRightClick);
@@ -152,6 +164,29 @@ public class FurnitureData {
         tag.put("Elements", elementsTag);
 
         return tag;
+    }
+
+    public long getAtlasPixels() {
+        String hash = getHash();
+        if (!hash.equals(atlasPixelsHash)) {
+            long pixels = 0;
+            for (int state : getUniqueSolidStates()) {
+                for (Element element : elements) {
+                    if (element.type != ElementType.ELEMENT || !element.isMasked(state)) continue;
+                    for (Direction direction : Direction.values()) {
+                        Vector2i dimensions = ModelUtils.getFaceDimensions(element, direction);
+                        pixels += (long) dimensions.x * dimensions.y;
+                    }
+                }
+            }
+            atlasPixels = pixels;
+            atlasPixelsHash = hash;
+        }
+        return atlasPixels;
+    }
+
+    public boolean hasCategory() {
+        return !tag.equals("miscellaneous");
     }
 
     public int getCost() {
@@ -183,6 +218,26 @@ public class FurnitureData {
         }
 
         return new AABB(minX, minY, minZ, maxX, maxY, maxZ);
+    }
+
+    /**
+     * The bounds of the rotated elements, in pixels.
+     */
+    public AABB meshBoundingBox() {
+        String hash = getHash();
+        if (!hash.equals(meshBoundsHash)) {
+            AABB bounds = null;
+            for (Element element : elements) {
+                if (element.type != ElementType.ELEMENT && element.type != ElementType.SPRITE) continue;
+                for (Vector3f corner : ModelUtils.getCorners(element)) {
+                    AABB point = new AABB(corner.x, corner.y, corner.z, corner.x, corner.y, corner.z);
+                    bounds = bounds == null ? point : bounds.minmax(point);
+                }
+            }
+            meshBounds = bounds == null ? new AABB(0, 0, 0, 16, 16, 16) : bounds;
+            meshBoundsHash = hash;
+        }
+        return meshBounds;
     }
 
     public int getVolume() {
@@ -369,15 +424,7 @@ public class FurnitureData {
             }
         }
         if (advanced) {
-            int pixels = 0;
-            for (Element element : elements) {
-                for (Map<Integer, int[]> texture : element.bakedTextures.textures.values()) {
-                    for (Map.Entry<Integer, int[]> states : texture.entrySet()) {
-                        pixels += states.getValue().length;
-                    }
-                }
-            }
-            double usage = pixels / Math.pow(DynamicAtlas.BAKED.getSize(), 2);
+            double usage = getAtlasPixels() / Math.pow(DynamicAtlas.BAKED.getSize(), 2);
             tooltip.add(Component.translatable("gui.immersive_furniture.atlas_usage", String.format("%.1f%%", usage * 100)).withStyle(ChatFormatting.DARK_GRAY));
         }
         if (hasAdvanced && !advanced) {
@@ -828,9 +875,6 @@ public class FurnitureData {
         public void sanityCheck() {
             if (sprite.item) {
                 sprite.tiled = false;
-
-                // TODO: Remove this once most people ported to 0.1.0
-                sprite.sprite = ResourceLocation.withDefaultNamespace("item/bread");
             }
 
             // Pose anchors are the shape of the players' butt
@@ -1153,6 +1197,7 @@ public class FurnitureData {
         public boolean tiled = false;
         public boolean item = false;
         public boolean align = false;
+        public boolean mirrored = false;
 
         public Sprite() {
         }
@@ -1164,6 +1209,7 @@ public class FurnitureData {
             this.tiled = NBTHelper.getBoolean(tag, "Tiled", tiled);
             this.item = NBTHelper.getBoolean(tag, "Item", item);
             this.align = NBTHelper.getBoolean(tag, "Align", align);
+            this.mirrored = NBTHelper.getBoolean(tag, "Mirrored", mirrored);
         }
 
         public Sprite(Sprite sprite) {
@@ -1173,6 +1219,7 @@ public class FurnitureData {
             this.tiled = sprite.tiled;
             this.item = sprite.item;
             this.align = sprite.align;
+            this.mirrored = sprite.mirrored;
         }
 
         public CompoundTag toTag() {
@@ -1183,6 +1230,9 @@ public class FurnitureData {
             tag.putBoolean("Tiled", tiled);
             tag.putBoolean("Item", item);
             tag.putBoolean("Align", align);
+            if (mirrored) {
+                tag.putBoolean("Mirrored", true);
+            }
             return tag;
         }
     }

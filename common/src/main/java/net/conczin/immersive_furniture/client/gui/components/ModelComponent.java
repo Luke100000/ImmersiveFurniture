@@ -28,6 +28,7 @@ public class ModelComponent extends ScreenComponent {
     static final Component POSITION_TITLE = Component.translatable("gui.immersive_furniture.position");
     static final Component SIZE_TITLE = Component.translatable("gui.immersive_furniture.size");
     static final Component ROTATION_TITLE = Component.translatable("gui.immersive_furniture.rotation");
+    static final Component FLIP_TITLE = Component.translatable("gui.immersive_furniture.flip");
     static final Component MOVE_FURNITURE_TITLE = Component.translatable("gui.immersive_furniture.move_furniture");
     static final Component FURNITURE_DIMENSION_TITLE = Component.translatable("gui.immersive_furniture.furniture_dimension");
 
@@ -232,9 +233,19 @@ public class ModelComponent extends ScreenComponent {
         addButton(leftPos + 62, y + 1, 14, 222, 2, null, () -> rotate(22.5f));
         addButton(leftPos + 78, y + 1, 14, 206, 2, null, () -> rotate(-22.5f));
 
+        // Flip, only when the window is tall enough to push the rest down
+        if (hasFlipRow()) {
+            y += 32;
+            addButton(leftPos + 6, y, 16, 16, 192, "gui.immersive_furniture.flip.x", () -> flip(Direction.Axis.X));
+            addButton(leftPos + 24, y, 16, 32, 192, "gui.immersive_furniture.flip.y", () -> flip(Direction.Axis.Y));
+            addButton(leftPos + 42, y, 16, 48, 192, "gui.immersive_furniture.flip.z", () -> flip(Direction.Axis.Z));
+        }
+
+        int boxY = getSecondBoxY();
+
         // Element type
         for (FurnitureData.ElementType type : FurnitureData.ElementType.values()) {
-            addToggleButton(leftPos + 6 + type.ordinal() * 18, topPos + 94, 16, 176 + type.ordinal() * 16, 192, "gui.immersive_furniture.element_type." + type.name().toLowerCase(), () -> {
+            addToggleButton(leftPos + 6 + type.ordinal() * 18, boxY + 2, 16, 176 + type.ordinal() * 16, 192, "gui.immersive_furniture.element_type." + type.name().toLowerCase(), () -> {
                 screen.selectedElements.forEach(e -> {
                     e.type = type;
                     e.sanityCheck();
@@ -245,28 +256,28 @@ public class ModelComponent extends ScreenComponent {
 
         if (firstElement.type == FurnitureData.ElementType.PARTICLE_EMITTER) {
             // Direction velocity
-            BoundedDoubleSlider directionalVelocitySlider = new BoundedDoubleSlider(leftPos + 6, topPos + 112, (width - 14) / 2, 20,
+            BoundedDoubleSlider directionalVelocitySlider = new BoundedDoubleSlider(leftPos + 6, boxY + 20, (width - 14) / 2, 20,
                     "gui.immersive_furniture.directional_velocity",
                     firstElement.particleEmitter.velocityDirectional, 0, 5.0);
             directionalVelocitySlider.setCallback(v -> screen.selectedElements.forEach(e -> e.particleEmitter.velocityDirectional = v.floatValue()));
             screen.addRenderableWidget(directionalVelocitySlider);
 
             // Random velocity
-            BoundedDoubleSlider velocityRandomSlider = new BoundedDoubleSlider(leftPos + 8 + (width - 14) / 2, topPos + 112, (width - 14) / 2, 20,
+            BoundedDoubleSlider velocityRandomSlider = new BoundedDoubleSlider(leftPos + 8 + (width - 14) / 2, boxY + 20, (width - 14) / 2, 20,
                     "gui.immersive_furniture.random_velocity",
                     firstElement.particleEmitter.velocityRandom, 0, 5.0);
             velocityRandomSlider.setCallback(v -> screen.selectedElements.forEach(e -> e.particleEmitter.velocityRandom = v.floatValue()));
             screen.addRenderableWidget(velocityRandomSlider);
 
             // Particle amount
-            BoundedDoubleSlider amountSlider = new BoundedDoubleSlider(leftPos + 6, topPos + 134, width - 32, 20,
+            BoundedDoubleSlider amountSlider = new BoundedDoubleSlider(leftPos + 6, boxY + 42, width - 32, 20,
                     "gui.immersive_furniture.particle_amount",
                     firstElement.particleEmitter.amount, 0, 4.0);
             amountSlider.setCallback(v -> screen.selectedElements.forEach(e -> e.particleEmitter.amount = v.floatValue()));
             screen.addRenderableWidget(amountSlider);
 
             // Particle settings
-            addToggleButton(leftPos + width - 23, topPos + 136, 16, 192, 160, "gui.immersive_furniture.on_interact", () -> {
+            addToggleButton(leftPos + width - 23, boxY + 44, 16, 192, 160, "gui.immersive_furniture.on_interact", () -> {
                 screen.selectedElements.forEach(e -> e.particleEmitter.onInteract = !e.particleEmitter.onInteract);
                 screen.init();
 
@@ -279,7 +290,7 @@ public class ModelComponent extends ScreenComponent {
             }).setEnabled(!firstElement.particleEmitter.onInteract);
         } else if (firstElement.type == FurnitureData.ElementType.SOUND_EMITTER) {
             // Volume
-            BoundedDoubleSlider volumeSlider = new BoundedDoubleSlider(leftPos + 6, topPos + 112, (width - 14) / 2, 20,
+            BoundedDoubleSlider volumeSlider = new BoundedDoubleSlider(leftPos + 6, boxY + 20, (width - 14) / 2, 20,
                     "gui.immersive_furniture.volume",
                     firstElement.soundEmitter.volume, 0, 2.0);
             volumeSlider.setCallback(v -> {
@@ -289,7 +300,7 @@ public class ModelComponent extends ScreenComponent {
             screen.addRenderableWidget(volumeSlider);
 
             // Pitch
-            BoundedDoubleSlider velocityRandomSlider = new BoundedDoubleSlider(leftPos + 8 + (width - 14) / 2, topPos + 112, (width - 14) / 2, 20,
+            BoundedDoubleSlider velocityRandomSlider = new BoundedDoubleSlider(leftPos + 8 + (width - 14) / 2, boxY + 20, (width - 14) / 2, 20,
                     "gui.immersive_furniture.pitch",
                     firstElement.soundEmitter.pitch, 0.5, 2.0);
             velocityRandomSlider.setCallback(v -> {
@@ -300,7 +311,7 @@ public class ModelComponent extends ScreenComponent {
 
             // Frequency
             if (!firstElement.soundEmitter.onInteract) {
-                BoundedDoubleSlider frequencySlider = new BoundedDoubleSlider(leftPos + 6, topPos + 134, width - 32, 20,
+                BoundedDoubleSlider frequencySlider = new BoundedDoubleSlider(leftPos + 6, boxY + 42, width - 32, 20,
                         "gui.immersive_furniture.frequency",
                         firstElement.soundEmitter.frequency, 0.0, 1.0);
                 frequencySlider.setCallback(v -> {
@@ -311,7 +322,7 @@ public class ModelComponent extends ScreenComponent {
             }
 
             // Sound settings
-            addToggleButton(leftPos + width - 23, topPos + 136, 16, 192, 160, "gui.immersive_furniture.on_interact", () -> {
+            addToggleButton(leftPos + width - 23, boxY + 44, 16, 192, 160, "gui.immersive_furniture.on_interact", () -> {
                 Common.clientHandler.stopAllFurnitureSounds();
                 screen.selectedElements.forEach(e -> {
                     e.soundEmitter.onInteract = !e.soundEmitter.onInteract;
@@ -331,7 +342,7 @@ public class ModelComponent extends ScreenComponent {
             List<Pose> poses = List.of(Pose.SITTING, Pose.SLEEPING);
             for (int i = 0; i < poses.size(); i++) {
                 Pose pose = poses.get(i);
-                addToggleButton(leftPos + 6 + i * 18, topPos + 114, 16, 160 + i * 16, 160, "gui.immersive_furniture.player_pose." + pose.name().toLowerCase(), () -> {
+                addToggleButton(leftPos + 6 + i * 18, boxY + 22, 16, 160 + i * 16, 160, "gui.immersive_furniture.player_pose." + pose.name().toLowerCase(), () -> {
                     screen.selectedElements.forEach(e -> {
                         e.playerPose.pose = pose;
                         e.sanityCheck();
@@ -343,22 +354,28 @@ public class ModelComponent extends ScreenComponent {
             // Rotation
             for (int i = 0; i < 360; i += 90) {
                 final int rotation = i;
-                addToggleButton(leftPos + 6 + i / 90 * 18, topPos + 114, 16, 96 + (i / 90) * 16, 160, "gui.immersive_furniture.rotation." + i, () -> {
+                addToggleButton(leftPos + 6 + i / 90 * 18, boxY + 22, 16, 96 + (i / 90) * 16, 160, "gui.immersive_furniture.rotation." + i, () -> {
                     // TODO: Rotate around origin
                     screen.selectedElements.forEach(e -> e.sprite.rotation = rotation);
                     screen.init();
                 }).setEnabled(firstElement.sprite.rotation != rotation);
             }
 
+            // Mirror
+            addToggleButton(leftPos + 78, boxY + 22, 16, 64, 160, "gui.immersive_furniture.mirror", () -> {
+                screen.selectedElements.forEach(e -> e.sprite.mirrored = !e.sprite.mirrored);
+                screen.init();
+            }).setEnabled(!firstElement.sprite.mirrored);
+
             // Size
-            addButton(leftPos + 6, topPos + 132, 16, 112, 192, "gui.immersive_furniture.decrease_size", () -> {
+            addButton(leftPos + 6, boxY + 40, 16, 112, 192, "gui.immersive_furniture.decrease_size", () -> {
                 screen.selectedElements.forEach(e -> {
                     e.sprite.size = Math.max(0.25f, e.sprite.size / 2.0f);
                     e.sanityCheck();
                 });
                 screen.init();
             });
-            addButton(leftPos + 24, topPos + 132, 16, 96, 192, "gui.immersive_furniture.increase_size", () -> {
+            addButton(leftPos + 24, boxY + 40, 16, 96, 192, "gui.immersive_furniture.increase_size", () -> {
                 screen.selectedElements.forEach(e -> {
                     e.sprite.size = Math.min(2.0f, e.sprite.size * 2.0f);
                     e.sanityCheck();
@@ -368,7 +385,7 @@ public class ModelComponent extends ScreenComponent {
 
             // Align toggle (only visible when item == true)
             if (firstElement.sprite.item) {
-                addToggleButton(leftPos + 78, topPos + 114, 16, 240, 160, "gui.immersive_furniture.align", () -> {
+                addToggleButton(leftPos + 42, boxY + 40, 16, 240, 160, "gui.immersive_furniture.align", () -> {
                     screen.selectedElements.forEach(e -> {
                         e.sprite.align = !e.sprite.align;
                         e.sanityCheck();
@@ -378,7 +395,7 @@ public class ModelComponent extends ScreenComponent {
             }
 
             // Item toggle
-            addToggleButton(leftPos + 60, topPos + 132, 16, 0, 160, "gui.immersive_furniture.item", () -> {
+            addToggleButton(leftPos + 60, boxY + 40, 16, 0, 160, "gui.immersive_furniture.item", () -> {
                 screen.selectedElements.forEach(e -> {
                     e.sprite.item = !e.sprite.item;
                     e.sanityCheck();
@@ -387,13 +404,48 @@ public class ModelComponent extends ScreenComponent {
             }).setEnabled(!firstElement.sprite.item);
 
             // Tiled toggle
-            addToggleButton(leftPos + 78, topPos + 132, 16, 144, 192, "gui.immersive_furniture.tiled", () -> {
+            addToggleButton(leftPos + 78, boxY + 40, 16, 144, 192, "gui.immersive_furniture.tiled", () -> {
                 screen.selectedElements.forEach(e -> {
                     e.sprite.tiled = !e.sprite.tiled;
                     e.sanityCheck();
                 });
                 screen.init();
             }).setEnabled(!firstElement.sprite.tiled);
+        }
+    }
+
+    private boolean hasFlipRow() {
+        return height >= 222;
+    }
+
+    private int getSecondBoxY() {
+        return topPos + (hasFlipRow() ? 124 : 92);
+    }
+
+    private void flip(Direction.Axis axis) {
+        Vector3f center = new Vector3f();
+        screen.selectedElements.stream().map(FurnitureData.Element::getCenter).forEach(center::add);
+        center.div(screen.selectedElements.size());
+
+        for (FurnitureData.Element element : screen.selectedElements) {
+            float offset = (float) (center.get(axis.ordinal()) - element.getCenter().get(axis.ordinal())) * 2;
+            offset = Math.round(offset * 4) / 4f;
+            element.move(
+                    axis == Direction.Axis.X ? offset : 0,
+                    axis == Direction.Axis.Y ? offset : 0,
+                    axis == Direction.Axis.Z ? offset : 0
+            );
+
+            // A mirror keeps rotations around its normal, but reverses all others
+            if (element.axis != axis) {
+                element.rotation = -element.rotation;
+            }
+
+            // Sprites lie in the local xy-plane, mirror their image unless flipped along their normal
+            if (element.type == FurnitureData.ElementType.SPRITE && axis != Direction.Axis.Z) {
+                element.sprite.mirrored = !element.sprite.mirrored;
+                element.sprite.rotation = ((axis == Direction.Axis.X ? 360 : 540) - element.sprite.rotation) % 360;
+            }
         }
     }
 
@@ -533,10 +585,14 @@ public class ModelComponent extends ScreenComponent {
             if (firstElement.type != FurnitureData.ElementType.PLAYER_POSE) {
                 graphics.drawString(minecraft.font, ROTATION_TITLE, leftPos + 6, topPos + 62, 0xFFFFFF);
             }
+            if (hasFlipRow()) {
+                graphics.drawString(minecraft.font, FLIP_TITLE, leftPos + 6, topPos + 94, 0xFFFFFF);
+            }
 
             // Outlines
-            renderSmoothOutline(graphics, leftPos + 4, topPos + 4, width - 8, 87, 0x44000000);
-            renderSmoothOutline(graphics, leftPos + 4, topPos + 92, width - 8, height - 117, 0x44000000);
+            int boxY = getSecondBoxY();
+            renderSmoothOutline(graphics, leftPos + 4, topPos + 4, width - 8, boxY - topPos - 5, 0x44000000);
+            renderSmoothOutline(graphics, leftPos + 4, boxY, width - 8, topPos + height - 25 - boxY, 0x44000000);
         }
 
         renderSmoothOutline(graphics, leftPos + 4, topPos + height - 24, width - 8, 20, 0x44000000);

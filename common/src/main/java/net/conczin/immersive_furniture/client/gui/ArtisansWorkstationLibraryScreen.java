@@ -4,11 +4,15 @@ import com.mojang.blaze3d.platform.InputConstants;
 import net.conczin.immersive_furniture.Common;
 import net.conczin.immersive_furniture.client.gui.widgets.LegacyImageButton;
 import net.conczin.immersive_furniture.client.gui.widgets.StateImageButton;
+import net.conczin.immersive_furniture.client.model.DynamicAtlas;
+import net.conczin.immersive_furniture.client.model.FurnitureModelFactory;
+import net.conczin.immersive_furniture.config.Config;
 import net.conczin.immersive_furniture.data.FurnitureData;
 import net.conczin.immersive_furniture.data.FurnitureDataManager;
 import net.conczin.immersive_furniture.data.api.API;
 import net.conczin.immersive_furniture.data.api.Auth;
 import net.conczin.immersive_furniture.data.api.responses.*;
+import net.conczin.immersive_furniture.data.api.types.LiteContent;
 import net.conczin.immersive_furniture.item.Items;
 import net.conczin.immersive_furniture.network.Network;
 import net.conczin.immersive_furniture.network.c2s.CraftRequest;
@@ -31,10 +35,16 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 
+import java.nio.file.Path;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static net.conczin.immersive_furniture.client.gui.components.SettingsComponent.TAGS;
 import static net.conczin.immersive_furniture.data.api.API.request;
@@ -42,6 +52,8 @@ import static net.conczin.immersive_furniture.data.api.API.request;
 public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen {
     static final Component SEARCH_TITLE = Component.translatable("itemGroup.search");
     static final Component SEARCH_HINT = Component.translatable("gui.recipebook.search_hint").withStyle(ChatFormatting.ITALIC).withStyle(ChatFormatting.GRAY);
+    static final Component LIBRARY_SEARCH_HINT = Component.translatable("gui.immersive_furniture.search.hint").withStyle(ChatFormatting.ITALIC).withStyle(ChatFormatting.GRAY);
+    static final int SEARCH_DEBOUNCE_MS = 300;
     static final int ENTRIES_PER_PAGE = 8;
 
     public enum Tab {
@@ -54,7 +66,9 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
     public enum SortingMode {
         DATE(88),
         LIKES(66),
-        RECOMMENDATIONS(154);
+        RECOMMENDATIONS(154),
+        HOT(176),
+        POPULAR(198);
 
         private final int u;
 
@@ -66,7 +80,9 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
             return switch (this) {
                 case DATE -> LIKES;
                 case LIKES -> RECOMMENDATIONS;
-                case RECOMMENDATIONS -> DATE;
+                case RECOMMENDATIONS -> HOT;
+                case HOT -> POPULAR;
+                case POPULAR -> DATE;
             };
         }
 
@@ -84,6 +100,10 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
     private boolean awaitingSearch = false;
     private boolean shouldSearch = true;
     private String lastSearch = "";
+    private long searchDebounceUntil = 0;
+    private EditBox searchBox;
+    private int similarTo = -1;
+    private String similarToName = "";
 
     private boolean authenticating;
     private boolean isBrowserOpen = false;
@@ -97,6 +117,8 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
 
     List<ResourceLocation> furniture = new LinkedList<>();
     List<ResourceLocation> localFiles;
+
+    Map<ResourceLocation, LiteContent> libraryContents = new HashMap<>();
 
     ResourceLocation selected = null;
 
@@ -145,19 +167,37 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
             }
 
             // Search box
-            EditBox searchBox = new EditBox(font, leftPos + 5, topPos + 5, windowWidth - 64 - 12, font.lineHeight + 3, SEARCH_TITLE);
+            int searchWidth = windowWidth - 64 - 12 - (similarTo == -1 ? 0 : 14);
+            searchBox = new EditBox(font, leftPos + 5, topPos + 5, searchWidth, font.lineHeight + 3, SEARCH_TITLE);
             searchBox.setMaxLength(50);
             searchBox.setVisible(true);
             searchBox.setValue(lastSearch);
-            searchBox.setHint(SEARCH_HINT);
+            searchBox.setHint(getSearchHint());
             searchBox.setResponder(s -> {
                 if (!s.equals(lastSearch)) {
                     lastSearch = s;
+                    page = 0;
                     shouldSearch = true;
+                    searchDebounceUntil = System.currentTimeMillis() + SEARCH_DEBOUNCE_MS;
                 }
             });
             addRenderableWidget(searchBox);
             setInitialFocus(searchBox);
+
+            // Leave the similar furniture view
+            if (similarTo != -1) {
+                addRenderableWidget(
+                        Button.builder(Component.literal("×"), b -> {
+                                    similarTo = -1;
+                                    page = 0;
+                                    shouldSearch = true;
+                                    init();
+                                })
+                                .bounds(leftPos + 5 + searchWidth + 2, topPos + 5, 12, 12)
+                                .tooltip(Tooltip.create(Component.translatable("gui.immersive_furniture.similar.clear")))
+                                .build()
+                );
+            }
 
             // Tags
             int i = 0;
@@ -174,14 +214,28 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
 
             int y = topPos + windowHeight - 25;
 
-            // Sort by date
-            addRenderableWidget(
-                    new LegacyImageButton(leftPos + 3, y, 22, 22, order.getU(), 114, 22, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE, b -> {
-                        order = order.cycle();
+            // Sort, similar furniture is always sorted by similarity
+            SortingMode[] modes = SortingMode.values();
+            boolean showAllModes = leftPos + 3 + modes.length * 23 + 4 <= leftPos + windowWidth / 2 - 24 - 6;
+            if (similarTo == -1 && showAllModes) {
+                int sx = leftPos + 3;
+                for (SortingMode mode : modes) {
+                    addToggleButton(sx, y, 22, mode.getU(), 114, "gui.immersive_furniture.sort." + mode.key(), b -> {
+                        order = mode;
                         shouldSearch = true;
                         init();
-                    })
-            ).setTooltip(Tooltip.create(Component.translatable("gui.immersive_furniture.sort." + order.key())));
+                    }).setEnabled(mode != order);
+                    sx += 23;
+                }
+            } else if (similarTo == -1) {
+                addRenderableWidget(
+                        new LegacyImageButton(leftPos + 3, y, 22, 22, order.getU(), 114, 22, TEXTURE, TEXTURE_SIZE, TEXTURE_SIZE, b -> {
+                            order = order.cycle();
+                            shouldSearch = true;
+                            init();
+                        })
+                ).setTooltip(Tooltip.create(Component.translatable("gui.immersive_furniture.sort." + order.key())));
+            }
 
             // Page buttons
             addRenderableWidget(
@@ -198,6 +252,15 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
                         init();
                     })
             );
+
+            // Website
+            addButton(leftPos + windowWidth - 104, topPos + windowHeight - 22, 16, 48, 160, "gui.immersive_furniture.website", () -> {
+                try {
+                    Util.getPlatform().openUri(Config.getInstance().immersiveLibraryUrl + "/furniture");
+                } catch (Exception e) {
+                    Common.logger.error(e);
+                }
+            });
 
             // Login
             MutableComponent text = Component.translatable(authenticated || authenticating ? "gui.immersive_furniture.logout" : "gui.immersive_furniture.login");
@@ -226,7 +289,9 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
             addRenderableWidget(
                     Button.builder(Component.translatable("gui.immersive_furniture.create"), b -> {
                                 if (minecraft != null) {
-                                    minecraft.setScreen(new ArtisansWorkstationEditorScreen(new FurnitureData()));
+                                    FurnitureData data = new FurnitureData();
+                                    data.name = "";
+                                    minecraft.setScreen(new ArtisansWorkstationEditorScreen(data));
                                 }
                             })
                             .bounds(leftPos + windowWidth - 64 - 4, topPos + windowHeight - 24, 64, 20)
@@ -234,31 +299,38 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
                             .build()
             );
         } else {
-            // Favorite
-            int x = leftPos + windowWidth / 2;
             int y = topPos + windowHeight - 25;
+            boolean local = selected.getNamespace().equals("local");
+            boolean canDelete = tab == Tab.SUBMISSIONS || tab == Tab.LOCAL;
+            boolean canReport = tab == Tab.GLOBAL;
 
-            if (!selected.getNamespace().equals("local")) {
-                addToggleButton(x - 50 - 11, y, 22, 0, 114, "gui.immersive_furniture.favorite", b -> {
+            // Center the visible buttons, 25 pixels apart
+            int buttons = 2 + (canDelete ? 1 : 0) + (local ? 0 : 1) + (canReport ? 1 : 0);
+            int x = leftPos + windowWidth / 2 - (buttons * 25 - 3) / 2;
+
+            // Favorite
+            LiteContent content = libraryContents.get(selected);
+            if (!local) {
+                addToggleButton(x, y, 22, 0, 114, "gui.immersive_furniture.favorite", b -> {
                     if (authenticated) {
                         FurnitureData model = FurnitureDataManager.getData(selected);
                         if (model != null) {
-                            if (!b.isEnabled()) {
-                                request(API.HttpMethod.DELETE, "like/furniture/" + model.contentid);
-                            } else {
-                                request(API.HttpMethod.POST, "like/furniture/" + model.contentid);
+                            boolean like = b.isEnabled();
+                            request(like ? API.HttpMethod.POST : API.HttpMethod.DELETE, "v1/like/furniture/" + model.contentid);
+                            if (content != null) {
+                                libraryContents.put(selected, withLiked(content, like));
                             }
-                            b.setEnabled(!b.isEnabled());
+                            b.setEnabled(!like);
                         }
                     } else {
                         setError("gui.immersive_furniture.login_required");
                     }
-                }).setEnabled(tab != Tab.FAVORITES);
+                }).setEnabled(content != null ? !content.is_liked() : tab != Tab.FAVORITES);
             }
 
             // Publish
-            if (selected.getNamespace().equals("local")) {
-                addButton(x - 25 - 11, y, 22, 22 * 6, 114, "gui.immersive_furniture.publish", () -> {
+            if (local) {
+                addButton(x, y, 22, 22 * 6, 114, "gui.immersive_furniture.publish", () -> {
                     if (authenticated) {
                         FurnitureData model = FurnitureDataManager.getData(selected);
                         if (model != null) {
@@ -269,37 +341,61 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
                     }
                 });
             }
+            x += 25;
 
             // Delete
-            if (tab == Tab.SUBMISSIONS || tab == Tab.LOCAL) {
-                addButton(x - 11, y, 22, 22 * 2, 114, "gui.immersive_furniture.delete", this::delete);
+            if (canDelete) {
+                addButton(x, y, 22, 22 * 2, 114, "gui.immersive_furniture.delete", this::delete);
+                x += 25;
             }
 
             // Modify
-            addButton(x + 25 - 11, y, 22, 22, 114, "gui.immersive_furniture.modify", () -> {
+            addButton(x, y, 22, 22, 114, "gui.immersive_furniture.modify", () -> {
                 FurnitureData data = FurnitureDataManager.getData(selected);
                 if (minecraft != null && data != null) {
                     minecraft.setScreen(new ArtisansWorkstationEditorScreen(new FurnitureData(data)));
                 }
             });
+            x += 25;
+
+            // Similar
+            if (!local) {
+                addButton(x, y, 22, 22 * 10, 114, "gui.immersive_furniture.similar", () -> {
+                    FurnitureData data = FurnitureDataManager.getData(selected);
+                    if (data != null) {
+                        similarTo = data.contentid;
+                        similarToName = data.name;
+                        selected = null;
+                        tab = Tab.GLOBAL;
+                        page = 0;
+                        shouldSearch = true;
+                        init();
+                    }
+                });
+                x += 25;
+            }
 
             // Report
-            if (tab == Tab.GLOBAL) {
-                addToggleButton(x + 50 - 11, y, 22, 22 * 5, 114, "gui.immersive_furniture.report", b -> {
+            if (canReport) {
+                addToggleButton(x, y, 22, 22 * 5, 114, "gui.immersive_furniture.report", b -> {
                     if (authenticated) {
                         FurnitureData model = FurnitureDataManager.getData(selected);
                         if (model != null) {
-                            if (b.isEnabled()) {
-                                request(API.HttpMethod.DELETE, "report/furniture/" + model.contentid + "/DEFAULT");
-                            } else {
-                                request(API.HttpMethod.POST, "report/furniture/" + model.contentid + "/DEFAULT");
+                            boolean report = !b.isEnabled();
+                            request(report ? API.HttpMethod.POST : API.HttpMethod.DELETE, "v1/report/furniture/" + model.contentid + "/DEFAULT");
+                            if (content != null) {
+                                if (report) {
+                                    content.reports().add("DEFAULT");
+                                } else {
+                                    content.reports().remove("DEFAULT");
+                                }
                             }
-                            b.setEnabled(!b.isEnabled());
+                            b.setEnabled(report);
                         }
                     } else {
                         setError("gui.immersive_furniture.login_required");
                     }
-                }).setEnabled(false);
+                }).setEnabled(content != null && content.reports().contains("DEFAULT"));
             }
 
             // Close
@@ -327,6 +423,18 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
         }
     }
 
+    private static LiteContent withLiked(LiteContent c, boolean liked) {
+        return new LiteContent(c.content_id(), c.user_id(), c.username(), c.likes() + Boolean.compare(liked, c.is_liked()), c.tags(), c.title(), c.version(), c.created_at(), c.updated_at(), liked, c.reports());
+    }
+
+    private static Component getLikes(LiteContent c) {
+        return Component.literal("❤ %s".formatted(c.likes())).withStyle(ChatFormatting.GRAY);
+    }
+
+    private static String formatDate(long timestamp) {
+        return DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withZone(ZoneId.systemDefault()).format(Instant.ofEpochSecond(timestamp));
+    }
+
     private void addWindowSizeButton() {
         Component text = getWindowSizeTooltip();
         StateImageButton button = new StateImageButton(
@@ -348,7 +456,7 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
             if (tab == Tab.SUBMISSIONS) {
                 FurnitureData model = FurnitureDataManager.getData(selected);
                 if (model != null) {
-                    request(API.HttpMethod.DELETE, "content/furniture/" + model.contentid);
+                    request(API.HttpMethod.DELETE, "v1/content/furniture/" + model.contentid);
                 } else {
                     setError("gui.immersive_furniture.delete_failed");
                 }
@@ -406,11 +514,20 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
                         FurnitureData data = FurnitureDataManager.getData(furniture.get(i));
                         if (data != null) {
                             float rot = (float) (hovered ? (System.currentTimeMillis() % 10000) / 10000.0f * Math.PI * 2.0f : -Math.PI / 4 * 3);
-                            renderModel(graphics, data, tileLeft + tileWidth / 2.0, tileTop + tileHeight / 2.0, Math.min(tileWidth, tileHeight), rot, (float) (-Math.PI / 4));
+                            // Fit the inside of the tile, its frame is 6 pixels wide
+                            renderModel(graphics, data, tileLeft + tileWidth / 2.0, tileTop + tileHeight / 2.0, tileWidth - 12, tileHeight - 12, rot, (float) (-Math.PI / 4), false);
 
                             if (hovered) {
                                 tooltip = data.getTooltip(Screen.hasShiftDown());
                                 tooltip.add(0, Component.literal(data.name).withStyle(ChatFormatting.BOLD));
+
+                                LiteContent content = libraryContents.get(furniture.get(i));
+                                if (content != null) {
+                                    tooltip.add(2, getLikes(content));
+                                    if (Screen.hasShiftDown()) {
+                                        tooltip.add(Component.translatable("gui.immersive_furniture.published", formatDate(content.created_at())).withStyle(ChatFormatting.DARK_GRAY));
+                                    }
+                                }
                             }
                         }
                     }
@@ -418,6 +535,23 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
             }
 
             graphics.drawCenteredString(font, String.valueOf(page + 1), leftPos + windowWidth / 2, topPos + windowHeight - 17, 0xFFFFFF);
+
+            // Not every furniture has enough likes or a preview to find neighbours
+            if (similarTo != -1 && furniture.isEmpty() && !shouldSearch && !awaitingSearch) {
+                graphics.drawCenteredString(font, Component.translatable("gui.immersive_furniture.similar.empty"), leftPos + windowWidth / 2, topPos + windowHeight / 2, 0xAAAAAA);
+            }
+
+            // The edit box hides its hint while focused, but it's focused by default
+            if (searchBox.isFocused() && searchBox.getValue().isEmpty()) {
+                graphics.drawString(font, getSearchHint(), searchBox.getX() + 4, searchBox.getY() + (searchBox.getHeight() - 8) / 2, 0xFFFFFF);
+            }
+
+            // Search syntax cheat sheet, local files are only filtered by name
+            if (tooltip == null && tab != Tab.LOCAL && searchBox.isMouseOver(mouseX, mouseY)) {
+                tooltip = Arrays.stream(Component.translatable("gui.immersive_furniture.search.tooltip").getString().split("\n"))
+                        .map(line -> (Component) Component.literal(line))
+                        .toList();
+            }
         } else {
             FurnitureData data = FurnitureDataManager.getData(selected);
 
@@ -425,13 +559,19 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
                 graphics.pose().pushPose();
                 graphics.pose().translate(0, 0, 1024);
                 graphics.enableScissor(leftPos + 6, topPos + 6, leftPos + windowWidth - 6, topPos + windowHeight - 28 - 6);
-                renderModel(graphics, data, leftPos + windowWidth / 2.0, topPos + windowHeight / 2.0, windowHeight - 28, previewYaw, previewPitch);
+                renderModel(graphics, data, leftPos + windowWidth / 2.0, topPos + (windowHeight - 28) / 2.0, windowWidth - 12, windowHeight - 28 - 12, previewYaw, previewPitch, true);
                 graphics.flush();
                 graphics.disableScissor();
 
                 // Title and author
                 graphics.drawString(font, data.name, leftPos + 8, topPos + 8, 0xFFFFFF);
                 graphics.drawString(font, Component.translatable("gui.immersive_furniture.author", data.author).withStyle(ChatFormatting.ITALIC).withStyle(ChatFormatting.GRAY), leftPos + 8, topPos + 18, 0xFFFFFF);
+
+                // Likes
+                LiteContent content = libraryContents.get(selected);
+                if (content != null) {
+                    graphics.drawString(font, getLikes(content), leftPos + 8, topPos + 28, 0xFFFFFF);
+                }
 
                 // Icon and cost
                 graphics.pose().translate(leftPos + windowWidth, topPos + windowHeight - 28, 0);
@@ -541,7 +681,7 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
         awaitingAuthentication = true;
         CompletableFuture.runAsync(() -> {
             try {
-                Response response = Auth.hasToken() ? request(API.HttpMethod.GET, IsAuthResponse::new, "auth") : null;
+                Response response = Auth.hasToken() ? request(API.HttpMethod.GET, IsAuthResponse.class, "v1/auth") : null;
                 if (response instanceof IsAuthResponse authResponse) {
                     if (authResponse.authenticated()) {
                         authenticated = true;
@@ -588,8 +728,8 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
 
         private AuthLinkScreen(String authUrl) {
             super(confirmed -> {
-                    }, Component.translatableWithFallback("gui.immersive_furniture.auth_link.title", "Open authentication link?"),
-                    Component.translatableWithFallback("gui.immersive_furniture.auth_link.message", "Open this link in your browser to log in."),
+                    }, Component.translatable("gui.immersive_furniture.auth_link.title"),
+                    Component.translatable("gui.immersive_furniture.auth_link.message"),
                     authUrl,
                     CommonComponents.GUI_CANCEL,
                     true);
@@ -628,6 +768,21 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
     }
 
     @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        // Pasting a furniture link opens it
+        if (Screen.isPaste(keyCode) && minecraft != null && openLink(minecraft.keyboardHandler.getClipboard())) {
+            return true;
+        }
+
+        // Enter searches right away
+        if (selected == null && searchBox.isFocused() && (keyCode == InputConstants.KEY_RETURN || keyCode == InputConstants.KEY_NUMPADENTER)) {
+            searchDebounceUntil = 0;
+            return true;
+        }
+        return super.keyPressed(keyCode, scanCode, modifiers);
+    }
+
+    @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (selected == null) {
             for (int x = 0; x < 4; x++) {
@@ -642,7 +797,14 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
             }
         }
 
-        return super.mouseClicked(mouseX, mouseY, button);
+        boolean handled = super.mouseClicked(mouseX, mouseY, button);
+
+        // Buttons that rebuild the screen would keep the focus on their removed widget
+        if (selected == null && getFocused() != null && !children().contains(getFocused())) {
+            setFocused(searchBox);
+        }
+
+        return handled;
     }
 
     @Override
@@ -658,15 +820,37 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
         return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
     }
 
+    private boolean openLink(String text) {
+        String host = Config.getInstance().immersiveLibraryUrl.replaceFirst("^\\w+://", "").replaceFirst("/+$", "");
+        Matcher matcher = Pattern.compile(Pattern.quote(host) + "/furniture/(\\d{1,9})\\b").matcher(text);
+        if (!matcher.find()) return false;
+
+        tab = Tab.GLOBAL;
+        page = 0;
+        similarTo = -1;
+        shouldSearch = true;
+        setSelected(ResourceLocation.fromNamespaceAndPath("library", matcher.group(1)));
+        init();
+        return true;
+    }
+
     public void setSelected(ResourceLocation location) {
         this.selected = location;
         previewYaw = (float) (-Math.PI / 4 * 3);
         previewPitch = (float) (-Math.PI / 4);
     }
 
+    private Component getSearchHint() {
+        if (similarTo != -1) {
+            return Component.translatable("gui.immersive_furniture.similar_to", similarToName).withStyle(ChatFormatting.ITALIC).withStyle(ChatFormatting.GRAY);
+        }
+        return tab == Tab.LOCAL ? SEARCH_HINT : LIBRARY_SEARCH_HINT;
+    }
+
     public void setTab(Tab tab) {
         this.tab = tab;
         this.page = 0;
+        this.similarTo = -1;
         this.shouldSearch = true;
         init();
     }
@@ -688,6 +872,7 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
             shouldSearch = false;
 
             // Fetch from local files
+            DynamicAtlas.SCRATCH.clear();
             furniture = localFiles.stream()
                     .filter(l -> Utils.search(lastSearch, l.toString()))
                     .filter(l -> {
@@ -698,33 +883,50 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
                     .limit(ENTRIES_PER_PAGE)
                     .toList();
         } else {
-            if (awaitingSearch) return;
+            if (awaitingSearch || System.currentTimeMillis() < searchDebounceUntil) return;
             shouldSearch = false;
 
             // Fetch from the library
             awaitingSearch = true;
             Tab requestTab = tab;
+            Map<String, String> params = new HashMap<>(Map.of(
+                    "order", order.key(),
+                    "descending", "true",
+                    "offset", String.valueOf(page * ENTRIES_PER_PAGE),
+                    "limit", String.valueOf(ENTRIES_PER_PAGE)
+            ));
+            if (tab == Tab.FAVORITES) params.put("liked_by", "me");
+            if (tab == Tab.SUBMISSIONS) params.put("author_id", "me");
+            if (similarTo != -1) {
+                params.put("similar_to", String.valueOf(similarTo));
+                params.put("order", "relevance");
+            }
+
+            // Search terms and the category as an exact tag filter
+            List<String> terms = new LinkedList<>();
+            if (!lastSearch.isBlank()) terms.add(lastSearch);
+            if (!tagFilter.equals("miscellaneous")) terms.add("#" + tagFilter);
+            if (!terms.isEmpty()) params.put("q", String.join(",", terms));
+
             CompletableFuture.runAsync(() -> {
-                Response response = request(API.HttpMethod.GET, ContentListResponse::new, "v2/content/furniture", Map.of(
-                        "whitelist", lastSearch + (tagFilter.equals("miscellaneous") ? "" : "," + tagFilter),
-                        "blacklist", "",
-                        "order", order.key(),
-                        "track", tab == Tab.FAVORITES ? "likes" : tab == Tab.SUBMISSIONS ? "submissions" : "all",
-                        "descending", "true",
-                        "offset", String.valueOf(page * ENTRIES_PER_PAGE),
-                        "limit", String.valueOf(ENTRIES_PER_PAGE)
-                ));
+                Response response = request(API.HttpMethod.GET, ContentListResponse.class, "v3/content/furniture", params);
 
                 if (response instanceof ContentListResponse contentListResponse) {
-                    List<ResourceLocation> foundFurniture = Arrays.stream(contentListResponse.contents())
-                            .map(c -> ResourceLocation.fromNamespaceAndPath("library", c.contentid() + "." + c.version()))
-                            .collect(Collectors.toList());
+                    Map<ResourceLocation, LiteContent> found = new LinkedHashMap<>();
+                    for (LiteContent c : contentListResponse.contents()) {
+                        found.put(ResourceLocation.fromNamespaceAndPath("library", c.content_id() + "." + c.version()), c);
+                    }
+                    List<ResourceLocation> foundFurniture = new LinkedList<>(found.keySet());
                     Minecraft.getInstance().execute(() -> {
                         if (tab == requestTab) {
+                            libraryContents.putAll(found);
+                            DynamicAtlas.SCRATCH.clear();
                             furniture = foundFurniture;
                             init();
                         }
                     });
+                } else if (response instanceof ErrorResponse e && e.code() == 401) {
+                    setError("gui.immersive_furniture.login_required");
                 } else {
                     setError("gui.immersive_furniture.list_fetch_failed");
                 }
@@ -740,9 +942,12 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
         CompletableFuture.runAsync(() -> {
             if (!Auth.hasToken()) return;
 
+            // The library relies on baked textures
+            FurnitureModelFactory.bakeMissingTextures(data);
+
             // Gather tags
-            List<String> tags = new LinkedList<>();
-            tags.add(data.tag);
+            Set<String> tags = new LinkedHashSet<>(data.tags);
+            if (data.hasCategory()) tags.add(data.tag);
             if (data.hasParticles()) tags.add("has_particles");
             if (data.hasSounds()) tags.add("has_sounds");
             if (data.canSit()) tags.add("can_sit");
@@ -761,8 +966,8 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
             // Upload
             Response request = request(
                     data.contentid == -1 ? API.HttpMethod.POST : API.HttpMethod.PUT,
-                    data.contentid == -1 ? ContentIdResponse::new : SuccessResponse::new,
-                    data.contentid == -1 ? "content/furniture" : "content/furniture/" + data.contentid,
+                    data.contentid == -1 ? ContentIdResponse.class : SuccessResponse.class,
+                    data.contentid == -1 ? "v1/content/furniture" : "v1/content/furniture/" + data.contentid,
                     Map.of(
 
                     ), Map.of(
@@ -786,6 +991,11 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
                 } else {
                     setError("gui.immersive_furniture.upload_failed");
                 }
+            }
+        }).whenComplete((result, throwable) -> {
+            if (throwable != null) {
+                Common.logger.error("Failed to publish furniture", throwable);
+                setError("gui.immersive_furniture.upload_failed");
             }
             uploading = false;
         });

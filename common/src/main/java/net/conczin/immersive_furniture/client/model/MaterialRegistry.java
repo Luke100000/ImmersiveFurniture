@@ -24,7 +24,7 @@ public class MaterialRegistry {
                     if (source != null) {
                         materials.put(source.location(), source);
                     }
-                } catch (Exception e) {
+                } catch (Throwable e) {
                     // Some blocks have unsafe dynamic generation, let's safely ignore them here
                 }
             }

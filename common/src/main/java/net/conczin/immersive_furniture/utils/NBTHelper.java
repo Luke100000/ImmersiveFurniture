@@ -4,7 +4,7 @@ import net.minecraft.nbt.*;
 import net.minecraft.resources.ResourceLocation;
 import org.joml.Vector3f;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
@@ -187,7 +187,7 @@ public class NBTHelper {
      * @return A Set containing the strings from the ListTag
      */
     public static Set<String> getStringSet(ListTag listTag) {
-        Set<String> stringSet = new HashSet<>();
+        Set<String> stringSet = new LinkedHashSet<>();
         for (Tag tag : listTag) {
             if (tag instanceof StringTag stringTag) {
                 stringSet.add(stringTag.getAsString());

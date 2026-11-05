@@ -35,14 +35,14 @@ public class FurnitureModelFactory {
 
     private int zFightingCounter = 0;
 
-    private FurnitureModelFactory(FurnitureData data, DynamicAtlas atlas) {
+    private FurnitureModelFactory(FurnitureData data, DynamicAtlas atlas, boolean storeTextures) {
         this.inEditor = Minecraft.getInstance().screen instanceof ArtisansWorkstationEditorScreen;
         this.data = data;
         this.solidStates = data.getUniqueSolidStates();
 
         splitSprites();
         geometry = new FurnitureGeometryAnalyzer(elements);
-        faceTextureBaker = new FurnitureFaceTextureBaker(atlas, inEditor, elements);
+        faceTextureBaker = new FurnitureFaceTextureBaker(atlas, inEditor, storeTextures, elements);
 
         // Fetch all textures
         textures.put("0", Either.left(new Material(InventoryMenu.BLOCK_ATLAS, Common.locate("block/furniture"))));
@@ -117,18 +117,19 @@ public class FurnitureModelFactory {
 
     private BlockElementFace getSpriteFace(FurnitureData.Element element, boolean front) {
         Vector3i size = element.getSize();
+        boolean reversed = front == element.sprite.mirrored;
         return new BlockElementFace(
                 null,
                 elementToIndex.get(element),
                 element.sprite.sprite.toString(),
                 new BlockFaceUV(
                         new float[]{
-                                front ? 0 : size.x / element.sprite.size,
+                                reversed ? size.x / element.sprite.size : 0,
                                 0,
-                                front ? size.x / element.sprite.size : 0,
+                                reversed ? 0 : size.x / element.sprite.size,
                                 size.y / element.sprite.size
                         },
-                        element.sprite.rotation
+                        front ? element.sprite.rotation : (360 - element.sprite.rotation) % 360
                 )
         );
     }
@@ -249,7 +250,21 @@ public class FurnitureModelFactory {
      * This function is somewhat slow, call async whenever possible
      */
     public static CompositeBlockModel getModel(FurnitureData data, DynamicAtlas atlas) {
-        FurnitureModelFactory factory = new FurnitureModelFactory(data, atlas);
+        return getModel(data, atlas, false);
+    }
+
+    /**
+     * Bakes the faces that lack a texture into the data, keeping existing ones.
+     */
+    public static void bakeMissingTextures(FurnitureData data) {
+        try (var ignored = DynamicAtlas.SCRATCH.bakeLock.acquire()) {
+            DynamicAtlas.SCRATCH.clear();
+            getModel(data, DynamicAtlas.SCRATCH, true);
+        }
+    }
+
+    private static CompositeBlockModel getModel(FurnitureData data, DynamicAtlas atlas, boolean storeTextures) {
+        FurnitureModelFactory factory = new FurnitureModelFactory(data, atlas, storeTextures);
 
         // Create a model for each transparency type
         CompositeBlockModel composite = new CompositeBlockModel(factory.indexToElement);

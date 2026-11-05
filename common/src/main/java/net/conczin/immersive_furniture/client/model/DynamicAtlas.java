@@ -19,11 +19,12 @@ import java.util.concurrent.ConcurrentSkipListSet;
 public class DynamicAtlas extends DynamicTexture {
     public static final DynamicAtlas BAKED = new DynamicAtlas(Client.getBakedAtlasSize(), "baked");
     public static DynamicAtlas ENTITY = new DynamicAtlas(Config.getInstance().getEntityAtlasSize(), "entity");
-    public static final DynamicAtlas SCRATCH = new DynamicAtlas(Config.getInstance().getScratchAtlasSize(), "scratch");
+    public static DynamicAtlas SCRATCH = new DynamicAtlas(Config.getInstance().getScratchAtlasSize(), "scratch");
 
     public final ScopedLock bakeLock = new ScopedLock();
 
     int lastStateId;
+    int uploadedStateId;
     boolean full;
     int allocated;
     int size;
@@ -57,6 +58,17 @@ public class DynamicAtlas extends DynamicTexture {
 
     public static void resizeEntity(int size) {
         ENTITY = new DynamicAtlas(size, "entity");
+    }
+
+    public static boolean tryResizeScratch(int size) {
+        DynamicAtlas atlas = SCRATCH;
+        if (!atlas.bakeLock.tryLock()) return false;
+        try {
+            SCRATCH = new DynamicAtlas(size, "scratch");
+            return true;
+        } finally {
+            atlas.bakeLock.unlock();
+        }
     }
 
     public Quad allocate(int w, int h) {
@@ -143,11 +155,16 @@ public class DynamicAtlas extends DynamicTexture {
         if (dirty && RenderSystem.isOnRenderThreadOrInit()) {
             this.upload();
             dirty = false;
+            uploadedStateId = lastStateId;
         }
     }
 
     public int getLastStateId() {
         return lastStateId;
+    }
+
+    public boolean isUploaded(int stateId) {
+        return stateId <= uploadedStateId;
     }
 
     public record Quad(int x, int y, int w, int h) {

@@ -3,9 +3,83 @@ package net.conczin.immersive_furniture.data;
 import com.mojang.math.Axis;
 import net.minecraft.core.Direction;
 import org.joml.Quaternionf;
+import org.joml.Vector2i;
 import org.joml.Vector3f;
+import org.joml.Vector3i;
 
 public class ModelUtils {
+    public static Vector2i getFaceDimensions(FurnitureData.Element element, Direction direction) {
+        switch (direction) {
+            case UP, DOWN -> {
+                return new Vector2i(
+                        (int) (element.to.x - element.from.x),
+                        (int) (element.to.z - element.from.z)
+                );
+            }
+            case NORTH, SOUTH -> {
+                return new Vector2i(
+                        (int) (element.to.x - element.from.x),
+                        (int) (element.to.y - element.from.y)
+                );
+            }
+            case WEST, EAST -> {
+                return new Vector2i(
+                        (int) (element.to.z - element.from.z),
+                        (int) (element.to.y - element.from.y)
+                );
+            }
+            default -> throw new IllegalArgumentException("Invalid direction: " + direction);
+        }
+    }
+
+    public static Vector3i to3D(FurnitureData.Element element, Direction direction, int x, int y, Vector3i target) {
+        switch (direction) {
+            case UP -> {
+                return target.set(
+                        (int) element.from.x + x,
+                        (int) element.to.y,
+                        (int) element.from.z + y
+                );
+            }
+            case DOWN -> {
+                return target.set(
+                        (int) element.from.x + x,
+                        (int) element.from.y,
+                        (int) element.to.z - y
+                );
+            }
+            case NORTH -> {
+                return target.set(
+                        (int) element.to.x - x,
+                        (int) element.to.y - y,
+                        (int) element.from.z
+                );
+            }
+            case SOUTH -> {
+                return target.set(
+                        (int) element.from.x + x,
+                        (int) element.to.y - y,
+                        (int) element.to.z
+                );
+            }
+            case WEST -> {
+                return target.set(
+                        (int) element.from.x,
+                        (int) element.to.y - y,
+                        (int) element.from.z + x
+                );
+            }
+            case EAST -> {
+                return target.set(
+                        (int) element.to.x,
+                        (int) element.to.y - y,
+                        (int) element.to.z - x
+                );
+            }
+            default -> throw new IllegalArgumentException("Invalid direction: " + direction);
+        }
+    }
+
     public static Quaternionf getElementRotation(ElementRotation rotation) {
         Vector3f axis = switch (rotation.axis()) {
             case X -> new Vector3f(1.0f, 0.0f, 0.0f);
