@@ -1,3 +1,7 @@
+# 0.4.1
+
+* Fixed crashes
+
 # 0.4.0
 
 * Added similar furniture search

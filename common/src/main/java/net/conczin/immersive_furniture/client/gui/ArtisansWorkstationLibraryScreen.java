@@ -35,7 +35,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 
-import java.nio.file.Path;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -411,7 +410,11 @@ public class ArtisansWorkstationLibraryScreen extends ArtisansWorkstationScreen 
             // Craft
             addRenderableWidget(
                     Button.builder(Component.translatable("gui.immersive_furniture.craft"), b -> {
-                                Network.sendToServer(new CraftRequest(FurnitureDataManager.getData(selected), holdingShift()));
+                                FurnitureData data = FurnitureDataManager.getData(selected);
+                                if (data == null) {
+                                    return;
+                                }
+                                Network.sendToServer(new CraftRequest(data, holdingShift()));
                                 if (!holdingCtrl() && !holdingShift()) {
                                     Minecraft.getInstance().setScreen(null);
                                 }
