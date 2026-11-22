@@ -5,6 +5,7 @@
 # 0.4.2
 
 * Fixed culling issues
+* Fixed a crash maybe
 
 # 0.4.1
 

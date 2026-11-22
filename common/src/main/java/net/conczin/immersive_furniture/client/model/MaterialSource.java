@@ -178,8 +178,8 @@ public record MaterialSource(
             y = smartWrap(y, h, th, material.margin);
         }
 
-        x = x % tw;
-        y = y % th;
+        x = Math.floorMod(x, tw);
+        y = Math.floorMod(y, th);
 
         if (material.axis != FurnitureData.MaterialAxis.X && direction == Direction.NORTH) {
             x = tw - x - 1;
