@@ -521,9 +521,9 @@ public class ModelComponent extends ScreenComponent {
         }
 
         if (rx != null) {
-            rx.setEnabled(firstElement.axis == Direction.Axis.X);
-            ry.setEnabled(firstElement.axis == Direction.Axis.Y);
-            rz.setEnabled(firstElement.axis == Direction.Axis.Z);
+            rx.setEnabled(firstElement.axis != Direction.Axis.X);
+            ry.setEnabled(firstElement.axis != Direction.Axis.Y);
+            rz.setEnabled(firstElement.axis != Direction.Axis.Z);
         }
     }
 
