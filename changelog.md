@@ -1,11 +1,8 @@
-# TODO
-
-* selecting elements sometimes has the rotation wrong
-
 # 0.4.2
 
 * Fixed culling issues
 * Fixed a crash maybe
+* Lazy asset loading for faster bootup
 
 # 0.4.1
 

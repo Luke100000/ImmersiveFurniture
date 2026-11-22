@@ -198,7 +198,7 @@ public class SettingsComponent extends ScreenComponent {
         data.sources.clear();
         for (FurnitureData.Element element : data.elements) {
             if (element.type != FurnitureData.ElementType.ELEMENT) continue;
-            MaterialSource source = MaterialRegistry.INSTANCE.materials.getOrDefault(element.material.source, MaterialSource.DEFAULT);
+            MaterialSource source = MaterialRegistry.INSTANCE.getMaterials().getOrDefault(element.material.source, MaterialSource.DEFAULT);
 
             for (Direction value : Direction.values()) {
                 ResourceLocation location = source.getMaterial(value).sprite().contents().name();

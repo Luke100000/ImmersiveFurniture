@@ -154,7 +154,7 @@ public record MaterialSource(
         }
 
         // Fetch texture data
-        MaterialSource source = MaterialRegistry.INSTANCE.materials.getOrDefault(
+        MaterialSource source = MaterialRegistry.INSTANCE.getMaterials().getOrDefault(
                 material.source,
                 MaterialSource.DEFAULT
         );
