@@ -2,6 +2,8 @@
   "block.immersive_furniture.artisans_workstation": "장인의 워크스테이션",
   "item.immersive_furniture.artisans_workstation": "장인의 워크스테이션",
   "item.immersive_furniture.crafting_material": "제작 재료",
+  "item.immersive_furniture.mallet": "망치",
+  "item.immersive_furniture.mallet.tooltip": "가구를 왼쪽 클릭하면 1픽셀씩 밀 수 있고, 오른쪽 클릭하면 당길 수 있습니다.",
   "immersive_furniture.not_enough_material": "제작 재료가 부족합니다!",
   "immersive_furniture.no_permission": "귀하는 그렇게 할 권한이 없습니다.",
   "immersive_furniture.indium_missing": "몰입형 가구는 나트륨과 함께 제대로 작동하려면 인듐이 필요합니다!",
