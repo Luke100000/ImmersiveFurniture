@@ -2,6 +2,8 @@
   "block.immersive_furniture.artisans_workstation": "Handwerker-Werkbank",
   "item.immersive_furniture.artisans_workstation": "Handwerker-Werkbank",
   "item.immersive_furniture.crafting_material": "Handwerksmaterial",
+  "item.immersive_furniture.mallet": "Mallet",
+  "item.immersive_furniture.mallet.tooltip": "Klicke mit der linken Maustaste auf ein Möbelstück, um es um einen Pixel zu verschieben, und mit der rechten Maustaste, um es zu ziehen.",
   "immersive_furniture.not_enough_material": "Nicht genug Handwerksmaterial!",
   "immersive_furniture.no_permission": "Du hast keine Berechtigung, das zu tun.",
   "immersive_furniture.indium_missing": "Immersive Möbel benötigt Indium, um richtig mit Natrium zu funktionieren!",
