@@ -2,6 +2,7 @@ package net.conczin.immersive_furniture.block;
 
 import net.conczin.immersive_furniture.block.entity.FurnitureBlockEntity;
 import net.conczin.immersive_furniture.data.FurnitureData;
+import net.conczin.immersive_furniture.item.Items;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.Containers;
@@ -36,7 +37,7 @@ public class EntityFurnitureBlock extends BaseFurnitureBlock implements EntityBl
 
     @Override
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
-        if (!player.isCrouching()) {
+        if (!player.isCrouching() && !player.getItemInHand(hand).is(Items.MALLET)) {
             if (level.getBlockEntity(pos) instanceof FurnitureBlockEntity blockEntity && blockEntity.getContainerSize() > 0) {
                 player.openMenu(blockEntity);
                 return InteractionResult.sidedSuccess(level.isClientSide);

@@ -88,6 +88,8 @@ public final class CommonForge {
     public static void onBuildCreativeModeTabContents(BuildCreativeModeTabContentsEvent event) {
         if (event.getTabKey() == CreativeModeTabs.FUNCTIONAL_BLOCKS) {
             event.accept(Items.ARTISANS_WORKSTATION);
+        } else if (event.getTabKey() == CreativeModeTabs.TOOLS_AND_UTILITIES) {
+            event.accept(Items.MALLET);
         } else if (event.getTabKey() == CreativeModeTabs.INGREDIENTS) {
             event.accept(Items.CRAFTING_MATERIAL);
         }

@@ -9,6 +9,7 @@ public interface Items {
     Item ARTISANS_WORKSTATION = new BlockItem(Blocks.ARTISANS_WORKSTATION, baseProps());
     Item FURNITURE = new FurnitureItem(baseProps());
     Item CRAFTING_MATERIAL = new Item(baseProps());
+    Item MALLET = new MalletItem(baseProps().stacksTo(1));
 
     static Item.Properties baseProps() {
         return new Item.Properties();
@@ -18,5 +19,6 @@ public interface Items {
         helper.register(Common.locate("artisans_workstation"), ARTISANS_WORKSTATION);
         helper.register(Common.locate("furniture"), FURNITURE);
         helper.register(Common.locate("crafting_material"), CRAFTING_MATERIAL);
+        helper.register(Common.locate("mallet"), MALLET);
     }
 }
