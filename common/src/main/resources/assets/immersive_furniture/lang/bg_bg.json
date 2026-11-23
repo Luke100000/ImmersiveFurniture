@@ -2,6 +2,8 @@
   "block.immersive_furniture.artisans_workstation": "Работна станция на занаятчията",
   "item.immersive_furniture.artisans_workstation": "Работна станция на занаятчията",
   "item.immersive_furniture.crafting_material": "Материал за изработка",
+  "item.immersive_furniture.mallet": "Маллет",
+  "item.immersive_furniture.mallet.tooltip": "Кликнете с левия бутон върху мебелта, за да я преместите с един пиксел, а с десния бутон – за да я издърпате.",
   "immersive_furniture.not_enough_material": "Няма достатъчно материал за изработка!",
   "immersive_furniture.no_permission": "Нямате право да го правите.",
   "immersive_furniture.indium_missing": "Immersive Furniture изисква Indium, за да работи правилно с Sodium!",
