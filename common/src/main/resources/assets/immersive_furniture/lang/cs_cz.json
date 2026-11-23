@@ -2,6 +2,8 @@
   "block.immersive_furniture.artisans_workstation": "Pracovní stanice řemeslníka",
   "item.immersive_furniture.artisans_workstation": "Pracovní stanice řemeslníka",
   "item.immersive_furniture.crafting_material": "Výrobní materiál",
+  "item.immersive_furniture.mallet": "Malleta",
+  "item.immersive_furniture.mallet.tooltip": "Kliknutím levým tlačítkem myši na nábytek jej stisknete pravým tlačítkem myši.",
   "immersive_furniture.not_enough_material": "Nedostatek výrobních materiálů!",
   "immersive_furniture.no_permission": "K tomu nemáte oprávnění.",
   "immersive_furniture.indium_missing": "Pohlcující nábytek vyžaduje, aby Indie správně pracovala se Sodi!",
