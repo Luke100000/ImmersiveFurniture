@@ -2,6 +2,8 @@
   "block.immersive_furniture.artisans_workstation": "Amatnieka darbstacija",
   "item.immersive_furniture.artisans_workstation": "Amatnieka darbstacija",
   "item.immersive_furniture.crafting_material": "Amatniecības materiāls",
+  "item.immersive_furniture.mallet": "Āmurs",
+  "item.immersive_furniture.mallet.tooltip": "Noklikšķiniet ar kreiso peles pogu uz mēbeles, lai to pabīdītu par vienu pikseli, un ar labo pogu — lai to pavelktu.",
   "immersive_furniture.not_enough_material": "Nav pietiekami daudz materiālu amatniecībai!",
   "immersive_furniture.no_permission": "Jums nav atļaujas to darīt.",
   "immersive_furniture.indium_missing": "Lai Immersive Furniture darbotos pareizi, ir nepieciešams Indium un Sodium!",
