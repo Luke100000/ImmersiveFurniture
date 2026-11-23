@@ -2,6 +2,8 @@
   "block.immersive_furniture.artisans_workstation": "Kunstenaars se Werkstasie",
   "item.immersive_furniture.artisans_workstation": "Kunstenaars se Werkstasie",
   "item.immersive_furniture.crafting_material": "Handwerkmateriaal",
+  "item.immersive_furniture.mallet": "Malle",
+  "item.immersive_furniture.mallet.tooltip": "Linkskliek meubels om dit 'n piksel vorentoe te stoot, regs-kliek om dit terug te trek.",
   "immersive_furniture.not_enough_material": "Nie genoeg handwerkmateriaal nie!",
   "immersive_furniture.no_permission": "Jy het nie toestemming om dit te doen nie.",
   "immersive_furniture.indium_missing": "Immersive Meubels vereis Indium om behoorlik saam met Natrium te werk!",
