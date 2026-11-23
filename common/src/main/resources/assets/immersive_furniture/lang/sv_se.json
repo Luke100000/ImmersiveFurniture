@@ -2,6 +2,8 @@
   "block.immersive_furniture.artisans_workstation": "Konstnärens arbetsstation",
   "item.immersive_furniture.artisans_workstation": "Konstnärens arbetsstation",
   "item.immersive_furniture.crafting_material": "Tillverkningsmaterial",
+  "item.immersive_furniture.mallet": "Mallet",
+  "item.immersive_furniture.mallet.tooltip": "Vänsterklicka på möbler för att trycka på en pixel, högerklicka för att dra den.",
   "immersive_furniture.not_enough_material": "Inte tillräckligt med tillverkningsmaterial!",
   "immersive_furniture.no_permission": "Du har inte behörighet att göra det.",
   "immersive_furniture.indium_missing": "Omslutande möbler kräver Indium att köra ordentligt med natrium!",
