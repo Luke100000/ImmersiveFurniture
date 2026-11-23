@@ -2,6 +2,8 @@
   "block.immersive_furniture.artisans_workstation": "สถานีทำงานของช่างฝีมือ",
   "item.immersive_furniture.artisans_workstation": "สถานีทำงานของช่างฝีมือ",
   "item.immersive_furniture.crafting_material": "วัสดุทำของ",
+  "item.immersive_furniture.mallet": "มัลเลต",
+  "item.immersive_furniture.mallet.tooltip": "คลิกซ้ายที่เฟอร์นิเจอร์เพื่อดันมันไป 1 พิกเซล คลิกขวาเพื่อดึงมัน",
   "immersive_furniture.not_enough_material": "วัสดุทำของไม่พอ!",
   "immersive_furniture.no_permission": "คุณไม่มีสิทธิ์ที่จะทำเช่นนั้น",
   "immersive_furniture.indium_missing": "เฟอร์นิเจอร์ดื่มด่ำต้องการอินเดียมในการทำงานอย่างถูกต้องกับโซเดียม!",
