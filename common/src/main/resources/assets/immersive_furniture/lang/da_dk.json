@@ -2,6 +2,8 @@
   "block.immersive_furniture.artisans_workstation": "Håndværkers Arbejdsstation",
   "item.immersive_furniture.artisans_workstation": "Håndværkers Arbejdsstation",
   "item.immersive_furniture.crafting_material": "Fremstil Materiale",
+  "item.immersive_furniture.mallet": "Mallet",
+  "item.immersive_furniture.mallet.tooltip": "Venstreklik møbler for at skubbe den til en pixel, højreklik for at trække den.",
   "immersive_furniture.not_enough_material": "Ikke nok fremstillingsmateriale!",
   "immersive_furniture.no_permission": "Du har ikke tilladelse til at gøre det.",
   "immersive_furniture.indium_missing": "Immersive Møbler kræver Indium til at køre ordentligt med Sodium!",
