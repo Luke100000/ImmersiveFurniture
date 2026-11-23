@@ -3,6 +3,7 @@
 * Fixed culling issues
 * Fixed a crash maybe
 * Lazy asset loading for faster bootup
+* Furniture are now considered solid
 
 # 0.4.1
 

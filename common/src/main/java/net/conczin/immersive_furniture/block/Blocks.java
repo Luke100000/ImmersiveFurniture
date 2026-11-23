@@ -38,7 +38,8 @@ public interface Blocks {
                 .sound(SoundType.WOOD)
                 .pushReaction(PushReaction.BLOCK)
                 .noOcclusion()
-                .dynamicShape();
+                .dynamicShape()
+                .forceSolidOn();
     }
 
     static void registerBlocks(Common.RegisterHelper<Block> helper) {
