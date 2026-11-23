@@ -2,6 +2,8 @@
   "block.immersive_furniture.artisans_workstation": "Stasiun Kerja Pengrajin",
   "item.immersive_furniture.artisans_workstation": "Stasiun Kerja Pengrajin",
   "item.immersive_furniture.crafting_material": "Bahan Kerajinan",
+  "item.immersive_furniture.mallet": "Palu",
+  "item.immersive_furniture.mallet.tooltip": "Klik kiri pada furnitur untuk menggesernya satu piksel, klik kanan untuk menariknya.",
   "immersive_furniture.not_enough_material": "Tidak cukup bahan kerajinan!",
   "immersive_furniture.no_permission": "Anda tidak memiliki izin untuk melakukan hal tersebut.",
   "immersive_furniture.indium_missing": "Furnitur Immersive membutuhkan Indium agar dapat berjalan dengan baik dengan Sodium!",
