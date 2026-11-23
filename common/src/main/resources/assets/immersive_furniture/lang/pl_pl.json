@@ -2,6 +2,8 @@
   "block.immersive_furniture.artisans_workstation": "Stacja Robocza Artystyki",
   "item.immersive_furniture.artisans_workstation": "Stacja Robocza Artystyki",
   "item.immersive_furniture.crafting_material": "Materiał rzemieślniczy",
+  "item.immersive_furniture.mallet": "Mleko",
+  "item.immersive_furniture.mallet.tooltip": "Kliknij lewym przyciskiem myszy mebel, aby przepchnąć go w piksel, kliknij prawym przyciskiem myszy, aby go pociągnąć.",
   "immersive_furniture.not_enough_material": "Za mało materiału wytwarzającego!",
   "immersive_furniture.no_permission": "Nie masz uprawnień, aby to zrobić.",
   "immersive_furniture.indium_missing": "Immerywny mebel wymaga Indium aby działał poprawnie z Sodem!",
