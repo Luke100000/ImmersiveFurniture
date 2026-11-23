@@ -2,6 +2,8 @@
   "block.immersive_furniture.artisans_workstation": "Handverks arbeiðspláss",
   "item.immersive_furniture.artisans_workstation": "Handverks arbeiðspláss",
   "item.immersive_furniture.crafting_material": "Handverks evni",
+  "item.immersive_furniture.mallet": "Mallet",
+  "item.immersive_furniture.mallet.tooltip": "Left-click furniture to push it a pixel, right-click to pull it.",
   "immersive_furniture.not_enough_material": "Ikki nóg mikið handverks evni!",
   "immersive_furniture.no_permission": "You do not have permission to do that.",
   "immersive_furniture.indium_missing": "Immersive Furniture krevur Indium at virka ordiligt við Sodium!",
