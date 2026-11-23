@@ -2,6 +2,8 @@
   "block.immersive_furniture.artisans_workstation": "Amatininko darbo vieta",
   "item.immersive_furniture.artisans_workstation": "Amatininko darbo vieta",
   "item.immersive_furniture.crafting_material": "Amatų medžiaga",
+  "item.immersive_furniture.mallet": "Plaktukas",
+  "item.immersive_furniture.mallet.tooltip": "Kairiuoju pelės mygtuku spustelėkite baldą, kad jį pastumtumėte vienu pikseliu, dešiniuoju – kad jį patrauktumėte.",
   "immersive_furniture.not_enough_material": "Nepakanka medžiagos amatams!",
   "immersive_furniture.no_permission": "Jūs neturite leidimo tai daryti.",
   "immersive_furniture.indium_missing": "Kad \"Immersive Furniture\" tinkamai veiktų su \"Sodium\", reikia indžio!",
