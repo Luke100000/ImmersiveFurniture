@@ -2,6 +2,8 @@
   "block.immersive_furniture.artisans_workstation": "Уртаҡ оҫталарҙың эш урыны",
   "item.immersive_furniture.artisans_workstation": "Уртаҡ оҫталарҙың эш урыны",
   "item.immersive_furniture.crafting_material": "Ҡул эштәре өсөн материал",
+  "item.immersive_furniture.mallet": "Молоток",
+  "item.immersive_furniture.mallet.tooltip": "Мебельде суҙыр өсөн уның өҫтөнә һул төймә менән баҫығыҙ, бер пиксельгә этер өсөн; тартыр өсөн уның өҫтөнә уң төймә менән баҫығыҙ.",
   "immersive_furniture.not_enough_material": "Ҡул эштәре өсөн материал етмәй!",
   "immersive_furniture.no_permission": "Һеҙҙә был эште башҡарыу өсөн рөхсәт юҡ.",
   "immersive_furniture.indium_missing": "Индиум, натрий менән бергә дөрөҫ эшләүе өсөн Immersive Furniture-ҡа кәрәк!",
