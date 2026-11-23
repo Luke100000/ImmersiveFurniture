@@ -2,6 +2,8 @@
   "block.immersive_furniture.artisans_workstation": "Stesen Kerja Artisan",
   "item.immersive_furniture.artisans_workstation": "Stesen Kerja Artisan",
   "item.immersive_furniture.crafting_material": "Bahan Crafting",
+  "item.immersive_furniture.mallet": "Palu",
+  "item.immersive_furniture.mallet.tooltip": "Klik kiri perabot untuk menolaknya satu piksel, klik kanan untuk menariknya.",
   "immersive_furniture.not_enough_material": "Tidak cukup bahan crafting!",
   "immersive_furniture.no_permission": "Anda tidak mempunyai kebenaran untuk melakukan itu.",
   "immersive_furniture.indium_missing": "Perabot Immersive memerlukan Indium untuk berfungsi dengan baik dengan Natrium!",
