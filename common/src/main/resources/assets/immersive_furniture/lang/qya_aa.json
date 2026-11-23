@@ -2,6 +2,8 @@
   "block.immersive_furniture.artisans_workstation": "Hernyëa Hlarëa",
   "item.immersive_furniture.artisans_workstation": "Hernyëa Hlarëa",
   "item.immersive_furniture.crafting_material": "Caranë",
+  "item.immersive_furniture.mallet": "Mallet",
+  "item.immersive_furniture.mallet.tooltip": "Left-click furniture to push it a pixel, right-click to pull it.",
   "immersive_furniture.not_enough_material": "Uva etë caranë!",
   "immersive_furniture.no_permission": "You do not have permission to do that.",
   "immersive_furniture.indium_missing": "\"Immersive Furniture\" requerita Indium na auta i nárë ve Sodium!",
