@@ -2,6 +2,8 @@
   "block.immersive_furniture.artisans_workstation": "noitatSroW s'nasiatrA",
   "item.immersive_furniture.artisans_workstation": "noitatSroW s'nasiatrA",
   "item.immersive_furniture.crafting_material": "laitraM gnitfarC",
+  "item.immersive_furniture.mallet": "Mallet",
+  "item.immersive_furniture.mallet.tooltip": "Left-click furniture to push it a pixel, right-click to pull it.",
   "immersive_furniture.not_enough_material": "!laitraM gnitaferc gnuoy enoN",
   "immersive_furniture.no_permission": "You do not have permission to do that.",
   "immersive_furniture.indium_missing": "!ʃuoıɯ puɐɯɐs puɐ ɐuɐʍ sʍolloʍ sɐʍʇlᴉɗ sǝɹɐʍ 世界ٔ ˙ɯɹoʍɐ?",
