@@ -2,6 +2,8 @@
   "block.immersive_furniture.artisans_workstation": "Obair na h-Ealaíne",
   "item.immersive_furniture.artisans_workstation": "Obair na h-Ealaíne",
   "item.immersive_furniture.crafting_material": "Stuth obrach",
+  "item.immersive_furniture.mallet": "Mallet",
+  "item.immersive_furniture.mallet.tooltip": "Left-click furniture to push it a pixel, right-click to pull it.",
   "immersive_furniture.not_enough_material": "Cha bhith stuth obrach gu leòr!",
   "immersive_furniture.no_permission": "You do not have permission to do that.",
   "immersive_furniture.indium_missing": "Tha feum air Indium ann an Làimhseachadh Còmhdach airson a bhith ag obair gu mionaideach le Sodium!",
