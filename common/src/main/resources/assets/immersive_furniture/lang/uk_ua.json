@@ -2,6 +2,8 @@
   "block.immersive_furniture.artisans_workstation": "Майстерна робоча станція",
   "item.immersive_furniture.artisans_workstation": "Майстерна робоча станція",
   "item.immersive_furniture.crafting_material": "Створення матеріалу",
+  "item.immersive_furniture.mallet": "Киянка",
+  "item.immersive_furniture.mallet.tooltip": "Клацніть лівою кнопкою миші, щоб перемістити його в піксель, клацніть правою кнопкою миші, щоб витягнути його.",
   "immersive_furniture.not_enough_material": "Не достатньо матеріалу для створення!",
   "immersive_furniture.no_permission": "У тебе немає дозволу на те, щоб це зробити.",
   "immersive_furniture.indium_missing": "Захоплюючий меблі вимагає щоб Індій працював належним чином з Содюмом!",

@@ -2,6 +2,8 @@
   "block.immersive_furniture.artisans_workstation": "Rzemieślnicza Stacja Robocza",
   "item.immersive_furniture.artisans_workstation": "Rzemieślnicza Stacja Robocza",
   "item.immersive_furniture.crafting_material": "Materiał Rzemieślniczy",
+  "item.immersive_furniture.mallet": "Mallet",
+  "item.immersive_furniture.mallet.tooltip": "Left-click furniture to push it a pixel, right-click to pull it.",
   "immersive_furniture.not_enough_material": "Za mało materiału rzemieślniczego!",
   "immersive_furniture.no_permission": "You do not have permission to do that.",
   "immersive_furniture.indium_missing": "Furnitura Immersywna potrzebuje Indium, żeby prawidłowo działać z Sodium!",

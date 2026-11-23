@@ -2,6 +2,8 @@
   "block.immersive_furniture.artisans_workstation": "Artisan's Workstation",
   "item.immersive_furniture.artisans_workstation": "Artisan's Workstation",
   "item.immersive_furniture.crafting_material": "Herstellungsmaterial",
+  "item.immersive_furniture.mallet": "Mallet",
+  "item.immersive_furniture.mallet.tooltip": "Klicken Sie mit der linken Maustaste auf Möbel, um es zu schieben ein Pixel, Rechtsklick, um es zu ziehen.",
   "immersive_furniture.not_enough_material": "Nicht genug Herstellungsmaterial!",
   "immersive_furniture.no_permission": "Sie haben keine Berechtigung, dies zu tun.",
   "immersive_furniture.indium_missing": "Immersive Möbel benötigen Indium korrekt mit Sodium zu laufen!",

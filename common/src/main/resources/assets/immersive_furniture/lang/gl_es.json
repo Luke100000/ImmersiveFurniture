@@ -2,6 +2,8 @@
   "block.immersive_furniture.artisans_workstation": "Estación de traballo do artesán",
   "item.immersive_furniture.artisans_workstation": "Estación de traballo do artesán",
   "item.immersive_furniture.crafting_material": "Material de fabricación",
+  "item.immersive_furniture.mallet": "Mazo",
+  "item.immersive_furniture.mallet.tooltip": "Fai clic co botón esquerdo do rato no mobiliario para empurralo un píxel, e fai clic co botón dereito para arrastralo.",
   "immersive_furniture.not_enough_material": "Non hai suficiente material de fabricación!",
   "immersive_furniture.no_permission": "Non tes permiso para facer iso.",
   "immersive_furniture.indium_missing": "O mobiliario inmersivo require indio para funcionar correctamente con sodio!",

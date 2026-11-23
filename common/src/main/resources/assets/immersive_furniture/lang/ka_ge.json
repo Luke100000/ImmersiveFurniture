@@ -2,6 +2,8 @@
   "block.immersive_furniture.artisans_workstation": "ხელოსნის სამუშაო ადგილი",
   "item.immersive_furniture.artisans_workstation": "ხელოსნის სამუშაო ადგილი",
   "item.immersive_furniture.crafting_material": "მომზადების მასალა",
+  "item.immersive_furniture.mallet": "ჩაქუჩი",
+  "item.immersive_furniture.mallet.tooltip": "მარცხენა კლავიშზე დაწკაპუნებით ავეჯი ერთი პიქსელით გადაწიეთ, მარჯვენა კლავიშზე დაწკაპუნებით კი — მოქაჩეთ.",
   "immersive_furniture.not_enough_material": "არ genug მომზადების მასალა!",
   "immersive_furniture.no_permission": "თქვენ არ გაქვთ ამის ნებართვა.",
   "immersive_furniture.indium_missing": "ბუნებრივი ავეჯი საჭიროებს ინდიუმს უზრუნველყოს სწორი მუშაობა ნატრიუმთან!",

@@ -2,6 +2,8 @@
   "block.immersive_furniture.artisans_workstation": "Opus Artificis",
   "item.immersive_furniture.artisans_workstation": "Opus Artificis",
   "item.immersive_furniture.crafting_material": "Materia Ad Fabricandum",
+  "item.immersive_furniture.mallet": "Malleus",
+  "item.immersive_furniture.mallet.tooltip": "Sinistra mure preme supellectilem ut eam unum pixellum impellas, dextra preme ut eam trahas.",
   "immersive_furniture.not_enough_material": "Non satis materiae ad fabricandum!",
   "immersive_furniture.no_permission": "Non licet tibi hoc facere.",
   "immersive_furniture.indium_missing": "Res ipsa vivens Indium ad functionem recte cum Sodium!",

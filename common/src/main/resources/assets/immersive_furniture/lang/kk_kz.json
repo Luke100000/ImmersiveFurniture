@@ -2,6 +2,8 @@
   "block.immersive_furniture.artisans_workstation": "Шебердің Жұмыс Отырысы",
   "item.immersive_furniture.artisans_workstation": "Шебердің Жұмыс Отырысы",
   "item.immersive_furniture.crafting_material": "Жасаушы Материал",
+  "item.immersive_furniture.mallet": "Мальлет",
+  "item.immersive_furniture.mallet.tooltip": "Жиһазды бір пиксельге итеру үшін сол жақ түймешікті басыңыз, тарту үшін оң жақ түймешікті басыңыз.",
   "immersive_furniture.not_enough_material": "Жасаушы материал жеткіліксіз!",
   "immersive_furniture.no_permission": "Сізде мұны істеуге рұқсат жоқ.",
   "immersive_furniture.indium_missing": "Индий натриймен дұрыс жұмыс істеу үшін Immersive Furniture қажет!",

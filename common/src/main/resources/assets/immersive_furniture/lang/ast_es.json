@@ -2,6 +2,8 @@
   "block.immersive_furniture.artisans_workstation": "Estación de Trabayu d'Artisanu",
   "item.immersive_furniture.artisans_workstation": "Estación de Trabayu d'Artisanu",
   "item.immersive_furniture.crafting_material": "Material de Fabricación",
+  "item.immersive_furniture.mallet": "Mallet",
+  "item.immersive_furniture.mallet.tooltip": "Left-click furniture to push it a pixel, right-click to pull it.",
   "immersive_furniture.not_enough_material": "¡Non hai material de fabricación abondo!",
   "immersive_furniture.no_permission": "You do not have permission to do that.",
   "immersive_furniture.indium_missing": "¡El moble immersiu requiere índiu pa funcionar correctamente con sodiu!",

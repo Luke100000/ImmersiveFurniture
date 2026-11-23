@@ -2,6 +2,8 @@
   "block.immersive_furniture.artisans_workstation": "Работна станица на занаетчија",
   "item.immersive_furniture.artisans_workstation": "Работна станица на занаетчија",
   "item.immersive_furniture.crafting_material": "Материјал за изработка",
+  "item.immersive_furniture.mallet": "Чекан",
+  "item.immersive_furniture.mallet.tooltip": "Кликнете лево на мебелот за да го поместите за еден пиксел, кликнете десно за да го повлечете.",
   "immersive_furniture.not_enough_material": "Нема доволно материјал за изработка!",
   "immersive_furniture.no_permission": "Немате дозвола да го направите тоа.",
   "immersive_furniture.indium_missing": "Иммерзивните мебел треба да има индий за правилно функционирање со натриум!",

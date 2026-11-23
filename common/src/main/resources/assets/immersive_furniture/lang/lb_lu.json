@@ -2,6 +2,8 @@
   "block.immersive_furniture.artisans_workstation": "Artisan's Workstation",
   "item.immersive_furniture.artisans_workstation": "Artisan's Workstation",
   "item.immersive_furniture.crafting_material": "Material fir d'Handwierk",
+  "item.immersive_furniture.mallet": "Mallet",
+  "item.immersive_furniture.mallet.tooltip": "Link-klickt op d'Mëbel fir et ëm ee Pixel ze schécken, riets-klickt fir et ze zéien.",
   "immersive_furniture.not_enough_material": "Net genuch Material fir d'Handwierk!",
   "immersive_furniture.no_permission": "Dir hutt net d'Erlaabnis dat ze maachen.",
   "immersive_furniture.indium_missing": "Immersiv Mëbel brauch Indium fir gutt mat Sodium ze fonctionnéieren!",

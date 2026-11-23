@@ -2,6 +2,8 @@
   "block.immersive_furniture.artisans_workstation": "Kunstniku töökoht",
   "item.immersive_furniture.artisans_workstation": "Kunstniku töökoht",
   "item.immersive_furniture.crafting_material": "Crafting materjal",
+  "item.immersive_furniture.mallet": "Mallet",
+  "item.immersive_furniture.mallet.tooltip": "Vasakklõpsa mööbliesemel, et seda ühe pikseli võrra lükata, ja parempõklõpsa, et seda tõmmata.",
   "immersive_furniture.not_enough_material": "Pole piisavalt käsitöömaterjali!",
   "immersive_furniture.no_permission": "Teil ei ole selleks luba.",
   "immersive_furniture.indium_missing": "Immersive Furniture nõuab Indiumit, et see töötaks korralikult koos Sodiumiga!",

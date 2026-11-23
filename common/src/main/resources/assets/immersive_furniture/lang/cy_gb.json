@@ -2,6 +2,8 @@
   "block.immersive_furniture.artisans_workstation": "Gorsaf Grefftwr",
   "item.immersive_furniture.artisans_workstation": "Gorsaf Grefftwr",
   "item.immersive_furniture.crafting_material": "Deunydd Grefft",
+  "item.immersive_furniture.mallet": "Malet",
+  "item.immersive_furniture.mallet.tooltip": "Cliciwch chwith ar ddodrefn i'w wthio picsel, cliciwch dde i'w dynnu.",
   "immersive_furniture.not_enough_material": "Nid yw digon o ddeunydd grefft!",
   "immersive_furniture.no_permission": "Nid oes gennych ganiatâd i wneud hynny.",
   "immersive_furniture.indium_missing": "Mae angen Indium ar Fefan Foddhaus i weithio'n iawn gyda Sodium!",

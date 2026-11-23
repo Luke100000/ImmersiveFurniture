@@ -2,6 +2,8 @@
   "block.immersive_furniture.artisans_workstation": "Кустарське Рабоче Місце",
   "item.immersive_furniture.artisans_workstation": "Кустарське Рабоче Місце",
   "item.immersive_furniture.crafting_material": "Матеріал для Виготовлення",
+  "item.immersive_furniture.mallet": "Mallet",
+  "item.immersive_furniture.mallet.tooltip": "Left-click furniture to push it a pixel, right-click to pull it.",
   "immersive_furniture.not_enough_material": "Недосить матеріалу для виготовлення!",
   "immersive_furniture.no_permission": "You do not have permission to do that.",
   "immersive_furniture.indium_missing": "Занурювальне меблі потребує Індію для правильного функціонування з Натрієм!",

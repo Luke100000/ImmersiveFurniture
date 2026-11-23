@@ -2,6 +2,8 @@
   "block.immersive_furniture.artisans_workstation": "工匠台",
   "item.immersive_furniture.artisans_workstation": "工匠台",
   "item.immersive_furniture.crafting_material": "制作材料",
+  "item.immersive_furniture.mallet": "马列特",
+  "item.immersive_furniture.mallet.tooltip": "左键点击家具来推送像素，右键点击以拉取它。",
   "immersive_furniture.not_enough_material": "没有足够的制作材料！",
   "immersive_furniture.no_permission": "您没有这样做的权限。",
   "immersive_furniture.indium_missing": "你需要安装铟才能在安装了钠的情况下正常运行沉浸式家具！",

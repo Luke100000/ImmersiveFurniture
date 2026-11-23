@@ -2,6 +2,8 @@
   "block.immersive_furniture.artisans_workstation": "Արտիստի Աշխատանքային Հարթակ",
   "item.immersive_furniture.artisans_workstation": "Արտիստի Աշխատանքային Հարթակ",
   "item.immersive_furniture.crafting_material": "Արտադրության Պաշտոն",
+  "item.immersive_furniture.mallet": "Մալետ",
+  "item.immersive_furniture.mallet.tooltip": "Ձախ կտտացրեք կահույքի վրա՝ այն մեկ պիքսել առաջ տանելու համար, աջ կտտացրեք՝ այն քաշելու համար։",
   "immersive_furniture.not_enough_material": "Չափը բավարար չէ!",
   "immersive_furniture.no_permission": "Դուք չունեք դրա թույլտվություն։",
   "immersive_furniture.indium_missing": "Իմերսիվ կահույքը պահանջում է Ինդիում՝ Աղիայի հետ ճիշտ աշխատելու համար!",

@@ -2,6 +2,8 @@
   "block.immersive_furniture.artisans_workstation": "Станцыя майстра",
   "item.immersive_furniture.artisans_workstation": "Станцыя майстра",
   "item.immersive_furniture.crafting_material": "Матэрыял для рамяства",
+  "item.immersive_furniture.mallet": "Малет",
+  "item.immersive_furniture.mallet.tooltip": "Левым клікам па мэблі пасуньце яе на піксель, правым — пацягніце.",
   "immersive_furniture.not_enough_material": "Недастаткова матэрыялаў для рамяства!",
   "immersive_furniture.no_permission": "У вас няма дазволу рабіць гэта.",
   "immersive_furniture.indium_missing": "Для належнай работы Immersive Furniture патрабуецца індый.",

@@ -2,6 +2,8 @@
   "block.immersive_furniture.artisans_workstation": "Artisans werkstation",
   "item.immersive_furniture.artisans_workstation": "Artisans werkstation",
   "item.immersive_furniture.crafting_material": "Handwerk Materiaal",
+  "item.immersive_furniture.mallet": "Mallet",
+  "item.immersive_furniture.mallet.tooltip": "Klik met de linkermuisknop op meubels om een pixel te duwen, met de rechtermuisknop om deze te trekken.",
   "immersive_furniture.not_enough_material": "Niet genoeg vervaardigingsmateriaal!",
   "immersive_furniture.no_permission": "Je hebt geen toestemming om dat te doen.",
   "immersive_furniture.indium_missing": "Immersieve meubilair vereist dat India correct werkt met Sodium!",

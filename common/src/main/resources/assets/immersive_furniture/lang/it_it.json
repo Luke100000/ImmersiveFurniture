@@ -2,6 +2,8 @@
   "block.immersive_furniture.artisans_workstation": "Workstation Artigiana",
   "item.immersive_furniture.artisans_workstation": "Workstation Artigiana",
   "item.immersive_furniture.crafting_material": "Materiale Di Creazione",
+  "item.immersive_furniture.mallet": "Mallet",
+  "item.immersive_furniture.mallet.tooltip": "Mobili con clic sinistro per premere un pixel, fare clic con il tasto destro del mouse per tirarlo.",
   "immersive_furniture.not_enough_material": "Non abbastanza materiale di lavoro!",
   "immersive_furniture.no_permission": "Non hai il permesso di farlo.",
   "immersive_furniture.indium_missing": "Mobili Immersivi richiede Indium per funzionare correttamente con Sodium!",

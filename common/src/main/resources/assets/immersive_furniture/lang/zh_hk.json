@@ -2,6 +2,8 @@
   "block.immersive_furniture.artisans_workstation": "工匠工作站",
   "item.immersive_furniture.artisans_workstation": "工匠工作站",
   "item.immersive_furniture.crafting_material": "工藝材料",
+  "item.immersive_furniture.mallet": "木槌",
+  "item.immersive_furniture.mallet.tooltip": "左鍵點擊家具可將其向前推一個像素，右鍵點擊則可將其向後拉。",
   "immersive_furniture.not_enough_material": "沒有足夠的工藝材料！",
   "immersive_furniture.no_permission": "您無權這樣做。",
   "immersive_furniture.indium_missing": "Immersive Furniture 需要 「铟 」與 「鈉 」一起正常運行！",

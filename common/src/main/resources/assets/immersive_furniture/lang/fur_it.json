@@ -2,6 +2,8 @@
   "block.immersive_furniture.artisans_workstation": "Postazion dal Artisan",
   "item.immersive_furniture.artisans_workstation": "Postazion dal Artisan",
   "item.immersive_furniture.crafting_material": "Material di Crafting",
+  "item.immersive_furniture.mallet": "Mallet",
+  "item.immersive_furniture.mallet.tooltip": "Left-click furniture to push it a pixel, right-click to pull it.",
   "immersive_furniture.not_enough_material": "Mancje di material di crafting!",
   "immersive_furniture.no_permission": "You do not have permission to do that.",
   "immersive_furniture.indium_missing": "Il mobili immersivi a besoin di Indium par funzionâ propie di Sodium!",

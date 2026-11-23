@@ -2,6 +2,8 @@
   "block.immersive_furniture.artisans_workstation": "Stazzjon tal-Ħolqa",
   "item.immersive_furniture.artisans_workstation": "Stazzjon tal-Ħolqa",
   "item.immersive_furniture.crafting_material": "Materjal tal-Ħolqien",
+  "item.immersive_furniture.mallet": "Maġġa",
+  "item.immersive_furniture.mallet.tooltip": "Ikklikkja bil-lemin fuq il-mobblar biex tgħadduh b'pixel, ikklikkja bil-xellug biex tiġbedh.",
   "immersive_furniture.not_enough_material": "Mhux biżżejjed materjal għall-ħolqien!",
   "immersive_furniture.no_permission": "Int m'għandekx permess li tagħmel dan.",
   "immersive_furniture.indium_missing": "Il-Merġin ta’ Immersive jeħtieġ Indium biex jaħdem sew ma’ Sodium!",

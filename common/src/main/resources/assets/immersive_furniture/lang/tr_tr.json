@@ -2,6 +2,8 @@
   "block.immersive_furniture.artisans_workstation": "Zanaatkarın İş İstasyonu",
   "item.immersive_furniture.artisans_workstation": "Zanaatkarın İş İstasyonu",
   "item.immersive_furniture.crafting_material": "Üretim Malzemesi",
+  "item.immersive_furniture.mallet": "Çekiç",
+  "item.immersive_furniture.mallet.tooltip": "Mobilyayı bir piksel itmek için sol tıklayın, çekmek için sağ tıklayın.",
   "immersive_furniture.not_enough_material": "Yeterli üretim malzemesi yok!",
   "immersive_furniture.no_permission": "Bunu yapmak için izniniz yok.",
   "immersive_furniture.indium_missing": "Sürükleyici Mobilya, Sodyum ile düzgün çalışması için İndiyum gerektirir!",

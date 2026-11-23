@@ -2,6 +2,8 @@
   "block.immersive_furniture.artisans_workstation": "Ụgbọ ọrụ onye na-eme nka",
   "item.immersive_furniture.artisans_workstation": "Ụgbọ ọrụ onye na-eme nka",
   "item.immersive_furniture.crafting_material": "Akụrụngwa ịrụ ọrụ aka",
+  "item.immersive_furniture.mallet": "Ọkpụkpụ eji akụ",
+  "item.immersive_furniture.mallet.tooltip": "Pịa bọtịnụ ekpe ka ị dọta ngwá ụlọ otu piksel, pịa bọtịnụ nri ka ị dọpụ ya.",
   "immersive_furniture.not_enough_material": "Enweghị akụrụngwa ịrụ ọrụ aka zuru ezu!",
   "immersive_furniture.no_permission": "Ị nweghị ikike ime nke ahụ.",
   "immersive_furniture.indium_missing": "Ihe eji eme ụlọ a chọrọ Indium iji rụọ ọrụ nke ọma na Sodium!",

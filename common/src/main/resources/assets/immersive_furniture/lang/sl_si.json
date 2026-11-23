@@ -2,6 +2,8 @@
   "block.immersive_furniture.artisans_workstation": "Obrtnikovo delovno mesto",
   "item.immersive_furniture.artisans_workstation": "Obrtnikovo delovno mesto",
   "item.immersive_furniture.crafting_material": "Material za izdelavo",
+  "item.immersive_furniture.mallet": "Kladivo",
+  "item.immersive_furniture.mallet.tooltip": "Z levim klikom na pohištvo ga premakni za en piksel, z desnim klikom pa ga potegni.",
   "immersive_furniture.not_enough_material": "Premalo materiala za izdelavo!",
   "immersive_furniture.no_permission": "Za to nimate dovoljenja.",
   "immersive_furniture.indium_missing": "Immersive Furniture zahteva Indij za pravilno delovanje z natrijem!",

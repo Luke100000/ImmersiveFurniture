@@ -2,6 +2,8 @@
   "block.immersive_furniture.artisans_workstation": "Fagmannsins Vinnustöð",
   "item.immersive_furniture.artisans_workstation": "Fagmannsins Vinnustöð",
   "item.immersive_furniture.crafting_material": "Hönnunarefni",
+  "item.immersive_furniture.mallet": "Mjöll",
+  "item.immersive_furniture.mallet.tooltip": "Vinstri-smelltu á húsgögn til að ýta þeim um einn pixla, hægri-smelltu til að toga þau.",
   "immersive_furniture.not_enough_material": "Ekki nógu mikið hönnunar efni!",
   "immersive_furniture.no_permission": "Þú hefur ekki leyfi til að gera það.",
   "immersive_furniture.indium_missing": "Dýrmæt húsgögn krafst Indium til að virka rétt með Sodium!",

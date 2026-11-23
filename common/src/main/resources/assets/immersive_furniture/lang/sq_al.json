@@ -2,6 +2,8 @@
   "block.immersive_furniture.artisans_workstation": "Stacioni i Artisanëve",
   "item.immersive_furniture.artisans_workstation": "Stacioni i Artisanëve",
   "item.immersive_furniture.crafting_material": "Materiale Artizanal",
+  "item.immersive_furniture.mallet": "Çekiç",
+  "item.immersive_furniture.mallet.tooltip": "Kliko me të majtën e mausit mobiljet për t'i shtyrë një piksel, kliko me të djathtën për t'i tërhequr.",
   "immersive_furniture.not_enough_material": "Nuk ka mjaftueshëm materiale artizanal!",
   "immersive_furniture.no_permission": "Ju nuk keni leje ta bëni këtë.",
   "immersive_furniture.indium_missing": "Mobiljet immersive kërkojnë Indium për të funksionuar siç duhet me Sodium!",

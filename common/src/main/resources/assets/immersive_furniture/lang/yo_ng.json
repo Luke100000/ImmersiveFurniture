@@ -2,6 +2,8 @@
   "block.immersive_furniture.artisans_workstation": "Ibi iṣẹ́ Ọmọ ọnà",
   "item.immersive_furniture.artisans_workstation": "Ibi iṣẹ́ Ọmọ ọnà",
   "item.immersive_furniture.crafting_material": "Ohun elo iṣẹ́ ọnà",
+  "item.immersive_furniture.mallet": "Mallet",
+  "item.immersive_furniture.mallet.tooltip": "Left-click furniture to push it a pixel, right-click to pull it.",
   "immersive_furniture.not_enough_material": "Kò pọ̀n tó fún iṣẹ́ ọnà!",
   "immersive_furniture.no_permission": "You do not have permission to do that.",
   "immersive_furniture.indium_missing": "Ṣiṣẹ́ Fọnitùrmù jẹ́ kí Indium lè ṣiṣẹ́ daradara pẹ̀lú Sodium!",

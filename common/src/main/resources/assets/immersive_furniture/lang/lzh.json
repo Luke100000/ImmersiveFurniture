@@ -2,6 +2,8 @@
   "block.immersive_furniture.artisans_workstation": "匠人之作坊",
   "item.immersive_furniture.artisans_workstation": "匠人之作坊",
   "item.immersive_furniture.crafting_material": "工艺材料",
+  "item.immersive_furniture.mallet": "Mallet",
+  "item.immersive_furniture.mallet.tooltip": "Left-click furniture to push it a pixel, right-click to pull it.",
   "immersive_furniture.not_enough_material": "工艺材料不足！",
   "immersive_furniture.no_permission": "You do not have permission to do that.",
   "immersive_furniture.indium_missing": "此沉浸家具需銦以與鈉協作之正常運行！",

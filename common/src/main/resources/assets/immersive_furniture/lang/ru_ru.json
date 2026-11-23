@@ -2,6 +2,8 @@
   "block.immersive_furniture.artisans_workstation": "Станция ремесленника",
   "item.immersive_furniture.artisans_workstation": "Станция ремесленника",
   "item.immersive_furniture.crafting_material": "Материал создания",
+  "item.immersive_furniture.mallet": "Малле",
+  "item.immersive_furniture.mallet.tooltip": "Щелкните левой кнопкой мыши по мебели, чтобы протолкнуть ее к пикселям, щелкните правой кнопкой мыши, чтобы притянуть ее.",
   "immersive_furniture.not_enough_material": "Не хватает материала создания!",
   "immersive_furniture.no_permission": "У вас нет на это разрешения.",
   "immersive_furniture.indium_missing": "Immersive Furniture требует Indium для корректной работы с Sodium!",

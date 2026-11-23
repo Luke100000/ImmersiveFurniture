@@ -2,6 +2,8 @@
   "block.immersive_furniture.artisans_workstation": "Bàn làm việc của nghệ nhân",
   "item.immersive_furniture.artisans_workstation": "Bàn làm việc của nghệ nhân",
   "item.immersive_furniture.crafting_material": "Vật liệu chế tạo",
+  "item.immersive_furniture.mallet": "Búa gỗ",
+  "item.immersive_furniture.mallet.tooltip": "Nhấp chuột trái vào đồ nội thất để đẩy nó đi một pixel, nhấp chuột phải để kéo nó lại.",
   "immersive_furniture.not_enough_material": "Không đủ vật liệu chế tạo!",
   "immersive_furniture.no_permission": "Bạn không có quyền làm điều đó.",
   "immersive_furniture.indium_missing": "Nội thất hấp dẫn yêu cầu Indium để hoạt động đúng cách với Sodium!",

@@ -2,6 +2,8 @@
   "block.immersive_furniture.artisans_workstation": "Sraith Oibre na nUslóireacht",
   "item.immersive_furniture.artisans_workstation": "Sraith Oibre na nUslóireacht",
   "item.immersive_furniture.crafting_material": "Ábhair Ceardaíochta",
+  "item.immersive_furniture.mallet": "Málait",
+  "item.immersive_furniture.mallet.tooltip": "Cliceáil ar chlé ar an troscán chun é a bhrú picteilín amháin, cliceáil ar dheis chun é a tharraingt.",
   "immersive_furniture.not_enough_material": "Níl go leor ábhar ceardaíochta!",
   "immersive_furniture.no_permission": "Níl cead agat é sin a dhéanamh.",
   "immersive_furniture.indium_missing": "Teastaíonn Indium ó Furniture Immersive chun a reáchtáil i gceart le Sodium!",

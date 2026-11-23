@@ -2,6 +2,8 @@
   "block.immersive_furniture.artisans_workstation": "Pagsasangkapan ng Artisan",
   "item.immersive_furniture.artisans_workstation": "Pagsasangkapan ng Artisan",
   "item.immersive_furniture.crafting_material": "Materyal na Gawa",
+  "item.immersive_furniture.mallet": "Martilyo",
+  "item.immersive_furniture.mallet.tooltip": "I-left-click ang muwebles para itulak ito ng isang pixel, i-right-click para hilahin ito.",
   "immersive_furniture.not_enough_material": "Hindi sapat ang materyal na gawa!",
   "immersive_furniture.no_permission": "Wala kang pahintulot na gawin iyon.",
   "immersive_furniture.indium_missing": "Kailangan ng Immersive Furniture ang Indium upang gumana nang tama gamit ang Sodium!",

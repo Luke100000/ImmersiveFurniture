@@ -2,6 +2,8 @@
   "block.immersive_furniture.artisans_workstation": "Arbeitsplatz des Handwerkers",
   "item.immersive_furniture.artisans_workstation": "Arbeitsplatz des Handwerkers",
   "item.immersive_furniture.crafting_material": "Handwerkliches Material",
+  "item.immersive_furniture.mallet": "Mallet",
+  "item.immersive_furniture.mallet.tooltip": "Left-click furniture to push it a pixel, right-click to pull it.",
   "immersive_furniture.not_enough_material": "Nicht genug Handwerksmaterial!",
   "immersive_furniture.no_permission": "You do not have permission to do that.",
   "immersive_furniture.indium_missing": "Immersive Furniture benötigt Indium, um ordnungsgemäß mit Natrium zu funktionieren!",

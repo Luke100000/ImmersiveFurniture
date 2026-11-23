@@ -2,6 +2,8 @@
   "block.immersive_furniture.artisans_workstation": "Σταθμός Εργασίας Του Artisan",
   "item.immersive_furniture.artisans_workstation": "Σταθμός Εργασίας Του Artisan",
   "item.immersive_furniture.crafting_material": "Υλικό Κατασκευής",
+  "item.immersive_furniture.mallet": "Mallet",
+  "item.immersive_furniture.mallet.tooltip": "Αριστερά κάντε κλικ στα έπιπλα για να το πιέσετε με ένα pixel, κάντε δεξί κλικ για να το τραβήξετε.",
   "immersive_furniture.not_enough_material": "Δεν υπάρχει αρκετό υλικό κατασκευής!",
   "immersive_furniture.no_permission": "Δεν έχετε άδεια να το κάνετε αυτό.",
   "immersive_furniture.indium_missing": "Immersive έπιπλα απαιτεί Indium για να τρέξει σωστά με νάτριο!",
