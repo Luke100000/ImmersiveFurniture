@@ -2,6 +2,8 @@
   "block.immersive_furniture.artisans_workstation": "Kézműves munkaállomás",
   "item.immersive_furniture.artisans_workstation": "Kézműves munkaállomás",
   "item.immersive_furniture.crafting_material": "Kézműves anyag",
+  "item.immersive_furniture.mallet": "Kalapács",
+  "item.immersive_furniture.mallet.tooltip": "Kattints a bútorra a bal egérgombbal, hogy egy képponttal eltolhasd, a jobb egérgombbal pedig, hogy hátrahúzd.",
   "immersive_furniture.not_enough_material": "Nincs elég kézműves anyag!",
   "immersive_furniture.no_permission": "Erre nincs engedélye.",
   "immersive_furniture.indium_missing": "Az Immersive Furniture-nek Indiumra van szüksége a megfelelő működéshez a Sodiummal együtt!",
