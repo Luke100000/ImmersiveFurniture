@@ -2,6 +2,8 @@
   "block.immersive_furniture.artisans_workstation": "Estação do Artesão",
   "item.immersive_furniture.artisans_workstation": "Estação do Artesão",
   "item.immersive_furniture.crafting_material": "Material de Criação",
+  "item.immersive_furniture.mallet": "Marreta",
+  "item.immersive_furniture.mallet.tooltip": "Móveis de clique esquerdo para empurrá-lo um pixel, clique com o botão direito para puxá-lo.",
   "immersive_furniture.not_enough_material": "Sem materiais de criação suficientes!",
   "immersive_furniture.no_permission": "Você não tem permissão para fazer isso.",
   "immersive_furniture.indium_missing": "Móveis imersivas requerem que o Índio funcione corretamente com o Sodium!",
