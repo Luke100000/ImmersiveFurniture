@@ -2,6 +2,8 @@
   "block.immersive_furniture.artisans_workstation": "la tarci je stela",
   "item.immersive_furniture.artisans_workstation": "la tarci je stela",
   "item.immersive_furniture.crafting_material": "lo titla poi se darxi",
+  "item.immersive_furniture.mallet": "Mallet",
+  "item.immersive_furniture.mallet.tooltip": "Left-click furniture to push it a pixel, right-click to pull it.",
   "immersive_furniture.not_enough_material": "na xamgu lo titla poi se darxi!",
   "immersive_furniture.no_permission": "You do not have permission to do that.",
   "immersive_furniture.indium_missing": "lo nu se zbasu ca'o se prenu li'u cu tfiku lo indium mo'u se fanmo fa'o lo sodium!",
