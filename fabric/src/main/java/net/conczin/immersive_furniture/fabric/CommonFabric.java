@@ -72,6 +72,8 @@ public final class CommonFabric implements ModInitializer {
 
         ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.FUNCTIONAL_BLOCKS)
                 .register((itemGroup) -> itemGroup.accept(Items.ARTISANS_WORKSTATION));
+        ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.TOOLS_AND_UTILITIES)
+                .register((itemGroup) -> itemGroup.accept(Items.MALLET));
         ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.INGREDIENTS)
                 .register((itemGroup) -> itemGroup.accept(Items.CRAFTING_MATERIAL));
     }

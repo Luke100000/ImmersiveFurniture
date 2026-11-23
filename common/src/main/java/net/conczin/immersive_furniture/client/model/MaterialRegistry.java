@@ -12,9 +12,22 @@ import java.util.Map;
 public class MaterialRegistry {
     public static final MaterialRegistry INSTANCE = new MaterialRegistry();
 
-    public volatile Map<ResourceLocation, MaterialSource> materials = Map.of();
+    private volatile Map<ResourceLocation, MaterialSource> materials;
 
     public void sync() {
+        materials = null;
+    }
+
+    public Map<ResourceLocation, MaterialSource> getMaterials() {
+        Map<ResourceLocation, MaterialSource> current = materials;
+        if (current == null) {
+            current = scan();
+            materials = current;
+        }
+        return current;
+    }
+
+    private static Map<ResourceLocation, MaterialSource> scan() {
         Map<ResourceLocation, MaterialSource> materials = new HashMap<>();
         for (Block block : BuiltInRegistries.BLOCK) {
             BlockState state = block.defaultBlockState();
@@ -29,6 +42,6 @@ public class MaterialRegistry {
                 }
             }
         }
-        this.materials = Map.copyOf(materials);
+        return Map.copyOf(materials);
     }
 }

@@ -41,7 +41,7 @@ public class FurnitureModelFactory {
         this.solidStates = data.getUniqueSolidStates();
 
         splitSprites();
-        geometry = new FurnitureGeometryAnalyzer(elements);
+        geometry = new FurnitureGeometryAnalyzer(elements, data.size);
         faceTextureBaker = new FurnitureFaceTextureBaker(atlas, inEditor, storeTextures, elements);
 
         // Fetch all textures

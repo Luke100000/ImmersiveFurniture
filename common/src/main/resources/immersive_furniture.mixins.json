@@ -11,7 +11,8 @@
   "client": [
     "client.BlockModelShaperMixin", "client.CameraMixin", "client.DebugScreenOverlayMixin",
     "client.ItemModelShaperMixin", "client.ItemRendererMixin", "client.LevelRendererMixin",
-    "client.LivingEntityRendererMixin", "client.MinecraftMixin", "client.SableFurnitureOutlineMixin",
+    "client.LivingEntityRendererMixin", "client.MinecraftMixin", "client.MultiPlayerGameModeMixin",
+    "client.SableFurnitureOutlineMixin",
     "client.ScreenMixin", "client.SpriteContentsAccessor", "client.SpriteLoaderMixin", "client.TextureAtlasAccessor"
   ]
 }

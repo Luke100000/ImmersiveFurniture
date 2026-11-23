@@ -1,0 +1,6 @@
+{
+  "parent": "item/handheld",
+  "textures": {
+    "layer0": "immersive_furniture:item/mallet"
+  }
+}

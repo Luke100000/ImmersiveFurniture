@@ -1,3 +1,11 @@
+# 0.5.0
+
+* Added the mallet to quickly move furniture one pixel around
+* Fixed culling issues
+* Fixed a crash maybe
+* Lazy asset loading for faster bootup
+* Furniture are now considered solid
+
 # 0.4.1
 
 * Fixed crashes

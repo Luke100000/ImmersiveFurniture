@@ -21,6 +21,7 @@ import java.util.zip.GZIPInputStream;
 public class API {
     private static final Gson gson = new Gson();
     private static final int TIMEOUT_MS = 10000;
+    private static final String USER_AGENT = "ImmersiveFurniture";
 
     public enum HttpMethod {
         POST, GET, DELETE, PUT
@@ -60,6 +61,7 @@ public class API {
             con.setRequestProperty("Content-Type", "application/json");
             con.setRequestProperty("Accept-Encoding", "gzip");
             con.setRequestProperty("Accept", "application/json");
+            con.setRequestProperty("User-Agent", USER_AGENT);
 
             // Authenticate
             if (Auth.hasToken()) {

@@ -8,15 +8,9 @@ import net.minecraft.client.renderer.block.model.BlockElementFace;
 import net.minecraft.core.Direction;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
+import org.joml.Vector3i;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.IdentityHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 final class FurnitureGeometryAnalyzer {
     private static final float Z_FIGHT_MARGIN = 0.01f;
@@ -24,8 +18,10 @@ final class FurnitureGeometryAnalyzer {
     private final Map<FurnitureData.Element, Map<Direction, FaceGeometry>> faceGeometry = new IdentityHashMap<>();
     private final Map<FurnitureData.Element, Bounds> elementBounds = new IdentityHashMap<>();
     private final SpatialIndex spatialIndex;
+    private final Vector3i size;
 
-    FurnitureGeometryAnalyzer(List<FurnitureData.Element> elements) {
+    FurnitureGeometryAnalyzer(List<FurnitureData.Element> elements, Vector3i size) {
+        this.size = size;
         for (FurnitureData.Element element : elements) {
             if (!hasFaces(element)) continue;
 
@@ -42,15 +38,36 @@ final class FurnitureGeometryAnalyzer {
         spatialIndex = new SpatialIndex(elements, elementBounds);
     }
 
+    /**
+     * Only faces lying on the block boundary and completely inside the block may be culled by the neighbor block.
+     */
     Direction getCullDirection(FurnitureData.Element element, Direction direction) {
         Vector3f[] vertices = getFace(element, direction).vertices;
-        if (onPlane(vertices, Direction.Axis.X, 0.0f)) return Direction.WEST;
-        if (onPlane(vertices, Direction.Axis.X, 1.0f)) return Direction.EAST;
-        if (onPlane(vertices, Direction.Axis.Y, 0.0f)) return Direction.DOWN;
-        if (onPlane(vertices, Direction.Axis.Y, 1.0f)) return Direction.UP;
-        if (onPlane(vertices, Direction.Axis.Z, 0.0f)) return Direction.NORTH;
-        if (onPlane(vertices, Direction.Axis.Z, 1.0f)) return Direction.SOUTH;
+        for (Direction.Axis axis : Direction.Axis.values()) {
+            if (!blockCullAllowed(axis)) continue;
+            if (onPlane(vertices, axis, 0.0f) && withinBlock(vertices, axis)) {
+                return Direction.get(Direction.AxisDirection.NEGATIVE, axis);
+            }
+            if (onPlane(vertices, axis, 1.0f) && withinBlock(vertices, axis)) {
+                return Direction.get(Direction.AxisDirection.POSITIVE, axis);
+            }
+        }
         return null;
+    }
+
+    private boolean blockCullAllowed(Direction.Axis axis) {
+        return axis == Direction.Axis.Y ? size.y <= 1 : size.x <= 1 && size.z <= 1;
+    }
+
+    private static boolean withinBlock(Vector3f[] vertices, Direction.Axis skipped) {
+        for (Vector3f vertex : vertices) {
+            for (Direction.Axis axis : Direction.Axis.values()) {
+                if (axis == skipped) continue;
+                float c = vertex.get(axis.ordinal());
+                if (c < 0.0f || c > 1.0f) return false;
+            }
+        }
+        return true;
     }
 
     boolean isFaceFullyContained(FurnitureData.Element element, Direction direction, int state) {

@@ -5,6 +5,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.util.Mth;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -68,9 +69,18 @@ public abstract class AbstractFurnitureBlockEntity extends BlockEntity implement
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
+
+        int oldX = subOffsetX;
+        int oldY = subOffsetY;
+        int oldZ = subOffsetZ;
         subOffsetX = loadOffset(tag, "SubOffsetX");
         subOffsetY = loadOffset(tag, "SubOffsetY");
         subOffsetZ = loadOffset(tag, "SubOffsetZ");
+
+        if (level != null && level.isClientSide && (oldX != subOffsetX || oldY != subOffsetY || oldZ != subOffsetZ)) {
+            BlockState state = getBlockState();
+            level.sendBlockUpdated(worldPosition, state, state, Block.UPDATE_CLIENTS);
+        }
     }
 
     private static int loadOffset(CompoundTag tag, String key) {

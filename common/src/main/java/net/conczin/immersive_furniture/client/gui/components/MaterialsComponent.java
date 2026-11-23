@@ -109,7 +109,7 @@ public class MaterialsComponent extends ListComponent {
     void updateSearch() {
         // Filter materials
         filteredMaterials.clear();
-        MaterialRegistry.INSTANCE.materials.entrySet().stream()
+        MaterialRegistry.INSTANCE.getMaterials().entrySet().stream()
                 .filter(entry -> Utils.search(searchBox.getValue(), entry.getKey().toString()))
                 .sorted(Comparator.comparingInt(a -> (Config.getInstance().favorites.contains(a.getKey().toString()) ? 0 : 1)))
                 .forEach(filteredMaterials::add);

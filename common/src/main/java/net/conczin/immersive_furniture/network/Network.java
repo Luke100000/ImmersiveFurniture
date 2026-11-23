@@ -2,6 +2,7 @@ package net.conczin.immersive_furniture.network;
 
 import net.conczin.immersive_furniture.network.c2s.CraftRequest;
 import net.conczin.immersive_furniture.network.c2s.FurnitureDataRequest;
+import net.conczin.immersive_furniture.network.c2s.MalletRequest;
 import net.conczin.immersive_furniture.network.s2c.FurnitureDataResponse;
 import net.conczin.immersive_furniture.network.s2c.FurnitureInteractMessage;
 import net.conczin.immersive_furniture.network.s2c.FurnitureRegistryMessage;
@@ -39,6 +40,7 @@ public class Network {
     public static void register(Registrar c) {
         c.register(CraftRequest.TYPE, CraftRequest.STREAM_CODEC, true);
         c.register(FurnitureDataRequest.TYPE, FurnitureDataRequest.STREAM_CODEC, true);
+        c.register(MalletRequest.TYPE, MalletRequest.STREAM_CODEC, true);
 
         c.register(FurnitureDataResponse.TYPE, FurnitureDataResponse.STREAM_CODEC, false);
         c.register(FurnitureInteractMessage.TYPE, FurnitureInteractMessage.STREAM_CODEC, false);
