@@ -2,6 +2,8 @@
   "block.immersive_furniture.artisans_workstation": "Umjetnikova radna stanica",
   "item.immersive_furniture.artisans_workstation": "Umjetnikova radna stanica",
   "item.immersive_furniture.crafting_material": "Materijal za izradu",
+  "item.immersive_furniture.mallet": "Čekić",
+  "item.immersive_furniture.mallet.tooltip": "Lijevo kliknite na namještaj da ga pomaknete za jedan piksel, desno kliknite da ga povučete.",
   "immersive_furniture.not_enough_material": "Nema dovoljno materijala za izradu!",
   "immersive_furniture.no_permission": "Nemate dopuštenje to učiniti.",
   "immersive_furniture.indium_missing": "Zaronk koji immersivni namještaj zahtijeva Indij za pravilno funkcioniranje s Natrijem!",
