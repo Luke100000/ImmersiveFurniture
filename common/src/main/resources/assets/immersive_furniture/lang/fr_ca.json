@@ -2,6 +2,8 @@
   "block.immersive_furniture.artisans_workstation": "Poste de travail de l'artisan",
   "item.immersive_furniture.artisans_workstation": "Poste de travail de l'artisan",
   "item.immersive_furniture.crafting_material": "Matériel d'artisanat",
+  "item.immersive_furniture.mallet": "Maillet",
+  "item.immersive_furniture.mallet.tooltip": "Cliquez avec le bouton gauche de la souris sur un meuble pour le pousser d'un pixel, cliquez avec le bouton droit pour le tirer.",
   "immersive_furniture.not_enough_material": "Pas assez de matériel d'artisanat!",
   "immersive_furniture.no_permission": "Vous n'avez pas l'autorisation de faire cela.",
   "immersive_furniture.indium_missing": "Les meubles immersifs nécessitent de l'indium pour fonctionner correctement avec du sodium!",
