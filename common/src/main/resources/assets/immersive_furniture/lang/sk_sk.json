@@ -2,6 +2,8 @@
   "block.immersive_furniture.artisans_workstation": "Pracovisko remeselníka",
   "item.immersive_furniture.artisans_workstation": "Pracovisko remeselníka",
   "item.immersive_furniture.crafting_material": "Remeselný materiál",
+  "item.immersive_furniture.mallet": "Kladivo",
+  "item.immersive_furniture.mallet.tooltip": "Kliknutím ľavým tlačidlom myši posuňte nábytok o jeden pixel, kliknutím pravým tlačidlom ho potiahnite.",
   "immersive_furniture.not_enough_material": "Nedostatok materiálu na výrobu!",
   "immersive_furniture.no_permission": "Nemáte na to povolenie.",
   "immersive_furniture.indium_missing": "Immersive Furniture vyžaduje Indium, aby správne fungovalo so Sodíkom!",
