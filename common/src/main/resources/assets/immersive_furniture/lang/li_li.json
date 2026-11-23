@@ -2,6 +2,8 @@
   "block.immersive_furniture.artisans_workstation": "Artisaneweksjob",
   "item.immersive_furniture.artisans_workstation": "Artisaneweksjob",
   "item.immersive_furniture.crafting_material": "Bouwmateriaal",
+  "item.immersive_furniture.mallet": "Mallet",
+  "item.immersive_furniture.mallet.tooltip": "Left-click furniture to push it a pixel, right-click to pull it.",
   "immersive_furniture.not_enough_material": "Nok genoeg bouwmateriaal!",
   "immersive_furniture.no_permission": "You do not have permission to do that.",
   "immersive_furniture.indium_missing": "Immersive Möbel heuf Indium noog om e goed te laote laote mèt Sodium!",
