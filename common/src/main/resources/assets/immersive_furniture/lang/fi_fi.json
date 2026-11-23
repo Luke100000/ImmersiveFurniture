@@ -2,6 +2,8 @@
   "block.immersive_furniture.artisans_workstation": "Taiteilijan Työasema",
   "item.immersive_furniture.artisans_workstation": "Taiteilijan Työasema",
   "item.immersive_furniture.crafting_material": "Rakennusmateriaali",
+  "item.immersive_furniture.mallet": "Malli",
+  "item.immersive_furniture.mallet.tooltip": "Klikkaa vasemmalla painikkeella huonekaluja painamalla sitä pikseliä hiiren kakkospainikkeella vetääksesi sen.",
   "immersive_furniture.not_enough_material": "Materiaalia ei ole tarpeeksi!",
   "immersive_furniture.no_permission": "Sinulla ei ole lupaa tehdä sitä.",
   "immersive_furniture.indium_missing": "Immersive Furniture edellyttää, että Indium toimii kunnolla Sodium!",
