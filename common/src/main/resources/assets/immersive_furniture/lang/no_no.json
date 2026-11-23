@@ -2,6 +2,8 @@
   "block.immersive_furniture.artisans_workstation": "Artisans arbeidsstasjon",
   "item.immersive_furniture.artisans_workstation": "Artisans arbeidsstasjon",
   "item.immersive_furniture.crafting_material": "Lage materiale",
+  "item.immersive_furniture.mallet": "Lommebok",
+  "item.immersive_furniture.mallet.tooltip": "Venstreklikk på møblene for å skyve en piksel, høyreklikk for å trekke den.",
   "immersive_furniture.not_enough_material": "Ikke nok lager materiale!",
   "immersive_furniture.no_permission": "Du har ikke tillatelse til å gjøre det.",
   "immersive_furniture.indium_missing": "Immersive møbler krever indium for å kjøre ordentlig med Sodium!",
